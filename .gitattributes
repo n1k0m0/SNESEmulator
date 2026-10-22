@@ -24,3 +24,20 @@ tools/dsp-oracle.cpp text eol=lf
 testdata/dsp-reference/reference-license.txt -text -whitespace
 
 SNESEmulator.Core.Tests/VideoTests.cs text eol=lf
+
+# M8 source/tool fingerprints and freely licensed console fixtures.
+SNESEmulator.Core.Tests/CompatibilityTests.cs text eol=lf
+SNESEmulator.Core.Tests/TimingTests.cs text eol=lf
+SNESEmulator.Core/OwnIpl.cs text eol=lf
+SNESEmulator.Lab/Program.cs text eol=lf
+tools/*-console.cpp text eol=lf
+tools/m8-*.cpp text eol=lf
+tools/m8-*.hpp text eol=lf
+
+# Preserve upstream license/attribution bytes exactly.
+testdata/m8-console/*LICENSE* -text -whitespace
+testdata/m8-console/bsnes-GPLv3.txt -text -whitespace
+testdata/m8-console-own-ipl/*LICENSE* -text -whitespace
+testdata/m8-console-own-ipl/bsnes-GPLv3.txt -text -whitespace
+testdata/m8-game/*.md -text
+testdata/m8-game/*LICENSE -text -whitespace

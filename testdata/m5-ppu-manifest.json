@@ -38,8 +38,19 @@
     },
     {
       "path": "SNESEmulator.Core.Tests/PpuTests.cs",
-      "bytes": 34494,
-      "sha256": "53ec6593fdc352cfcf5275165eb236ecc72a30fc88796f58954881662d9f4006"
+      "bytes": 34489,
+      "sha256": "2940df41b1f99653dc30980d786061bb70bb92bf42cd8d8e90a05cd294dd7ff5"
+    }
+  ],
+  "m8ReviewedCorrections": [
+    {
+      "superseded": {
+        "path": "SNESEmulator.Core.Tests/PpuTests.cs",
+        "bytes": 34494,
+        "sha256": "53ec6593fdc352cfcf5275165eb236ecc72a30fc88796f58954881662d9f4006"
+      },
+      "reason": "Format9 rejects ambiguous old WAI/H0 saves, including8; no rendering oracle change.",
+      "evidence": "docs/m8-compatibility-contract.md; testdata/m8-console/manifest.json; testdata/m8-console-own-ipl/manifest.json"
     }
   ]
 }

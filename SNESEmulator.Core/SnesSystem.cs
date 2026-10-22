@@ -35,7 +35,7 @@ public sealed class SnesSystem
         };
         Clock.PeripheralAdvanced=SynchronizeDevices;
         Clock.RefreshStarted=()=>{for(int i=1;i<=5;i++)Clock.Schedule(Clock.Now+i*8,HardwareEventKind.Device,1,-6);};
-        Clock.InterlaceInput=()=>(Bus.Ppu.Registers[0x33]&1)!=0;
+        Clock.InterlaceInput=()=>Bus.Ppu.FrameGeometry.Interlace;
         Bus.Ppu.Clock=Clock;
         Bus.CpuIo.Clock=Clock;Bus.DeferCpuMdr=true;
         Clock.DeviceEvent=e=>{if((e.Payload&255)==7)Bus.Dma.RequestHdma(e.Payload==7);else Bus.CpuIo.Event(e.Payload);};
@@ -43,7 +43,17 @@ public sealed class SnesSystem
         Clock.FieldStarted=()=>{Bus.Ppu.CompleteField();Bus.CpuIo.NewField();Bus.Ppu.Scanline=0;};
         Clock.VblankStarted=()=>Bus.BeginVblank();
     }
-    private void SynchronizeDevices(){Bus.Ppu.Synchronize(false);Bus.Apu.RunUntil(Clock.ApuTicks);Bus.Ppu.PublishNotifications();}
+    private void SynchronizeDevices()
+    {
+        // Both pinned cycle renderers catch the PPU up with a strict '<'
+        // comparison before MMIO. A phase exactly on the bus endpoint remains
+        // pending until that CPU/DMA effect commits. The condition is derived
+        // entirely from the already serialized CPU/DMA remaining-cycle state.
+        bool busEndpoint=Clock.StallUntil<=Clock.Now&&((cycleActive&&cycleRemaining==0)||(Bus.Dma.Busy&&Bus.Dma.State.Remaining==0));
+        if(!busEndpoint)Bus.Ppu.Synchronize(false);
+        Bus.Apu.RunUntil(Clock.ApuTicks);Bus.Ppu.PublishNotifications();
+    }
+    private void CommitPpuEndpoint(){Bus.Ppu.Synchronize(false);Bus.Ppu.PublishNotifications();}
     private void ScheduleIoLine()
     {
         Bus.CpuIo.ScheduleIrq(false);
@@ -93,6 +103,7 @@ public sealed class SnesSystem
             if(cycle.Read){heldRead=cycle;holdRemaining=4;}
             CyclePhaseObserved?.Invoke(new(cycle.Read?"read-latch":"write-latch",Clock.Now,cycleStart,latchClock,cycle));
         }
+        CommitPpuEndpoint();
     }
     private void AfterCycle(CpuCycle cycle)
     {
@@ -116,7 +127,7 @@ public sealed class SnesSystem
             int remaining=Bus.Dma.State.Remaining;
             long next=Math.Min(target,Math.Min(Clock.Now+remaining,Clock.NextEventClock));
             Clock.ActiveTimeElapsed=elapsed=>Bus.Dma.Elapse(elapsed);try{Clock.AdvanceTo(next);}finally{Clock.ActiveTimeElapsed=null;}SyncInterrupts();
-            if(Bus.Dma.State.Remaining==0&&Clock.StallUntil<=Clock.Now)Bus.Dma.Boundary(Clock.Now);
+            if(Bus.Dma.State.Remaining==0&&Clock.StallUntil<=Clock.Now){Bus.Dma.Boundary(Clock.Now);CommitPpuEndpoint();}
         }
     }
     private void AdvanceActive(ref int remaining,bool hold)
@@ -146,7 +157,10 @@ public sealed class SnesSystem
             if(Cpu.AtInstructionBoundary)
             {
                 SyncInterrupts();
-                if(Cpu.Stopped||Cpu.Waiting&&!Cpu.HasWakeSignal)
+                // WAI continues the six-master-clock CPU idle oscillator. Its
+                // remaining phase must survive an IRQ edge and a saved budget.
+                // STP alone suspends the processor until reset.
+                if(Cpu.Stopped)
                 {
                     if(Bus.Dma.Requested&&!Bus.Dma.Busy){Bus.Dma.CpuBoundary(6,Clock.Now);Bus.Dma.CpuBoundary(6,Clock.Now);}
                     if(Bus.Dma.Busy){try{AdvanceDma();}catch(ClockBudget){break;}continue;}

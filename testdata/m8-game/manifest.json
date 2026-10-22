@@ -1,0 +1,19 @@
+{
+  "source": "https://github.com/undisbeliever/unnamed-snes-engine",
+  "commit": "1c06fee8fbaffbc720ca5fee3dd8c5f2f5838254",
+  "unmodified": true,
+  "sha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+  "license": "MIT code; Zlib audio driver; CC BY-SA 4.0 art/music/SFX; CC0, public domain and Apache-2.0 samples; see retained CREDITS and THIRD_PARTY_LICENSES",
+  "submodules": " 17823e5a55893e8442917abadb4e84feb216e5ad terrific-audio-driver (17823e5)\n acaf7dc23ea1b7f5ff1134ab73359c8b2c6d1359 terrific-audio-driver/wiz (acaf7dc)\n c471848a73484d9ee8e2f06faf45412b6256459a wiz (c471848)\n",
+  "cargoLockSha256": "0f4979b62351862fa3253b4a4d8aa365d585e412bd3f42d2eda082d427b7dcb3",
+  "build": "python tools/m8-game-build.py",
+  "rust": "rustc 1.85.1 (4eb161250 2025-03-15)\n",
+  "toolSha256": {
+    "artifacts\\m8-rust\\rustup\\toolchains\\1.85.1-x86_64-unknown-linux-gnu\\bin\\rustc": "f8d033fd72e878ec60493788c8bffec2e6c154dcab6f0cb4c145af8ada26a7ed",
+    "artifacts\\m8-rust\\rustup\\toolchains\\1.85.1-x86_64-unknown-linux-gnu\\bin\\cargo": "87e9ff02f95ea17d877e7c4eeb0f365f50fe3827f5afec132131ff3b8031a57e",
+    "artifacts\\m8-game-source\\wiz\\bin\\wiz": "8da569436ff9de07634484c5c47f0d2d8976cdaff4313558dd3ce8c774188368",
+    "artifacts\\m8-game-source\\terrific-audio-driver\\wiz\\bin\\wiz": "8da569436ff9de07634484c5c47f0d2d8976cdaff4313558dd3ce8c774188368",
+    "artifacts\\m8-game-source\\terrific-audio-driver\\target\\release\\tad-compiler": "c24b87c0648006ccb52a1b4ddbb37540a204675e241593f9aff9a677efac4e20"
+  },
+  "buildOptions": "Wiz WERR=0, CXX=g++ -include cstdint; unchanged source; Rust1.85.1 cargo --release --locked"
+}

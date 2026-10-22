@@ -54,12 +54,13 @@ public sealed partial class Ppu
         objectFetchIndex=objectFetchCount=0;objectFetches=[];objectCursor=objectColumn=0;objectDescriptor=null;objectFetchDone=false;objectNextH=1080;phaseH=0;
     }
     public long NextBoundary => Clock==null?long.MaxValue:Clock.Now-Clock.H+phaseH;
-    // Called after queued hardware events at this timestamp, before APU and CPU/DMA effects.
+    // H0 latches belong to the PPU phase too. An exactly tied CPU/DMA bus
+    // endpoint can commit first; queued notices publish after the APU commit.
     public void Synchronize(bool publish=true)
     {
         if(Clock==null||processedClock==Clock.Now)return;
         if(phaseH>Clock.H)return;
-        notifications.Clear();int h=phaseH;phaseH+=2;processedClock=Clock.Now;
+        notifications.Clear();int h=phaseH;if(h==0)BeginPpuLine();phaseH=h+2;processedClock=Clock.Now;
         if(h>=1360||Scanline>=240)return;
         if(Scanline>224&&Scanline<240&&(Registers[0x33]&4)!=0&&FrameGeometry.Height==224)ResizeField(FrameGeometry.Width,239);
         bool active=!ForcedBlank&&!InVblank;

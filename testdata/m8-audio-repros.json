@@ -1,0 +1,2219 @@
+{
+  "schema": "m8-audio-first-divergence-repro-v1",
+  "rom": "testdata/m8-game/unnamed-snes-game.sfc",
+  "source": "unchanged pinned external game; program not minimized or rewritten",
+  "command": "python tools/m8-audio-probe.py --short",
+  "prerequisite": "python tools/m8-reference-build.py; build Lab; local original IPL for its explicitly separate cases",
+  "profile": "Only the shortened same-frequency reproductions force ntsc-reference-crystal; every result row records its actual executed profile below.",
+  "inputBattery": "zero-filled4096-byte input",
+  "rows": [
+    {
+      "dataset": "m8-console",
+      "case": "game-120",
+      "reference": "bsnes",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 63899,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-120",
+      "reference": "ares",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 63932,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-175",
+      "reference": "bsnes",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 93221,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-175",
+      "reference": "ares",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 93253,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-300",
+      "reference": "bsnes",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 159862,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-300",
+      "reference": "ares",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 159894,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-600",
+      "reference": "bsnes",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 319798,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-600",
+      "reference": "ares",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 319830,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-reference-crystal-120",
+      "reference": "ares",
+      "firstPair": 42338,
+      "actualStereo": [
+        0,
+        0
+      ],
+      "referenceStereo": [
+        -1,
+        -1
+      ],
+      "actualNativeCrystal": 32516256,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Unresolved register-write/voice history phase; independent references disagree",
+      "shortReproFields": 82,
+      "executedProfile": {
+        "Id": "m8-test-ntsc-reference-crystal-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24606720,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 63932,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-reference-crystal-300",
+      "reference": "bsnes",
+      "firstPair": 88915,
+      "actualStereo": [
+        -5103,
+        -4979
+      ],
+      "referenceStereo": [
+        -5097,
+        -4973
+      ],
+      "actualNativeCrystal": 68287392,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Unresolved register-write/voice history phase; independent references disagree",
+      "shortReproFields": 168,
+      "executedProfile": {
+        "Id": "m8-test-ntsc-reference-crystal-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24606720,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 159862,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console",
+      "case": "game-reference-crystal-300",
+      "reference": "ares",
+      "firstPair": 42338,
+      "actualStereo": [
+        0,
+        0
+      ],
+      "referenceStereo": [
+        -1,
+        -1
+      ],
+      "actualNativeCrystal": 32516256,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Unresolved register-write/voice history phase; independent references disagree",
+      "shortReproFields": 82,
+      "executedProfile": {
+        "Id": "m8-test-ntsc-reference-crystal-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24606720,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 159894,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console-own-ipl",
+      "case": "game-120",
+      "reference": "bsnes",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 63899,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console-own-ipl",
+      "case": "game-120",
+      "reference": "ares",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 63932,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console-own-ipl",
+      "case": "game-300",
+      "reference": "bsnes",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 159861,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console-own-ipl",
+      "case": "game-300",
+      "reference": "ares",
+      "firstPair": 42296,
+      "actualStereo": [
+        -1,
+        -1
+      ],
+      "referenceStereo": [
+        0,
+        0
+      ],
+      "actualNativeCrystal": 32484000,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Chosen nominal frequency differs from references",
+      "shortReproFields": null,
+      "executedProfile": {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24576000,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 159894,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console-own-ipl",
+      "case": "game-reference-crystal-120",
+      "reference": "ares",
+      "firstPair": 42895,
+      "actualStereo": [
+        178,
+        321
+      ],
+      "referenceStereo": [
+        218,
+        321
+      ],
+      "actualNativeCrystal": 32944032,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Unresolved register-write/voice history phase; independent references disagree",
+      "shortReproFields": 82,
+      "executedProfile": {
+        "Id": "m8-test-ntsc-reference-crystal-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24606720,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 63932,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console-own-ipl",
+      "case": "game-reference-crystal-300",
+      "reference": "bsnes",
+      "firstPair": 88915,
+      "actualStereo": [
+        -5097,
+        -4973
+      ],
+      "referenceStereo": [
+        -5103,
+        -4979
+      ],
+      "actualNativeCrystal": 68287392,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Unresolved register-write/voice history phase; independent references disagree",
+      "shortReproFields": 168,
+      "executedProfile": {
+        "Id": "m8-test-ntsc-reference-crystal-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24606720,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 159861,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    },
+    {
+      "dataset": "m8-console-own-ipl",
+      "case": "game-reference-crystal-300",
+      "reference": "ares",
+      "firstPair": 42895,
+      "actualStereo": [
+        178,
+        321
+      ],
+      "referenceStereo": [
+        218,
+        321
+      ],
+      "actualNativeCrystal": 32944032,
+      "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+      "firmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "replay": [
+        [
+          150,
+          4096
+        ],
+        [
+          152,
+          0
+        ],
+        [
+          210,
+          32768
+        ],
+        [
+          212,
+          0
+        ],
+        [
+          270,
+          256
+        ],
+        [
+          290,
+          0
+        ],
+        [
+          310,
+          32768
+        ],
+        [
+          312,
+          0
+        ],
+        [
+          340,
+          1024
+        ],
+        [
+          360,
+          0
+        ]
+      ],
+      "status": "red software accuracy difference; no tolerance",
+      "causeStatus": "Unresolved register-write/voice history phase; independent references disagree",
+      "shortReproFields": 82,
+      "executedProfile": {
+        "Id": "m8-test-ntsc-reference-crystal-unverified",
+        "Pal": false,
+        "MasterHzNumerator": 945000000,
+        "MasterHzDenominator": 44,
+        "Lines": 262,
+        "CpuRevision": 2,
+        "Ppu1Revision": 1,
+        "Ppu2Revision": 3,
+        "ApuHzNumerator": 24606720,
+        "ApuHzDenominator": 1
+      },
+      "referenceRates": {
+        "masterHz": 21477272.727272727,
+        "masterNumerator": 945000000,
+        "masterDenominator": 44,
+        "apuNumerator": 24606720,
+        "apuDenominator": 1,
+        "apuHz": 24606720,
+        "nativePairs": 159894,
+        "origin": "first DAC pair after reference power; no sample shift"
+      }
+    }
+  ],
+  "probeAnalysis": {
+    "own": {
+      "bsnes": {
+        "dspWriteCounts": [
+          3585,
+          3585
+        ],
+        "firstWriteSampleBinDifference": [
+          {
+            "sampleCount": 1757,
+            "address": 108,
+            "value": 224,
+            "Crystal": 1349832,
+            "epoch": "committed SMP write"
+          },
+          {
+            "sampleCount": 1750,
+            "address": 108,
+            "value": 224
+          }
+        ],
+        "voice2WritesNearFirstBsnesDifference": {
+          "own": [
+            {
+              "sampleCount": 88913,
+              "address": 39,
+              "value": 127,
+              "Crystal": 68285448,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88913,
+              "address": 37,
+              "value": 0,
+              "Crystal": 68285760,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 36,
+              "value": 11,
+              "Crystal": 68286024,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 35,
+              "value": 15,
+              "Crystal": 68286288,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 34,
+              "value": 206,
+              "Crystal": 68286552,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88915,
+              "address": 33,
+              "value": 3,
+              "Crystal": 68286984,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88915,
+              "address": 32,
+              "value": 3,
+              "Crystal": 68287248,
+              "epoch": "committed SMP write"
+            }
+          ],
+          "reference": [
+            {
+              "sampleCount": 88912,
+              "address": 39,
+              "value": 127
+            },
+            {
+              "sampleCount": 88912,
+              "address": 37,
+              "value": 0
+            },
+            {
+              "sampleCount": 88912,
+              "address": 36,
+              "value": 11
+            },
+            {
+              "sampleCount": 88913,
+              "address": 35,
+              "value": 15
+            },
+            {
+              "sampleCount": 88913,
+              "address": 34,
+              "value": 206
+            },
+            {
+              "sampleCount": 88914,
+              "address": 33,
+              "value": 3
+            },
+            {
+              "sampleCount": 88914,
+              "address": 32,
+              "value": 3
+            }
+          ]
+        },
+        "registerDifferencesAt88915": [
+          {
+            "address": 41,
+            "own": 218,
+            "reference": 217
+          }
+        ],
+        "aramEqualAt88915": true
+      },
+      "ares": {
+        "dspWriteCounts": [
+          3585,
+          3585
+        ],
+        "firstWriteSampleBinDifference": [
+          {
+            "sampleCount": 1757,
+            "address": 108,
+            "value": 224,
+            "Crystal": 1349832,
+            "epoch": "committed SMP write"
+          },
+          {
+            "sampleCount": 1750,
+            "address": 108,
+            "value": 224
+          }
+        ],
+        "voice2WritesNearFirstBsnesDifference": {
+          "own": [
+            {
+              "sampleCount": 88913,
+              "address": 39,
+              "value": 127,
+              "Crystal": 68285448,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88913,
+              "address": 37,
+              "value": 0,
+              "Crystal": 68285760,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 36,
+              "value": 11,
+              "Crystal": 68286024,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 35,
+              "value": 15,
+              "Crystal": 68286288,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 34,
+              "value": 206,
+              "Crystal": 68286552,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88915,
+              "address": 33,
+              "value": 3,
+              "Crystal": 68286984,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88915,
+              "address": 32,
+              "value": 3,
+              "Crystal": 68287248,
+              "epoch": "committed SMP write"
+            }
+          ],
+          "reference": [
+            {
+              "sampleCount": 88913,
+              "address": 39,
+              "value": 127
+            },
+            {
+              "sampleCount": 88913,
+              "address": 37,
+              "value": 0
+            },
+            {
+              "sampleCount": 88913,
+              "address": 36,
+              "value": 11
+            },
+            {
+              "sampleCount": 88914,
+              "address": 35,
+              "value": 15
+            },
+            {
+              "sampleCount": 88914,
+              "address": 34,
+              "value": 206
+            },
+            {
+              "sampleCount": 88915,
+              "address": 33,
+              "value": 3
+            },
+            {
+              "sampleCount": 88915,
+              "address": 32,
+              "value": 3
+            }
+          ]
+        },
+        "registerDifferencesAt88915": [
+          {
+            "address": 10,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 14,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 26,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 30,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 38,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 42,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 46,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 54,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 58,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 62,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 70,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 74,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 78,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 86,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 90,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 94,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 106,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 110,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 122,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 126,
+            "own": 0,
+            "reference": 96
+          }
+        ],
+        "aramEqualAt88915": false
+      }
+    },
+    "original": {
+      "bsnes": {
+        "dspWriteCounts": [
+          3585,
+          3585
+        ],
+        "firstWriteSampleBinDifference": [
+          {
+            "sampleCount": 41683,
+            "address": 111,
+            "value": 0,
+            "Crystal": 32012448,
+            "epoch": "committed SMP write"
+          },
+          {
+            "sampleCount": 41682,
+            "address": 111,
+            "value": 0
+          }
+        ],
+        "voice2WritesNearFirstBsnesDifference": {
+          "own": [
+            {
+              "sampleCount": 88912,
+              "address": 39,
+              "value": 127,
+              "Crystal": 68284464,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88912,
+              "address": 37,
+              "value": 0,
+              "Crystal": 68284776,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88912,
+              "address": 36,
+              "value": 11,
+              "Crystal": 68285040,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88913,
+              "address": 35,
+              "value": 15,
+              "Crystal": 68285304,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88913,
+              "address": 34,
+              "value": 206,
+              "Crystal": 68285568,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 33,
+              "value": 3,
+              "Crystal": 68286000,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 32,
+              "value": 3,
+              "Crystal": 68286264,
+              "epoch": "committed SMP write"
+            }
+          ],
+          "reference": [
+            {
+              "sampleCount": 88913,
+              "address": 39,
+              "value": 127
+            },
+            {
+              "sampleCount": 88913,
+              "address": 37,
+              "value": 0
+            },
+            {
+              "sampleCount": 88914,
+              "address": 36,
+              "value": 11
+            },
+            {
+              "sampleCount": 88914,
+              "address": 35,
+              "value": 15
+            },
+            {
+              "sampleCount": 88914,
+              "address": 34,
+              "value": 206
+            },
+            {
+              "sampleCount": 88915,
+              "address": 33,
+              "value": 3
+            },
+            {
+              "sampleCount": 88915,
+              "address": 32,
+              "value": 3
+            }
+          ]
+        },
+        "registerDifferencesAt88915": [
+          {
+            "address": 41,
+            "own": 217,
+            "reference": 218
+          }
+        ],
+        "aramEqualAt88915": true
+      },
+      "ares": {
+        "dspWriteCounts": [
+          3585,
+          3585
+        ],
+        "firstWriteSampleBinDifference": [
+          {
+            "sampleCount": 41683,
+            "address": 111,
+            "value": 0,
+            "Crystal": 32012448,
+            "epoch": "committed SMP write"
+          },
+          {
+            "sampleCount": 41682,
+            "address": 111,
+            "value": 0
+          }
+        ],
+        "voice2WritesNearFirstBsnesDifference": {
+          "own": [
+            {
+              "sampleCount": 88912,
+              "address": 39,
+              "value": 127,
+              "Crystal": 68284464,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88912,
+              "address": 37,
+              "value": 0,
+              "Crystal": 68284776,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88912,
+              "address": 36,
+              "value": 11,
+              "Crystal": 68285040,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88913,
+              "address": 35,
+              "value": 15,
+              "Crystal": 68285304,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88913,
+              "address": 34,
+              "value": 206,
+              "Crystal": 68285568,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 33,
+              "value": 3,
+              "Crystal": 68286000,
+              "epoch": "committed SMP write"
+            },
+            {
+              "sampleCount": 88914,
+              "address": 32,
+              "value": 3,
+              "Crystal": 68286264,
+              "epoch": "committed SMP write"
+            }
+          ],
+          "reference": [
+            {
+              "sampleCount": 88912,
+              "address": 39,
+              "value": 127
+            },
+            {
+              "sampleCount": 88913,
+              "address": 37,
+              "value": 0
+            },
+            {
+              "sampleCount": 88913,
+              "address": 36,
+              "value": 11
+            },
+            {
+              "sampleCount": 88914,
+              "address": 35,
+              "value": 15
+            },
+            {
+              "sampleCount": 88914,
+              "address": 34,
+              "value": 206
+            },
+            {
+              "sampleCount": 88914,
+              "address": 33,
+              "value": 3
+            },
+            {
+              "sampleCount": 88915,
+              "address": 32,
+              "value": 3
+            }
+          ]
+        },
+        "registerDifferencesAt88915": [
+          {
+            "address": 10,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 14,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 26,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 30,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 38,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 41,
+            "own": 217,
+            "reference": 218
+          },
+          {
+            "address": 42,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 46,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 54,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 58,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 62,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 70,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 73,
+            "own": 184,
+            "reference": 185
+          },
+          {
+            "address": 74,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 78,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 86,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 89,
+            "own": 28,
+            "reference": 27
+          },
+          {
+            "address": 90,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 94,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 106,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 110,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 122,
+            "own": 0,
+            "reference": 96
+          },
+          {
+            "address": 126,
+            "own": 0,
+            "reference": 96
+          }
+        ],
+        "aramEqualAt88915": false
+      }
+    }
+  },
+  "observationCaveat": "Own registers/ARAM sampled after same-crystal SPC commit; reference snapshots inside DAC before stream. Differences exactly at a coincident SPC effect do not alone establish a hardware or arithmetic defect. Write traces show sample bins, not a recovered exact reference crystal. Unused ares register/RAM power entropy is not counted as a functional failure.",
+  "firstBsnesInterpretation": "At88915 full ARAM agrees, OUTX voice2($29) differs. Nearby Voice2 pitch/volume writes cross different sample bins. Earlier bootstrap/CPU-APU polling phases already differ; exact root cause remains open. No speculative DSP patch.",
+  "evidence": "artifacts/m8-audio-probe and artifacts/m8-audio-repro-short; immutable copies in final implementation evidence",
+  "shortExecutionConfirmed": {
+    "readOnlyProbeMatchesAllOriginalVideoPcmSram": true,
+    "shortReproductions": 4,
+    "expectedFirstSamples": {
+      "own-ares": 42895,
+      "original-ares": 42338,
+      "own-bsnes": 88915,
+      "original-bsnes": 88915
+    }
+  }
+}

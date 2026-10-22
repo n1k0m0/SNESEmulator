@@ -120,8 +120,8 @@ static class Lab
         var report=new TestReport(suite);
         string reason=suite switch {
             "audio-conformance"=>"Native DSP digital conformance runs in Core.Tests --dsp-only. Original-console audio captures remain unavailable; this skipped inventory is not the digital conformance result.",
-            "hardware-evidence"=>"No measured original console/revision or trace acquisition is available. Proposed profiles remain unverified.",
-            "graphics-conformance"=>"No independent hardware/reference-emulator frame corpus acquired. Synthetic comparator checks and diagnostic rendering are internal checks only.",
+            "hardware-evidence"=>"No own hardware measurement or replayable original-console trace is available. Published measurements are catalogued in the M8 ledger; product revision profiles remain unverified.",
+            "graphics-conformance"=>"Original-console frame captures remain unavailable. M8 independent software frame fixtures run separately through tools/m8-console-suite.py; software agreement is not hardware proof.",
             _=>throw new ArgumentException("Unknown unavailable evidence suite") };
         report.Add(suite,"skipped",reason);report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/"+suite);return report.ExitCode;
     }
@@ -170,16 +170,18 @@ static class Lab
     {
         var options=new Dictionary<string,string>();
         for(int i=0;i<args.Length;i+=2){if(i+1==args.Length || !args[i].StartsWith("--"))throw new ArgumentException("ROM options require --key value pairs");options.Add(args[i][2..],args[i+1]);}
-        foreach(string key in options.Keys)if(key is not ("frames" or "masterclocks" or "output" or "rom" or "replay" or "trace-limit" or "expect-wram" or "expect-frame" or "expect-native" or "expect-audio" or "expect-geometry" or "expect-brightness" or "diagnostic"))throw new ArgumentException("Unknown ROM option: "+key);
+        foreach(string key in options.Keys)if(key is not ("frames" or "masterclocks" or "output" or "rom" or "replay" or "trace-limit" or "expect-wram" or "expect-frame" or "expect-native" or "expect-audio" or "expect-geometry" or "expect-brightness" or "diagnostic" or "region"))throw new ArgumentException("Unknown ROM option: "+key);
         string Opt(string k,string fallback)=>options.GetValueOrDefault(k,fallback);
         long frames=long.Parse(Opt("frames","8")),clockLimit=long.Parse(Opt("masterclocks","100000000"));
         if(frames<1||clockLimit<1)throw new ArgumentException("Positive frame and masterclock limits required");
         string prefix=Opt("output",Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/rom");
-        var report=new TestReport("headless-rom");var machine=new SnesSystem();
+        var report=new TestReport("headless-rom");
+        var machine=Opt("region","auto") switch {"auto"=>new SnesSystem(),"ntsc"=>new SnesSystem(HardwareProfile.Ntsc),"pal"=>new SnesSystem(HardwareProfile.PalProfile),"ntsc-reference-crystal"=>new SnesSystem(HardwareProfile.Ntsc with {Id="m8-test-ntsc-reference-crystal-unverified",ApuHzNumerator=32040*768}),_=>throw new ArgumentException("region must be auto, ntsc, pal or ntsc-reference-crystal (laboratory frequency experiment)")};
         if(Opt("diagnostic","video") is not ("video" or "audio"))throw new ArgumentException("diagnostic must be video or audio");
         byte[] rom=options.ContainsKey("rom")?File.ReadAllBytes(options["rom"]):Opt("diagnostic","video")=="audio"?AudioDiagnosticRom.Create():DiagnosticRom.Create();machine.Insert(new Cartridge(rom));
         report.Metadata["romSha256"]=Convert.ToHexString(SHA256.HashData(rom));report.Metadata["profile"]=machine.Profile;
-        report.Metadata["accuracy"]="Exact master-clock budget with individually timed CPU cycles. Generic CPU bus conformance and analytical profile timing are separate evidence. M5 Mode0/1 PPU advances at explicit fetch and pixel phases; oscillator/revision target is unverified hardware.";
+        report.Metadata["apuFirmwareSha256"]=machine.Bus.Apu.FirmwareHash;
+        report.Metadata["accuracy"]="Own individually timed CPU and Mode0-7 PPU with native raw fields. Generic CPU vectors, pinned console software comparisons and analytical NTSC/PAL profiles are separate evidence. Mode7 electrical VRAM subslots, first hires half-pixel and physical INIDISP/reset/revision effects remain unverified hardware.";
         report.Metadata["busTraceContract"]="Explicit read-latch, write-latch and cycle-complete phases. Valid read latch after accessClocks-4 active clocks plus4 active trailing hold; writes at completion. Each record includes phase timestamp, cycle start, latch timestamp and captured value. MDR exceptions follow the M3 contract.";
         report.Metadata["framesLimit"]=frames;report.Metadata["masterclockLimit"]=clockLimit;
         ReplayEvent[] replay=[];
@@ -195,10 +197,21 @@ static class Lab
         StereoSample? firstAudio=null,lastAudio=null;long audioCount=0,dspRows=0;
         void DrainAudio(){foreach(var sample in machine.Bus.Apu.Dsp.DrainSamples()){firstAudio??=sample;lastAudio=sample;audio.Write(sample.Left);audio.Write(sample.Right);audioCount++;}}
         var registerTrace=new Queue<string>();
-        machine.Bus.AccessObserved=(direction,address,value)=>{if((address&0x40ffc0)==0x2100){registerTrace.Enqueue($"clock{machine.Clock.Now} H{machine.Clock.H} V{machine.Clock.V} {direction} ${address:X6}=${value:X2}");if(registerTrace.Count>128)registerTrace.Dequeue();}};
+        using var mmioTrace=new StreamWriter(prefix+".mmio.jsonl");using var portsTrace=new StreamWriter(prefix+".ports.jsonl");using var audioProbeTrace=new StreamWriter(prefix+".audio-probe.jsonl");using var dspWritesTrace=new StreamWriter(prefix+".dsp-writes.jsonl");bool audioProbe=Environment.GetEnvironmentVariable("SNES_LAB_AUDIO_PROBE")=="1";long mmioRows=0;
+        machine.Bus.AccessObserved=(direction,address,value)=>{if(audioProbe&&direction=="write"&&(address&0x40fffc)==0x2140)portsTrace.WriteLine(JsonSerializer.Serialize(new{clock=machine.Clock.Now,fieldIndex=machine.Frames,v=machine.Clock.V,h=machine.Clock.H,address,value}));if((address&0x40ffc0)==0x2100){registerTrace.Enqueue($"clock{machine.Clock.Now} H{machine.Clock.H} V{machine.Clock.V} {direction} ${address:X6}=${value:X2}");if(registerTrace.Count>128)registerTrace.Dequeue();}if(((address&0x40ffc0)==0x2100||(address&0x40ffe0)==0x4200)&&mmioRows++<1000000)mmioTrace.WriteLine(JsonSerializer.Serialize(new{clock=machine.Clock.Now,fieldIndex=machine.Frames,field=machine.Clock.Field,v=machine.Clock.V,h=machine.Clock.H,direction,address,value}));};
         long clocks=0,busEvents=0,instructions=0;int replayIndex=0,traceLimit=int.Parse(Opt("trace-limit","4096"));
         if(traceLimit<0)throw new ArgumentException("Trace limit must not be negative");
-        if(traceLimit>0)machine.Bus.Apu.DspPhaseObserved=phase=>{dspTrace.WriteLine(JsonSerializer.Serialize(phase));if(++dspRows>=traceLimit)machine.Bus.Apu.DspPhaseObserved=null;};
+        if(traceLimit>0||audioProbe)machine.Bus.Apu.DspPhaseObserved=phase=>{
+            if(dspRows++<traceLimit)dspTrace.WriteLine(JsonSerializer.Serialize(phase));
+            long sample=phase.Sample-1;
+            if(audioProbe&&phase.Phase==27&&(sample is >=42880 and <=42910 or >=88900 and <=88930))
+            {
+                File.WriteAllBytes(prefix+".sample-"+sample+".apu.bin",machine.Bus.Apu.DspRegisters.Concat(machine.Bus.Apu.Ram).ToArray());
+                audioProbeTrace.WriteLine(JsonSerializer.Serialize(new{sample,masterClock=machine.Clock.Now,phase.Crystal,phase.Phase,epoch="after same-crystal APU commit, DAC phase27"}));
+            }
+            if(dspRows>=traceLimit&&!audioProbe)machine.Bus.Apu.DspPhaseObserved=null;
+        };
+        if(audioProbe)machine.Bus.Apu.PhaseObserved=phase=>{if(phase.Cycle.Direction=="write"&&phase.Cycle.Address==0xf3)dspWritesTrace.WriteLine(JsonSerializer.Serialize(new{sampleCount=machine.Bus.Apu.Dsp.SampleCount,address=machine.Bus.Apu.DspAddress&127,value=phase.Cycle.Value,phase.Crystal,epoch="committed SMP write"}));};
         machine.CyclePhaseObserved=phase=>{if(busEvents++<traceLimit)busTrace.WriteLine(JsonSerializer.Serialize(new {sequence=busEvents,origin="CPU",phase}));};
         machine.Bus.Dma.Observed=phase=>{if(busEvents++<traceLimit)busTrace.WriteLine(JsonSerializer.Serialize(new {sequence=busEvents,origin=phase.Job==DmaJob.Dma?"DMA":"HDMA",phase}));};
         machine.Clock.EventObserved=e=>rasterTrace.WriteLine(JsonSerializer.Serialize(new {masterClock=machine.Clock.Now,h=machine.Clock.H,v=machine.Clock.V,field=machine.Clock.Field,kind=e.Kind.ToString()}));
@@ -213,9 +226,11 @@ static class Lab
             DrainAudio();
         }
         DrainAudio();audio.Flush();audio.Dispose();dspTrace.Flush();
-        report.Metadata["audio"]=new{format="signed16 stereo interleaved little-endian",sampleRate=32000,channels=2,pairs=audioCount,firstIndex=firstAudio?.Index,firstCrystal=firstAudio?.Crystal,lastIndex=lastAudio?.Index,lastCrystal=lastAudio?.Crystal,sha256=Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(prefix+".stereo-pcm16le.bin"))),droppedPairs=machine.Bus.Apu.Dsp.DroppedPresentationSamples,traceRows=dspRows,phasesExecuted=machine.Bus.Apu.Crystal/24};
+        report.Metadata["audio"]=new{format="signed16 stereo interleaved little-endian",sampleRate=(double)machine.Profile.ApuHzNumerator/(machine.Profile.ApuHzDenominator*768),sampleRateNumerator=machine.Profile.ApuHzNumerator,sampleRateDenominator=checked(machine.Profile.ApuHzDenominator*768),channels=2,pairs=audioCount,firstIndex=firstAudio?.Index,firstCrystal=firstAudio?.Crystal,lastIndex=lastAudio?.Index,lastCrystal=lastAudio?.Crystal,sha256=Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(prefix+".stereo-pcm16le.bin"))),droppedPairs=machine.Bus.Apu.Dsp.DroppedPresentationSamples,traceRows=dspRows,phasesExecuted=machine.Bus.Apu.Crystal/24};
         clocks=machine.Clock.Now;machine.CyclePhaseObserved=null;machine.Bus.Dma.Observed=null;machine.Clock.EventObserved=null;
         File.WriteAllBytes(prefix+".wram.bin",machine.Bus.Wram);
+        File.WriteAllBytes(prefix+".sram.bin",machine.Bus.Cartridge!.Sram);
+        report.Metadata["sramSha256"]=Convert.ToHexStringLower(SHA256.HashData(machine.Bus.Cartridge.Sram));
         var video=machine.Bus.Ppu.CompletedFrame??machine.Bus.Ppu.Frame;
         using(var output=new BinaryWriter(File.Create(prefix+".argb32le.bin")))foreach(uint pixel in video.Argb.Span)output.Write(pixel);
         using(var native=new BinaryWriter(File.Create(prefix+".rgb555le.bin")))foreach(ushort pixel in video.Native.Span)native.Write(pixel);

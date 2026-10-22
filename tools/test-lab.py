@@ -24,6 +24,7 @@ run([sys.executable,'tools/fetch-spc700.py','--verify',*(['--full'] if args.full
 run([sys.executable,'tools/own-ipl.py'])
 run([sys.executable,'tools/verify-ppu-testdata.py'])
 run([sys.executable,'tools/verify-video-testdata.py'])
+run([sys.executable,'tools/verify-m8-testdata.py'])
 run([sys.executable,'tools/dsp-reference.py','--verify'])
 run([sys.executable,'tools/verify-dsp-gaussian.py'])
 # M5 adds334 full-system PPU snapshots and42 graphics groups to87 prior groups.
@@ -31,6 +32,13 @@ supervised('core',['dotnet',str(CORE)],timeout=240)
 supervised('video-conformance',['dotnet',str(CORE),'--video-only'],timeout=180)
 run([sys.executable,'tools/test-video-cli.py'])
 run([sys.executable,'tools/video-mutations.py'])
+# M8 owns a separate bounded gate; external game/state workloads are not
+# folded into the existing240-second core supervisor.
+supervised('m8-state',['dotnet',str(CORE),'--compatibility-only'],timeout=360)
+run([sys.executable,'tools/m8-console-suite.py','--verify','--own-ipl'])
+original_m8=ROOT/pathlib.Path(__import__('os').environ.get('SNESEMULATOR_IPL','testdata/local-firmware/ipl.bin'))
+run([sys.executable,'tools/m8-console-suite.py','--verify'],0 if original_m8.exists() else 2)
+if args.full:assert original_m8.exists(),'Full M8 original-IPL comparison requires local firmware'
 supervised('audio-conformance',['dotnet',str(CORE),'--dsp-only'],timeout=120)
 supervised('audio-long-run',['dotnet',str(CORE),'--dsp-long'],timeout=180)
 supervised('mutations',['dotnet',str(LAB),'mutations'])

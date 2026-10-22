@@ -1,6 +1,6 @@
 # M7 native video, raw fields and transport contract
 
-Own C# core; independent parent acceptance pending. M6 was independently accepted
+Own C# core; M7 independently accepted on `439a655199647f325bef6b6b3074e67948a105dc`, full Windows gate exit0, `artifacts/root-m7-validation.log`; unchanged evidence in `artifacts/root-m7-evidence/`. M6 was independently accepted
 on `e4645770cea052885808ca5b27a45d60de470157`, full gate exit0,
 `artifacts/root-m6-validation.log`, unchanged reports in `artifacts/root-m6-evidence/`.
 No original console is owned or newly measured. M7 extends the existing analytical
@@ -64,16 +64,16 @@ frequency maps them to native audio without a50/60Hz host assumption.
 
 `Interlace` records the display input at field start. `TimingInterlace` separately
 records the actual counter latch controlling short/long lines and field duration.
-They can differ after a mid-field SETINI write. BG and OBJ interlace address
+They can temporarily differ before V128 after a new field-start display latch. M8 corrected the former live-SETINI counter input; a write between V0 and V128 affects the next field, not the current counter latch. BG and OBJ interlace address
 generation use their live register inputs at their own fetch phases, so a raster
 transition can mix addressing within one raw field. The metadata does not claim
 that every row used an identical register snapshot. OBJ interlace halves coverage
 height and selects parity-specific source rows, including vertical flip.
 
-The counter samples its interlace input at V128/H0 in this selected model. The
+The counter samples the V0 display interlace latch at V128/H0 in this selected model (M8 source-path correction). The
 pinned comparison itself calls the precise capture time unimportant before the
 affected lines; V128 is therefore a reproducible analytical convention, not a
-verified silicon deadline. Field-end projections before V128 use the current
+verified silicon deadline. Field-end projections before V128 use the captured display
 input, while actual execution still waits for the latch. NTSC noninterlaced odd
 fields have a1360-clock line240; PAL interlaced odd fields have a1368-clock
 line311. An interlaced even field adds one line. All other lines have1364 clocks.
@@ -93,9 +93,11 @@ Lab ARGB/RGB555/brightness dumps and comparators use its stride. Native comparis
 include first pixel/line, brightness, field metadata and timestamp domain;
 `--expect-geometry` and `--expect-brightness` are separate CLI oracles.
 
+M8 supersedes the timing assumptions and state version: see [M8 contract](m8-compatibility-contract.md). Its V64 SETINI program executes on both references and gives first two field edges357368/714736 NTSC and425568/851140 PAL. Historical M7 evidence and old worksheets remain archived.
+
 ## State and transport
 
-Savestate **format8** stores exact array lengths/geometry, completed field,
+Historical M7 savestate **format8** stores exact array lengths/geometry, completed field,
 all plane/OPT/half-screen/mosaic/affine/math latches and the existing complete
 CPU/DMA/HDMA/SPC/DSP phases. Formats1–7 are rejected with an explanation because
 their missing pipeline data cannot be recovered reliably. Presentation queues
@@ -175,4 +177,4 @@ separate two-BRR-voice forced-blank case. No accuracy features were disabled;
 these single-host observations remain below realtime and do not replace M9
 profiling. Native512×239 and4:3 GUI stripe scenes were visually inspected,
 without an in-app browser. Full identities and group times: [baseline](baselines/m7.json).
-Independent M7 parent acceptance remains pending.
+M7 independently accepted on `439a655199647f325bef6b6b3074e67948a105dc`, full Windows gate exit0, `artifacts/root-m7-validation.log`; unchanged evidence in `artifacts/root-m7-evidence/`.

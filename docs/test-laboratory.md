@@ -514,4 +514,15 @@ Raw-field metadata is emitted alongside `.rgb555le.bin`, `.brightness.bin` and
 are independent oracles only when their inputs are independently derived.
 Hardware inventory remains explicitly incomplete: absolute PPU origin, Mode7
 VRAM subslots, the first hires half-pixel and published physical INIDISP glitches
-have no new original-console measurement. M7 parent acceptance is pending.
+have no new original-console measurement. M7 independently accepted on `439a655199647f325bef6b6b3074e67948a105dc`, full Windows gate exit0, `artifacts/root-m7-validation.log`; unchanged evidence in `artifacts/root-m7-evidence/`.
+
+
+## M8 Offline-Konsolenvergleiche und Zustände
+
+Der [M8-Vertrag](m8-compatibility-contract.md) beschreibt20 unverändert gebaute externe Testprogramme, ein tatsächlich klingendes externes HiROM-Techdemo, getrennte Own-/Original-IPL-Datensätze und die vollständigen unabhängigen Cycle-PPU-Konsolenadapter. `tools/test-lab.py` führt `verify-m8-testdata.py`, `Core.Tests --compatibility-only` im eigenen360s-Watchdog und beide `m8-console-suite.py --verify`-Varianten aus. Jede Variante hat600s Gesamt- und120s Kindprozessgrenzen. Der Own-IPL-Datensatz läuft ohne Firmware/WSL/Netzwerk in CI. Fehlt das lokale Original-IPL, bleibt dessen Gate sichtbar skipped; Full verlangt dessen Ausführung.
+
+27 zusätzliche Gruppen prüfen externe Snapshotfortsetzungen, tatsächlich klingende Titelmusik, Spielraum/Input/SRAM, WAI-Restphasen, MMIO-Endpunkte, Pending-H0-Beobachter und sechs veröffentlichte Frequenzparameter. Große Game-State-Fälle erweitern nicht den alten240s-Core-Watchdog. Bildvergleiche prüfen native RGB555/Helligkeit und Parität mit fest begründeten Koordinaten. Audiodifferenzen innerhalb der gemeinsamen Samplefolge bleiben rot, selbst wenn die Aufnahmeenden verschieden sind. [Titelmatrix](m8-title-matrix.md), [Hardwareledger](../testdata/m8-hardware-evidence.json) und die separaten `accuracy.json`-Berichte enthalten die Grenzen.
+
+`--accuracy-only` bewahrt den roten Genauigkeitsexit. `--verify` prüft lediglich unveränderte manuell geprüfte Unterschiede; es macht bekannte Fehler nicht zu bestandenen Genauigkeitsfällen. Negative Kontrollen lösen tatsächliche Pixel-/Kanal-/Koordinaten-/Samplefehler sowie Missing/Crash/Timeout aus. Referenzprogramme und Overlays sind vollständig gepinnt; die frei verteilbaren Fixtures sind offline hashgeprüft. Kein heutiger eigener Emulatoroutput dient als unabhängiges Sollbild. Historische rote Entwicklungsbefunde bleiben in der M8-Evidenz.
+
+M8 korrigiert den alten M2-Test, der den WAI-Fehler als Null-Idle-Verhalten erwartete, sowie M7s Live-SETINI-Auslegung. Die korrigierten Erwartungen stammen aus beiden Quellen und tatsächlich ausgeführten ROM-/Bus-/Feldbeobachtern. Format9 lehnt unvollständig migrierbare ältere Saves ab. M6s isolierte DSP-Konformität bleibt eine andere Evidenzart als Ganzkonsolen-Audio.

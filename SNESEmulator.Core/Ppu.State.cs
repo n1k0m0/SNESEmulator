@@ -56,7 +56,11 @@ public sealed partial class Ppu
         ObjectCursor=objectCursor,ObjectColumn=objectColumn,ObjectNextH=objectNextH,ObjectFetchDone=objectFetchDone,ObjectDescriptor=objectDescriptor,SelectedCount=selectedCount,FirstObject=firstObject,FetchIndex=objectFetchIndex,Fetches=objectFetches,InternalOam=internalOamAddress,InternalCgram=internalCgramAddress,
         MosaicRemaining=mosaicRemaining,MosaicHorizontal=mosaicHorizontal,SamplePalette=samplePalette,SamplePriority=samplePriority,MosaicStart=mosaicStart,PhaseH=phaseH,ProcessedClock=processedClock,BelowColor=belowColor,BelowLayer=belowLayer}))!;
     public void ValidateClock()
-    {if(Clock!=null&&(Scanline!=Clock.V||processedClock>Clock.Now||NextBoundary<Clock.Now||FrameGeometry.Field!=Clock.Field||FrameGeometry.FieldIndex!=Clock.Fields||FrameGeometry.StartClock>Clock.Now||FrameGeometry.EndClock!=FrameGeometry.StartClock||FrameGeometry.MasterHzNumerator!=Clock.Profile.MasterHzNumerator||FrameGeometry.MasterHzDenominator!=Clock.Profile.MasterHzDenominator||FrameGeometry.ApuHzNumerator!=Clock.Profile.ApuHzNumerator||FrameGeometry.ApuHzDenominator!=Clock.Profile.ApuHzDenominator||(CompletedFrame?.Geometry.EndClock??0)>Clock.Now))throw new InvalidDataException("Inconsistent PPU clock state");}
+    {
+        if(Clock==null)return;
+        bool pendingFieldH0=Clock.H==0&&Clock.V==0&&phaseH==0&&processedClock<Clock.Now&&Clock.Fields>0&&FrameGeometry.FieldIndex==Clock.Fields-1&&FrameGeometry.Field!=Clock.Field&&CompletedFrame?.Geometry.FieldIndex==FrameGeometry.FieldIndex&&CompletedFrame.Geometry.EndClock==Clock.Now;
+        if(Scanline!=Clock.V||processedClock>Clock.Now||NextBoundary<Clock.Now||(!pendingFieldH0&&(FrameGeometry.Field!=Clock.Field||FrameGeometry.FieldIndex!=Clock.Fields))||FrameGeometry.StartClock>Clock.Now||FrameGeometry.EndClock!=FrameGeometry.StartClock||FrameGeometry.MasterHzNumerator!=Clock.Profile.MasterHzNumerator||FrameGeometry.MasterHzDenominator!=Clock.Profile.MasterHzDenominator||FrameGeometry.ApuHzNumerator!=Clock.Profile.ApuHzNumerator||FrameGeometry.ApuHzDenominator!=Clock.Profile.ApuHzDenominator||(CompletedFrame?.Geometry.EndClock??0)>Clock.Now)throw new InvalidDataException("Inconsistent PPU clock state");
+    }
     public void RestorePipeline(PpuPipelineState s)
     {
         if(s.ObjectCursor is < -1 or >31||s.ObjectColumn is <0 or >8||s.ObjectNextH is <1080 or >1360||(s.ObjectNextH&3)!=0||

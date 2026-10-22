@@ -1,6 +1,6 @@
 {
   "schema": "snes-m7-native-video-v1",
-  "status": "Implementation full gate passed; final error-text and CLI-adapter fixes targeted separately. Independent parent acceptance pending. Measurement record, not an expected-output oracle.",
+  "status": "Independently accepted by parent; implementation and parent measurements remain separate.",
   "fullGateCommit": "7cf7cc18f38b0826a74d797bef73d9c0ad26af9f",
   "postGateCommit": "adef880b670dd8df6a2c0657bab405d8b6557535",
   "implementationCommits": [
@@ -261,5 +261,15 @@
     "exitCode": 0,
     "log": "artifacts/root-m6-validation.log",
     "evidence": "artifacts/root-m6-evidence/"
+  },
+  "independentAcceptance": {
+    "commit": "439a655199647f325bef6b6b3074e67948a105dc",
+    "command": "python tools/test-lab.py --windows --full",
+    "exitCode": 0,
+    "log": "artifacts/root-m7-validation.log",
+    "evidence": "artifacts/root-m7-evidence/",
+    "files": 286,
+    "nativePixelsIndependentlyCalculated": 122368,
+    "audio8FieldSha256": "a0ca8a2262b4c3ca022f3ae157efb10ed7c1de0555d1d239d19ed25314db8e48"
   }
 }

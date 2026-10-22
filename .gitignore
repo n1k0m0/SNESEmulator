@@ -87,3 +87,5 @@ testdata/65816-full/
 
 # One licensed external PPU test fixture (hash/license pinned).
 !/testdata/ppu-external/vram-mid-scanline-test.sfc
+!/testdata/m8-roms/*.sfc
+!/testdata/m8-game/*.sfc

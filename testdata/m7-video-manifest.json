@@ -112,8 +112,8 @@
   "files": [
     {
       "path": "SNESEmulator.Core.Tests/VideoTests.cs",
-      "sha256": "f6cd4cfaa701293cc847b99d0333349c3940325c490b26c646f541822cac2659",
-      "bytes": 28311
+      "sha256": "28e0c8b429f4cc827a34a2eae74a9507ab838e7f8071ab72a55f3522e95e3254",
+      "bytes": 28685
     },
     {
       "path": "SNESEmulator.Core/PpuDiagnosticRom.cs",
@@ -129,6 +129,17 @@
       "path": "testdata/hardware-profiles.json",
       "sha256": "7b3039034318ff9b93652842bb65de16370b0ea34def8bc125e74b67418e5105",
       "bytes": 6672
+    }
+  ],
+  "m8ReviewedCorrections": [
+    {
+      "superseded": {
+        "path": "SNESEmulator.Core.Tests/VideoTests.cs",
+        "sha256": "f6cd4cfaa701293cc847b99d0333349c3940325c490b26c646f541822cac2659",
+        "bytes": 28311
+      },
+      "reason": "Pinned ppu.hpp getter returns V0 display.interlace; V128 captures that latch, not live SETINI. Both executed V64 ROM references establish corrected first field edges.",
+      "evidence": "docs/m8-compatibility-contract.md; testdata/m8-console/manifest.json; testdata/m8-console-own-ipl/manifest.json"
     }
   ]
 }

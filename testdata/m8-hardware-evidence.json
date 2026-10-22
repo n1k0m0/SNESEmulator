@@ -1,0 +1,87 @@
+{
+  "schema": "m8-primary-hardware-evidence-v1",
+  "ownConsole": false,
+  "sources": [
+    {
+      "id": "inidisp",
+      "url": "https://undisbeliever.net/snesdev/registers/inidisp.html",
+      "sha256": "b7360f98071fbc38b8f2a3da286252a074cb9f0949d0630e14064de6a0abdbc0",
+      "bytes": 35927,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "id": "smpspeed",
+      "url": "https://undisbeliever.net/blog/20250313-smpspeed.html",
+      "sha256": "fb5321e227ae8ca25988679e488d40d7b23b7af72947bcfe7dc84e46d48c562b",
+      "bytes": 32498,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    }
+  ],
+  "boards": [
+    {
+      "family": "separate-chip 2/1/3 NTSC or PAL",
+      "productProfiles": "analytical timing/revision IDs only; no newly certified physical motherboard"
+    },
+    {
+      "family": "published 1-CHIP comparisons",
+      "productSupport": "not a separate certified profile"
+    }
+  ],
+  "publishedTests": [
+    {
+      "id": "mid-frame-forced-blank",
+      "source": "inidisp",
+      "hardware": "1-CHIP Super Famicom captures; similar3-chip behavior described",
+      "pcb": null,
+      "siliconRevision": "exact capture revision not supplied",
+      "publishedRomSha256": null,
+      "localUnmodifiedRom": "d63b83ffa3224fa9b0fd7787f49e2b9be222bb0d12c6615f451c0dfaead19803",
+      "localSourceCommit": "ac6ef8006809c0ff5dabc8ff137a4623967697fe",
+      "publishedResult": "Forced-blank transitions can corrupt subsequent graphics. Physical contention behavior differs across revisions.",
+      "softwareResult": "Exact digital fields compared with pinned cycle bsnes/ares; continued BG fetching follows selected software model.",
+      "hardwareAccuracyStatus": "FAIL: published corruption not reproduced",
+      "uncertainty": "No capture binary identity, electrical trace, board or reset-state reproduction; local program is not a verified copy of capture binary."
+    },
+    {
+      "id": "early-read-and-dma",
+      "source": "inidisp",
+      "hardware": "3-chip and1-chip; S-CPU-A revision2 DMA erratum reported",
+      "pcb": null,
+      "testRomSha256": null,
+      "publishedResult": "Early reads and HDMA writes to INIDISP can cause corruption or later DMA failure.",
+      "softwareResult": "Not executed as electrical/revision-specific hardware tests.",
+      "hardwareAccuracyStatus": "UNTESTED / unimplemented errata",
+      "uncertainty": "Do not infer support from normal DMA/HDMA success."
+    },
+    {
+      "id": "brightness-transients",
+      "source": "inidisp",
+      "hardware": "3-chip,1-chip and modified1-chip analog output",
+      "pcb": null,
+      "testRomSha256": null,
+      "localUnmodifiedRom": "e55f0bc62c91504ed6d65685cfd53d4fa4fa85b4e0b34c069bb4c0f0c45821d3",
+      "publishedResult": "Analog output brightness changes have revision-dependent transients; brightness zero is not electrically black.",
+      "softwareResult": "Digital register/pixel deadlines compared separately; analog waveform not modeled.",
+      "hardwareAccuracyStatus": "FAIL: analog transient/weak-signal model absent",
+      "uncertainty": "No oscilloscope capture or DAC-voltage comparison."
+    },
+    {
+      "id": "temperature-dependent-smp-rate",
+      "source": "smpspeed",
+      "hardware": "Published two-hour real-console measurements, not later Mesen simulation table",
+      "pcb": null,
+      "captureRomSha256": null,
+      "toolCommit": "0c1aaa874e80f2fb744186f5f6e33e06778dba77",
+      "toolLicense": "MIT embedded source notice",
+      "toolSourceSha256": "566f212fb6ab8356831622df6ffb2825f841963474c1b4ac6329dea335549eac",
+      "publishedResult": "Rate varies by console and temperature. Six rounded extrema become explicit rational test parameters.",
+      "parameterFile": "testdata/m8-measured-rates.json",
+      "ownResult": "Actual CPU/IPL/SPC upload and reply runs at all six parameters; exact rational clock and DAC counts checked.",
+      "hardwareAccuracyStatus": "PARAMETER TEST ONLY",
+      "uncertainty": "No replay of physical bus data, no own capture, no universal32040Hz claim; article-linked archives not redistributed."
+    }
+  ],
+  "excludedEvidence": "Later Simulating IPL loader speeds table is explicitly Mesen simulation and is not treated as a hardware measurement. Unlicensed linked capture archives are not redistributed."
+}

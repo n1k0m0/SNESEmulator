@@ -200,16 +200,16 @@ static class VideoTests
             foreach(bool pal in new[]{false,true})foreach(int overscan in new[]{0,4})
             {
                 var r=Background(5,1|overscan);int[] rows=Enumerable.Range(0,64).Select(i=>i/8%2==0?1:2).ToArray();r.Vram(0,Tile(4,rows));r.Vram(32,Tile(4,rows));
-                var m=Boot(r,pal);long line=NextLine(m);m.RunUntil(line+90);Check(m.Clock.Field&&m.Clock.Interlace);PixelRow(m,0,992);
+                var m=Boot(r,pal);long line=NextLine(m);m.RunUntil(line+90);Check(m.Clock.Field&&!m.Clock.Interlace&&m.Bus.Ppu.FrameGeometry.Interlace,"display latch is new; V128 timing capture remains pending");PixelRow(m,0,992);
                 Check(m.Bus.Ppu.FrameGeometry.Interlace&&m.Bus.Ppu.FrameGeometry.Field&&m.Bus.Ppu.FrameGeometry.Height==(overscan==0?224:239));
                 m.RunUntil(NextLine(m)+90);PixelRow(m,0,31);Check(!m.Bus.Ppu.FrameGeometry.Field);
             }
         });
-        test("M7 SETINI counter interlace input deadline H0 V128 and actual field durations",()=>{
+        test("M8 corrected SETINI display latch precedes V128 counter capture",()=>{
             foreach(bool pal in new[]{false,true})foreach(int delta in new[]{-1,1})
             {
                 var m=Boot(Background(2),pal);long start=m.Clock.Now+m.Clock.ClocksUntilFieldEnd;m.RunUntil(start+128*1364L+delta);m.Bus.Ppu.Write(0x33,1);m.RunUntil(start+129*1364L);
-                Check(m.Clock.Interlace==(delta<0),"V128 sampled interlace input");Check(!m.Bus.Ppu.FrameGeometry.Interlace&&m.Bus.Ppu.FrameGeometry.TimingInterlace==(delta<0),"field-start display flag differs explicitly from actual timing latch");long end=start+(pal?312:262)*1364L+(pal&&delta<0?4:!pal&&delta>0?-4:0);m.RunUntil(end);Check(m.Clock.V==0&&m.Clock.Fields==2,"interlaced odd field duration or short240 line");
+                Check(!m.Clock.Interlace,"V128 samples the V0 display latch, not live SETINI");Check(!m.Bus.Ppu.FrameGeometry.Interlace&&!m.Bus.Ppu.FrameGeometry.TimingInterlace,"Mid-field SETINI must not change this field's captured display input");long end=start+(pal?312:262)*1364L+(!pal?-4:0);m.RunUntil(end);Check(m.Clock.V==0&&m.Clock.Fields==2,"noninterlaced odd field duration");m.RunUntil(end+129*1364L);Check(m.Bus.Ppu.FrameGeometry.Interlace&&m.Clock.Interlace&&m.Bus.Ppu.FrameGeometry.TimingInterlace,"next V0 display latch reaches V128 counter");
             }
         });
         test("M7 field timing short NTSC and long PAL lines no float drift",()=>{
@@ -227,7 +227,9 @@ static class VideoTests
             foreach(bool pal in new[]{false,true})foreach(bool hires in new[]{false,true})
             {
                 var r=Background(hires?5:2,5);if(hires)r.Vram(32,Tile(4,1));var m=Boot(r,pal);m.RunFrame();m.RunFrame();
-                int width=hires?512:256;long start=pal?426932:358732,end=pal?852504:716100;
+                // M8 source-path correction: power-on V0 captured SETINI=0.
+                // Unchanged independent console ROMs check these first edges.
+                int width=hires?512:256;long start=pal?425568:357368,end=pal?851140:714736;
                 var geometry=new PpuGeometry(width,239,width,true,true,true,1,start,end,pal?21281370:945000000,pal?1:44,TimingInterlace:true);
                 ushort[] expected=Enumerable.Repeat((ushort)31,width*239).ToArray();if(hires)for(int y=0;y<239;y++)expected[y*width]=0;
                 var frame=new PpuFrame(geometry,expected,Enumerable.Repeat((byte)15,expected.Length).ToArray(),Array.Empty<uint>());

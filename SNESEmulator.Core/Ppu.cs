@@ -55,10 +55,15 @@ public sealed partial class Ppu
     public void StartLine(int line)
     {
         Scanline=line;
-        if(line==0){RangeOver=TimeOver=false;mosaicStart=1;BeginField();}
-        // The counter's interlace input has its own mid-field sampling deadline.
-        if(line==128&&Clock!=null){Clock.Interlace=(Registers[0x33]&1)!=0;FrameGeometry=FrameGeometry with{TimingInterlace=Clock.Interlace};}
-        if(line==((Registers[0x33]&4)!=0?240:225)&&!ForcedBlank)OamAddress=oamReload;
+        phaseH=0;
+        // The counter samples the display latch, captured at V0 by the PPU,
+        // rather than the live SETINI bit. This is the pinned references' path.
+        if(line==128&&Clock!=null){Clock.Interlace=FrameGeometry.Interlace;FrameGeometry=FrameGeometry with{TimingInterlace=Clock.Interlace};}
+    }
+    private void BeginPpuLine()
+    {
+        if(Scanline==0){RangeOver=TimeOver=false;mosaicStart=1;BeginField();}
+        if(Scanline==((Registers[0x33]&4)!=0?240:225)&&!ForcedBlank)OamAddress=oamReload;
         BeginPipelineLine();
     }
     public void Write(int register,byte value)

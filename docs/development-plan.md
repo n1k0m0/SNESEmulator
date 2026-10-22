@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M6 unabhängig abgenommen; M7 implementiert, unabhängige Abnahme ausstehend. M8–M10 bleiben offen. Messumfang: [Testlabor](test-laboratory.md), [M6-Vertrag](m6-dsp-contract.md), [M5-Vertrag](m5-ppu-contract.md), [M4-Vertrag](m4-apu-contract.md), [M3-Vertrag](m3-io-contract.md), [M2-Vertrag](m2-timing-contract.md). Alle5.080.400 externen CPU-Semantik- und Busfälle bestehen. Keine eigene Konsolenmessung.
+Status: M0–M7 unabhängig abgenommen. M8 wird implementiert; M9–M10 bleiben offen. Messumfang: [Testlabor](test-laboratory.md), [M6-Vertrag](m6-dsp-contract.md), [M5-Vertrag](m5-ppu-contract.md), [M4-Vertrag](m4-apu-contract.md), [M3-Vertrag](m3-io-contract.md), [M2-Vertrag](m2-timing-contract.md). Alle5.080.400 externen CPU-Semantik- und Busfälle bestehen. Keine eigene Konsolenmessung.
 
 ## Ziel und Nachweis
 
@@ -300,7 +300,7 @@ Abnahme:
 
 ### M7 – Grafikmodi, Regionen und Hardwaredetails
 
-M7 ist implementiert; unabhängige Abnahme steht aus. Der saubere Vollgate auf `7cf7cc1` bestand mit182 portablen und10 Windowsgruppen. Anschließend wurden nur der Format8-Fehlertext und der Lab-Optionsadapter korrigiert und gezielt geprüft; finaler Produkt-/Toolstand `adef880`. Native Rohfelder, getrennte Display-/Timing-Interlace-Metadaten, Quellenunsicherheiten und Messumfang: [M7-Vertrag](m7-video-contract.md), [Baseline](baselines/m7.json). Kein neuer Hardwaremessnachweis und kein Echtzeitclaim.
+M7 ist implementiert und unabhängig auf `439a655199647f325bef6b6b3074e67948a105dc` angenommen (Root-Fullgate Exit0). Der saubere Vollgate auf `7cf7cc1` bestand mit182 portablen und10 Windowsgruppen. Anschließend wurden nur der Format8-Fehlertext und der Lab-Optionsadapter korrigiert und gezielt geprüft; finaler Produkt-/Toolstand `adef880`. Native Rohfelder, getrennte Display-/Timing-Interlace-Metadaten, Quellenunsicherheiten und Messumfang: [M7-Vertrag](m7-video-contract.md), [Baseline](baselines/m7.json). Kein neuer Hardwaremessnachweis und kein Echtzeitclaim.
 
 Arbeit:
 

@@ -197,12 +197,21 @@ static class TimingTests
                 c.SetInterruptLines(false,true);c.Step();Check(c.PC==0x9000);c.Step();Check(c.PC==(masked?0x9001:0xa000),$"E={e} I={masked}");
             }
         });
-        test("M2 WAI STP suspend CPU clocks while scheduler and APU continue",()=>
+        test("M8 WAI retains idle clocks while STP suspends CPU and peripherals continue",()=>
         {
             foreach(byte op in new byte[]{0xcb,0xdb})
             {
                 var m=Machine();m.Cpu.PC=0;m.Cpu.PBR=0;m.Bus.Wram[0]=op;var cycles=new List<long>();m.Cpu.CycleObserved=c=>cycles.Add(m.Clock.Now);
-                m.RunUntil(10000);Check(m.Clock.Now==10000&&m.Clock.ApuTicks>0&&m.Cpu.Instructions==1,"sleep cannot hang budget");Check(cycles.SequenceEqual(new long[]{4,14,20,20}),"quiescent marker has zero duration; sleep produces no CPU bus clocks");
+                m.RunUntil(10000);Check(m.Clock.Now==10000&&m.Clock.ApuTicks>0&&m.Cpu.Instructions==1,"sleep cannot hang budget");
+                Check(cycles.Take(4).SequenceEqual(new long[]{4,14,20,20}),"terminal marker has zero duration");
+                if(op==0xdb)Check(cycles.Count==4,"STP suspends CPU until reset");
+                else
+                {
+                    // Pinned WDC65816 instructionWait: continuous six-master
+                    // idle cycles, interrupted only by the40-master refresh.
+                    Check(cycles.Count>1000&&cycles[4]==26,"WAI must retain its oscillator");
+                    Check(cycles.Skip(3).Zip(cycles.Skip(4),(a,b)=>b-a).All(d=>d is 6 or 46),"WAI idle or refresh duration");
+                }
             }
         });
         test("M2 reset IRQ NMI entry continuation survives every cycle",()=>
