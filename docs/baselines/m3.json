@@ -1,0 +1,82 @@
+{
+  "schema": "snes-m3-io-dma-v1",
+  "status": "All implementation gates passed on clean implementation commit; independent parent acceptance pending. Measurement record, not expected-output oracle.",
+  "implementationCommit": "127c6688ac832a6e34a38165e18594cebe914bfd",
+  "command": "python tools/test-lab.py --windows --full",
+  "log": "artifacts/m3-counter-full-validation.log",
+  "exitCode": 0,
+  "workingTreeStatus": "",
+  "sourceCommit": "307c63f5673c8c6b861c52f71ddb89212a227480",
+  "manifestSha256": "609272ECB3E2516D9B2566D14B84D2C38264D84AD33270122EE48228B4BB1192",
+  "semantics": {
+    "executed": 5080400,
+    "passed": 5080400,
+    "failed": 0,
+    "files": 512,
+    "skipped": 0
+  },
+  "genericBus": {
+    "executed": 5080400,
+    "passed": 5080400,
+    "failed": 0,
+    "files": 512,
+    "skipped": 0,
+    "cycleRows": 26184846
+  },
+  "regression": {
+    "portablePassed": 66,
+    "priorPortablePreserved": 45,
+    "newM3PortableGroups": 21,
+    "windowsPassed": 5,
+    "laboratoryMutationsPassed": 11,
+    "m3ProtocolMutations": 3,
+    "originalCpuRomCases": 80,
+    "everyClockDmaIdleCheckpoints": 1260,
+    "everyClockRunningCpuDmaCheckpoints": 181,
+    "everyClockHdmaCheckpoints": 301,
+    "everyClockRmwRefreshCheckpoints": 200,
+    "savestateVersion": 4,
+    "olderSavestateVersionsRejected": [
+      1,
+      2,
+      3
+    ],
+    "sourceReferenceRevision": "78474e5d39f58872dc21aca18cf9eb583b147fe7",
+    "lastDotIrqMatrix": "NTSC/PAL x interlace/noninterlace x both fields x allowed/suppressed; includes1360 short and1368 long line historical counter taps",
+    "observedRefreshRomExample": {
+      "firstReadClock": 1876,
+      "firstReadH": 512,
+      "refreshLine": 1,
+      "refreshH": [
+        534,
+        574
+      ],
+      "lastWriteClock": 1976,
+      "lastWriteH": 612
+    },
+    "observerSnapshotContinuation": "CPU read hold, DMA A/B2180, HDMA table/indirect/transfer phases; no repeated effects"
+  },
+  "reportSha256": {
+    "core-child": "4b1c1737be44cae573a2adda779f21e6b43b8e9c4fa8f2e6be41adad6b739b79",
+    "conformance-child": "3d8403efe8fbcb9b784636c6cdbac97994bf16ba8adf4ef6c69b4ba1ca491141",
+    "bus-conformance-child": "c1c6ca78ff89cd10fc10b19d770c9065a807be3665bac3a4bad45b42f93796d8",
+    "windows-integration-child": "9c2f7182b6f619069a0edb558a8719bbe254c69500503db133dfa2725441816f",
+    "mutations-child": "34f72574b30d09a330217bba65bce64a790736ea8052738817492be2eb757fbb"
+  },
+  "uiSmoke": {
+    "scene": "demo",
+    "exitCode": 0,
+    "inspected": true,
+    "image": "artifacts/m3-ui-demo.png",
+    "sha256": "4b2c174f33e1663c5dc5edc71b411cf697d679389d5d590fbba12e6cb85b64fb",
+    "scope": "Original diagnostic rendered by the own CPU/DMA/PPU. Not a pixel accuracy oracle."
+  },
+  "limitations": [
+    "Source-informed analytical timing is not original-console measurement. User has no local console; future evidence work will use published hardware tests/results.",
+    "No external licensed M3 hardware-ROM suite executed; original80 CPU fixture programs do not claim hardware certification.",
+    "PPU read buffers/complete PPU MDR and physical PPU/APU reset pins remain M5/M7; current generic PPU read-zero fallback is not accurate open bus.",
+    "Auxiliary controller data lines are electrical fixtures, not multitap support; simultaneous manual/auto serial electrical behavior is source-modelled but unmeasured.",
+    "Mid-frame HDMA transfer seed and timer-write behavior carry the pinned reference own unverified labels.",
+    "No SPC700/DSP/native audio; whole-line graphics and commercial game compatibility remain future milestones."
+  ]
+}

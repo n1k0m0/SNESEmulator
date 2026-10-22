@@ -236,7 +236,8 @@ execute/acknowledge the IRQ vector. This is original test software, not a
 hardware-certified third-party suite. No licensed external M3 ROM was acquired.
 
 Every-clock save/load comparisons cover1260 bus-idle DMA,181 running-CPU DMA,
-and301 HDMA setup/line checkpoints against uninterrupted end states. Public phase
+and301 HDMA setup/line checkpoints against uninterrupted end states. Another200
+checkpoints cover E-RMW internal/valid-write ALU edges and colliding refresh. Public phase
 observer snapshots verify no repeated2180/table/indirect effects. ALU and auto-joy
 states have additional edge checkpoints. Three negative clock/channel/target
 mutations use the same positive protocol verifier, in addition to the unchanged11
@@ -248,6 +249,9 @@ Savestate4 stores all M3 intermediate state, cartridge options/mapper and the
 auto/forced profile choice. Same-ROM wrong-mapper loads and versions1–3 are
 rejected. PPU/APU convenience reset and electrical effects explicitly deferred
 in the M3 contract are not claimed physically accurate.
+
+The clean implementation gate and report hashes are recorded in
+[baselines/m3.json](baselines/m3.json); independent parent review is pending.
 
 ## Headless limits, replay and artifacts
 
