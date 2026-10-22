@@ -3,7 +3,7 @@ namespace SNESEmulator.Core;
 public enum HardwareEventKind { Refresh, LineEnd, VblankNmi, External, CpuStall }
 public sealed record HardwareEvent(long Clock,int Priority,long Sequence,HardwareEventKind Kind,int Payload=0);
 public sealed record ClockState(long Now,int H,int V,bool Field,long Fields,bool Interlace,long ApuTicks,long ApuRemainder,
-    long StallUntil,long NextSequence,HardwareEvent[] Events);
+    long StallUntil,long NextSequence,HardwareEvent[] Events,int VblankLine=225);
 
 /// <summary>Integer clock and stable typed-event queue. Events at a bus endpoint precede the bus effect.</summary>
 public sealed class MasterClock(HardwareProfile profile)
@@ -36,7 +36,7 @@ public sealed class MasterClock(HardwareProfile profile)
         }
     }
     public void Reset()
-    {Profile.Validate();Now=H=V=0;Field=false;Fields=ApuTicks=ApuRemainder=StallUntil=sequence=0;Interlace=false;events.Clear();ScheduleLine();}
+    {Profile.Validate();Now=H=V=0;Field=false;Fields=ApuTicks=ApuRemainder=StallUntil=sequence=0;Interlace=false;VblankLine=225;events.Clear();ScheduleLine();}
     public void Schedule(long at,HardwareEventKind kind,int payload=0,int priority=0)
     {if(at<Now)throw new ArgumentOutOfRangeException(nameof(at));events.Add(new(at,priority,sequence++,kind,payload));events.Sort(Compare);}
     private static int Compare(HardwareEvent a,HardwareEvent b) {int n=a.Clock.CompareTo(b.Clock);if(n!=0)return n;n=a.Priority.CompareTo(b.Priority);return n!=0?n:a.Sequence.CompareTo(b.Sequence);}
@@ -86,10 +86,11 @@ public sealed class MasterClock(HardwareProfile profile)
             return remaining;
         }
     }
-    public ClockState Capture()=>new(Now,H,V,Field,Fields,Interlace,ApuTicks,ApuRemainder,StallUntil,sequence,events.ToArray());
+    public ClockState Capture()=>new(Now,H,V,Field,Fields,Interlace,ApuTicks,ApuRemainder,StallUntil,sequence,events.ToArray(),VblankLine);
     public void Restore(ClockState s)
     {
         if(s.Now<0||s.H<0||s.H>=Profile.LineClocks(s.V,s.Field,s.Interlace)||s.V<0||s.V>=Profile.FieldLines(s.Field,s.Interlace)||s.Fields<0||s.ApuTicks<0||s.ApuRemainder<0||s.ApuRemainder>=Profile.MasterHzNumerator*Profile.ApuHzDenominator||s.Events.Any(e=>e.Clock<s.Now)||s.Events.Select(e=>e.Sequence).Distinct().Count()!=s.Events.Length||s.Events.Any(e=>e.Sequence>=s.NextSequence))throw new InvalidDataException("Invalid clock state");
-        Now=s.Now;H=s.H;V=s.V;Field=s.Field;Fields=s.Fields;Interlace=s.Interlace;ApuTicks=s.ApuTicks;ApuRemainder=s.ApuRemainder;StallUntil=s.StallUntil;sequence=s.NextSequence;events.Clear();events.AddRange(s.Events);events.Sort(Compare);
+        if(s.VblankLine is not (225 or 240))throw new InvalidDataException("Invalid Vblank line");
+        Now=s.Now;H=s.H;V=s.V;Field=s.Field;Fields=s.Fields;Interlace=s.Interlace;ApuTicks=s.ApuTicks;ApuRemainder=s.ApuRemainder;StallUntil=s.StallUntil;sequence=s.NextSequence;VblankLine=s.VblankLine;events.Clear();events.AddRange(s.Events);events.Sort(Compare);
     }
 }

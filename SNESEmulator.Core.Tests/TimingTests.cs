@@ -28,6 +28,7 @@ static class TimingTests
         });
         test("M2 NTSC PAL fields short long lines dots and refresh phase",()=>
         {
+            var custom=new MasterClock(HardwareProfile.Ntsc);custom.Reset();custom.VblankLine=240;var restored=new MasterClock(HardwareProfile.Ntsc);restored.Restore(custom.Capture());Check(restored.VblankLine==240,"overscan scheduling latch is serialized");
             foreach(var p in new[]{HardwareProfile.Ntsc,HardwareProfile.PalProfile})foreach(bool interlace in new[]{false,true})
             {
                 var c=new MasterClock(p);c.Reset();c.Interlace=interlace;var refresh=new List<long>();c.EventObserved=e=>{if(e.Kind==HardwareEventKind.Refresh)refresh.Add(e.Clock);};
