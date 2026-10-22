@@ -1,6 +1,6 @@
 namespace SNESEmulator.Core;
 
-public enum HardwareEventKind { Refresh, LineEnd, VblankNmi, External, CpuStall }
+public enum HardwareEventKind { Refresh, LineEnd, VblankNmi, External, CpuStall, Device }
 public sealed record HardwareEvent(long Clock,int Priority,long Sequence,HardwareEventKind Kind,int Payload=0);
 public sealed record ClockState(long Now,int H,int V,bool Field,long Fields,bool Interlace,long ApuTicks,long ApuRemainder,
     long StallUntil,long NextSequence,HardwareEvent[] Events,int VblankLine=225);
@@ -20,6 +20,8 @@ public sealed class MasterClock(HardwareProfile profile)
     public long StallUntil {get;private set;}
     private long sequence;
     private readonly List<HardwareEvent> events=[];
+    public Action? RefreshStarted {get;set;}
+    public Action<HardwareEvent>? DeviceEvent {get;set;}
     public Action<HardwareEvent>? EventObserved {get;set;}
     public Action<int>? LineCompleted {get;set;}
     public Action<int>? LineStarted {get;set;}
@@ -56,7 +58,8 @@ public sealed class MasterClock(HardwareProfile profile)
             var e=events[0];events.RemoveAt(0);AdvanceRaw(e.Clock);
             switch(e.Kind)
             {
-                case HardwareEventKind.Refresh:StallUntil=Math.Max(StallUntil,Now+40);break;
+                case HardwareEventKind.Device:DeviceEvent?.Invoke(e);break;
+                case HardwareEventKind.Refresh:StallUntil=Math.Max(StallUntil,Now+40);RefreshStarted?.Invoke();break;
                 case HardwareEventKind.CpuStall:StallUntil=Math.Max(StallUntil,Now+e.Payload);break;
                 case HardwareEventKind.LineEnd:
                     LineCompleted?.Invoke(V);H=0;V++;

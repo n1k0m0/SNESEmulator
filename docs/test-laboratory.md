@@ -1,11 +1,13 @@
-# Test laboratory: M0–M2 CPU semantics, bus cycles and analytical timing
+# Test laboratory: M0–M3 CPU, bus, timing and 5A22 I/O
 
 M0 establishes measurement, not CPU or SNES accuracy. The original17 assertions
 are preserved as12 portable core regressions and5 Windows/network integrations.
 `SNESEmulator.Core.Tests` references only the core and portable testing library;
 it does not load Windows Forms, OpenTK, the frontend, audio devices or TLS.
 `SNESEmulator.Tests` retains the existing Windows frontend/transport dependency.
-M1 adds12 portable semantic regression groups; M2 adds21 timing/continuation groups (45 total portable tests).
+M1 adds12 portable semantic groups; M2 adds21 timing/continuation groups.
+M3 adds21 I/O/DMA groups (66 total portable tests); independent M3 acceptance
+remains pending. M0–M2 were independently accepted by the parent full gate.
 No sibling C64 repository is modified.
 
 ## Reproduce locally
@@ -215,6 +217,38 @@ dotnet run --project SNESEmulator.Lab -c Release -- cpu-bus-full artifacts/bus t
 dotnet run --project SNESEmulator.Lab -c Release -- benchmark
 ```
 
+## M3 I/O and transfer gate
+
+Read [the M3 contract](m3-io-contract.md) for the exact analytical behavior,
+source revisions and remaining PPU/electrical/hardware evidence limits.
+`IoDmaTests` adds21 groups to the existing45: normal extended mapper metadata,
+manual region/profile choice, recursive mirroring, SRAM retention, CPU MDR and
+MMIO masks, all DMA patterns/directions and65536-byte counter, invalid A/B ranges,
+WRAM conflicts, HDMA setup/direct/indirect/repeat/two-pass order and preemption,
+ALU intermediate states and real CPU edge placement, H/V/HV IRQ and NMI holds,
+counter latches, serial signatures and all four automatic JOY result lines.
+
+The original `IoDmaDiagnosticRom` generator executes80 CPU cases (8 modes ×2
+bus directions ×5 raster start classes), with WRAM signatures and protocol
+oracles independent of the incomplete PPU. Refresh integration asserts a real
+transfer straddling refresh, HBlank/VBlank use actual polling, and timer cases
+execute/acknowledge the IRQ vector. This is original test software, not a
+hardware-certified third-party suite. No licensed external M3 ROM was acquired.
+
+Every-clock save/load comparisons cover1260 bus-idle DMA,181 running-CPU DMA,
+and301 HDMA setup/line checkpoints against uninterrupted end states. Public phase
+observer snapshots verify no repeated2180/table/indirect effects. ALU and auto-joy
+states have additional edge checkpoints. Three negative clock/channel/target
+mutations use the same positive protocol verifier, in addition to the unchanged11
+laboratory mutations. Old immediate-result Foundation tests now advance the real
+ALU/DMA/JOY state before the unchanged final expectations. M2 system IRQ injection
+uses the external bus IRQ wire because SnesSystem now owns CPU line wiring.
+
+Savestate4 stores all M3 intermediate state, cartridge options/mapper and the
+auto/forced profile choice. Same-ROM wrong-mapper loads and versions1–3 are
+rejected. PPU/APU convenience reset and electrical effects explicitly deferred
+in the M3 contract are not claimed physically accurate.
+
 ## Headless limits, replay and artifacts
 
 `rom` defaults to the original diagnostic ROM. Options require key/value pairs:
@@ -248,8 +282,8 @@ Events at the same timestamp execute before latch/completion transitions in
 priority/creation order. CPU architectural registers commit at
 instruction boundaries; cycle rows carry the in-flight pin values. Partial
 frames remain partial and completed-field count is separate. PPU rendering is
-still whole-line host ARGB output; DMA transfers remain immediate legacy code
-followed by serialized stall debt, not accurate DMA timing. No SPC700/DSP or
+still whole-line host ARGB output. M3 replaces immediate DMA/stall debt with
+serializable DMA/HDMA bus ownership and phase machines; see the M3 contract. No SPC700/DSP or
 native audio samples exist. The rational oscillator counter is only the APU
 scheduling foundation. These limitations remain visible in hardware/graphics/
 audio evidence reports as skipped, never passing accuracy claims.

@@ -11,22 +11,26 @@ public enum SnesButtons : ushort
 
 public sealed class ControllerPorts
 {
-    public ushort[] Buttons { get; } = new ushort[2];
-    public ushort[] Latched { get; } = new ushort[2];
+    public ushort[] Buttons { get; } = new ushort[4];
+    public ushort[] Latched { get; } = new ushort[4];
+    // Optional fixture/peripheral electrical data-2 lines; standard pads leave them low.
+    public bool[] AuxiliaryConnected {get;} = new bool[2];
     public int[] Position { get; } = new int[2];
     public bool Strobe { get; private set; }
     public void Write(byte value)
     {
-        Strobe = (value & 1) != 0;
-        if (Strobe) Latch();
+        bool next = (value & 1) != 0;
+        if (Strobe && !next) Latch();
+        if(Strobe!=next)Array.Clear(Position);
+        Strobe = next;
     }
-    public void Latch() { Array.Copy(Buttons, Latched, 2); Array.Clear(Position); }
+    public void Latch() { for(int i=0;i<4;i++)Latched[i]=(ushort)(Buttons[i]&0xfff0); Array.Clear(Position); }
     public byte Read(int port)
     {
-        if (Strobe) Latch();
+        if (Strobe) return (byte)(((Buttons[port] >> 15)&1)|(AuxiliaryConnected[port]?((Buttons[port+2] >> 15)&1)<<1:0));
         int bit = Position[port];
         if (!Strobe && bit < 16) Position[port]++;
-        return (byte)(bit >= 16 ? 1 : (Latched[port] >> (15 - bit)) & 1);
+        return (byte)(bit >= 16 ? (AuxiliaryConnected[port]?3:1) : ((Latched[port] >> (15 - bit)) & 1) | (AuxiliaryConnected[port]?((Latched[port+2] >> (15 - bit)) & 1) << 1:0));
     }
     public void Restore(bool strobe) => Strobe = strobe;
 }

@@ -8,3 +8,6 @@ testdata/** text eol=lf
 SNESEmulator.Core/DiagnosticRom.cs text eol=lf
 
 testdata/65816/upstream-* -whitespace
+
+SNESEmulator.Core/IoDmaDiagnosticRom.cs text eol=lf
+SNESEmulator.Core.Tests/IoDmaTests.cs text eol=lf

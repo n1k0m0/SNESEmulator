@@ -17,13 +17,13 @@ public static class StateSerializer
         using (var zip = new GZipStream(file, CompressionLevel.Fastest))
         using (var w = new BinaryWriter(zip))
         {
-            w.Write("SNESSAV"); w.Write(3); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));
+            w.Write("SNESSAV"); w.Write(4); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));w.Write(machine.ProfileForced);w.Write((int)cart.Mapping);w.Write(JsonSerializer.Serialize(cart.Options));
             var c = machine.Cpu; var b = machine.Bus; var p = b.Ppu;
             w.Write(c.A); w.Write(c.X); w.Write(c.Y); w.Write(c.S); w.Write(c.D); w.Write(c.PC);
             w.Write(c.P); w.Write(c.PBR); w.Write(c.DBR); w.Write(c.E); w.Write(c.Waiting); w.Write(c.Stopped); w.Write(c.Instructions);
             w.Write(machine.Frames); w.Write(machine.MasterRemainder);
             w.Write(b.Wram); w.Write(b.Io); w.Write(b.DmaRegisters); w.Write(cart.Sram);
-            w.Write(b.OpenBus); w.Write(b.WramAddress); w.Write(b.NmiFlag); w.Write(b.NmiPending); w.Write(b.DmaMasterCycles);
+            w.Write(b.OpenBus); w.Write(b.WramAddress); w.Write(b.NmiFlag); w.Write(b.NmiPending);
             w.Write(p.Vram); w.Write(p.Cgram); w.Write(p.Oam); w.Write(p.Registers);
             w.Write(p.VramAddress); w.Write(p.CgramAddress); w.Write(p.OamAddress); w.Write(p.ScrollLatch); w.Write(p.Scanline);
             foreach (ushort value in p.Scroll) w.Write(value);
@@ -32,8 +32,9 @@ public static class StateSerializer
             foreach (ushort value in b.Controllers.Buttons) w.Write(value);
             foreach (ushort value in b.Controllers.Latched) w.Write(value);
             foreach (int value in b.Controllers.Position) w.Write(value);
-            w.Write(b.Controllers.Strobe);
+            w.Write(b.Controllers.Strobe);foreach(bool value in b.Controllers.AuxiliaryConnected)w.Write(value);
             w.Write(JsonSerializer.Serialize(machine.Clock.Capture()));w.Write(JsonSerializer.Serialize(machine.CapturePhase()));
+            w.Write(JsonSerializer.Serialize(b.CpuIo.State));w.Write(JsonSerializer.Serialize(b.Dma.State));
             w.Write(JsonSerializer.Serialize(c.CaptureContinuation()));w.Write(JsonSerializer.Serialize(c.CaptureInterrupts()));
         }
         File.Move(temporary, path, true);
@@ -43,27 +44,34 @@ public static class StateSerializer
         using var file = File.OpenRead(path);
         using var zip = new GZipStream(file, CompressionMode.Decompress);
         using var r = new BinaryReader(zip);
-        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 3 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
+        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 4 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
             throw new InvalidDataException("Savestate version or cartridge does not match.");
         var profile=JsonSerializer.Deserialize<HardwareProfile>(r.ReadString())??throw new InvalidDataException("Missing hardware profile");
-        var m = new SnesSystem(profile); m.Insert(new Cartridge(cartridge.Rom, cartridge.SourcePath));
+        bool forced=r.ReadBoolean();var mapping=(CartridgeMapping)r.ReadInt32();
+        var options=JsonSerializer.Deserialize<CartridgeOptions>(r.ReadString())??throw new InvalidDataException("Missing cartridge options");
+        if(!Enum.IsDefined(mapping)||mapping!=cartridge.Mapping)throw new InvalidDataException("Savestate cartridge mapper does not match.");
+        var restoredCart=new Cartridge(cartridge.Rom,cartridge.SourcePath,options);
+        if(restoredCart.Mapping!=mapping)throw new InvalidDataException("Invalid saved mapper options");
+        var m = new SnesSystem(profile,forced);m.Insert(restoredCart);
         var c = m.Cpu; var b = m.Bus; var p = b.Ppu;
         c.A = r.ReadUInt16(); c.X = r.ReadUInt16(); c.Y = r.ReadUInt16(); c.S = r.ReadUInt16(); c.D = r.ReadUInt16(); c.PC = r.ReadUInt16();
         c.P = r.ReadByte(); c.PBR = r.ReadByte(); c.DBR = r.ReadByte(); c.E = r.ReadBoolean(); c.Waiting = r.ReadBoolean(); c.Stopped = r.ReadBoolean(); c.Instructions = r.ReadInt64();
         long frames=r.ReadInt64();int remainder=r.ReadInt32();
         Read(r, b.Wram); Read(r, b.Io); Read(r, b.DmaRegisters); Read(r, b.Cartridge!.Sram);
-        b.OpenBus = r.ReadByte(); b.WramAddress = r.ReadInt32(); b.NmiFlag = r.ReadBoolean(); b.NmiPending = r.ReadBoolean(); b.DmaMasterCycles = r.ReadInt32();
+        b.OpenBus = r.ReadByte(); b.WramAddress = r.ReadInt32(); b.NmiFlag = r.ReadBoolean(); b.NmiPending = r.ReadBoolean();
         Read(r, p.Vram); Read(r, p.Cgram); Read(r, p.Oam); Read(r, p.Registers);
         p.VramAddress = r.ReadUInt16(); p.CgramAddress = r.ReadUInt16(); p.OamAddress = r.ReadUInt16(); p.ScrollLatch = r.ReadByte(); p.Scanline = r.ReadInt32();
         for (int i = 0; i < p.Scroll.Length; i++) p.Scroll[i] = r.ReadUInt16();
         for (int i = 0; i < p.Pixels.Length; i++) p.Pixels[i] = r.ReadUInt32();
         Read(r, b.Apu.CpuToApu); Read(r, b.Apu.ApuToCpu);
-        for (int i = 0; i < 2; i++) b.Controllers.Buttons[i] = r.ReadUInt16();
-        for (int i = 0; i < 2; i++) b.Controllers.Latched[i] = r.ReadUInt16();
+        for (int i = 0; i < 4; i++) b.Controllers.Buttons[i] = r.ReadUInt16();
+        for (int i = 0; i < 4; i++) b.Controllers.Latched[i] = r.ReadUInt16();
         for (int i = 0; i < 2; i++) b.Controllers.Position[i] = r.ReadInt32();
-        b.Controllers.Restore(r.ReadBoolean());
+        b.Controllers.Restore(r.ReadBoolean());for(int i=0;i<2;i++)b.Controllers.AuxiliaryConnected[i]=r.ReadBoolean();
         m.Clock.Restore(JsonSerializer.Deserialize<ClockState>(r.ReadString())??throw new InvalidDataException("Missing clock state"));
         m.RestorePhase(JsonSerializer.Deserialize<ExecutionPhase>(r.ReadString())??throw new InvalidDataException("Missing CPU phase"));
+        b.CpuIo.Restore(JsonSerializer.Deserialize<IoState>(r.ReadString())??throw new InvalidDataException("Missing I/O state"));
+        b.Dma.Restore(JsonSerializer.Deserialize<DmaState>(r.ReadString())??throw new InvalidDataException("Missing DMA state"));
         c.RestoreContinuation(JsonSerializer.Deserialize<CpuContinuation>(r.ReadString()));
         c.RestoreInterrupts(JsonSerializer.Deserialize<CpuInterruptState>(r.ReadString())??throw new InvalidDataException("Missing interrupt state"));
         if(frames!=m.Frames||remainder!=m.MasterRemainder)throw new InvalidDataException("Inconsistent clock state");

@@ -1,6 +1,6 @@
 namespace SNESEmulator.Core;
 
-public sealed record ExecutionPhase(int CycleRemaining,bool CycleActive,long StallDebt,int HoldRemaining=0,CpuCycle? HeldRead=null,long CycleStart=0,long LatchClock=0);
+public sealed record ExecutionPhase(int CycleRemaining,bool CycleActive,int HoldRemaining=0,CpuCycle? HeldRead=null,long CycleStart=0,long LatchClock=0,bool WriteAluDone=false);
 public sealed record TimedCpuCycleEvent(string Phase,long MasterClock,long StartClock,long? LatchClock,CpuCycle Cycle);
 
 public sealed class SnesSystem
@@ -13,46 +13,70 @@ public sealed class SnesSystem
     public int MasterRemainder {get=>Clock.H;set {if(value!=Clock.H)throw new InvalidOperationException("Raster phase is clock-owned");}}
     private int cycleRemaining;
     private bool cycleActive;
-    private long stallDebt;
     private int holdRemaining;
     private CpuCycle? heldRead;
     private long cycleStart,latchClock;
     public Action<TimedCpuCycleEvent>? CyclePhaseObserved {get;set;}
     private long target;
+    private bool writeAluDone;
+    private readonly bool forcedProfile;
+    public bool ProfileForced=>forcedProfile;
     private sealed class ClockBudget : Exception;
     private readonly ClockBudget budget=new();
-    public SnesSystem(HardwareProfile? profile=null)
-    {Profile=profile??HardwareProfile.Ntsc;Clock=new(Profile);Cpu=new(Bus);ConfigureClock();Bus.Reset();Clock.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;}
+    public SnesSystem(HardwareProfile? profile=null,bool? forceProfile=null)
+    {forcedProfile=forceProfile??profile!=null;Profile=profile??HardwareProfile.Ntsc;Clock=new(Profile);Cpu=new(Bus);ConfigureClock();Bus.Reset();Clock.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;Cpu.InterruptPollingAllowed=()=>!Bus.CpuIo.State.IrqLock;}
     private void ConfigureClock()
     {
+        Clock.RefreshStarted=()=>{for(int i=1;i<=5;i++)Clock.Schedule(Clock.Now+i*8,HardwareEventKind.Device,1,-6);};
         Clock.LineCompleted=line=>{if(line>0)Bus.Ppu.RenderScanline(line-1);};
-        Clock.LineStarted=line=>Bus.Ppu.Scanline=line;
-        Clock.FieldStarted=()=>{Bus.NmiFlag=false;Bus.Ppu.Scanline=0;};
+        Bus.CpuIo.Clock=Clock;Bus.DeferCpuMdr=true;
+        Clock.DeviceEvent=e=>{if((e.Payload&255)==7)Bus.Dma.RequestHdma(e.Payload==7);else Bus.CpuIo.Event(e.Payload);};
+        Clock.LineStarted=line=>{Bus.Ppu.Scanline=line;ScheduleIoLine();};
+        Clock.FieldStarted=()=>{Bus.CpuIo.NewField();Bus.Ppu.Scanline=0;};
         Clock.VblankStarted=()=>Bus.BeginVblank();
     }
-    public void Insert(Cartridge cartridge)
-    {Bus.Cartridge=cartridge;if(cartridge.Pal!=Profile.Pal){Profile=cartridge.Pal?HardwareProfile.PalProfile:HardwareProfile.Ntsc;Clock=new(Profile);ConfigureClock();}Reset();}
-    public void Reset()
+    private void ScheduleIoLine()
     {
-        Bus.Reset();Cpu.BeforeCycle=null;Cpu.EffectCompleted=null;Cpu.AfterCycle=null;Cpu.ResumeCycle=null;Cpu.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;
-        Clock.Reset();cycleRemaining=holdRemaining=0;cycleActive=false;stallDebt=0;heldRead=null;cycleStart=latchClock=0;
+        Bus.CpuIo.ScheduleIrq(false);
+        if(Clock.V==0)Clock.Schedule(Clock.Now+12+(Clock.Now&7),HardwareEventKind.Device,7,-2);
+        if(Clock.V<Clock.VblankLine)Clock.Schedule(Clock.Now+1104,HardwareEventKind.Device,0x107,-2);
     }
-    public ExecutionPhase CapturePhase()=>new(cycleRemaining,cycleActive,stallDebt,holdRemaining,heldRead,cycleStart,latchClock);
+    public void Insert(Cartridge cartridge)
+    {Bus.Cartridge=cartridge;if(!forcedProfile&&cartridge.Pal!=Profile.Pal){Profile=cartridge.Pal?HardwareProfile.PalProfile:HardwareProfile.Ntsc;Clock=new(Profile);ConfigureClock();}PowerOn();}
+    public void PowerOn()=>ResetCore(true);
+    public void Reset()=>ResetCore(false);
+    private void ResetCore(bool powerOn)
+    {
+        Bus.Reset(powerOn);Cpu.BeforeCycle=null;Cpu.EffectCompleted=null;Cpu.AfterCycle=null;Cpu.ResumeCycle=null;Cpu.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;
+        Clock.Reset();cycleRemaining=holdRemaining=0;cycleActive=false;heldRead=null;cycleStart=latchClock=0;writeAluDone=false;ScheduleIoLine();
+    }
+    public ExecutionPhase CapturePhase()=>new(cycleRemaining,cycleActive,holdRemaining,heldRead,cycleStart,latchClock,writeAluDone);
     public void RestorePhase(ExecutionPhase p)
     {
-        if(p.CycleRemaining is <0 or >12||p.StallDebt<0||p.HoldRemaining is <0 or >4||p.CycleStart<0||p.LatchClock<0||(p.HeldRead!=null&&(!p.HeldRead.Valid||!p.HeldRead.Read))||(p.HoldRemaining>0&&p.HeldRead==null))throw new InvalidDataException("Invalid CPU phase");
-        cycleRemaining=p.CycleRemaining;cycleActive=p.CycleActive;stallDebt=p.StallDebt;holdRemaining=p.HoldRemaining;heldRead=p.HeldRead;cycleStart=p.CycleStart;latchClock=p.LatchClock;
+        if(p.CycleRemaining is <0 or >12||p.HoldRemaining is <0 or >4||p.CycleStart<0||p.LatchClock<0||(p.HeldRead!=null&&(!p.HeldRead.Valid||!p.HeldRead.Read))||(p.HoldRemaining>0&&p.HeldRead==null))throw new InvalidDataException("Invalid CPU phase");
+        cycleRemaining=p.CycleRemaining;cycleActive=p.CycleActive;holdRemaining=p.HoldRemaining;heldRead=p.HeldRead;cycleStart=p.CycleStart;latchClock=p.LatchClock;writeAluDone=p.WriteAluDone;
     }
-    private void SyncInterrupts() {if(Bus.NmiPending){Cpu.PulseNmi();Bus.NmiPending=false;}}
+    private void SyncInterrupts()
+    {
+        Cpu.SetInterruptLines(Bus.CpuIo.State.NmiOutput,Bus.CpuIo.IrqOutput||Bus.ExternalIrqLine);
+        if(Bus.NmiPending){Cpu.PulseNmi();Bus.NmiPending=false;}
+    }
     private void BeforeCycle(CpuCycle cycle)
     {
         if(cycle.Pins=="--------"){cycleStart=Clock.Now;return;}
-        if(!cycleActive){cycleStart=Clock.Now;cycleRemaining=Profile.AccessClocks(cycle,(Bus.Io[13]&1)!=0)-(cycle.Valid&&cycle.Read?4:0);cycleActive=true;}
+        if(!cycleActive){
+            if(!cycle.Read&&!writeAluDone){Bus.CpuIo.AluEdge();writeAluDone=true;}
+            int clocks=Profile.AccessClocks(cycle,(Bus.Io[13]&1)!=0);
+            if(Bus.Dma.CpuBoundary(clocks,Clock.Now))AdvanceDma();
+            cycleStart=Clock.Now;cycleRemaining=clocks-(cycle.Valid&&cycle.Read?4:0);cycleActive=true;
+        }
         AdvanceActive(ref cycleRemaining);
         cycleActive=false;
     }
     private void OnBusEffect(CpuCycle cycle)
     {
+        Bus.CpuIo.State.IrqLock=false;
+        if(cycle.Valid&&!cycle.Read&&cycle.Address is {} a&&(a&0x40ffff)==0x4200)Bus.CpuIo.State.IrqLock=true;
         SyncInterrupts();
         if(cycle.Valid)
         {
@@ -64,25 +88,38 @@ public sealed class SnesSystem
     private void AfterCycle(CpuCycle cycle)
     {
         if(cycle.Valid&&cycle.Read){FinishReadHold();return;}
+        if(cycle.Read)Bus.CpuIo.AluEdge();writeAluDone=false;
         CyclePhaseObserved?.Invoke(new("cycle-complete",Clock.Now,cycleStart,cycle.Valid?latchClock:null,cycle));
     }
     private void FinishReadHold()
     {
         if(heldRead==null)return;
         AdvanceActive(ref holdRemaining);
-        var cycle=heldRead;heldRead=null;
+        var cycle=heldRead;heldRead=null;Bus.CpuIo.AluEdge();
+        if(cycle.Address is {} address&&(address&0x40fc00)!=0x4000)Bus.OpenBus=cycle.Value!.Value;
         CyclePhaseObserved?.Invoke(new("cycle-complete",Clock.Now,cycleStart,latchClock,cycle));
+    }
+    private void AdvanceDma()
+    {
+        while(Bus.Dma.Busy) {
+            if(Clock.Now>=target)throw budget;
+            if(Clock.StallUntil>Clock.Now){Clock.AdvanceTo(Math.Min(target,Math.Min(Clock.StallUntil,Clock.NextEventClock)));SyncInterrupts();continue;}
+            int remaining=Bus.Dma.State.Remaining;
+            long next=Math.Min(target,Math.Min(Clock.Now+remaining,Clock.NextEventClock));
+            int elapsed=(int)(next-Clock.Now);Bus.Dma.Elapse(elapsed);Clock.AdvanceTo(next);SyncInterrupts();
+            if(Bus.Dma.State.Remaining==0&&Clock.StallUntil<=Clock.Now)Bus.Dma.Boundary(Clock.Now);
+        }
     }
     private void AdvanceActive(ref int remaining)
     {
-        while(remaining>0||Clock.StallUntil>Clock.Now||stallDebt>0)
+        while(remaining>0||Clock.StallUntil>Clock.Now)
         {
             if(Clock.Now>=target)throw budget;
-            if(Clock.StallUntil>Clock.Now||stallDebt>0)
+            if(Clock.StallUntil>Clock.Now)
             {
-                long end=Clock.StallUntil>Clock.Now?Clock.StallUntil:Clock.Now+stallDebt;
-                long next=Math.Min(target,Math.Min(end,Clock.NextEventClock));long elapsed=next-Clock.Now;
-                Clock.AdvanceTo(next);SyncInterrupts();if(stallDebt>0)stallDebt=Math.Max(0,stallDebt-elapsed);continue;
+                long end=Clock.StallUntil;
+                long next=Math.Min(target,Math.Min(end,Clock.NextEventClock));
+                Clock.AdvanceTo(next);SyncInterrupts();continue;
             }
             long until=Math.Min(target,Math.Min(Clock.Now+remaining,Clock.NextEventClock));int delta=(int)(until-Clock.Now);
             remaining-=delta;Clock.AdvanceTo(until);SyncInterrupts();
@@ -98,15 +135,17 @@ public sealed class SnesSystem
             {
                 SyncInterrupts();
                 if(Cpu.Stopped||Cpu.Waiting&&!Cpu.HasWakeSignal)
-                {Clock.AdvanceTo(Math.Min(target,Clock.NextEventClock));SyncInterrupts();continue;}
+                {
+                    if(Bus.Dma.Requested&&!Bus.Dma.Busy){Bus.Dma.CpuBoundary(6,Clock.Now);Bus.Dma.CpuBoundary(6,Clock.Now);}
+                    if(Bus.Dma.Busy){try{AdvanceDma();}catch(ClockBudget){break;}continue;}
+                    Clock.AdvanceTo(Math.Min(target,Clock.NextEventClock));SyncInterrupts();continue;
+                }
                 beforeInstruction?.Invoke(this);
             }
             try
             {
                 Cpu.RunInstruction();afterInstruction?.Invoke(this);
-                // Legacy DMA is explicitly approximate until M3; stall debt is consumed
-                // before further CPU effects, not evidence of accurate DMA timing.
-                if(Bus.DmaMasterCycles!=0){stallDebt+=Bus.DmaMasterCycles;Bus.DmaMasterCycles=0;}
+
             }
             catch(ClockBudget){break;}
         }

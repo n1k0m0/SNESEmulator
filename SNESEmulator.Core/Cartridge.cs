@@ -3,7 +3,9 @@ using System.Text;
 
 namespace SNESEmulator.Core;
 
-public enum CartridgeMapping { LoRom, HiRom }
+public enum CartridgeMapping { LoRom, HiRom, ExLoRom, ExHiRom }
+public sealed record CartridgeOptions(CartridgeMapping? Mapping = null, bool? Pal = null);
+public sealed record CartridgeMetadata(int HeaderOffset, byte MapMode, byte Chipset, byte Region, int DeclaredRomBytes, bool ChecksumValid, bool CopierHeader, bool ManualMapping, bool ManualRegion, int[] HeaderScores);
 
 public sealed class Cartridge
 {
@@ -14,28 +16,41 @@ public sealed class Cartridge
     public string SourcePath { get; }
     public CartridgeMapping Mapping { get; }
     public bool Pal { get; }
+    public CartridgeMetadata Metadata { get; }
+    public CartridgeOptions Options { get; }
 
-    public Cartridge(byte[] image, string sourcePath = "")
+    public Cartridge(byte[] image, string sourcePath = "", CartridgeOptions? options = null)
     {
-        if (image.Length % 1024 == 512) image = image[512..];
-        if (image.Length < 32768 || image.Length > 4 * 1024 * 1024)
-            throw new InvalidDataException("Supported ROM size: 32 KiB to 4 MiB (LoROM/HiROM).");
-        int lo = Score(image, 0x7FC0), hi = Score(image, 0xFFC0);
-        Mapping = hi > lo ? CartridgeMapping.HiRom : CartridgeMapping.LoRom;
-        int header = Mapping == CartridgeMapping.LoRom ? 0x7FC0 : 0xFFC0;
-        if (Math.Max(lo, hi) < 0) throw new InvalidDataException("No valid SNES header/reset vector found.");
-        byte mode = image[header + 0x15];
-        byte chipset = image[header + 0x16];
-        if ((mode & 15) > 1 || chipset is not (0 or 1 or 2))
-            throw new NotSupportedException($"Cartridge hardware {mode:X2}/{chipset:X2} is not implemented (no enhancement chips yet).");
+        Options = options ?? new();
+        bool copier = image.Length % 1024 == 512;
+        if (copier) image = image[512..];
+        if (image.Length < 32768 || image.Length > 8 * 1024 * 1024)
+            throw new InvalidDataException("Supported normal mapper ROM size: 32 KiB to 8 MiB.");
+        int[] headers = [0x7fc0, 0xffc0, 0x407fc0, 0x40ffc0];
+        int[] scores = headers.Select(h => Score(image, h)).ToArray();
+        int selected = Array.IndexOf(scores, scores.Max());
+        Mapping = Options.Mapping ?? (CartridgeMapping)selected;
+        if(!Enum.IsDefined(Mapping))throw new InvalidDataException("Unknown cartridge mapping override.");
+        if(image.Length>0x400000&&Mapping is CartridgeMapping.LoRom or CartridgeMapping.HiRom)
+            throw new NotSupportedException("LoROM/HiROM wire at most4 MiB; select a documented extended mapper for larger normal boards.");
+        int header = headers[(int)Mapping];
+        if (header + 64 > image.Length || (Options.Mapping == null && scores.Max() < 0))
+            throw new InvalidDataException("No valid SNES header/reset vector found for selected mapping.");
+        byte mode = image[header + 0x15], chipset = image[header + 0x16];
+        if (chipset is not (0 or 1 or 2) || (Options.Mapping == null && (mode & 15) is not (0 or 1 or 2 or 5)))
+            throw new NotSupportedException($"Cartridge hardware {mode:X2}/{chipset:X2} is not implemented (normal discrete mappers only).");
         Rom = image.ToArray();
         Title = Encoding.ASCII.GetString(image, header, 21).Trim(' ', '\0');
-        Hash = Convert.ToHexString(SHA256.HashData(image));
-        SourcePath = sourcePath;
-        Pal = image[header + 0x19] is >= 2 and <= 12;
+        Hash = Convert.ToHexString(SHA256.HashData(image)); SourcePath = sourcePath;
+        Pal = Options.Pal ?? (image[header + 0x19] is >= 2 and <= 12);
         int size = image[header + 0x18];
         if (size > 9) throw new NotSupportedException("SRAM size exceeds 512 KiB.");
         Sram = new byte[size == 0 ? 0 : 1024 << size];
+        int checksum = image[header+0x1c] | image[header+0x1d]<<8;
+        int complement = image[header+0x1e] | image[header+0x1f]<<8;
+        int declared = image[header+0x17];
+        Metadata = new(header,mode,chipset,image[header+0x19],declared<=20?1024<<declared:0,
+            (checksum^complement)==65535,copier,Options.Mapping.HasValue,Options.Pal.HasValue,scores);
     }
 
     private static int Score(byte[] image, int h)
@@ -44,26 +59,44 @@ public sealed class Cartridge
         int checksum = image[h + 0x1C] | image[h + 0x1D] << 8;
         int complement = image[h + 0x1E] | image[h + 0x1F] << 8;
         int score = (checksum ^ complement) == 0xFFFF ? 8 : 0;
-        score += (image[h + 0x15] & 15) == (h == 0x7FC0 ? 0 : 1) ? 4 : 0;
+        score += (image[h + 0x15] & 15) == ((h & 0xffff) == 0x7FC0 ? (h > 0x400000 ? 2 : 0) : (h > 0x400000 ? 5 : 1)) ? 4 : 0;
         return score;
     }
 
+    // Decode absent address lines recursively. A 3-MiB image mirrors its final
+    // 1-MiB chip into 3..4 MiB; modulo would incorrectly map that window to chip 0.
+    public static int Mirror(int address, int size)
+    {
+        if(size <= 0) throw new ArgumentOutOfRangeException(nameof(size));
+        int baseOffset=0, mask=1<<23;
+        while(address>=size) {
+            while((address & mask)==0) mask>>=1;
+            address-=mask;
+            if(size>mask) {size-=mask;baseOffset+=mask;}
+            mask>>=1;
+        }
+        return baseOffset+address;
+    }
     public int RomOffset(int address)
     {
-        int bank = address >> 16, offset = address & 0xFFFF;
-        if (Mapping == CartridgeMapping.LoRom)
-            return ((bank & 0x7F) * 0x8000 + (offset & 0x7FFF)) % Rom.Length;
-        return (((bank & 0x3F) << 16) | offset) % Rom.Length;
+        int bank=(address>>16)&255, offset=address&65535;
+        int raw=Mapping switch {
+            CartridgeMapping.LoRom => ((bank&127)<<15)|(offset&32767),
+            CartridgeMapping.HiRom => ((bank&63)<<16)|offset,
+            CartridgeMapping.ExHiRom => (((bank&0x80)==0?0x400000:0)|((bank&63)<<16)|offset),
+            // Extended LoROM: low-bank half at 4 MiB, high-bank half at 0 MiB.
+            _ => (((bank&0x80)==0?0x400000:0)|((bank&127)<<15)|(offset&32767))
+        };
+        return Mirror(raw,Rom.Length);
     }
-
     public int SramOffset(int address)
     {
-        if (Sram.Length == 0) return -1;
-        int bank = address >> 16, offset = address & 0xFFFF;
-        if (Mapping == CartridgeMapping.LoRom && (bank & 0x7F) is >= 0x70 and <= 0x7D && offset < 0x8000)
-            return (((bank & 15) << 15) | offset) % Sram.Length;
-        if (Mapping == CartridgeMapping.HiRom && (bank & 0x7F) is >= 0x20 and <= 0x3F && offset is >= 0x6000 and < 0x8000)
-            return (((bank & 0x1F) << 13) | (offset & 0x1FFF)) % Sram.Length;
+        if(Sram.Length==0)return -1;
+        int bank=(address>>16)&255,offset=address&65535;
+        if(Mapping is CartridgeMapping.LoRom or CartridgeMapping.ExLoRom && (bank&127) is >=0x70 and <=0x7f && offset<0x8000)
+            return Mirror(((bank&15)<<15)|offset,Sram.Length);
+        if(Mapping is CartridgeMapping.HiRom or CartridgeMapping.ExHiRom && (bank&127) is >=0x20 and <=0x3f && offset is >=0x6000 and <0x8000)
+            return Mirror(((bank&31)<<13)|(offset&8191),Sram.Length);
         return -1;
     }
 }

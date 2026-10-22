@@ -1,6 +1,6 @@
 {
   "schema": "snes-m2-read-phase-correction-v1",
-  "status": "All implementation gates passed on a clean commit; independent parent review pending. Measurement record, not an expected-output oracle.",
+  "status": "Accepted by independent parent full gate; historical M2 measurement record, not an expected-output oracle.",
   "implementationCommit": "bfabb2762a7647ced10a5dac56990a4256d219b3",
   "command": "python tools/test-lab.py --windows --full",
   "correction": "The previous all-effects-at-endpoint timing model was materially wrong. Generic generated65816 vectors do not encode SNES master-clock latch phases and therefore could not detect it. Read sampling now occurs after accessClocks-4 active clocks, followed by four active hold clocks; writes latch at completion.",
@@ -195,5 +195,6 @@
     "MDR/OpenBus precision remains M3, including4000-43FF internal CPU reads that preserve MDR in the reference",
     "Existing M3 DMA/HDMA/I/O and M5/M7 whole-line rendering limitations remain unchanged",
     "No SPC700/DSP sound core; independent native audio/graphics/hardware evidence remains explicitly skipped"
-  ]
+  ],
+  "rootGateLog": "artifacts/root-m2-phase-validation.log"
 }

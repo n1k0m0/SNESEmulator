@@ -1,125 +1,106 @@
 namespace SNESEmulator.Core;
 
-public interface ICpuBus
-{
-    byte Read(int address);
-    void Write(int address, byte value);
-}
+public interface ICpuBus { byte Read(int address); void Write(int address, byte value); }
+public enum AccessOrigin { Cpu, DmaA, DmaB, HdmaA, HdmaB }
+public sealed record BusAccess(AccessOrigin Origin,string Direction,int Address,byte Value);
 
 public sealed class SystemBus : ICpuBus
 {
-    /// <summary>Logical access observer. No cycle timing or CPU/DMA-origin guarantee.</summary>
-    public Action<string, int, byte>? AccessObserved { get; set; }
-    public byte[] Wram { get; } = new byte[128 * 1024];
-    public byte[] Io { get; } = new byte[0x400];
-    public byte[] DmaRegisters { get; } = new byte[128];
-    public Ppu Ppu { get; } = new();
-    public Apu Apu { get; } = new();
-    public ControllerPorts Controllers { get; } = new();
-    public Cartridge? Cartridge { get; set; }
-    public byte OpenBus { get; set; }
-    public int WramAddress { get; set; }
-    public bool NmiFlag { get; set; }
-    public bool NmiPending { get; set; }
-    public int DmaMasterCycles { get; set; }
-
-    public byte Read(int address)
+    public Action<string,int,byte>? AccessObserved {get;set;}
+    public Action<BusAccess>? AccessOriginObserved {get;set;}
+    public byte[] Wram {get;}=new byte[128*1024];
+    public byte[] Io {get;}=new byte[0x400];
+    public byte[] DmaRegisters {get;}=new byte[128];
+    public Ppu Ppu {get;}=new();
+    public Apu Apu {get;}=new();
+    public ControllerPorts Controllers {get;}=new();
+    public CpuIo CpuIo {get;}
+    public DmaController Dma {get;}
+    public Cartridge? Cartridge {get;set;}
+    public byte OpenBus {get;set;}
+    internal bool DeferCpuMdr {get;set;}
+    public int WramAddress {get;set;}
+    public bool NmiFlag {get;set;}
+    public bool NmiPending {get;set;}
+    public bool ExternalIrqLine {get=>CpuIo.State.ExternalIrq;set=>CpuIo.State.ExternalIrq=value;}
+    public SystemBus(){CpuIo=new(this);Dma=new(this);}
+    public static bool LowBank(int address)=>(address&0x400000)==0;
+    public static bool IsWram(int address)=>(address&0xfe0000)==0x7e0000 || (address&0x40e000)==0;
+    public static bool ValidDmaA(int address)=>!LowBank(address)||!((address&65535) is >=0x2100 and <=0x21ff or >=0x4000 and <=0x41ff or >=0x4200 and <=0x421f or >=0x4300 and <=0x437f);
+    public byte Read(int address)=>Read(address,AccessOrigin.Cpu);
+    public byte Read(int address,AccessOrigin origin)
     {
-        address &= 0xFFFFFF;
-        int bank = address >> 16, a = address & 0xFFFF;
-        byte result = OpenBus;
-        if (bank is 0x7E or 0x7F) result = Wram[address & 0x1FFFF];
-        else if ((bank & 0x7F) < 0x40 && a < 0x2000) result = Wram[a];
-        else if ((bank & 0x7F) < 0x40 && a is >= 0x2100 and < 0x2140) result = Ppu.Read(a);
-        else if ((bank & 0x7F) < 0x40 && a is >= 0x2140 and < 0x2180) result = Apu.ApuToCpu[a & 3];
-        else if ((bank & 0x7F) < 0x40 && a == 0x2180) { result = Wram[WramAddress]; WramAddress = (WramAddress + 1) & 0x1FFFF; }
-        else if ((bank & 0x7F) < 0x40 && a is 0x4016 or 0x4017) result = (byte)((OpenBus & 0xFC) | Controllers.Read(a & 1));
-        else if ((bank & 0x7F) < 0x40 && a is >= 0x4300 and < 0x4380) result = DmaRegisters[a & 127];
-        else if ((bank & 0x7F) < 0x40 && a is >= 0x4200 and < 0x4400)
-        {
-            result = a switch
-            {
-                0x4210 => (byte)((NmiFlag ? 0x80 : 0) | 2),
-                0x4212 => (byte)(Ppu.InVblank ? 0x80 : 0),
-                >= 0x4218 and <= 0x421B => (byte)(Controllers.Latched[(a - 0x4218) / 2] >> ((a & 1) * 8)),
-                _ => Io[a - 0x4200]
+        address&=0xffffff;int bank=address>>16,a=address&65535;byte result=OpenBus;
+        if(bank is 0x7e or 0x7f)result=Wram[address&0x1ffff];
+        else if(LowBank(address)&&a<0x2000)result=Wram[a];
+        else if(LowBank(address)&&a is >=0x2100 and <0x2140) {
+            result=a switch {
+                0x2137=>LatchCounters(),0x213c=>CpuIo.ReadCounter(false),0x213d=>CpuIo.ReadCounter(true),0x213f=>CpuIo.ReadStatus(),
+                _=>Ppu.Read(a)
             };
-            if (a == 0x4210) NmiFlag = false;
         }
-        else if (Cartridge is { } cart)
-        {
-            int sram = cart.SramOffset(address);
-            if (sram >= 0) result = cart.Sram[sram];
-            else if (a >= 0x8000 || (bank & 0x7F) >= 0x40) result = cart.Rom[cart.RomOffset(address)];
+        else if(LowBank(address)&&a is >=0x2140 and <0x2180)result=Apu.ApuToCpu[a&3];
+        else if(LowBank(address)&&a==0x2180){result=Wram[WramAddress];WramAddress=(WramAddress+1)&0x1ffff;}
+        else if(LowBank(address)&&a==0x4016)result=(byte)((OpenBus&0xfc)|Controllers.Read(0));
+        else if(LowBank(address)&&a==0x4017)result=(byte)((OpenBus&0xe0)|0x1c|Controllers.Read(1));
+        else if(LowBank(address)&&a is >=0x4300 and <0x4380) {
+            int r=a&15;if(r<=11||r==15)result=DmaRegisters[(a&0x70)|(r==15?11:r)];
         }
-        AccessObserved?.Invoke("read", address, result);
-        return OpenBus = result;
+        else if(LowBank(address)&&a is >=0x4200 and <0x4400) {
+            result=a switch {
+                0x4210=>CpuIo.ReadNmi(OpenBus),0x4211=>CpuIo.ReadIrq(OpenBus),
+                0x4212=>(byte)((OpenBus&0x3e)|(Ppu.InVblank?128:0)|((CpuIo.Clock?.H is <=2 or >=1096)?64:0)|(CpuIo.AutoBusy?1:0)),
+                0x4213=>Io[1],0x4214=>(byte)CpuIo.State.Quotient,0x4215=>(byte)(CpuIo.State.Quotient>>8),
+                0x4216=>(byte)CpuIo.State.Product,0x4217=>(byte)(CpuIo.State.Product>>8),
+                >=0x4218 and <=0x421f=>(byte)(CpuIo.State.Joy[(a-0x4218)/2]>>((a&1)*8)),_=>OpenBus
+            };
+        }
+        else if(Cartridge is {} cart) {
+            int sram=cart.SramOffset(address);
+            if(sram>=0)result=cart.Sram[sram];
+            else if(a>=0x8000||(bank&127)>=0x40)result=cart.Rom[cart.RomOffset(address)];
+        }
+        // CPU's internal I/O read path does not drive the external MDR.
+        if(origin!=AccessOrigin.Cpu||(!DeferCpuMdr&&(address&0x40fc00)!=0x4000))OpenBus=result;
+        AccessOriginObserved?.Invoke(new(origin,"read",address,result));AccessObserved?.Invoke("read",address,result);return result;
     }
-
-    public void Write(int address, byte value)
+    private byte LatchCounters(){if((Io[1]&128)!=0)CpuIo.LatchCounters();return OpenBus;}
+    public void Write(int address,byte value)=>Write(address,value,AccessOrigin.Cpu);
+    public void Write(int address,byte value,AccessOrigin origin)
     {
-        AccessObserved?.Invoke("write", address & 0xFFFFFF, value);
-        address &= 0xFFFFFF; OpenBus = value;
-        int bank = address >> 16, a = address & 0xFFFF;
-        if (bank is 0x7E or 0x7F) Wram[address & 0x1FFFF] = value;
-        else if ((bank & 0x7F) < 0x40 && a < 0x2000) Wram[a] = value;
-        else if ((bank & 0x7F) < 0x40 && a is >= 0x2100 and < 0x2140) Ppu.Write(a, value);
-        else if ((bank & 0x7F) < 0x40 && a is >= 0x2140 and < 0x2180) Apu.CpuToApu[a & 3] = value;
-        else if ((bank & 0x7F) < 0x40 && a == 0x2180) { Wram[WramAddress] = value; WramAddress = (WramAddress + 1) & 0x1FFFF; }
-        else if ((bank & 0x7F) < 0x40 && a is >= 0x2181 and <= 0x2183)
-        {
-            int shift = (a - 0x2181) * 8;
-            WramAddress = ((WramAddress & ~(255 << shift)) | value << shift) & 0x1FFFF;
-        }
-        else if ((bank & 0x7F) < 0x40 && a == 0x4016) Controllers.Write(value);
-        else if ((bank & 0x7F) < 0x40 && a is >= 0x4300 and < 0x4380) DmaRegisters[a & 127] = value;
-        else if ((bank & 0x7F) < 0x40 && a is >= 0x4200 and < 0x4400)
-        {
-            byte old = Io[a - 0x4200]; Io[a - 0x4200] = value;
-            if (a == 0x4200 && (old & 0x80) == 0 && (value & 0x80) != 0 && NmiFlag) NmiPending = true;
-            if (a == 0x4203) { int v = Io[2] * value; Io[0x16] = (byte)v; Io[0x17] = (byte)(v >> 8); }
-            if (a == 0x4206)
-            {
-                int numerator = Io[4] | Io[5] << 8;
-                int q = value == 0 ? 65535 : numerator / value, r = value == 0 ? numerator : numerator % value;
-                Io[0x14] = (byte)q; Io[0x15] = (byte)(q >> 8); Io[0x16] = (byte)r; Io[0x17] = (byte)(r >> 8);
+        address&=0xffffff;OpenBus=value;int bank=address>>16,a=address&65535;
+        if(bank is 0x7e or 0x7f)Wram[address&0x1ffff]=value;
+        else if(LowBank(address)&&a<0x2000)Wram[a]=value;
+        else if(LowBank(address)&&a is >=0x2100 and <0x2140)Ppu.Write(a,value);
+        else if(LowBank(address)&&a is >=0x2140 and <0x2180)Apu.CpuToApu[a&3]=value;
+        else if(LowBank(address)&&a==0x2180){Wram[WramAddress]=value;WramAddress=(WramAddress+1)&0x1ffff;}
+        else if(LowBank(address)&&a is >=0x2181 and <=0x2183){int shift=(a-0x2181)*8;WramAddress=((WramAddress&~(255<<shift))|value<<shift)&0x1ffff;}
+        else if(LowBank(address)&&a==0x4016)CpuIo.WriteStrobe(value);
+        else if(LowBank(address)&&a is >=0x4300 and <0x4380){int r=a&15;if(r<=11||r==15)DmaRegisters[(a&0x70)|(r==15?11:r)]=value;}
+        else if(LowBank(address)&&a is >=0x4200 and <=0x420d) {
+            byte old=Io[a-0x4200];Io[a-0x4200]=value;
+            switch(a) {
+                case 0x4200:CpuIo.WriteControl(old,value);break;
+                case 0x4201:if((old&128)!=0&&(value&128)==0)CpuIo.LatchCounters();break;
+                case 0x4203:CpuIo.StartMultiply(value);break;
+                case 0x4206:CpuIo.StartDivide(value);break;
+                case >=0x4207 and <=0x420a:CpuIo.ScheduleIrq();break;
+                case 0x420b:Dma.Request(value);break;
             }
-            if (a == 0x420B) RunDma(value);
         }
-        else if (Cartridge is { } cart && cart.SramOffset(address) is var sram && sram >= 0) cart.Sram[sram] = value;
+        else if(Cartridge is {} cart&&cart.SramOffset(address) is var sram&&sram>=0)cart.Sram[sram]=value;
+        AccessOriginObserved?.Invoke(new(origin,"write",address,value));AccessObserved?.Invoke("write",address,value);
     }
-    public void BeginVblank()
+    public void BeginVblank()=>CpuIo.BeginVblank();
+    public void RunDma(byte channels)=>Dma.Request(channels);
+    // Warm reset retains WRAM and physical pad buttons. PowerOn defines a
+    // reproducible RAM seed, not a measured power-on RAM pattern.
+    public void Reset(bool powerOn=true)
     {
-        NmiFlag = true;
-        if ((Io[0] & 0x80) != 0) NmiPending = true;
-        if ((Io[0] & 1) != 0) Controllers.Latch();
-    }
-    private static readonly int[][] DmaPatterns = [[0], [0,1], [0,0], [0,0,1,1], [0,1,2,3], [0,1,0,1], [0,0], [0,0,1,1]];
-    public void RunDma(byte channels)
-    {
-        for (int ch = 0; ch < 8; ch++)
-        {
-            if ((channels & (1 << ch)) == 0) continue;
-            int d = ch * 16, control = DmaRegisters[d], source = DmaRegisters[d+2] | DmaRegisters[d+3] << 8;
-            int bank = DmaRegisters[d+4] << 16, count = DmaRegisters[d+5] | DmaRegisters[d+6] << 8;
-            if (count == 0) count = 65536;
-            var pattern = DmaPatterns[control & 7];
-            for (int i = 0; i < count; i++)
-            {
-                int b = 0x2100 | ((DmaRegisters[d+1] + pattern[i % pattern.Length]) & 255);
-                if ((control & 0x80) == 0) Write(b, Read(bank | source)); else Write(bank | source, Read(b));
-                if ((control & 8) == 0) source = (source + ((control & 16) != 0 ? -1 : 1)) & 65535;
-            }
-            DmaRegisters[d+2] = (byte)source; DmaRegisters[d+3] = (byte)(source >> 8);
-            DmaRegisters[d+5] = DmaRegisters[d+6] = 0;
-            DmaMasterCycles += 8 + count * 8;
-        }
-        Io[0x0B] = 0;
-    }
-    public void Reset()
-    {
-        Array.Clear(Wram); Array.Clear(Io); Array.Clear(DmaRegisters);
-        Ppu.Reset(); Apu.Reset(); WramAddress = 0; OpenBus = 0; NmiPending = NmiFlag = false; DmaMasterCycles = 0;
-        Array.Clear(Controllers.Buttons); Controllers.Latch(); Controllers.Write(0);
+        if(powerOn)Array.Clear(Wram);
+        Array.Clear(Io);Array.Fill(DmaRegisters,(byte)255);Io[1]=255;Io[7]=Io[9]=255;Io[8]=Io[10]=1;
+        Ppu.Reset();Apu.Reset();CpuIo.Reset();Dma.Reset();WramAddress=0;OpenBus=0;NmiPending=NmiFlag=false;
+        if(powerOn)Array.Clear(Controllers.Buttons);
+        Controllers.Latch();Controllers.Write(0);
     }
 }

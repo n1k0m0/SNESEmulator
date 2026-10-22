@@ -118,14 +118,14 @@ static class TimingTests
         {
             foreach(bool nmi in new[]{false,true})foreach(long edge in new[]{24L,26L,28L,30L})
             {
-                var m=Program(0xad,0x40,0x21,0xea,0xdb);m.Cpu.P=0x30;m.Clock.Schedule(edge,HardwareEventKind.External);m.Clock.EventObserved=e=>{if(e.Kind==HardwareEventKind.External){if(nmi)m.Cpu.PulseNmi();else m.Cpu.SetInterruptLines(false,true);}};
+                var m=Program(0xad,0x40,0x21,0xea,0xdb);m.Cpu.P=0x30;m.Clock.Schedule(edge,HardwareEventKind.External);m.Clock.EventObserved=e=>{if(e.Kind==HardwareEventKind.External){if(nmi)m.Cpu.PulseNmi();else m.Bus.ExternalIrqLine=true;}};
                 m.RunUntil(30);var irq=m.Cpu.CaptureInterrupts();Check((nmi?irq.PollNmi:irq.PollIrq)==(edge==24),$"edge {edge} poll precedes final read start24, latch26, completion30");
                 m.RunUntil(44);Check(m.Cpu.PC==(edge==24?3:4),"later edge remains pending until following NOP completes");
             }
             foreach(long edge in new[]{26L,30L})
             {
                 var m=Program(0xad,0x40,0x21,0xea,0xdb);m.Cpu.P=0x30;var trace=new List<TimedCpuCycleEvent>();m.CyclePhaseObserved=trace.Add;
-                m.Clock.Schedule(edge,HardwareEventKind.Refresh,priority:-10);m.Clock.Schedule(edge,HardwareEventKind.External);m.Clock.EventObserved=e=>{if(e.Kind==HardwareEventKind.External)m.Cpu.SetInterruptLines(false,true);};
+                m.Clock.Schedule(edge,HardwareEventKind.Refresh,priority:-10);m.Clock.Schedule(edge,HardwareEventKind.External);m.Clock.EventObserved=e=>{if(e.Kind==HardwareEventKind.External)m.Bus.ExternalIrqLine=true;};
                 m.RunUntil(70);var data=trace.Where(t=>t.Cycle.Address==0x2140).ToArray();Check(data.Length==2&&data[0].MasterClock==(edge==26?66:26)&&data[1].MasterClock==70,"refresh and IRQ at latch/completion have distinct read sample phases");
                 Check(m.Cpu.PC==3&&!m.Cpu.CaptureInterrupts().PollIrq);m.RunUntil(84);Check(m.Cpu.PC==4&&m.Cpu.CaptureInterrupts().PollIrq,"IRQ remains pending through hold stall and next instruction");
             }

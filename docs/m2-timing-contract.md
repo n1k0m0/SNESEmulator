@@ -1,5 +1,10 @@
 # M2 timing contract and evidence limits
 
+Historical M2 acceptance record. The independent parent gate passed at
+`artifacts/root-m2-phase-validation.log`. [M3](m3-io-contract.md) supersedes
+the legacy DMA, MDR, I/O and savestate-format limitations stated below; M2
+read-latch/hold timing and generic CPU coverage remain unchanged.
+
 The own C# CPU emits independently generated electrical cycle records. The full
 external 65816 suite passes semantics and exact bus rows separately. Hardware
 profile tests are analytical conformance tests, not measurements of a console.

@@ -5,12 +5,15 @@ Architekturkonzept von [C64Emulator](https://github.com/n1k0m0/C64Emulator).
 Der SNES-Kern wird hier selbst entwickelt; es wird kein Snes9x-, bsnes- oder
 Libretro-Kern eingebunden.
 
-**Stand: 0.1.0-dev – ausführbare Entwicklungsgrundlage.** Das eigene Diagnose-ROM
-läuft mit CPU, DMA, PPU und NMI. Dies ist noch kein allgemein spielekompatibler
-SNES-Emulator. Insbesondere SPC700/DSP-Sound, Sprites, HDMA, IRQ-Timing und die
-weiteren PPU-Modi fehlen. Viele Spiele werden deshalb noch nicht starten oder
-korrekt dargestellt. Der CPU-Kern arbeitet instruktionsweise mit angenähertem
-Timing; die Tests belegen keine vollständige 65C816-Konformität.
+**Stand: 0.1.0-dev – eigener Entwicklungskern, noch keine allgemeine
+Spielekompatibilität.** M0–M2 sind unabhängig geprüft; M3 implementiert 5A22-I/O,
+DMA/HDMA, Timer-IRQ, zeitlich laufende Rechenoperationen und Controller. Die
+unabhängige M3-Abnahme steht aus. Alle 5.080.400 festgeschriebenen externen
+65C816-Semantikfälle und die zugehörigen generischen Busvektoren bestehen.
+SNES-spezifische Clocks und I/O bleiben quellengestützte analytische Ziele,
+ohne eigene Originalkonsolenmessung. SPC700/DSP, Sprites und weitere PPU-Modi
+fehlen weiterhin. Siehe [Testlabor](docs/test-laboratory.md) und
+[M3-Vertrag](docs/m3-io-contract.md).
 
 ## Starten
 
@@ -175,4 +178,7 @@ oder Nintendo-Firmware enthalten.
 
 ## Testlabor
 
-`python tools/test-lab.py --windows` pr�ft die bisherigen17 F�lle (12 Kern +5 Netzwerk) und das M0-Testlabor. Die externe CPU-Bestandsaufnahme bleibt getrennt sichtbar rot. Details, Limits und reproduzierbare Befehle: [Testlabor](docs/test-laboratory.md).
+`python tools/test-lab.py --windows --full` prüft portable Kernregressionen,
+fünf Windows-/Netzwerkgruppen und die vollständigen, festgeschriebenen externen
+CPU-Semantik- und Busdaten getrennt. Ohne `--full` bleiben die nicht ausgeführten
+Daten ausdrücklich sichtbar. Details: [Testlabor](docs/test-laboratory.md).

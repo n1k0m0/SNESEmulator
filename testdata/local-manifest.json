@@ -17,8 +17,8 @@
       "path": "SNESEmulator.Core/DiagnosticRom.cs",
       "source": "Original C# diagnostic ROM generator; repository source",
       "license": "Apache-2.0",
-      "version": "M0-v1",
-      "sha256": "9cfdba9830f92566305515977b8fee478716085fdcae6d09b375561b01747ff8",
+      "version": "M3-v1-autojoy-busy-rise-and-fall",
+      "sha256": "d9573272081901d21d53f6ecd762ebf2b945863315593a60fb8e66d13a2a621b",
       "profile": "ntsc-separate-2-1-3-unverified or explicitly selected PAL",
       "start": "reset via generated ROM vector",
       "seed": null,
@@ -48,6 +48,30 @@
       "seed": null,
       "success": "exact independently supplied final registers/status/RAM and no unexpected changed writes",
       "timeoutSeconds": 120
+    },
+    {
+      "path": "SNESEmulator.Core/IoDmaDiagnosticRom.cs",
+      "source": "Original repository source; M3 analytical protocol/ROM oracle",
+      "license": "Apache-2.0",
+      "version": "M3-v1",
+      "sha256": "1b0eedf498a9e2cc8c27b75de9b9bf26998e5de0bf3d4bc79e22f27d2e533b70",
+      "profile": "ntsc-separate-2-1-3-unverified",
+      "start": "deterministic convenience reset; no physical-reset phase claim",
+      "seed": null,
+      "success": "independent WRAM and fixed bus-phase expectations, plus complete-state continuation equality",
+      "timeoutSeconds": 120
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/IoDmaTests.cs",
+      "source": "Original repository source; M3 analytical protocol/ROM oracle",
+      "license": "Apache-2.0",
+      "version": "M3-v1",
+      "sha256": "7d71b82f82473f09aed6b9bf4fdd1f7efa83e013ad3a477257f810f1becf4ffd",
+      "profile": "ntsc-separate-2-1-3-unverified",
+      "start": "deterministic convenience reset; no physical-reset phase claim",
+      "seed": null,
+      "success": "independent WRAM and fixed bus-phase expectations, plus complete-state continuation equality",
+      "timeoutSeconds": 120
     }
   ],
   "analyticalOracles": [
@@ -65,6 +89,11 @@
       "id": "M2-timing",
       "source": "SNESEmulator.Core.Tests/TimingTests.cs: independent integer field/clock/APU equations, stable event ordering, access map, complete-state chunk/save checks and bus negative mutations",
       "provenance": "Analytical specification tests and internal determinism; external generic 65816 vectors are verified separately; no original-console claim"
+    },
+    {
+      "id": "M3-io-dma",
+      "source": "docs/m3-io-contract.md and original IoDmaTests; pinned reference semantics, fixed ALU worksheet and protocol specification",
+      "provenance": "Source-informed analytical tests and internal determinism; 80 original CPU ROM executions; no new acquired original-console measurements"
     }
   ],
   "unavailable": [

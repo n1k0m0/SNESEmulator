@@ -27,18 +27,30 @@ auf einen eigenen Emulationsthread umgestellt werden.
 
 ## Hardwarebasis
 
-`Cpu65816` enthält den instruktionsorientierten Dekoder mit Emulations-/Native-
-Modus, variabler Registerbreite, Stack, ALU, BCD, Sprüngen, Blocktransfers und
-NMI/Softwareinterrupts. Die Befehlstakte sind angenähert. Es fehlt eine externe
-CPU-Konformitätssuite; insbesondere Bankgrenzen, Direct-Page-/Stack-Sonderfälle,
-Buszugriffe pro Zyklus und Interruptgrenzen müssen systematisch validiert werden.
+`Cpu65816` ist ein eigener C#-Kern mit getrennten Read/Write/Internal-Zyklen,
+Emulations-/Native-Modus und einer serialisierbaren Fortsetzung. Abgeschlossene
+MMIO-Effekte werden beim Fortsetzen nicht wiederholt. Alle 5.080.400 gepinnten
+externen Semantikfälle und 26.184.846 generische elektrische Buszeilen bestehen.
+Diese Softwarevektoren sind keine Messung eines echten 5A22.
 
-`SystemBus` verbindet 128 KiB WRAM, ROM/SRAM, PPU-Ports, die vier APU-
-Kommunikationsports, Controller, Multiply/Divide und acht DMA-Kanäle.
-Rechenoperationen sind derzeit sofort verfügbar; Hardwarelatenzen und Open-Bus-
-Details sind noch nicht genau modelliert. Allgemeines DMA hat Transfermuster,
-Richtungswechsel sowie feste/inkrementierende/dekrementierende A-Adressen.
-HDMA und H-/V-Timer-IRQ fehlen.
+`MasterClock` besitzt die ganzzahlige Zeit, Rasterzähler und stabile typisierte
+Ereignisse. `RunUntil(t)` endet exakt bei t, auch in CPU-Read-Hold, DMA, HDMA und
+Refresh. CPU-Lesezugriffe latchen nach Zugriffszeit minus vier Clocks; vier
+Clocks Hold folgen. Das externe CPU-MDR übernimmt den Wert erst danach.
+Interne CPU-Leseports 4000–43FF erhalten MDR. MEMSEL steuert nur die belegten
+FastROM-Adressbereiche. Hardwareprofile behalten explizite manuelle Auswahl vor
+der Headerregion bei. Der Epoch H0/V0 bleibt ein deterministischer Komfortreset,
+keine gemessene physische Resetfreigabe.
+
+`SystemBus` verbindet 128 KiB WRAM, normale LoROM/HiROM/ExLoROM/ExHiROM-Mappings,
+rekursive Chipspiegelung, SRAM, PPU-/APU-Ports und 5A22-I/O. `CpuIo` enthält
+ALU-Zwischenzustände, Timer-IRQ/NMI-Holds, Zählerlatches und serielle/automatische
+JOY-Abfrage. `DmaController` übernimmt den Bus mit eigenen gespeicherten Phasen:
+A/B-Read nach vier Clocks, Write nach weiteren vier, Priorität, Start-/End-Sync,
+HDMA-Tabellen und Präemption. Savestate v4 speichert diese Zwischenzustände und
+bindet den Mapper zusätzlich zum ROM-Hash. Siehe [M3-Vertrag](m3-io-contract.md)
+für genaue Grenzen und Quellen. PowerOn definiert RAM-Testseeds; Reset erhält
+CPU-WRAM und SRAM, ist aber kein vollständiges Modell aller Reset-Pins der PPU.
 
 `Ppu` implementiert VRAM/CGRAM/OAM-Speicher und grundlegende Schreibports,
 Forced Blank, Helligkeit, VRAM-Remapping, BG-Scroll und einen Scanline-Renderer
@@ -64,8 +76,8 @@ Die verbindliche Arbeitsreihenfolge und die geplanten Abnahmekriterien stehen
 im [Entwicklungsplan](development-plan.md). Dieser beschreibt künftige Arbeit;
 er ändert den oben dokumentierten Implementierungsstand nicht.
 
-Zuerst entstehen Testlabor, unabhängige CPU-Prüfungen und eine präzise
-Masterclock-/Buszeitbasis. Darauf bauen DMA/HDMA, IRQ, SPC700, PPU und DSP auf.
+Testlabor, unabhängige CPU-Prüfungen und Masterclock sind M0–M2; M3 ergänzt
+DMA/HDMA und I/O. Darauf folgen SPC700, PPU und DSP.
 PAL/NTSC, Hardwareabgleich, Produktreife und Zusatzchips folgen mit jeweils
 eigenen Nachweisen. Savestates, Frontend- und Netzwerkregressionen begleiten
 die Hardwareentwicklung von Beginn an.

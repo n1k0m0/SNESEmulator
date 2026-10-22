@@ -37,8 +37,8 @@ Test("Unsupported cartridge rejected",()=>
 Test("WRAM mirrors, multiplication, division",()=>
 {
     var b=new SystemBus(); b.Write(0x7E0008,0x5A); Check(b.Read(8)==0x5A && b.Read(0x800008)==0x5A);
-    b.Write(0x4202,13); b.Write(0x4203,17); Check(b.Read(0x4216)==221);
-    b.Write(0x4204,100); b.Write(0x4205,0); b.Write(0x4206,7); Check(b.Read(0x4214)==14 && b.Read(0x4216)==2);
+    b.Write(0x4202,13); b.Write(0x4203,17); for(int i=0;i<8;i++)b.CpuIo.AluEdge(); Check(b.Read(0x4216)==221);
+    b.Write(0x4204,100); b.Write(0x4205,0); b.Write(0x4206,7); for(int i=0;i<16;i++)b.CpuIo.AluEdge(); Check(b.Read(0x4214)==14 && b.Read(0x4216)==2);
 });
 Test("65816 native mode and accumulator high byte",()=>
 {
@@ -66,14 +66,15 @@ Test("Controller serial and auto-read ordering",()=>
     b.Write(0x4016,1); b.Write(0x4016,0);
     for(int i=0;i<16;i++) Check((b.Read(0x4016)&1)==((b.Controllers.Buttons[0]>>(15-i))&1));
     Check((b.Read(0x4016)&1)==1);
-    b.Write(0x4200,1); b.BeginVblank();
-    Check((b.Read(0x4218)|b.Read(0x4219)<<8)==b.Controllers.Buttons[0]);
+    var m=Diagnostic();m.Cpu.Stopped=true;m.Bus.Controllers.Buttons[0]=b.Controllers.Buttons[0];
+    m.Bus.Write(0x4200,1);m.RunUntil(225L*1364+5000);
+    Check((m.Bus.Read(0x4218)|m.Bus.Read(0x4219)<<8)==b.Controllers.Buttons[0]);
 });
 Test("DMA alternates VRAM low/high and wraps source",()=>
 {
-    var b=new SystemBus(); b.Ppu.Write(0x15,0x80);
+    var m=Diagnostic();m.Cpu.Stopped=true;var b=m.Bus; b.Ppu.Write(0x15,0x80);
     for(int i=0;i<16;i++) b.Wram[i]=(byte)(i+1);
-    b.Write(0x4300,1);b.Write(0x4301,0x18);b.Write(0x4304,0x7E);b.Write(0x4305,16);b.Write(0x420B,1);
+    b.Write(0x4300,1);b.Write(0x4301,0x18);b.Write(0x4302,0);b.Write(0x4303,0);b.Write(0x4304,0x7E);b.Write(0x4305,16);b.Write(0x4306,0);b.Write(0x420B,1);m.RunUntil(200);
     Check(b.Ppu.Vram.Take(16).SequenceEqual(Enumerable.Range(1,16).Select(i=>(byte)i)));
     Check(b.DmaRegisters[2]==16 && b.DmaRegisters[5]==0 && b.Ppu.VramAddress==8);
 });
@@ -196,6 +197,7 @@ Test("M1 permanently reduced upstream failure regressions",()=>
     }
 });
 TimingTests.Run(Test,testRoot);
+IoDmaTests.Run(Test,testRoot);
 Console.WriteLine($"{passed} passed, {failed} failed. Temporary test data: {testRoot}");
 report.Save(args.Length>0?args[0]:Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/core-regression");
 return failed==0?0:1;

@@ -2,6 +2,7 @@ namespace SNESEmulator.Core;
 
 public sealed partial class Cpu65816
 {
+    public Func<bool>? InterruptPollingAllowed {get;set;}
     public Action<CpuCycle>? BeforeCycle { get; set; }
     /// <summary>Initialize scheduler phase state before exposing an actual bus effect.</summary>
     public Action<CpuCycle>? EffectCompleted { get; set; }
@@ -101,7 +102,7 @@ public sealed partial class Cpu65816
         count++;if(address.HasValue)address &= 0xffffff;
         if(initial!=null && cursor<completed.Count) {ResumeCycle?.Invoke();var prior=completed[cursor];var sampled=samples[cursor++];sampleNmi=sampled.Nmi;sampleIrq=sampled.Irq;lastAddress=address??0;return prior.Value??0;}
         var pending=new CpuCycle(address,value,pins);
-        pendingSample??=new(nmiLatched,irqLine&&(P&I)==0);
+        pendingSample??=new(nmiLatched&&(InterruptPollingAllowed?.Invoke()??true),irqLine&&(P&I)==0&&(InterruptPollingAllowed?.Invoke()??true));
         sampleNmi=pendingSample.Nmi;sampleIrq=pendingSample.Irq;
         BeforeCycle?.Invoke(pending);
         byte? data=value;

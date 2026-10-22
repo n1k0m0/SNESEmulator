@@ -24,7 +24,11 @@ public static class DiagnosticRom
         int loop = code.Count;
         Emit(0xCB, 0x80, 0xFD); // WAI/BRA, resumed by NMI.
         int nmi = code.Count;
-        Emit(0x48); // PHA; animate BG1 and let the controller change its direction/speed.
+        Emit(0x48); // PHA; auto polling starts after the NMI edge.
+        // First wait for the hardware busy assertion, then completion. Testing
+        // only for busy=0 immediately upon NMI would read the previous field.
+        Emit(0xAD,0x12,0x42,0x29,0x01,0xF0,0xF9);
+        Emit(0xAD,0x12,0x42,0x29,0x01,0xD0,0xF9);
         Emit(0xEE, 0x00, 0x00); // INC scroll
         Emit(0xAD, 0x19, 0x42, 0x29, 0x02, 0xF0, 0x06); // JOY1 left?
         Emit(0xCE, 0x00, 0x00, 0xCE, 0x00, 0x00); // Two decrements reverse the automatic motion.

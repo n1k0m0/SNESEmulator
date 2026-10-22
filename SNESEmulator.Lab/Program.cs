@@ -192,6 +192,7 @@ static class Lab
         long clocks=0,busEvents=0,instructions=0;int replayIndex=0,traceLimit=int.Parse(Opt("trace-limit","4096"));
         if(traceLimit<0)throw new ArgumentException("Trace limit must not be negative");
         machine.CyclePhaseObserved=phase=>{if(busEvents++<traceLimit)busTrace.WriteLine(JsonSerializer.Serialize(new {sequence=busEvents,origin="CPU",phase}));};
+        machine.Bus.Dma.Observed=phase=>{if(busEvents++<traceLimit)busTrace.WriteLine(JsonSerializer.Serialize(new {sequence=busEvents,origin=phase.Job==DmaJob.Dma?"DMA":"HDMA",phase}));};
         machine.Clock.EventObserved=e=>rasterTrace.WriteLine(JsonSerializer.Serialize(new {masterClock=machine.Clock.Now,h=machine.Clock.H,v=machine.Clock.V,field=machine.Clock.Field,kind=e.Kind.ToString()}));
         var watch=Stopwatch.StartNew();
         while(machine.Frames<frames && machine.Clock.Now<clockLimit)
@@ -202,7 +203,7 @@ static class Lab
                 if(instructions++<traceLimit)cpuTrace.WriteLine(JsonSerializer.Serialize(new {frame=m.Frames,line=m.Clock.V,masterClock=m.Clock.Now,state=CpuVector.State(m.Cpu)}));
             });
         }
-        clocks=machine.Clock.Now;machine.CyclePhaseObserved=null;machine.Clock.EventObserved=null;
+        clocks=machine.Clock.Now;machine.CyclePhaseObserved=null;machine.Bus.Dma.Observed=null;machine.Clock.EventObserved=null;
         File.WriteAllBytes(prefix+".wram.bin",machine.Bus.Wram);
         using(var output=new BinaryWriter(File.Create(prefix+".argb32le.bin")))foreach(uint pixel in machine.Bus.Ppu.Pixels)output.Write(pixel);
         report.Metadata["cpuState"]=CpuVector.State(machine.Cpu);report.Metadata["completedFrames"]=machine.Frames;report.Metadata["masterclocks"]=clocks;report.Metadata["instructionsAttempted"]=instructions;
