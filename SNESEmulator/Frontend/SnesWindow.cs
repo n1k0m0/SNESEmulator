@@ -110,8 +110,8 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             Text(34,126,"F10  SETTINGS / NETWORK / MEDIA / RESET",1);
             Text(34,144,"F12  SAVE AND LOAD    F11 FULLSCREEN",1);
             Text(34,162,"F6   RUN ORIGINAL DIAGNOSTIC ROM",1);
-            Text(34,196,"CORE: CPU / LOROM / HIROM / DMA / BG0-1",1);
-            Text(34,214,"SPC700 AUDIO / SPRITES / HDMA: PENDING",1,255,220,140);
+            Text(34,196,"CORE: CPU / SPC700 / DMA / HDMA / PPU0-1",1);
+            Text(34,214,"SPRITES / WINDOWS / COLOR MATH - NO AUDIO",1,255,220,140);
         }
         Text(8,276,Clip(status,82),1,192,210,225);
         if (remote && hostMenu.Length > 0) { DrawFilledRectangleWithAlpha(8,4,496,18,10,14,24,240); Text(14,9,Clip(hostMenu,78),1); }

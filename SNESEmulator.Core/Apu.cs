@@ -125,6 +125,9 @@ public sealed class Apu : ISpcBus
     {
         if(crystal<Crystal)throw new ArgumentOutOfRangeException(nameof(crystal));budget=crystal;
         if(Isolated){Crystal=crystal;return;}
+        // No segment endpoint: timer input and MMIO stay untouched. Avoid replaying
+        // the SPC continuation at every intervening PPU half-dot.
+        if((cycleActive||holding)&&nextEffect>crystal){Crystal=crystal;return;}
         try{while(true){FinishHold();Cpu.RunInstruction();}}catch(Budget){}
     }
     public long NextBoundary=>Isolated?long.MaxValue:cycleActive||holding?nextEffect:Crystal+1;

@@ -6,15 +6,14 @@ Der SNES-Kern wird hier selbst entwickelt; es wird kein Snes9x-, bsnes- oder
 Libretro-Kern eingebunden.
 
 **Stand: 0.1.0-dev – eigener Entwicklungskern, noch keine allgemeine
-Spielekompatibilität.** M0–M3 sind unabhängig geprüft. M4 ergänzt eine eigene
-SPC700, Timer, reale IPL-Ausführung und CPU/APU-Uploads; unabhängige M4-Abnahme
-ausstehend. Alle 5.080.400 externen 65C816-Semantik- und Busfälle bestehen.
-Die SPC-Suite umfasst 256.000 Semantik- und freigegebene Busfälle: 249.000
-passen roh, 7.000 haben eine dokumentierte indirekt-Y-Zyklusadjudikation anhand
-veröffentlichter Hardwareforschung. Es gibt keine eigene Konsolenmessung.
-S-DSP-Audio, Sprites und weitere PPU-Modi bleiben offen. Siehe
-[Testlabor](docs/test-laboratory.md), [M3-Vertrag](docs/m3-io-contract.md)
-und [M4-APU-Vertrag](docs/m4-apu-contract.md).
+Spielekompatibilität.** M0–M4 sind unabhängig geprüft. M5 ergänzt eine getaktete
+Mode0/1-PPU mit Sprites, Fenstern, Farbmathematik und nativen RGB555-Referenzen;
+unabhängige M5-Abnahme ausstehend. Alle5.080.400 externen CPU-Semantik- und
+Busfälle bestehen. Die SPC-Suite umfasst256.000 Semantik-/freigegebene Busfälle:
+249.000 passen roh,7.000 haben eine quellengestützte indirekt-Y-Adjudikation.
+Es gibt keine eigene Konsolenmessung. S-DSP-Audio und Modi2–7 bleiben offen.
+Siehe [Testlabor](docs/test-laboratory.md), [M4](docs/m4-apu-contract.md)
+und [M5-PPU-Vertrag](docs/m5-ppu-contract.md).
 
 ## Starten
 

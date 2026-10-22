@@ -17,3 +17,8 @@ SingleStepTests SPC700 test vectors are MIT-licensed, Copyright2024
 SingleStepTests. The redistributed offline samples retain their license at
 testdata/spc700-sample/LICENSE. Full vectors are local test inputs, not shipped
 with the emulator. No external SPC700 implementation source was incorporated.
+
+The external VRAM mid-scanline test ROM and retained source are Copyright
+2022 Marcus Rowe (undisbeliever), Zlib license. See
+testdata/ppu-external/upstream-LICENSE and testdata/m5-ppu-manifest.json.
+It is laboratory test data; no third-party emulator core code is included.

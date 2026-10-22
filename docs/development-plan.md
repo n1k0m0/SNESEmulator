@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M3 unabhängig abgenommen; M4 implementiert, unabhängige Abnahme ausstehend; Messumfang und Grenzen siehe [Testlabor](test-laboratory.md). M5–M10 bleiben offen. M4-Vertrag: [SPC700/APU](m4-apu-contract.md). M3-Vertrag und Evidenzgrenzen: [5A22-I/O](m3-io-contract.md). Alle 5.080.400 festgeschriebenen externen CPU-Semantikfälle bestehen; Alle externen Busvektoren bestehen zusätzlich; SNES-Timingprofile sind analytisch geprüft, ohne Originalhardware-Messnachweis. Siehe [M2-Vertrag](m2-timing-contract.md).
+Status: M0–M4 unabhängig abgenommen; M5 implementiert, unabhängige Abnahme ausstehend. M6–M10 bleiben offen. Messumfang: [Testlabor](test-laboratory.md), [M5-Vertrag](m5-ppu-contract.md), [M4-Vertrag](m4-apu-contract.md), [M3-Vertrag](m3-io-contract.md), [M2-Vertrag](m2-timing-contract.md). Alle5.080.400 externen CPU-Semantik- und Busfälle bestehen. Keine eigene Konsolenmessung.
 
 ## Ziel und Nachweis
 
@@ -205,7 +205,8 @@ Abnahme:
 
 ### M4 – SPC700 und APU-Kommunikation
 
-Implementiert; unabhängige Abnahme ausstehend. [Vertrag](m4-apu-contract.md)
+Unabhängig abgenommen auf `0b1139436727c835c4fdbf944c74e3d0067c3944`, Exit0,
+`artifacts/root-m4-validation.log`. [Vertrag](m4-apu-contract.md)
 mit Trennung roher/adjudizierter SPC-Busfälle, eigener Bootroutine und lokaler
 Original-IPL-Eingabe. S-DSP-Audio bleibt M6.
 
@@ -229,6 +230,10 @@ Abnahme:
   zeitlich reproduzierbar getestet.
 
 ### M5 – Grundlegende PPU vollständig
+
+Implementiert; unabhängige Root-Abnahme ausstehend. [PPU-Vertrag](m5-ppu-contract.md)
+trennt quelleninformierte Fetch-/MMIO-Phasen, native Sollbilder und Grenzen
+der Hardware-Evidenz. Kein eigener Konsolenmessnachweis. Modi2–7 bleiben M7.
 
 Arbeit:
 

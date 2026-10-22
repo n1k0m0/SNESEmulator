@@ -169,7 +169,7 @@ static class Lab
     {
         var options=new Dictionary<string,string>();
         for(int i=0;i<args.Length;i+=2){if(i+1==args.Length || !args[i].StartsWith("--"))throw new ArgumentException("ROM options require --key value pairs");options.Add(args[i][2..],args[i+1]);}
-        foreach(string key in options.Keys)if(key is not ("frames" or "masterclocks" or "output" or "rom" or "replay" or "trace-limit" or "expect-wram" or "expect-frame"))throw new ArgumentException("Unknown ROM option: "+key);
+        foreach(string key in options.Keys)if(key is not ("frames" or "masterclocks" or "output" or "rom" or "replay" or "trace-limit" or "expect-wram" or "expect-frame" or "expect-native"))throw new ArgumentException("Unknown ROM option: "+key);
         string Opt(string k,string fallback)=>options.GetValueOrDefault(k,fallback);
         long frames=long.Parse(Opt("frames","8")),clockLimit=long.Parse(Opt("masterclocks","100000000"));
         if(frames<1||clockLimit<1)throw new ArgumentException("Positive frame and masterclock limits required");
@@ -177,8 +177,8 @@ static class Lab
         var report=new TestReport("headless-rom");var machine=new SnesSystem();
         byte[] rom=options.ContainsKey("rom")?File.ReadAllBytes(options["rom"]):DiagnosticRom.Create();machine.Insert(new Cartridge(rom));
         report.Metadata["romSha256"]=Convert.ToHexString(SHA256.HashData(rom));report.Metadata["profile"]=machine.Profile;
-        report.Metadata["accuracy"]="Exact master-clock budget with individually timed CPU cycles. Generic CPU bus conformance and analytical profile timing are separate evidence. Whole-line PPU rendering and legacy immediate DMA remain incomplete M3/M5 devices; oscillator/revision target is unverified hardware.";
-        report.Metadata["busTraceContract"]="Explicit read-latch, write-latch and cycle-complete phases. Valid read latch after accessClocks-4 active clocks plus4 active trailing hold; writes at completion. Each record includes phase timestamp, cycle start, latch timestamp and captured value. MDR exceptions remain M3.";
+        report.Metadata["accuracy"]="Exact master-clock budget with individually timed CPU cycles. Generic CPU bus conformance and analytical profile timing are separate evidence. M5 Mode0/1 PPU advances at explicit fetch and pixel phases; oscillator/revision target is unverified hardware.";
+        report.Metadata["busTraceContract"]="Explicit read-latch, write-latch and cycle-complete phases. Valid read latch after accessClocks-4 active clocks plus4 active trailing hold; writes at completion. Each record includes phase timestamp, cycle start, latch timestamp and captured value. MDR exceptions follow the M3 contract.";
         report.Metadata["framesLimit"]=frames;report.Metadata["masterclockLimit"]=clockLimit;
         ReplayEvent[] replay=[];
         if(options.TryGetValue("replay",out string? replayPath))
@@ -189,6 +189,8 @@ static class Lab
         }
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(prefix))!);
         using var cpuTrace=new StreamWriter(prefix+".cpu.jsonl");using var busTrace=new StreamWriter(prefix+".bus.jsonl");using var rasterTrace=new StreamWriter(prefix+".raster.jsonl");
+        var registerTrace=new Queue<string>();
+        machine.Bus.AccessObserved=(direction,address,value)=>{if((address&0x40ffc0)==0x2100){registerTrace.Enqueue($"clock{machine.Clock.Now} H{machine.Clock.H} V{machine.Clock.V} {direction} ${address:X6}=${value:X2}");if(registerTrace.Count>128)registerTrace.Dequeue();}};
         long clocks=0,busEvents=0,instructions=0;int replayIndex=0,traceLimit=int.Parse(Opt("trace-limit","4096"));
         if(traceLimit<0)throw new ArgumentException("Trace limit must not be negative");
         machine.CyclePhaseObserved=phase=>{if(busEvents++<traceLimit)busTrace.WriteLine(JsonSerializer.Serialize(new {sequence=busEvents,origin="CPU",phase}));};
@@ -206,6 +208,10 @@ static class Lab
         clocks=machine.Clock.Now;machine.CyclePhaseObserved=null;machine.Bus.Dma.Observed=null;machine.Clock.EventObserved=null;
         File.WriteAllBytes(prefix+".wram.bin",machine.Bus.Wram);
         using(var output=new BinaryWriter(File.Create(prefix+".argb32le.bin")))foreach(uint pixel in machine.Bus.Ppu.Pixels)output.Write(pixel);
+        using(var native=new BinaryWriter(File.Create(prefix+".rgb555le.bin")))foreach(ushort pixel in machine.Bus.Ppu.NativePixels)native.Write(pixel);
+        File.WriteAllBytes(prefix+".brightness.bin",machine.Bus.Ppu.Brightness);
+        report.Metadata["nativeFrameSha256"]=Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(prefix+".rgb555le.bin")));
+        report.Metadata["frameGeometry"]=machine.Bus.Ppu.Frame.Geometry;
         report.Metadata["cpuState"]=CpuVector.State(machine.Cpu);report.Metadata["completedFrames"]=machine.Frames;report.Metadata["masterclocks"]=clocks;report.Metadata["instructionsAttempted"]=instructions;
         report.Metadata["traceLimit"]=traceLimit;report.Metadata["busEvents"]=busEvents;report.Metadata["traceTruncated"]=busEvents>traceLimit||instructions>traceLimit;
         report.Metadata["stopReason"]=machine.Frames>=frames?"frame-limit":"masterclock-limit";
@@ -223,6 +229,13 @@ static class Lab
         {
             byte[] bytes=File.ReadAllBytes(framePath);if(bytes.Length%4!=0)throw new InvalidDataException("ARGB32LE reference requires whole pixels");uint[] expected=new uint[bytes.Length/4];for(int i=0;i<expected.Length;i++)expected[i]=System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(i*4));
             string? diff=CpuVector.FirstPixelDifference(machine.Bus.Ppu.Pixels,expected,Ppu.Width);report.Metadata["frameOracleSha256"]=Convert.ToHexString(SHA256.HashData(bytes));report.Add("frame oracle",diff==null?"pass":"fail",diff);
+        }
+        if(options.TryGetValue("expect-native",out string? nativePath))
+        {
+            byte[] bytes=File.ReadAllBytes(nativePath);if(bytes.Length%2!=0)throw new InvalidDataException("RGB555LE reference requires whole pixels");
+            ushort[] expected=new ushort[bytes.Length/2];for(int i=0;i<expected.Length;i++)expected[i]=System.Buffers.Binary.BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(i*2));
+            string? diff=NativeFrameOracle.FirstDifference(machine.Bus.Ppu.NativePixels,expected,Ppu.Width,registerTrace.Prepend("PPU registers: "+Convert.ToHexString(machine.Bus.Ppu.Registers)));
+            report.Metadata["nativeOracleSha256"]=Convert.ToHexString(SHA256.HashData(bytes));report.Add("native pixel oracle",diff==null?"pass":"fail",diff);
         }
         report.Save(prefix);return report.ExitCode;
     }

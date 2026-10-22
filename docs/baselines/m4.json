@@ -1,6 +1,6 @@
 {
   "schema": "snes-m4-spc-apu-v1",
-  "status": "Clean implementation full gate passed; independent parent acceptance pending. Measurement record, not expected-output oracle.",
+  "status": "Clean implementation full gate passed; independently accepted by root. Measurement record, not expected-output oracle.",
   "implementationCommit": "bb1aaa9c2dc1dac7850ea2d12a71b73c9d05c079",
   "implementationCommits": [
     "607a7434eec3f260fe380dff90c1239b48889158",
@@ -162,5 +162,11 @@
     "Original logic-analyzer capture files not acquired",
     "Commercial-game matrix (M8)",
     "Active APU currently below realtime; optimize with identical digital output (M9)"
-  ]
+  ],
+  "independentAcceptance": {
+    "commit": "0b1139436727c835c4fdbf944c74e3d0067c3944",
+    "command": "python tools/test-lab.py --windows --full",
+    "exitCode": 0,
+    "log": "artifacts/root-m4-validation.log"
+  }
 }

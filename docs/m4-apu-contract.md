@@ -1,6 +1,9 @@
 # M4 SPC700 / S-SMP contract and evidence
 
-Own C# implementation, pending independent parent acceptance. The clean full
+Own C# implementation, independently accepted on
+`0b1139436727c835c4fdbf944c74e3d0067c3944`, full gate exit0,
+`artifacts/root-m4-validation.log`. M5 supersedes format5 with format6 PPU
+pipeline state while preserving this APU execution contract. The clean full
 gate passed on `bb1aaa9c2dc1dac7850ea2d12a71b73c9d05c079`, exit0,
 `artifacts/m4-full-validation.log`; structured evidence and all counts are in
 [the M4 baseline](baselines/m4.json). M0–M3 were

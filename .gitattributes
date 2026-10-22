@@ -13,3 +13,7 @@ SNESEmulator.Core/IoDmaDiagnosticRom.cs text eol=lf
 SNESEmulator.Core.Tests/IoDmaTests.cs text eol=lf
 
 SNESEmulator.Core/SpcUploadRom.cs text eol=lf
+
+SNESEmulator.Core/PpuDiagnosticRom.cs text eol=lf
+SNESEmulator.Core.Tests/PpuTests.cs text eol=lf
+testdata/**/*.sfc binary

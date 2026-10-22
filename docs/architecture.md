@@ -47,18 +47,21 @@ rekursive Chipspiegelung, SRAM, PPU-/APU-Ports und 5A22-I/O. `CpuIo` enthält
 ALU-Zwischenzustände, Timer-IRQ/NMI-Holds, Zählerlatches und serielle/automatische
 JOY-Abfrage. `DmaController` übernimmt den Bus mit eigenen gespeicherten Phasen:
 A/B-Read nach vier Clocks, Write nach weiteren vier, Priorität, Start-/End-Sync,
-HDMA-Tabellen und Präemption. Savestate v5 speichert diese Zwischenzustände und
+HDMA-Tabellen und Präemption. Savestate v6 speichert diese Zwischenzustände und
 bindet den Mapper zusätzlich zum ROM-Hash. Siehe [M3-Vertrag](m3-io-contract.md)
 für genaue Grenzen und Quellen. PowerOn definiert RAM-Testseeds; Reset erhält
 CPU-WRAM und SRAM, ist aber kein vollständiges Modell aller Reset-Pins der PPU.
 
-`Ppu` implementiert VRAM/CGRAM/OAM-Speicher und grundlegende Schreibports,
-Forced Blank, Helligkeit, VRAM-Remapping, BG-Scroll und einen Scanline-Renderer
-für 8×8-Hintergründe der Modi 0/1 mit elementarer Priorität. OAM ist gespeichert,
-aber Sprites werden noch nicht gerendert. VRAM-Lesepuffer, zahlreiche Leseports,
-16×16-Tiles, exakte Mode-1-Priorität, die Modi 2–7, Fenster, Farbmathematik,
-Interlace/Overscan und dotgenaues Timing sind offen. Unsupported PPU-Funktionen
-können derzeit zu fehlenden oder falschen Bildelementen führen.
+`Ppu` führt eigene Mode0/1-Hintergründe und alle128 OBJ über Fetch-/Pixelphasen
+im Masterclock-Scheduler aus. Individuelle VRAM/CGRAM/OAM- und Scroll-Latches,
+getrennte PPU1/PPU2-MDRs (PPU2 gemeinsam mit Zählerports), Fenster, Main/Sub,
+Farbmathematik und Mosaic sind serialisiert. Native RGB555 und Helligkeitsphase
+werden vor ARGB ausgegeben; das Lab vergleicht native Pixel mit erstem X/Y/Zeile
+und Register-/Buskontext. PPU-Observers laufen nach vollständigem Timestamp-
+Commit. Die Geometrie trägt Metadaten, bleibt vor M7 auf256×224 begrenzt.
+Modi2–7, Hires/Interlace/Overscan-Ausgabe und breite Hardware-Evidenz sind offen.
+Absolute PPU-Phasen sind ein quelleninformiertes analytisches Modell, kein neuer
+Konsolenmessnachweis. Siehe [M5-Vertrag](m5-ppu-contract.md).
 
 `Apu` führt eine eigene vollständige `Spc700` mit64KiB RAM, Timern,
 CONTROL/TEST, DSP-Registerschnittstelle und getrennten CPU/APU-Portlatches aus.

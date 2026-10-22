@@ -27,7 +27,6 @@ public sealed class IoState
     public bool CounterLatched {get;set;}
     public bool ReadHHigh {get;set;}
     public bool ReadVHigh {get;set;}
-    public byte Ppu2Mdr {get;set;}
 }
 
 public sealed class CpuIo(SystemBus bus)
@@ -179,15 +178,15 @@ public sealed class CpuIo(SystemBus bus)
     {
         ushort value=vertical?State.LatchedV:State.LatchedH;
         bool high=vertical?State.ReadVHigh:State.ReadHHigh;
-        byte result=high?(byte)((State.Ppu2Mdr&0xfe)|(value>>8)&1):(byte)value;
+        byte result=high?(byte)((bus.Ppu.Ppu2Mdr&0xfe)|(value>>8)&1):(byte)value;
         if(vertical)State.ReadVHigh=!high;else State.ReadHHigh=!high;
-        return State.Ppu2Mdr=result;
+        return bus.Ppu.Ppu2Mdr=result;
     }
     public byte ReadStatus()
     {
-        byte result=(byte)((State.Ppu2Mdr&0x20)|3|(Clock?.Profile.Pal==true?16:0)|(State.CounterLatched?64:0)|(Clock?.Field==true?128:0));
+        byte result=(byte)((bus.Ppu.Ppu2Mdr&0x20)|3|(Clock?.Profile.Pal==true?16:0)|(State.CounterLatched?64:0)|(Clock?.Field==true?128:0));
         State.ReadHHigh=State.ReadVHigh=false;
         if((bus.Io[1]&128)!=0)State.CounterLatched=false;
-        return State.Ppu2Mdr=result;
+        return bus.Ppu.Ppu2Mdr=result;
     }
 }

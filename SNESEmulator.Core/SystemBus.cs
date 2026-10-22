@@ -36,7 +36,7 @@ public sealed class SystemBus : ICpuBus
         else if(LowBank(address)&&a is >=0x2100 and <0x2140) {
             result=a switch {
                 0x2137=>LatchCounters(),0x213c=>CpuIo.ReadCounter(false),0x213d=>CpuIo.ReadCounter(true),0x213f=>CpuIo.ReadStatus(),
-                _=>Ppu.Read(a)
+                _=>Ppu.Read(a,OpenBus)
             };
         }
         else if(LowBank(address)&&a is >=0x2140 and <0x2180)result=Apu.ApuToCpu[a&3];

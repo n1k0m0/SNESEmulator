@@ -28,17 +28,17 @@ public sealed class SnesSystem
     private void ConfigureClock()
     {
         Clock.PeripheralBoundary=()=>{
-            long tick=Bus.Apu.NextBoundary;if(tick==long.MaxValue)return long.MaxValue;
+            long tick=Bus.Apu.NextBoundary;if(tick==long.MaxValue)return Bus.Ppu.NextBoundary;
             Int128 numerator=(Int128)tick*Profile.MasterHzNumerator*Profile.ApuHzDenominator;
             long denominator=checked(Profile.ApuHzNumerator*Profile.MasterHzDenominator);
-            return (long)((numerator+denominator-1)/denominator);
+            return Math.Min(Bus.Ppu.NextBoundary,(long)((numerator+denominator-1)/denominator));
         };
-        Clock.PeripheralAdvanced=()=>Bus.Apu.RunUntil(Clock.ApuTicks);
+        Clock.PeripheralAdvanced=()=>{Bus.Ppu.Synchronize();Bus.Apu.RunUntil(Clock.ApuTicks);};
         Clock.RefreshStarted=()=>{for(int i=1;i<=5;i++)Clock.Schedule(Clock.Now+i*8,HardwareEventKind.Device,1,-6);};
-        Clock.LineCompleted=line=>{if(line>0)Bus.Ppu.RenderScanline(line-1);};
+        Bus.Ppu.Clock=Clock;
         Bus.CpuIo.Clock=Clock;Bus.DeferCpuMdr=true;
         Clock.DeviceEvent=e=>{if((e.Payload&255)==7)Bus.Dma.RequestHdma(e.Payload==7);else Bus.CpuIo.Event(e.Payload);};
-        Clock.LineStarted=line=>{Bus.Ppu.Scanline=line;ScheduleIoLine();};
+        Clock.LineStarted=line=>{Bus.Ppu.StartLine(line);ScheduleIoLine();};
         Clock.FieldStarted=()=>{Bus.CpuIo.NewField();Bus.Ppu.Scanline=0;};
         Clock.VblankStarted=()=>Bus.BeginVblank();
     }
@@ -137,7 +137,7 @@ public sealed class SnesSystem
     {
         if(masterClock<Clock.Now)throw new ArgumentOutOfRangeException(nameof(masterClock));target=masterClock;
         // A snapshot from an APU phase may precede a same-timestamp typed event.
-        Clock.AdvanceTo(Clock.Now);Bus.Apu.RunUntil(Clock.ApuTicks);SyncInterrupts();
+        Clock.AdvanceTo(Clock.Now);Bus.Ppu.Synchronize();Bus.Apu.RunUntil(Clock.ApuTicks);SyncInterrupts();
         while(Clock.Now<target)
         {
             Bus.Ppu.Scanline=Clock.V;Clock.Interlace=(Bus.Ppu.Registers[0x33]&1)!=0;Clock.VblankLine=(Bus.Ppu.Registers[0x33]&4)!=0?240:225;

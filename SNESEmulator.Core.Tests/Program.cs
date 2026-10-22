@@ -12,6 +12,7 @@ void Test(string name,Action test)
     try { test(); passed++; report.Add(name,"pass"); Console.WriteLine("PASS "+name); }
     catch(Exception e) { failed++; report.Add(name,"fail",e.ToString()); Console.WriteLine("FAIL "+name+": "+e); }
 }
+if(args.Contains("--ppu-only")){PpuTests.Run(Test,testRoot);report.Metadata["M5"]=PpuTests.Evidence;report.Save("artifacts/m5-targeted");return failed==0?0:1;}
 SnesSystem Diagnostic() { var m=new SnesSystem(); m.Insert(new Cartridge(DiagnosticRom.Create())); return m; }
 Test("LoROM mapping, header, copier header",()=>
 {
@@ -199,6 +200,8 @@ Test("M1 permanently reduced upstream failure regressions",()=>
 TimingTests.Run(Test,testRoot);
 IoDmaTests.Run(Test,testRoot);
 ApuTests.Run(Test,testRoot);
+PpuTests.Run(Test,testRoot);
+report.Metadata["M5"]=PpuTests.Evidence;
 Console.WriteLine($"{passed} passed, {failed} failed. Temporary test data: {testRoot}");
 report.Save(args.Length>0?args[0]:Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/core-regression");
 return failed==0?0:1;

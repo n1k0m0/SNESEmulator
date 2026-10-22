@@ -1,117 +1,147 @@
 namespace SNESEmulator.Core;
 
-/// <summary>Initial scanline renderer: mode 0/1 backgrounds, 8x8 tiles, CGRAM and VRAM ports.</summary>
-public sealed class Ppu
+/// <summary>Own two-chip PPU. Timing/evidence contract: docs/m5-ppu-contract.md.</summary>
+public sealed partial class Ppu
 {
-    public const int Width = 256, Height = 224;
-    public byte[] Vram { get; } = new byte[65536];
-    public byte[] Cgram { get; } = new byte[512];
-    public byte[] Oam { get; } = new byte[544];
-    public byte[] Registers { get; } = new byte[64];
-    public uint[] Pixels { get; } = new uint[Width * Height];
-    public ushort[] Scroll { get; } = new ushort[8];
-    public ushort VramAddress { get; set; }
-    public ushort CgramAddress { get; set; }
-    public ushort OamAddress { get; set; }
-    public byte ScrollLatch { get; set; }
-    public int Scanline { get; set; }
-    public bool InVblank => Scanline >= ((Registers[0x33]&4)!=0?240:225);
-
-    public void Reset()
-    {
-        Array.Clear(Vram); Array.Clear(Cgram); Array.Clear(Oam); Array.Clear(Registers); Array.Clear(Scroll);
-        VramAddress = CgramAddress = OamAddress = 0; ScrollLatch = 0; Scanline = 0;
-        Registers[0] = 0x80; Array.Fill(Pixels, 0xFF000000u);
-    }
-    private int Increment => (Registers[0x15] & 3) switch { 0 => 1, 1 => 32, _ => 128 };
+    public const int Width=256,Height=224;
+    public byte[] Vram {get;}=new byte[65536];
+    public byte[] Cgram {get;}=new byte[512];
+    public byte[] Oam {get;}=new byte[544];
+    public byte[] Registers {get;}=new byte[64];
+    public uint[] Pixels {get;}=new uint[Width*Height];
+    // Native digital RGB555 before display brightness, plus the independent DAC control.
+    public ushort[] NativePixels {get;}=new ushort[Width*Height];
+    public byte[] Brightness {get;}=new byte[Width*Height];
+    public ushort[] Scroll {get;}=new ushort[8];
+    public ushort VramAddress {get;set;}
+    public ushort CgramAddress {get;set;}
+    public ushort OamAddress {get;set;}
+    public byte ScrollLatch {get;set;}
+    public int Scanline {get;set;}
+    public byte Ppu1Mdr {get;set;}
+    public byte Ppu2Mdr {get;set;}
+    public MasterClock? Clock {get;set;}
+    private ushort vramBuffer,oamReload,fixedColor;
+    private byte oamLatch,cgramLatch,scrollFineLatch,mode7Latch;
+    private readonly ushort[] mode7=new ushort[8];
+    public bool RangeOver {get;private set;}
+    public bool TimeOver {get;private set;}
+    public bool ForcedBlank=>(Registers[0]&128)!=0;
+    public bool InVblank=>Scanline>=((Registers[0x33]&4)!=0?240:225);
+    private bool MemoryBlank=>ForcedBlank||InVblank;
+    private int Increment=>(Registers[0x15]&3) switch{0=>1,1=>32,_=>128};
+    private int OamIndex(int address)=>(address&512)!=0?512+(address&31):address&511;
     private int VramByteAddress(bool high)
     {
-        int a = VramAddress;
-        a = ((Registers[0x15] >> 2) & 3) switch
-        {
-            1 => (a & 0xFF00) | ((a & 31) << 3) | ((a >> 5) & 7),
-            2 => (a & 0xFE00) | ((a & 63) << 3) | ((a >> 6) & 7),
-            3 => (a & 0xFC00) | ((a & 127) << 3) | ((a >> 7) & 7), _ => a
-        };
-        return ((a << 1) | (high ? 1 : 0)) & 0xFFFF;
+        int a=VramAddress;
+        a=((Registers[0x15]>>2)&3) switch{
+            1=>(a&0xff00)|((a&31)<<3)|((a>>5)&7),
+            2=>(a&0xfe00)|((a&63)<<3)|((a>>6)&7),
+            3=>(a&0xfc00)|((a&127)<<3)|((a>>7)&7),_=>a};
+        return ((a<<1)|(high?1:0))&65535;
     }
-    public void Write(int register, byte value)
+    private void PrefetchVram()=>vramBuffer=MemoryBlank?(ushort)(Vram[VramByteAddress(false)]|Vram[VramByteAddress(true)]<<8):(ushort)0;
+    public void Reset()
     {
-        register &= 63;
-        Registers[register] = value;
-        switch (register)
-        {
-            case 2: OamAddress = (ushort)((OamAddress & 0x200) | value << 1); break;
-            case 3: OamAddress = (ushort)((OamAddress & 0x1FF) | (value & 1) << 9); break;
-            case 4: Oam[OamAddress++ % 544] = value; break;
-            case >= 0x0D and <= 0x14:
-                int i = register - 0x0D;
-                Scroll[i] = (ushort)(((value << 8) | ScrollLatch) & 0x3FF);
-                ScrollLatch = value; break;
-            case 0x16: VramAddress = (ushort)((VramAddress & 0xFF00) | value); break;
-            case 0x17: VramAddress = (ushort)((VramAddress & 255) | value << 8); break;
-            case 0x18: case 0x19:
-                bool high = register == 0x19;
-                Vram[VramByteAddress(high)] = value;
-                if (((Registers[0x15] & 0x80) != 0) == high) VramAddress += (ushort)Increment;
-                break;
-            case 0x21: CgramAddress = (ushort)(value * 2); break;
-            case 0x22:
-                Cgram[CgramAddress & 511] = (byte)(value & ((CgramAddress & 1) != 0 ? 127 : 255));
-                CgramAddress = (ushort)((CgramAddress + 1) & 511); break;
-        }
+        Array.Clear(Vram);Array.Clear(Cgram);Array.Clear(Oam);Array.Clear(Registers);Array.Clear(Scroll);Array.Clear(mode7);
+        Array.Clear(NativePixels);Array.Clear(Brightness);Array.Fill(Pixels,0xff000000u);
+        VramAddress=CgramAddress=OamAddress=vramBuffer=oamReload=fixedColor=0;
+        ScrollLatch=oamLatch=cgramLatch=scrollFineLatch=mode7Latch=Ppu1Mdr=Ppu2Mdr=0;
+        Scanline=0;RangeOver=TimeOver=false;Registers[0]=128;ResetPipeline();
     }
-    public byte Read(int register) => (register & 63) switch
+    public void StartLine(int line)
     {
-        0x3E => 1, 0x3F => 3, _ => 0
-    };
-    private uint Color(int index)
-    {
-        int color = Cgram[(index * 2) & 511] | Cgram[(index * 2 + 1) & 511] << 8;
-        int brightness = Registers[0] & 15;
-        int r = (color & 31) * 255 * brightness / 465;
-        int g = ((color >> 5) & 31) * 255 * brightness / 465;
-        int b = ((color >> 10) & 31) * 255 * brightness / 465;
-        return 0xFF000000u | (uint)(r << 16 | g << 8 | b);
+        Scanline=line;
+        if(line==0){RangeOver=TimeOver=false;mosaicStart=1;}
+        if(line==((Registers[0x33]&4)!=0?240:225)&&!ForcedBlank)OamAddress=oamReload;
+        BeginPipelineLine();
     }
-    public void RenderScanline(int y)
+    public void Write(int register,byte value)
     {
-        if (y >= Height) return;
-        bool blank = (Registers[0] & 0x80) != 0;
-        for (int x = 0; x < Width; x++)
+        register&=63;if(register>=0x34)return;
+        byte old=Registers[register];Registers[register]=value;
+        switch(register)
         {
-            uint color = blank ? 0xFF000000 : Color(0);
-            int mode = Registers[5] & 7;
-            if (!blank && mode is 0 or 1)
-            {
-                // Basic low/high priority backgrounds. OBJ/window/color math are later phases.
-                for (int priority = 0; priority < 2; priority++)
-                for (int bg = mode == 0 ? 3 : 2; bg >= 0; bg--)
-                {
-                    if ((Registers[0x2C] & (1 << bg)) == 0) continue;
-                    int bpp = mode == 0 || bg == 2 ? 2 : 4;
-                    int sx = (x + Scroll[bg * 2]) & 1023, sy = (y + Scroll[bg * 2 + 1]) & 1023;
-                    int map = Registers[7 + bg], tileX = sx >> 3, tileY = sy >> 3;
-                    int screenX = (map & 1) != 0 ? (tileX >> 5) & 1 : 0;
-                    int screenY = (map & 2) != 0 ? (tileY >> 5) & 1 : 0;
-                    int screen = screenX + screenY * ((map & 1) != 0 ? 2 : 1);
-                    int address = ((map & 0xFC) * 512 + screen * 2048 + ((tileY & 31) * 32 + (tileX & 31)) * 2) & 65535;
-                    int tile = Vram[address] | Vram[(address + 1) & 65535] << 8;
-                    if (((tile >> 13) & 1) != priority) continue;
-                    int px = sx & 7, py = sy & 7;
-                    if ((tile & 0x4000) != 0) px = 7 - px;
-                    if ((tile & 0x8000) != 0) py = 7 - py;
-                    int baseAddress = ((Registers[0x0B + bg / 2] >> ((bg & 1) * 4)) & 15) * 8192;
-                    int data = baseAddress + (tile & 1023) * bpp * 8 + py * 2;
-                    int pixel = 0;
-                    for (int plane = 0; plane < bpp; plane++)
-                        pixel |= ((Vram[(data + plane / 2 * 16 + plane % 2) & 65535] >> (7 - px)) & 1) << plane;
-                    if (pixel == 0) continue;
-                    int palette = (tile >> 10) & 7;
-                    color = Color((mode == 0 ? bg * 32 : 0) + palette * (1 << bpp) + pixel);
+            case 0:if((old&128)!=0&&Scanline==((Registers[0x33]&4)!=0?240:225))OamAddress=oamReload;break;
+            case 2:case 3:
+                oamReload=(ushort)((Registers[2]|(Registers[3]&1)<<8)<<1);OamAddress=oamReload;break;
+            case 4:
+                int oa=OamAddress&1023;
+                // During active display the OAM address bus belongs to evaluation/fetch.
+                int target=MemoryBlank?oa:internalOamAddress;
+                if((oa&1)==0)oamLatch=value;
+                if((oa&512)!=0)Oam[OamIndex(target)]=value;
+                else if((oa&1)!=0){
+                    Oam[OamIndex(MemoryBlank?(oa&~1):target)]=oamLatch;
+                    Oam[OamIndex(MemoryBlank?(oa|1):target)]=value;
                 }
-            }
-            Pixels[y * Width + x] = color;
+                OamAddress=(ushort)((oa+1)&1023);break;
+            case 6:if((old&15)==0&&(value&15)!=0)mosaicRemaining=(value>>4)+2;break;
+            case >=0x0d and <=0x14:
+                int i=register-0x0d;
+                if((i&1)==0){Scroll[i]=(ushort)(((value<<8)|(ScrollLatch&0xf8)|(scrollFineLatch&7))&1023);scrollFineLatch=value;}
+                else Scroll[i]=(ushort)(((value<<8)|ScrollLatch)&1023);
+                ScrollLatch=value;
+                if(register<=0x0e)WriteMode7(6+register-0x0d,value);
+                break;
+            case 0x16:VramAddress=(ushort)((VramAddress&0xff00)|value);PrefetchVram();break;
+            case 0x17:VramAddress=(ushort)((VramAddress&255)|value<<8);PrefetchVram();break;
+            case 0x18:case 0x19:
+                bool high=register==0x19;
+                if(MemoryBlank)Vram[VramByteAddress(high)]=value;
+                if(((Registers[0x15]&128)!=0)==high)VramAddress=unchecked((ushort)(VramAddress+Increment));
+                break;
+            case >=0x1b and <=0x20:WriteMode7(register-0x1b,value);break;
+            case 0x21:CgramAddress=(ushort)(value*2);break;
+            case 0x22:
+                int ca=MemoryBlank||Clock==null||Scanline==0||Clock.H<88||Clock.H>=1096?CgramAddress:internalCgramAddress;
+                if((CgramAddress&1)==0)cgramLatch=value;
+                else{Cgram[ca&510]=cgramLatch;Cgram[(ca&510)+1]=(byte)(value&127);}
+                CgramAddress=(ushort)((CgramAddress+1)&511);break;
+            case 0x32:
+                if((value&32)!=0)fixedColor=(ushort)((fixedColor&~31)|(value&31));
+                if((value&64)!=0)fixedColor=(ushort)((fixedColor&~992)|((value&31)<<5));
+                if((value&128)!=0)fixedColor=(ushort)((fixedColor&~31744)|((value&31)<<10));
+                break;
         }
     }
+    private void WriteMode7(int i,byte value){mode7[i]=(ushort)(value<<8|mode7Latch);mode7Latch=value;}
+    public byte Read(int register,byte cpuMdr=0)
+    {
+        register&=63;
+        switch(register)
+        {
+            case >=0x34 and <=0x36:
+                int product=(short)mode7[0]*(sbyte)(mode7[1]>>8);return Ppu1Mdr=(byte)(product>>((register-0x34)*8));
+            case 0x38:
+                byte data=Oam[OamIndex(MemoryBlank?OamAddress:internalOamAddress)];OamAddress=(ushort)((OamAddress+1)&1023);return Ppu1Mdr=data;
+            case 0x39:case 0x3a:
+                bool high=register==0x3a;byte result=(byte)(vramBuffer>>(high?8:0));
+                if(((Registers[0x15]&128)!=0)==high){PrefetchVram();VramAddress=unchecked((ushort)(VramAddress+Increment));}
+                return Ppu1Mdr=result;
+            case 0x3b:
+                int ca=MemoryBlank||Clock==null||Scanline==0||Clock.H<88||Clock.H>=1096?CgramAddress:internalCgramAddress;
+                byte cg=Cgram[(ca&510)|(CgramAddress&1)];if((CgramAddress&1)!=0)cg=(byte)((cg&127)|(Ppu2Mdr&128));
+                CgramAddress=(ushort)((CgramAddress+1)&511);return Ppu2Mdr=cg;
+            case 0x3e:return Ppu1Mdr=(byte)((Ppu1Mdr&16)|1|(RangeOver?64:0)|(TimeOver?128:0));
+        }
+        return register<0x30&&(register&15) is 4 or 5 or 6 or 8 or 9 or 10?Ppu1Mdr:cpuMdr;
+    }
+    private ushort Palette(int index)
+    {internalCgramAddress=(index&255)*2;return (ushort)((Cgram[internalCgramAddress]|Cgram[internalCgramAddress+1]<<8)&32767);}
+    public static ushort ApplyBrightness(ushort color,byte brightness)
+    {
+        if(brightness>15)throw new ArgumentOutOfRangeException(nameof(brightness));
+        int result=0;for(int shift=0;shift<15;shift+=5)result|=((((color>>shift)&31)*brightness*2+15)/30)<<shift;
+        return (ushort)result;
+    }
+    public static uint ToArgb(ushort color,byte brightness)
+    {
+        int digital=ApplyBrightness(color,brightness);
+        int r=(digital&31)*255/31,g=((digital>>5)&31)*255/31,b=((digital>>10)&31)*255/31;
+        return 0xff000000u|(uint)(r<<16|g<<8|b);
+    }
+    public PpuFrame Frame=>new(new(Width,Height,Width,Clock?.Field??false),NativePixels,Brightness,Pixels);
 }
+public sealed record PpuGeometry(int Width,int Height,int Stride,bool Field);
+public sealed record PpuFrame(PpuGeometry Geometry,ReadOnlyMemory<ushort> Native,ReadOnlyMemory<byte> Brightness,ReadOnlyMemory<uint> Argb);

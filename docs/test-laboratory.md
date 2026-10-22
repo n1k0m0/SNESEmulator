@@ -288,8 +288,7 @@ stall or instruction, with serialized remaining time and captured read data.
 Events at the same timestamp execute before latch/completion transitions in
 priority/creation order. CPU architectural registers commit at
 instruction boundaries; cycle rows carry the in-flight pin values. Partial
-frames remain partial and completed-field count is separate. PPU rendering is
-still whole-line host ARGB output. M3 replaces immediate DMA/stall debt with
+frames remain partial and completed-field count is separate. M5 replaces whole-line PPU output with explicit fetch/pixel phases and native RGB555. M3 replaces immediate DMA/stall debt with
 serializable DMA/HDMA bus ownership and phase machines; see the M3 contract. M4 adds the own SPC700, real IPL execution and clocked MMIO; see its contract.
 S-DSP and native audio samples remain absent. These limitations remain visible in hardware/graphics/
 audio evidence reports as skipped, never passing accuracy claims.
@@ -359,5 +358,28 @@ all5080400 CPU semantic cases,5080400 CPU bus cases,256000 SPC semantic cases
 and256000 source-adjudicated SPC bus cases ran. Original IPL checks4/4 passed.
 The raw SPC split remains249000/7000. Structured clean reports are preserved
 under `artifacts/m4-implementation-evidence/`; counts/hashes and limits are
-recorded in [M4 baseline](baselines/m4.json). Independent parent acceptance is
-still pending.
+recorded in [M4 baseline](baselines/m4.json). Independent parent acceptance completed on `0b1139436727c835c4fdbf944c74e3d0067c3944`,
+`artifacts/root-m4-validation.log`, full gate exit0.
+
+
+## M5 native PPU gate
+
+The [PPU contract](m5-ppu-contract.md) documents the source-informed two-chip
+Mode0/1 target, MMIO/latches, all128 OBJ, main/sub windows/math, mosaic, analytical
+fetch deadlines and the unverified absolute hardware epoch. Format6 saves the
+in-flight graphics pipeline and rejects formats1–5. 334 every-master-clock
+continuations compare to untouched uninterrupted reference runs, including actual
+DMA/HDMA/IRQ/active APU and timed transfer traces. Public fetch/pixel/APU observer
+snapshots exercise committed-state capture. Literal worksheet expectations and
+fresh negative native-pixel mutations use the same comparator. Lab files include
+RGB555LE, separate brightness bytes and ARGB. `rom --expect-native` reports the
+first wrong pixel/hardware line and register/bus context.
+
+Original Apache-2.0 CPU test-ROM variants are assembled during the tests; executed
+unique hashes appear in Metadata.M5. Generator, worksheets and one unmodified
+Zlib external VRAM mid-scanline ROM/license/source are LF/hash-pinned by
+`testdata/m5-ppu-manifest.json`. The external program runs24 actual fields and
+repeated active VRAM write loops, with an independent source-derived full-white
+native frame oracle. `tools/rebuild-ppu-fixture.py` reproduced the ROM exactly.
+This is one external software test, not broad M8 hardware certification. No own
+console is available. Modes2–7 and variable geometry remain M7; audio remains M6.
