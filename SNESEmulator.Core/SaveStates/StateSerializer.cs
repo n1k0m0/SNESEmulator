@@ -17,7 +17,7 @@ public static class StateSerializer
         using (var zip = new GZipStream(file, CompressionLevel.Fastest))
         using (var w = new BinaryWriter(zip))
         {
-            w.Write("SNESSAV"); w.Write(2); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));
+            w.Write("SNESSAV"); w.Write(3); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));
             var c = machine.Cpu; var b = machine.Bus; var p = b.Ppu;
             w.Write(c.A); w.Write(c.X); w.Write(c.Y); w.Write(c.S); w.Write(c.D); w.Write(c.PC);
             w.Write(c.P); w.Write(c.PBR); w.Write(c.DBR); w.Write(c.E); w.Write(c.Waiting); w.Write(c.Stopped); w.Write(c.Instructions);
@@ -43,7 +43,7 @@ public static class StateSerializer
         using var file = File.OpenRead(path);
         using var zip = new GZipStream(file, CompressionMode.Decompress);
         using var r = new BinaryReader(zip);
-        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 2 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
+        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 3 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
             throw new InvalidDataException("Savestate version or cartridge does not match.");
         var profile=JsonSerializer.Deserialize<HardwareProfile>(r.ReadString())??throw new InvalidDataException("Missing hardware profile");
         var m = new SnesSystem(profile); m.Insert(new Cartridge(cartridge.Rom, cartridge.SourcePath));

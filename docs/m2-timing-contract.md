@@ -26,10 +26,13 @@ remain interruptible per byte.
 
 `SnesSystem.RunUntil(t)` ends at exactly master clock `t`. A partial cycle retains
 its remaining active clocks. Refresh and external typed stalls advance the
-independent clock but pause the CPU cycle. CPU read/write effects latch only
-after the cycle and any simultaneous stall have finished. At a shared timestamp,
+independent clock but pause the CPU cycle. Valid reads latch after `accessClocks - 4` active clocks, followed by four active
+clocks of trailing hold. Writes latch at cycle completion. Read data and MMIO
+side effects are captured once, before trailing time; a suspended hold stores
+the actual read value and cannot repeat the access. Simultaneous stalls pause
+the active pre-latch or hold phase. At a shared timestamp,
 typed events run first, ordered by priority and then creation sequence; CPU bus
-effects run after them. Raster state and interrupt requests synchronize before
+latches and completion transitions run after them. Raster state and interrupt requests synchronize before
 and after each bus effect. WAI/STP generate no ongoing CPU accesses while the
 clock, raster and APU accumulator continue. The all-low upstream terminal row is
 a zero-duration quiescent output marker.
@@ -37,9 +40,10 @@ a zero-duration quiescent output marker.
 `RunFrame()` ends at the next emulated field transition using that exact-budget
 API. One-clock, block and field requests produce byte-identical complete states.
 There is no Windows timer or rounded50/60-Hz value in hardware progression.
-Savestate format2 stores profile, event queue/stable sequence, raster/field,
+Savestate format3 stores profile, event queue/stable sequence, raster/field,
 APU rational remainder, partial CPU time, pending continuation, interrupt latches
-and legacy DMA stall debt. Format1 is explicitly rejected.
+and legacy DMA stall debt. It also stores the latched read, trailing hold time,
+cycle start and latch timestamp. Formats1 and2 are explicitly rejected.
 
 ## Analytical profiles
 
@@ -69,6 +73,34 @@ retain the corpus-observed transition timing. NMI wins arbitration; masked IRQ
 wakes WAI; wake completion consumes two internal cycles. Detailed 5A22 timer
 register IRQ generation, DMA overlap and related I/O edge behavior remain M3.
 
+## Read-phase correction and tracing
+
+The initial M2 implementation incorrectly latched every read at cycle completion.
+The full generic65816 corpus could not detect this because its rows describe bus
+cycles without SNES master-clock sample phases. That model is superseded by the
+read/hold split above; earlier timing acceptance was pending and did not establish
+these phases. The correction preserves the independent generic cycle sequences.
+
+`SnesSystem.CyclePhaseObserved` emits `read-latch`, `write-latch` and
+`cycle-complete` records. Each carries a master timestamp, cycle start, nullable
+latch timestamp and the actual cycle value/pins. Headless `.bus.jsonl` uses these
+explicit phase records. A clock budget ending during hold includes its latch
+record; continuation later emits completion without another latch. Generic
+`Cpu65816.CycleObserved` remains one electrical row per access (at the effect),
+with no SNES time implied when the standalone adapter is used.
+
+The absolute split follows the independently inspected bsnes memory-access
+reference at revision `78474e5d39f58872dc21aca18cf9eb583b147fe7`: read sampling after2/4/8
+clocks and four trailing clocks, versus writes after6/8/12 clocks. Anomie's
+read/write counter-latch discussion independently describes a one-dot (four
+master clocks) offset, but does not by itself specify every absolute bus phase.
+This is a source-informed analytical target, not an acquired hardware trace.
+No implementation source was copied.
+
+Precise MDR/Open Bus remains M3: the reference preserves MDR on internal CPU
+reads in banks00–3F/80–BF at4000–43FF, while the current bus still updates its
+legacy OpenBus there. The read/hold correction does not claim to resolve MDR.
+
 ## Independent sources
 
 - [WDC W65C816S datasheet](https://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf),
@@ -82,6 +114,9 @@ register IRQ generation, DMA overlap and related I/O edge behavior remain M3.
   last-cycle IRQ sampling, old-I versus RTI behavior and wake cycles. Published
   research informs the model; this project has acquired no original-console
   measurements. Some source sections explicitly describe conjectures.
+- [Pinned bsnes memory access reference](https://github.com/bsnes-emu/bsnes/blob/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/cpu/memory.cpp):
+  independently inspected read latch/hold versus write endpoint phases; comparison
+  implementation, with precise MDR exceptions deferred to M3.
 - [SNESdev timing](https://snes.nesdev.org/wiki/Timing): rational master clocks,
   PAL/NTSC short/long scanlines and interlace geometry.
 
@@ -93,10 +128,14 @@ external expected data remain separate from the independently written C# core.
 The gate runs all5,080,400 vectors in512 immutable full files twice: semantic
 state and exact electrical bus rows. The sample's first vector in every opcode/
 mode file also runs through `AdvanceCycle()` against the independent expectations.
-Fifteen timing regression groups exercise the profile map, two emulated hours
+Twenty-one timing regression groups exercise the profile map, two emulated hours
 (one per profile), event boundaries, refresh endpoints, every-master-clock
 save/load near instructions/refresh/field boundaries, side-effectful MMIO,
-interrupt entry/polling, sleeping CPU and negative comparator mutations.
+interrupt entry/polling, sleeping CPU and negative comparator mutations. Six
+additional phase groups check all6/8/12-clock read sample positions and endpoint
+writes, dynamic MMIO changes between read latch/completion, every-clock hold
+save/load with read side effects, refresh at both phases, IRQ/NMI and refresh
+collisions, and rejection of both older savestate versions.
 
 The locally observed benchmark on NILSPC1 / Windows10.0.26200 / .NET10.0.12 was
 595.01 diagnostic fields/s (212.64 million master clocks/s) with the resumable

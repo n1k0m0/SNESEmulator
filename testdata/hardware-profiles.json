@@ -23,7 +23,14 @@
         "refreshPhase": "first line538, then free-running divider aligned to global clock2 mod8 near H536",
         "epoch": "H0 V0 field0 AFTER deterministic convenience reset; not physical reset-release measurement",
         "apuNominalOscillatorHz": 24576000,
-        "apuCoupling": "independent rational integer accumulator; no SPC700/DSP execution"
+        "apuCoupling": "independent rational integer accumulator; no SPC700/DSP execution",
+        "readPhases": {
+          "latchAfterActiveMasterclocks": "accessClocks - 4",
+          "trailingHoldActiveMasterclocks": 4,
+          "writeLatch": "cycle completion",
+          "source": "https://github.com/bsnes-emu/bsnes/blob/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/cpu/memory.cpp",
+          "evidence": "reference-informed analytical model; no acquired hardware trace"
+        }
       },
       "hardwareEvidence": null,
       "currentReportedVersionIds": {
@@ -61,7 +68,14 @@
         "refreshPhase": "first line538, then free-running divider aligned to global clock2 mod8 near H536",
         "epoch": "H0 V0 field0 AFTER deterministic convenience reset; not physical reset-release measurement",
         "apuNominalOscillatorHz": 24576000,
-        "apuCoupling": "independent rational integer accumulator; no SPC700/DSP execution"
+        "apuCoupling": "independent rational integer accumulator; no SPC700/DSP execution",
+        "readPhases": {
+          "latchAfterActiveMasterclocks": "accessClocks - 4",
+          "trailingHoldActiveMasterclocks": 4,
+          "writeLatch": "cycle completion",
+          "source": "https://github.com/bsnes-emu/bsnes/blob/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/cpu/memory.cpp",
+          "evidence": "reference-informed analytical model; no acquired hardware trace"
+        }
       },
       "hardwareEvidence": null,
       "currentReportedVersionIds": {
@@ -102,7 +116,8 @@
     "PAL/NTSC selection follows cartridge metadata; profiles remain unverified hardware targets",
     "Whole-line renderer and host ARGB32 output remain M5/M7 work",
     "Legacy DMA is immediate with subsequent serialized stall debt; full DMA/HDMA, I/O latency and edge interactions are M3",
-    "APU oscillator is nominal; individual crystal tolerance and SPC700/DSP behavior are not implemented"
+    "APU oscillator is nominal; individual crystal tolerance and SPC700/DSP behavior are not implemented",
+    "Precise MDR behavior remains M3, including internal CPU reads4000-43FF that preserve MDR in the inspected reference"
   ],
   "openQuestions": [
     "Acquire named NTSC and PAL motherboard/revision evidence and measurements for the separate-CPU/two-PPU target.",

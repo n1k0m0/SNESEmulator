@@ -8,6 +8,7 @@ static class TimingTests
     static void Check(bool yes,string message="Timing assertion failed") {if(!yes)throw new Exception(message);}
     static string Json<T>(T value)=>JsonSerializer.Serialize(value);
     static SnesSystem Machine() {var m=new SnesSystem();m.Insert(new Cartridge(DiagnosticRom.Create()));return m;}
+    static SnesSystem Program(params byte[] bytes) {var m=Machine();m.Cpu.PC=0;m.Cpu.PBR=m.Cpu.DBR=0;bytes.CopyTo(m.Bus.Wram,0);return m;}
     public static void Run(Action<string,Action> test,string directory)
     {
         test("M2 presentation pacing uses actual rational field duration",()=>
@@ -53,25 +54,100 @@ static class TimingTests
         });
         test("M2 stable event ordering before CPU access at exact boundary",()=>
         {
-            var m=Machine();var order=new List<string>();m.Clock.Schedule(8,HardwareEventKind.External,1,4);m.Clock.Schedule(8,HardwareEventKind.External,2,4);m.Clock.Schedule(8,HardwareEventKind.External,3,-1);
+            var m=Machine();var order=new List<string>();m.Clock.Schedule(4,HardwareEventKind.External,1,4);m.Clock.Schedule(4,HardwareEventKind.External,2,4);m.Clock.Schedule(4,HardwareEventKind.External,3,-1);
             m.Clock.EventObserved=e=>{if(e.Kind==HardwareEventKind.External)order.Add("e"+e.Payload);};m.Cpu.CycleObserved=c=>order.Add("bus");
-            m.RunUntil(7);Check(order.Count==0);m.RunUntil(8);Check(order.SequenceEqual(new[]{"e3","e1","e2","bus"}),string.Join(',',order));
+            m.RunUntil(3);Check(order.Count==0);m.RunUntil(4);Check(order.SequenceEqual(new[]{"e3","e1","e2","bus"}),string.Join(',',order));
         });
         test("M2 refresh stalls CPU effects at endpoint and within a cycle",()=>
         {
-            foreach(int edge in new[]{7,8})
+            foreach(int edge in new[]{3,4})
             {
                 var m=Machine();var access=new List<long>();m.Cpu.CycleObserved=c=>access.Add(m.Clock.Now);m.Clock.Schedule(edge,HardwareEventKind.Refresh);
-                m.RunUntil(47);Check(access.Count==0,"refresh forbids CPU latch during pause");m.RunUntil(48);Check(access.SequenceEqual(new long[]{48}),"CPU active clocks resume after 40-clock stall");
+                m.RunUntil(43);Check(access.Count==0,"refresh forbids CPU latch during pause");m.RunUntil(44);Check(access.SequenceEqual(new long[]{44}),"read latches after 40-clock stall then holds four clocks");
                 Check(m.Clock.ApuTicks>0,"independent oscillator continues while CPU stalled");
+            }
+        });
+        test("M2 distinct read latch and completion phases for all access speeds",()=>
+        {
+            foreach(var (address,latch,complete) in new[]{(0x2140,26L,30L),(0x1000,28L,32L),(0x4016,32L,36L)})
+            {
+                var m=Program(0xad,(byte)address,(byte)(address>>8));var phases=new List<TimedCpuCycleEvent>();m.CyclePhaseObserved=phases.Add;
+                m.RunUntil(latch);Check(phases.Last().Phase=="read-latch"&&phases.Last().MasterClock==latch&&phases.Last().Cycle.Address==address);
+                Check(m.CapturePhase().HoldRemaining==4&&m.CapturePhase().HeldRead?.Address==address,"latched data has separate trailing phase");
+                m.RunUntil(complete);Check(phases.Last().Phase=="cycle-complete"&&phases.Last().MasterClock==complete&&phases.Last().LatchClock==latch&&m.Cpu.PC==3);
+            }
+            var fast=Machine();fast.Cpu.PBR=0x80;fast.Bus.Io[13]=1;var trace=new List<TimedCpuCycleEvent>();fast.CyclePhaseObserved=trace.Add;fast.RunUntil(6);
+            Check(trace[0].Phase=="read-latch"&&trace[0].MasterClock==2&&trace[1].Phase=="cycle-complete"&&trace[1].MasterClock==6,"FastROM read phase");
+            var write=Program(0x8d,0x40,0x21);write.Cpu.A=0x42;var writes=new List<TimedCpuCycleEvent>();write.CyclePhaseObserved=writes.Add;write.RunUntil(29);Check(write.Bus.Apu.CpuToApu[0]==0);write.RunUntil(30);
+            Check(write.Bus.Apu.CpuToApu[0]==0x42&&writes[^2].Phase=="write-latch"&&writes[^2].MasterClock==30&&writes[^1].Phase=="cycle-complete"&&writes[^1].MasterClock==30,"write effects stay at endpoint");
+        });
+        test("M2 MMIO changes between read latch and completion cannot change captured data",()=>
+        {
+            foreach(long edge in new[]{25L,26L,27L,29L,30L})
+            {
+                var m=Program(0xad,0x40,0x21);m.Bus.Apu.ApuToCpu[0]=0x11;m.Clock.Schedule(edge,HardwareEventKind.External);m.Clock.EventObserved=e=>{if(e.Kind==HardwareEventKind.External)m.Bus.Apu.ApuToCpu[0]=0x99;};
+                m.RunUntil(30);Check((m.Cpu.A&255)==(edge<=26?0x99:0x11),$"MMIO changes at {edge}; latch26 completion30");Check(m.Bus.Apu.ApuToCpu[0]==0x99);
+            }
+            var slow=Program(0xad,0x16,0x40);slow.Bus.Controllers.Latched[0]=0x8000;slow.Clock.Schedule(34,HardwareEventKind.External);slow.Clock.EventObserved=e=>{if(e.Kind==HardwareEventKind.External)slow.Bus.Controllers.Latched[0]=0;};slow.RunUntil(36);
+            Check((slow.Cpu.A&1)==1&&slow.Bus.Controllers.Position[0]==1,"12-clock JOYSER read samples at32 before change34 and completion36");
+        });
+        test("M2 MMIO read side effects and latched value survive every trailing hold clock",()=>
+        {
+            foreach(long stop in new[]{26L,27L,28L,29L,30L})
+            {
+                var m=Program(0xad,0x80,0x21);m.Bus.WramAddress=0x1000;m.Bus.Wram[0x1000]=0x42;m.RunUntil(stop);Check(m.Bus.WramAddress==0x1001,"read side effect at latch26");
+                m.Bus.Wram[0x1000]=0x99;string path=Path.Combine(directory,"m2-read-hold");StateSerializer.Save(m,path);var copy=StateSerializer.Load(m.Bus.Cartridge!,path);
+                var a=new List<TimedCpuCycleEvent>();var b=new List<TimedCpuCycleEvent>();m.CyclePhaseObserved=a.Add;copy.CyclePhaseObserved=b.Add;m.RunUntil(30);copy.RunUntil(30);
+                Check((m.Cpu.A&255)==0x42&&copy.Cpu.Registers==m.Cpu.Registers&&copy.Bus.WramAddress==0x1001&&m.Bus.WramAddress==0x1001&&a.SequenceEqual(b),$"resume hold at {stop}");
+                StateSerializer.Save(m,path+"a");StateSerializer.Save(copy,path+"b");Check(File.ReadAllBytes(path+"a").SequenceEqual(File.ReadAllBytes(path+"b")));
+            }
+            var observed=Program(0xad,0x80,0x21);observed.Bus.WramAddress=0x1000;observed.Bus.Wram[0x1000]=0x42;string atLatch=Path.Combine(directory,"m2-observed-latch");
+            observed.Cpu.CycleObserved=c=>{if(c.Address==0x2180)StateSerializer.Save(observed,atLatch);};observed.RunUntil(30);var fromLatch=StateSerializer.Load(observed.Bus.Cartridge!,atLatch);
+            Check(fromLatch.Clock.Now==26&&fromLatch.CapturePhase().HoldRemaining==4,"public latch observer sees serializable hold state");fromLatch.RunUntil(30);Check(fromLatch.Cpu.Registers==observed.Cpu.Registers&&fromLatch.Bus.WramAddress==0x1001);
+        });
+        test("M2 refresh at read hold and completion delays completion without another read",()=>
+        {
+            foreach(int edge in new[]{5,7,8})
+            {
+                var m=Program(0xea);var trace=new List<TimedCpuCycleEvent>();m.CyclePhaseObserved=trace.Add;m.Clock.Schedule(edge,HardwareEventKind.Refresh);m.RunUntil(47);
+                Check(trace.Count==1&&trace[0].Phase=="read-latch"&&trace[0].MasterClock==4,"refresh cannot move captured read");
+                m.Bus.Wram[0]=0xdb;m.RunUntil(48);Check(trace.Count==2&&trace[1].Phase=="cycle-complete"&&trace[1].MasterClock==48&&trace[1].Cycle.Value==0xea,"latched opcode survives refresh in hold");
+            }
+        });
+        test("M2 IRQ NMI edges at read latch and completion preserve last-cycle polling",()=>
+        {
+            foreach(bool nmi in new[]{false,true})foreach(long edge in new[]{24L,26L,28L,30L})
+            {
+                var m=Program(0xad,0x40,0x21,0xea,0xdb);m.Cpu.P=0x30;m.Clock.Schedule(edge,HardwareEventKind.External);m.Clock.EventObserved=e=>{if(e.Kind==HardwareEventKind.External){if(nmi)m.Cpu.PulseNmi();else m.Cpu.SetInterruptLines(false,true);}};
+                m.RunUntil(30);var irq=m.Cpu.CaptureInterrupts();Check((nmi?irq.PollNmi:irq.PollIrq)==(edge==24),$"edge {edge} poll precedes final read start24, latch26, completion30");
+                m.RunUntil(44);Check(m.Cpu.PC==(edge==24?3:4),"later edge remains pending until following NOP completes");
+            }
+            foreach(long edge in new[]{26L,30L})
+            {
+                var m=Program(0xad,0x40,0x21,0xea,0xdb);m.Cpu.P=0x30;var trace=new List<TimedCpuCycleEvent>();m.CyclePhaseObserved=trace.Add;
+                m.Clock.Schedule(edge,HardwareEventKind.Refresh,priority:-10);m.Clock.Schedule(edge,HardwareEventKind.External);m.Clock.EventObserved=e=>{if(e.Kind==HardwareEventKind.External)m.Cpu.SetInterruptLines(false,true);};
+                m.RunUntil(70);var data=trace.Where(t=>t.Cycle.Address==0x2140).ToArray();Check(data.Length==2&&data[0].MasterClock==(edge==26?66:26)&&data[1].MasterClock==70,"refresh and IRQ at latch/completion have distinct read sample phases");
+                Check(m.Cpu.PC==3&&!m.Cpu.CaptureInterrupts().PollIrq);m.RunUntil(84);Check(m.Cpu.PC==4&&m.Cpu.CaptureInterrupts().PollIrq,"IRQ remains pending through hold stall and next instruction");
+            }
+        });
+        test("M2 read hold savestate format rejects both earlier versions",()=>
+        {
+            var m=Program(0xad,0x80,0x21);m.RunUntil(27);string path=Path.Combine(directory,"m2-old-phase");StateSerializer.Save(m,path);
+            byte[] raw;using(var file=File.OpenRead(path))using(var gzip=new System.IO.Compression.GZipStream(file,System.IO.Compression.CompressionMode.Decompress))using(var memory=new MemoryStream()){gzip.CopyTo(memory);raw=memory.ToArray();}
+            int versionOffset;using(var reader=new BinaryReader(new MemoryStream(raw))){reader.ReadString();versionOffset=(int)reader.BaseStream.Position;}
+            foreach(int version in new[]{1,2})
+            {
+                System.Buffers.Binary.BinaryPrimitives.WriteInt32LittleEndian(raw.AsSpan(versionOffset,4),version);using(var file=File.Create(path+version))using(var gzip=new System.IO.Compression.GZipStream(file,System.IO.Compression.CompressionLevel.Fastest))gzip.Write(raw);
+                try {StateSerializer.Load(m.Bus.Cartridge!,path+version);throw new Exception("Older phase format accepted");}catch(InvalidDataException){}
             }
         });
         test("M2 exact clock chunking single clocks blocks and frames same state",()=>
         {
-            var block=Machine();var tiny=Machine();var frame=Machine();frame.RunFrame();long end=frame.Clock.Now;
+            var block=Machine();var tiny=Machine();var frame=Machine();var a=new List<TimedCpuCycleEvent>();var b=new List<TimedCpuCycleEvent>();var f=new List<TimedCpuCycleEvent>();block.CyclePhaseObserved=a.Add;tiny.CyclePhaseObserved=b.Add;frame.CyclePhaseObserved=f.Add;frame.RunFrame();long end=frame.Clock.Now;
             block.RunUntil(end);for(long t=1;t<=end;t++)tiny.RunUntil(t);
             string Save(SnesSystem m,string name){string path=Path.Combine(directory,name);StateSerializer.Save(m,path);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(path)));}
             Check(Save(block,"m2-block")==Save(tiny,"m2-tiny"),"one-clock and block complete state");Check(Save(frame,"m2-frame")==Save(block,"m2-block2"),"frame and block complete state");
+            Check(a.SequenceEqual(b)&&a.SequenceEqual(f),"latch/completion trace is identical for one-clock, block and frame execution");
         });
         test("M2 savestate at every master clock around instruction refresh and field boundaries",()=>
         {
@@ -125,7 +201,7 @@ static class TimingTests
             foreach(byte op in new byte[]{0xcb,0xdb})
             {
                 var m=Machine();m.Cpu.PC=0;m.Cpu.PBR=0;m.Bus.Wram[0]=op;var cycles=new List<long>();m.Cpu.CycleObserved=c=>cycles.Add(m.Clock.Now);
-                m.RunUntil(10000);Check(m.Clock.Now==10000&&m.Clock.ApuTicks>0&&m.Cpu.Instructions==1,"sleep cannot hang budget");Check(cycles.SequenceEqual(new long[]{8,14,20,20}),"quiescent marker has zero duration; sleep produces no CPU bus clocks");
+                m.RunUntil(10000);Check(m.Clock.Now==10000&&m.Clock.ApuTicks>0&&m.Cpu.Instructions==1,"sleep cannot hang budget");Check(cycles.SequenceEqual(new long[]{4,14,20,20}),"quiescent marker has zero duration; sleep produces no CPU bus clocks");
             }
         });
         test("M2 reset IRQ NMI entry continuation survives every cycle",()=>

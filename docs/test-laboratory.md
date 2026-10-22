@@ -5,7 +5,7 @@ are preserved as12 portable core regressions and5 Windows/network integrations.
 `SNESEmulator.Core.Tests` references only the core and portable testing library;
 it does not load Windows Forms, OpenTK, the frontend, audio devices or TLS.
 `SNESEmulator.Tests` retains the existing Windows frontend/transport dependency.
-M1 adds12 portable semantic regression groups; M2 adds15 timing/continuation groups (39 total portable tests).
+M1 adds12 portable semantic regression groups; M2 adds21 timing/continuation groups (45 total portable tests).
 No sibling C64 repository is modified.
 
 ## Reproduce locally
@@ -184,7 +184,7 @@ terminal WAI/STP row is a quiescent marker with zero hardware-clock duration.
 These are external software-generated generic65816 expectations, not a measured
 5A22 trace. Source pin semantics are specified in the retained upstream README.
 
-The39 portable cases include15 M2 groups: exact mapped access speeds; NTSC/PAL
+The45 portable cases include21 M2 groups: exact mapped access speeds; NTSC/PAL
 fields/interlace/short/long lines and dots; refresh phase; one emulated hour per
 profile with exact rational APU accumulation; stable event ordering; refresh at
 and within a CPU cycle; one-master-clock versus block versus frame complete
@@ -194,9 +194,11 @@ priority; RTI restored-I polling in both modes; WAI/STP clock suspension; every
 cycle of reset/IRQ/NMI entry; negative cycle/address/value/direction/pin mutations;
 and the first independent vector in all512 opcode/mode files through the
 single-cycle API. The mutation command separately reports five bus mutations in
-addition to its six existing checks (11 total). Version2 savestates include all
+addition to its six existing checks (11 total). Version3 savestates include all
 clock events, rational remainder, partial CPU-cycle time, continuation and
-interrupt latches. Version1 states are explicitly rejected.
+interrupt latches, captured read data and four-clock trailing hold. Versions1/2
+states are explicitly rejected. Additional tests change MMIO after read latch,
+save/load during each hold clock, and collide interrupts/refresh at both phases.
 
 The compact final measurement is recorded in [baselines/m2.json](baselines/m2.json).
 Read [the timing contract](m2-timing-contract.md) for the execution model,
@@ -234,10 +236,14 @@ raster JSONL and JSON/JUnit results. Hashes include ROM, replay, WRAM, image and
 any explicit oracle files. Replay checks compare CPU state, clocks, frame/WRAM
 hashes AND byte-identical CPU/bus/raster traces across two runs.
 
-**Device limitation:** CPU bus effects carry their real master-clock endpoint.
-The exact budget can end inside a CPU cycle, refresh stall or instruction, with
-serialized remaining time. Events at the same timestamp execute before the bus
-effect in priority/creation order. CPU architectural registers commit at
+**Device limitation:** timed traces distinguish `read-latch`, `write-latch` and
+`cycle-complete`. Valid reads latch after accessClocks−4 active clocks, followed
+by four active hold clocks; writes latch at completion. The earlier all-effects-
+at-endpoint model was materially incorrect and is superseded by this correction.
+The exact budget can end inside a pre-latch phase, trailing read hold, refresh
+stall or instruction, with serialized remaining time and captured read data.
+Events at the same timestamp execute before latch/completion transitions in
+priority/creation order. CPU architectural registers commit at
 instruction boundaries; cycle rows carry the in-flight pin values. Partial
 frames remain partial and completed-field count is separate. PPU rendering is
 still whole-line host ARGB output; DMA transfers remain immediate legacy code
