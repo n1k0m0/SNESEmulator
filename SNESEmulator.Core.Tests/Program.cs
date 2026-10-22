@@ -9,8 +9,9 @@ int passed=0,failed=0;
 void Check(bool value,string message="Assertion failed") { if(!value) throw new Exception(message); }
 void Test(string name,Action test)
 {
-    try { test(); passed++; report.Add(name,"pass"); Console.WriteLine("PASS "+name); }
-    catch(Exception e) { failed++; report.Add(name,"fail",e.ToString()); Console.WriteLine("FAIL "+name+": "+e); }
+    var watch=System.Diagnostics.Stopwatch.StartNew();
+    try { test(); passed++; report.Add(name,"pass",seconds:watch.Elapsed.TotalSeconds); Console.WriteLine("PASS "+name); }
+    catch(Exception e) { failed++; report.Add(name,"fail",e.ToString(),watch.Elapsed.TotalSeconds); Console.WriteLine("FAIL "+name+": "+e); }
 }
 if(args.Contains("--ppu-only")){PpuTests.Run(Test,testRoot);report.Metadata["M5"]=PpuTests.Evidence;report.Save("artifacts/m5-targeted");return failed==0?0:1;}
 SnesSystem Diagnostic() { var m=new SnesSystem(); m.Insert(new Cartridge(DiagnosticRom.Create())); return m; }
