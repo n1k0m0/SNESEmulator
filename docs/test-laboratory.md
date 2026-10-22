@@ -1,4 +1,4 @@
-# Test laboratory: M0–M4 CPU, bus, timing, 5A22 I/O and SPC700
+# Test laboratory: M0–M5 CPU, bus, I/O, SPC700 and native PPU
 
 M0 establishes measurement, not CPU or SNES accuracy. The original17 assertions
 are preserved as12 portable core regressions and5 Windows/network integrations.
@@ -8,7 +8,9 @@ it does not load Windows Forms, OpenTK, the frontend, audio devices or TLS.
 M1 adds12 portable semantic groups; M2 adds21 timing/continuation groups.
 M3 adds21 I/O/DMA groups (66 total through M3); M0–M3 were independently
 accepted (`artifacts/root-m3-validation.log`). M4 adds21 groups (87 total
-portable groups); independent M4 acceptance pending.
+portable groups); independently accepted on `0b1139436727c835c4fdbf944c74e3d0067c3944`
+(`artifacts/root-m4-validation.log`). M5 adds42 PPU groups (129 total), pending
+independent parent acceptance.
 No sibling C64 repository is modified.
 
 ## Reproduce locally
@@ -383,3 +385,25 @@ repeated active VRAM write loops, with an independent source-derived full-white
 native frame oracle. `tools/rebuild-ppu-fixture.py` reproduced the ROM exactly.
 This is one external software test, not broad M8 hardware certification. No own
 console is available. Modes2–7 and variable geometry remain M7; audio remains M6.
+
+The clean M5 full gate passed on `9e5a7817af00428915e36f1171d748577e28953e`,
+exit0, `artifacts/m5-full-validation.log`:129 portable groups,5 Windows groups,
+11 lab mutations,5,080,400 CPU semantic cases and5,080,400 CPU bus cases
+(26,184,846 rows),256,000 SPC semantic/approved bus cases (1,182,940 rows).
+Raw SPC results remain249,000 pass/7,000 explicitly source-adjudicated mismatches.
+Original local IPL4/4 passed. All corresponding reports have an empty working-tree
+status; unmodified copies are under `artifacts/m5-implementation-evidence/`.
+Counts, hashes, all129 group durations and114 executed original PPU ROM hashes
+are in [M5 baseline](baselines/m5.json). The external ROM executed86,016 active
+VRAM writes and its full57344pixel independent white oracle passed; the standalone
+native CLI oracle also passed. All five UI smoke scenes were awaited sequentially,
+inspected and saved under `artifacts/m5-ui-*.png`, using isolated save data.
+
+The original120second core watchdog correctly timed out; this red result remains
+in `artifacts/m5-first-timeout/`. An intentional reporter-instrumentation restart
+is separately archived. The completed core suite took126.56seconds with a240second
+watchdog; no test was skipped to make the gate pass. The active APU+M5 PPU benchmark
+measured21.62 diagnostic fields/s (7.72million master clocks/s) on NILSPC1,
+.NET10.0.12, all accuracy features enabled. M9 must improve this below-realtime
+workload while preserving digital results. Independent parent M5 acceptance is
+pending; the evidence remains analytical/software-derived, not a console capture.

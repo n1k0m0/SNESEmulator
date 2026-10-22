@@ -87,8 +87,8 @@ im [Entwicklungsplan](development-plan.md). Dieser beschreibt künftige Arbeit;
 er ändert den oben dokumentierten Implementierungsstand nicht.
 
 Testlabor, unabhängige CPU-Prüfungen und Masterclock sind M0–M2; M3 ergänzt
-DMA/HDMA und I/O. M4 implementiert SPC700 und reale APU-Uploads; es folgen PPU
-und DSP. Die unabhängige M4-Abnahme steht aus.
+DMA/HDMA und I/O. M4 ist unabhängig abgenommen; M5 implementiert die getaktete
+Mode0/1-PPU. Die unabhängige M5-Abnahme steht aus. M6 ergänzt den eigenen S-DSP.
 PAL/NTSC, Hardwareabgleich, Produktreife und Zusatzchips folgen mit jeweils
 eigenen Nachweisen. Savestates, Frontend- und Netzwerkregressionen begleiten
 die Hardwareentwicklung von Beginn an.
@@ -101,3 +101,9 @@ die Hardwareentwicklung von Beginn an.
 
 Die Referenzen dienen dem Ausbau und der unabhängigen Überprüfung. Die bisherige
 Smoke-Suite ersetzt keine vollständige Hardwarevalidierung.
+
+
+M5 local performance observation:21.62 diagnostic fields/s with the own SPC700
+and clocked PPU active,7.72million master clocks/s. This is below NTSC realtime;
+M9 optimization must preserve the digital accuracy path. Full counts, group times,
+clean report identities and evidence limits: [M5 baseline](baselines/m5.json).

@@ -212,3 +212,24 @@ forced-blank/SETINI early-read glitches; the broad native image/hardware corpus 
 commercial-game matrix. M7 implements modes2–7 and dynamic video geometry; M6
 implements S-DSP audio. M9 profiles performance. None of these is silently marked
 passing by a Mode0/1 diagnostic or a deterministic save/load test.
+
+
+## Clean implementation measurement
+
+Full gate `python tools/test-lab.py --windows --full` passed with exit0 on
+`9e5a7817af00428915e36f1171d748577e28953e`; all reports record a clean tree.
+129 portable groups include42 M5 groups and114 unique original CPU-ROM variants.
+Five Windows/network groups,11 laboratory mutations, the full5,080,400 CPU
+semantic/bus cases,256,000 SPC semantic/approved bus cases and4 original local
+IPL checks pass. Raw SPC still has249,000 passes and7,000 individually described
+adjudicated mismatches. The external VRAM program executes86,016 active writes,
+then passes its57344pixel source-derived white oracle. Native CLI2/2 and all five
+UI smoke scenes pass; screenshots were inspected, with save data isolated.
+
+The core takes126.56seconds; its earlier120second timeout is retained as a real
+red result, and the expanded suite now has a240second supervisor. Actual per-group
+times, all original ROM hashes, preserved report hashes and the intentional
+reporter restart are in [M5 baseline](baselines/m5.json). Local120field benchmark:
+21.62 fields/s, active SPC700 and full PPU accuracy path, no features disabled.
+This is below realtime and stays on M9's optimization backlog. Parent independent
+acceptance is still pending. No claim in this measurement is a new console trace.

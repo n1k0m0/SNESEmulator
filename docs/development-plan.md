@@ -33,7 +33,8 @@ Mode-0/1-Hintergründe, ein originales Diagnose-ROM, Menüs, Savestates und
 TLS-/Relay-Transport. Die 17 Tests sichern diese Grundlage ab; sie sind kein
 Beleg für allgemeine SNES-Kompatibilität.
 
-Die größten technischen Lücken im aktuellen Code:
+Historische Lücken des Ausgangsstands (durch die nachfolgenden Meilensteine
+schrittweise ersetzt; kein aktueller M5-Status):
 
 - `Cpu65816.Step()` verwendet überwiegend pauschale Befehlstakte.
 - `SnesSystem.RunFrame()` multipliziert diese pauschal mit sechs und rendert
@@ -235,6 +236,11 @@ Implementiert; unabhängige Root-Abnahme ausstehend. [PPU-Vertrag](m5-ppu-contra
 trennt quelleninformierte Fetch-/MMIO-Phasen, native Sollbilder und Grenzen
 der Hardware-Evidenz. Kein eigener Konsolenmessnachweis. Modi2–7 bleiben M7.
 
+Sauberer Implementierungsgate auf `9e5a7817af00428915e36f1171d748577e28953e`, Exit0,
+`artifacts/m5-full-validation.log`:129 portable/5 Windows-Gruppen,42 neue PPU-
+Gruppen,114 originale ROM-Varianten,334 Everyclock-Fortsetzungen; vollständige
+CPU-/SPC-/lokale Original-IPL-Nachweise erhalten. [Baseline](baselines/m5.json).
+
 Arbeit:
 
 - PPU-Register und ihre individuellen Latches, VRAM-Lesepuffer, CGRAM/OAM-
@@ -339,7 +345,7 @@ Arbeit:
 - Emulation auf einen eigenen, kontrollierten Thread verschieben. GUI und
   Transport erhalten unveränderliche Frames/Sampleblöcke; Eingaben werden an
   definierten Hardwarezeitpunkten übernommen.
-- M4-Benchmark: aktive APU erreicht lokal nur23.00 Diagnosefelder/s; M9 muss
+- M5-Benchmark: aktive APU und getaktete PPU erreichen lokal21.62 Diagnosefelder/s; M9 muss
   Budget-/Zyklusfortsetzung profilieren und bei identischer digitaler Ausgabe
   auf Echtzeit bringen. Dies ist kein60fps-Kompatibilitätsnachweis.
 - Hardwaregenaue Geschwindigkeit von Renderlimit, VSync, Turbo, Netzwerklatenz

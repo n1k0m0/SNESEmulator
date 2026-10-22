@@ -1,0 +1,839 @@
+{
+  "schema": "snes-m5-ppu-v1",
+  "status": "Clean implementation full gate passed; independent parent acceptance pending. Measurement record, not expected-output oracle.",
+  "implementationCommit": "9e5a7817af00428915e36f1171d748577e28953e",
+  "implementationCommits": [
+    "f0d0230488940219e4057ceaf449c4d1d954716d",
+    "270819e723eb1574a9a78ca8f721a0fb8501fe24",
+    "13fe7745448f19d424118cc3bed98ad6c6221b1e",
+    "9e5a7817af00428915e36f1171d748577e28953e"
+  ],
+  "command": "python tools/test-lab.py --windows --full",
+  "log": "artifacts/m5-full-validation.log",
+  "frozenLog": "artifacts/m5-implementation-evidence/full-validation.log",
+  "exitCode": 0,
+  "workingTreeStatus": "",
+  "portableGroups": 129,
+  "m5Groups": 42,
+  "windowsGroups": 5,
+  "laboratoryMutationGroups": 11,
+  "m3AdditionalNegativeTraceChecks": 3,
+  "m4NegativeComparatorMutations": 8,
+  "m5NativeSemanticMutations": 5,
+  "m5FullFramePixelMutations": 4,
+  "savestateVersion": 6,
+  "cpu65816Semantics": {
+    "executed": 5080400,
+    "failed": 0,
+    "files": 512
+  },
+  "cpu65816Bus": {
+    "executed": 5080400,
+    "failed": 0,
+    "files": 512,
+    "cycleRows": 26184846
+  },
+  "spc700": {
+    "executedCases": 256000,
+    "failedCases": 0,
+    "busCyclesCompared": 1182940,
+    "fixturesVerified": 256,
+    "revision": "67d15f492b2740964abd4efd1229e0ec9c342228",
+    "rawBusPassed": 249000,
+    "rawBusMismatches": 7000,
+    "sourceAdjudicatedCases": 7000,
+    "semanticPassed": 256000,
+    "semanticFailures": 0,
+    "approvedBusPassed": 256000,
+    "approvedBusFailures": 0,
+    "adjudicationRule": "spc-indirect-y-2017-v1: only17/37/57/77/97/B7/F7 order[0,1,3,4,2,5]; hardware researcher discussion https://forums.nesdev.org/viewtopic.php?t=16140"
+  },
+  "originalIpl": {
+    "tests": 4,
+    "passed": 4,
+    "firmwareSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+    "distribution": "local ignored test input only, not distributed"
+  },
+  "ppu": {
+    "originalRomVariants": 114,
+    "romSha256": [
+      "01F20A8B52C10E9EF712A658E1B50087F76C311F9065BD029DAF28D738E572D3",
+      "0570B2BD2CD8E917EDCAB28F5FDA82753113FC4CC7956178EC9EB001969082D9",
+      "083293F7D2CD57E923D44C46F5C57ED5B412EDD5147E3FFEE405C2530D6CC77C",
+      "0920A766E3FDC37BBE543942A5B9AEAA360A7FF44AF316CBB5E0055B58BFF3AD",
+      "0DEC341561939BDF78FDCA12C71F6CEC3AE8B93AD77FBDC5E20FF68BBF1EF432",
+      "0E6276CE944AC498D4C759C01AA313D0DEA1B915E5E91C9C7820C88AD69B7302",
+      "0E8C7EC3A61CEAFB0EAAABEB6DC587226762CA0721B9A8E7BC8A141DC95E1A60",
+      "16B17264FF334B92CF33967DAFD33060742899DFC67873AAD669287B75147D8C",
+      "17A9D13DA68A0899C061BD9172610235590B57E079DE1380BBFE8B7086BDD99E",
+      "199D01DC89CC69B1852A1D82AAE27E1B0F895712A9B7639D3EED52746FF7DDB2",
+      "1A770479F468EAA2335B82D76FF0A93727E6EB1A5454C5FF4A0EEB52C511BBA6",
+      "1C2C2652196E0A70B5BD1564E69A9D05815B272342065E404EC4E4385DEB34FF",
+      "1E7470DA2D4E47A5A240653426A58CEC9AF3AF8632587D540607D50E7E832108",
+      "1EEC30D9BD013B56D3F5B2015E532B204AA3BD21BD11AFB3FD04DA5925A482CB",
+      "208E8104B567D9969FEF2CFD9B36180803756FA54B4136EDA39D0AF3CF49DD21",
+      "22E606581F2C4ACFACA2935824A9643E22AFDB060BF95A51CEC68F990375C876",
+      "23D3411AA0B90E79E40B52B62B66B9A21D19E615D019D5F10A5961CD4B5E5979",
+      "24A7EA69FB260FD79A70D4FE45902DC80E74419A5C490D882E8C898CBC43C101",
+      "26BA53FAB17437D444623981EDF84B80E1F45B05E6EEDF98C582689CB2EEA085",
+      "27A9F2C9EB30FD96CC76BDCA8F8B9726A047B3A5BE4E2B53D58C6BD91608C5A4",
+      "27B080F7331EE40FB64F9B7770187ABF1FC1B5C87098B49D4F5A009C4BD79819",
+      "2BE92FD7118D60CC9339AD3B3DC29C59DF846067A9E997B7CC33CF282050E927",
+      "2EDED075E487A4027F4027D6296B783AC6B029B36197BE8B74A258B79A103A1D",
+      "2FAA85BC5EAC04BAA5CD94319C8450546FC7ABDDFD3F6F09A78E537390F18A36",
+      "34C385B2CF073CEACC74A1234ACA4E85806143D282D13B7BC1318C1418B88EFF",
+      "3584AD4C24A25A686D2CEF59D222D079BF6310F6D232B500923D9E556935D452",
+      "35949701B1A6841C7BC9525A8717F11A52B88A6629CBEA483830BFB21E6CBE11",
+      "38D995BDB8887A85C5E55A186048E3644DF4257EA3AF5F71AE373AA5DC5194CA",
+      "39B8C2B96E74B6AF387A966D241F57D6FE48179BF6587F9041482C8BD8C280FF",
+      "3A949245BFE65A34D8DB7B9F552805719914E6CF4C44BD23BCFC57781107422E",
+      "3E4BB2DE438DB2AE2764F2D84FDDB4EA79F59DF452D42C143443787464F4BE41",
+      "3EDB4700ABDF97097207081B28A4754B793EE9A9E93A685F844AF6D22BE173E1",
+      "41FA72B0BA7B6C555F3283BFE5A6E0F98513634FCE5E56257CC0506C14FAFCE9",
+      "4290063B523AF6D9F01A8EA252836C9D2321C4E97A4C0BEF73E7F883F22F39CA",
+      "47022BB83D6D518E447C0504F8CDF3F9A7F610302FD98267CF07AD8392B6F22B",
+      "480393E9BF9496078174ED918DFDD3A297FA2B69F39E45E52198C0A130EB294D",
+      "499C5416F9DD594B022DC7E551773FBDC25B4C3EE447839EAC8A75B29CA6B3AC",
+      "4C28E953DF16E6E5204CCE0FDC600D99D90A4EA6F85B919B066CACFE89FD2851",
+      "4D58D1566A98EE82A9F1704C29651F42748DBCE48B8CE8AB580C7A9B32199A07",
+      "4E36BD202EB68865E001E7C1BD72840DA4C0A5B06635ABFD4B071DF97F08F650",
+      "590D77083731BE391E33CACA6E7F876BEF343D468FE5A73A1BC7B80C3EEFF622",
+      "5A0BCC2C2CE612690C7B562A54D1E62D583FA52BF7D1D08D20388063725E63E6",
+      "5F5977BDE04CA659304D699FF7B25A0B6BA8A72062426EF5E53532910420541E",
+      "6586DA0C2FE499A861651B051AA5680370B8DA85725A4930BDE8309E458290D5",
+      "666EAEB1BFD9AE652858663C59209E7A47B04320A1AB29C88835BF72E130B41C",
+      "683F8586EE30B1712A149EB61559ED52A2E68751962115492C88BD014D9BCDF8",
+      "6D53739E6FFBAC770DFEDA0D7689816E8CA145E3E43D36EC586E59F42A5D75D7",
+      "6FF4B52562E38AE9DD4CA4256DFA598E8E453DE4CB5C823A516ADEA847BA56E0",
+      "72E018C3E769C532E9EBC439B99D61D7A32736695EACFC108E3B6CE034DF57FA",
+      "75270828EE14F90648FED5115936C3F5EE8A4A528F364BF6A85D3D5A84F54649",
+      "77E92036188CD44AA023F3F7D2B39CBEF7A0814DF1A15FC2A31A5884A52A0021",
+      "7E2B88262EE75D71303DF32574A5BDB96B366EDEC0B9E3CC6EBBEBAB83206386",
+      "7F4FF7BE027EB12D0EA56EDB69066D720C17BEBF217740392020C1D793990E03",
+      "832BF570DF8C0A534893A817833A73581330A4FBF0C0EC1B92F2D4510B9655FE",
+      "83632FA0EC5BC10A1B6B07EC6B675AF67642BBE9AF8BABE893A271ED1BB9E4E2",
+      "84F33CDEC5F4032AA9C266E5A451829F03D7A5C85E8F5FE6E3288E0ED3241A7D",
+      "860852B7FB6D054CBA185630B438F7AC37761BC728F6B0B3D8AFC4E4AD0D5AD5",
+      "889D0409EE548C13ED5DBBC3DFB0F7320A83B6E2FD918658457A653A84B7F903",
+      "88A7BBF073C4A4091D8E86FE5A502E690B89537CE224760567F769D2717C66D6",
+      "88CD1625007192D1AEB29FCEED2DB7279430E2F7C5C0B182CA9D39E40C7EEC0D",
+      "8A114428AA37DB520473FD6B2B29CAAB264B2FA98FA692B0DFE101E2D037B3D1",
+      "8B5AF278AA3E9AA8F84C4FFCB64BA5471FA1B3EC53E3E43F4BD7C11249C63A5A",
+      "8F7293D07100C928EED7BD45E0A60AFEDC2F3A9F1E2A21DF2392AB1CC75F74AB",
+      "8FD134CAAF6A12AD9143F159FBA1DC998AC6E6CC178CCCC31D556C584FC2790C",
+      "91D235D859814030F7AB009C3C660675C3AEF74612F46B749D49F7F15C1AB65E",
+      "92AC44C299F4248F054DE63312F5456FDD29D2DBA161D373B743943E26BD96B7",
+      "92CCCB76D9A976278B1C034803CB9C4E4ED9B06D630AF77AA1D9AE19FF1CCB8B",
+      "949F036B306690E27E6BCFAF052DA0C508F3C7868FC543DB6FEB4953F0682601",
+      "AC03A8485B31943C1463944A5AA5C171AD4D77B40C03E2D58C0118EFBCDA6132",
+      "ADE02296558DFC63C19D75097B81B6FCCA0CAC607808BE8C5F5148A8CFEEC2FA",
+      "AEC74B484A4B580B356486386D499A8E7991CA598430DDA0A2D647AB5B40C501",
+      "B0BE841BFDEE8A3E4A1C6ADB8B16A60F9187FC6A810A6A38E75A6ACE837C4129",
+      "B14346274F998B14AE763635F7594100794F71A78A84D5F2B725512DA650AFEA",
+      "B179B46F9C10084876385D9BC6589D62E54523C60EAB74FEEB0378DE61026314",
+      "B42801BC7C39B63C0437916D7F4A7227366DECAB80093485E191AD0C6C49F55C",
+      "B75145A24178181E41DE6F3B63B9A45E23A1F4B0B87047C25F202F798FE99ECB",
+      "B9B4DF44BEB12237FB5FC436820F6771769DB6DC6FC37A545DCC9401312EB509",
+      "B9CA2B2B3C126AA5B010EBE0686CDF78F9D26A7EB512CCE67B3D592BC3C1C6D9",
+      "BAB3BEF57639F60B8D44C67C65AC404A8E248A066648B7DB3527CA29E0B5383E",
+      "BC6AC28C1500B3C84E5FA6A5DA0B552F8BA9649FEA668FC22B84930FA2E9026B",
+      "BCFFE9999323FBB6C31750CBC1C32F3A0DDBF62E7EB18D27E6482DFC52DC3869",
+      "BEA3C7E2A108E7B8669DE99E4D26B307140562AA46B95CAB26811A3DCEC94EDC",
+      "BF2ED25C87A7F72F9592DC5279E43AE32CBC98DF0C8752B4417BA3383503B55A",
+      "BFA6B880F339F5314ACAC4751568EF2760884505E8AE83799DDD51EDCA7F6FE4",
+      "C16FA4B8C997B0E845DA6AFADEC020F6946E9FC76DC140E9A227BAE4C5E58E55",
+      "C431FCCE5461D9CA8FA273791BB9A72E685D7A9FD8AE98BBBAD5047C22E4E190",
+      "C52C9BCE015C2011F79D8EB006373023FA10412226C6471D18289BD2972CB5FD",
+      "C5546204A1A1A222D845439FE2F465964D34802FC613227BEC282FDF9D6BE04B",
+      "C63478AC96AFB30D0438C96CCFDEE3B820012D7EC02DA58081C3C4FEF40ECBF1",
+      "C705B49DC0378CC3CDBA3BA952684F648DF5639033210E893996F3DEC866ED88",
+      "C94ADEA58BF3C860D8E776D8C1ADA42F01E43C23A6DD2BDB96D71DCC6BCCA99E",
+      "CE5711FEEC32DB60D1D3BC4466E515A4B3A81DFFF22F7248E3AEA2837D7D8C2C",
+      "D1339F98D570DD6B3D60AF872577B0C73C28AB38046DE4988A7267785FE0E933",
+      "D27F06419A0B73B5EBF2C01DC11C1A0A932F69A0F8850E8FE28592C9F895C507",
+      "D6927A63BFC1B33A6995F2603F5681D3B48F7D1642EB0C6614139018CCC3DEB1",
+      "D8A1A4875B8E566744F732268F2ADDFDC70EF29A657FAED23708C7AA7EDA9C03",
+      "D98519A683AF2F425BE32C45037B645AEADBD379402393D409B79241930E2612",
+      "D9BE7368407CB1F47FABE33A928432CFBDB7C3610C51736A144F98A98B6F2A8E",
+      "DAE9AC6B057F0385D3D6B89FF0C40CC33582450F53B1B218DC609C9358631327",
+      "DC552FC6F14DA6B0B30F00E467B15D8CAAD18498B435F637F7331013BE8CBE72",
+      "DD43D27BE8DEACF9498C992EEACDFFF412F1FE3928F122D0D401DC970DCDA3E0",
+      "DF2A5BC548AA42770119E107368E66EC695A58C6A61B2A641EC1E3664207B85C",
+      "E3B1C76F1035B810B552FE321B6D352E57B4099CDA902BDBECC38092B9C581F1",
+      "E4CBC46F40DCD31D659121C233C9E3ECC79BAC92D401E71FCCAEFF171709CE60",
+      "E698948FFEA43A47DA49F9A5BF24AA057B75C33C24CA36926C64D5542F1C8E61",
+      "E6EEE312D4798F54A401A34DFDE27AE3D76FA2C7653B8D77CA4FA68DF9E056B8",
+      "E9517C8CA0F2A38F48953EB8C71A7907F519D25A7685739A5C229BC9C9AE58C5",
+      "EA453A45CCFB5270CB63973CE5BF6428F07960231532B8EBE683F86D53340FBB",
+      "EAE9F4B071604DD26A4D716F3AEEE36AFAEA60D8BF5B4F498FBFBBAD8D6A583A",
+      "EBE471B50C307F185CB7A2051546CD8BF57E4034B7ED1788D8F84F4609CD8A7D",
+      "F1E58221B771C4B5538BD4EB8FA2BF52314EEF16D728F1724CE19AFE3E85405D",
+      "F380657D582359DCB5AFC4D8703BBB94AC0328B335F0E20CD14BE9AD492384AF",
+      "F457A89E93281F10B9CA7125C1E46F6F813F69DFD9724568B5002993853C2719",
+      "FFD08920B4CE995A295CE8D8EDDE2B744AAE0D09D6FF00EB07E196B2A35581B1"
+    ],
+    "everyClockCaptures": 334,
+    "pipelineObserverContract": "all same-timestamp effects committed before observation",
+    "externalRom": "undisbeliever Zlib vram-mid-scanline-test",
+    "externalActiveVramWriteAttempts": 86016
+  },
+  "fixtureManifest": {
+    "path": "testdata/m5-ppu-manifest.json",
+    "sha256": "8b6bb5a2375eea03966de43ed743bcb721a4c47c1cec8cf3ca929f6992670128"
+  },
+  "nativeOracle": {
+    "externalFields": 24,
+    "expectedNativeRgb555": 32767,
+    "pixelsCompared": 57344,
+    "actualActiveVramWriteAttempts": 86016,
+    "nativeSha256": "A21FAFFD37E905F4C3DECFF311FCF244D67692AE73353B6D9A9C52E0933F11F7",
+    "successClass": "Independent source-derived white/red/blank protocol; no newly captured hardware frame",
+    "traceLimit": 64,
+    "traceTruncated": true
+  },
+  "timings": {
+    "coreSupervisedSeconds": 126.5573168,
+    "coreWatchdogSeconds": 240,
+    "portableGroups": [
+      {
+        "name": "LoROM mapping, header, copier header",
+        "seconds": 0.0085518
+      },
+      {
+        "name": "HiROM mapping and SRAM",
+        "seconds": 0.0002639
+      },
+      {
+        "name": "Unsupported cartridge rejected",
+        "seconds": 0.0004445
+      },
+      {
+        "name": "WRAM mirrors, multiplication, division",
+        "seconds": 0.0036334
+      },
+      {
+        "name": "65816 native mode and accumulator high byte",
+        "seconds": 0.0029603
+      },
+      {
+        "name": "65816 ADC/SBC flags and decimal",
+        "seconds": 0.0006404
+      },
+      {
+        "name": "65816 JSR/RTS stack and bank-local fetch",
+        "seconds": 0.0003177
+      },
+      {
+        "name": "Controller serial and auto-read ordering",
+        "seconds": 0.1281623
+      },
+      {
+        "name": "DMA alternates VRAM low/high and wraps source",
+        "seconds": 0.003883
+      },
+      {
+        "name": "Diagnostic ROM executes CPU/DMA/PPU/NMI",
+        "seconds": 0.5137989
+      },
+      {
+        "name": "Diagnostic ROM responds to actual controller registers",
+        "seconds": 0.9525385
+      },
+      {
+        "name": "Savestate resumes deterministically and rejects wrong ROM",
+        "seconds": 0.5318969
+      },
+      {
+        "name": "M1 E/M/X transitions and hidden accumulator",
+        "seconds": 0.0002004
+      },
+      {
+        "name": "M1 decimal carry overflow and borrow",
+        "seconds": 0.0018993
+      },
+      {
+        "name": "M1 emulation stack page wrap and native full stack",
+        "seconds": 0.000254
+      },
+      {
+        "name": "M1 Direct Page indexed wrap and long pointer page crossing",
+        "seconds": 0.0002554
+      },
+      {
+        "name": "M1 RMW memory width and flags",
+        "seconds": 7.49e-05
+      },
+      {
+        "name": "M1 MVN MVP index width and per-byte continuation",
+        "seconds": 0.0001655
+      },
+      {
+        "name": "M1 reset WAI masked IRQ unmasked IRQ NMI priority STP",
+        "seconds": 0.000195
+      },
+      {
+        "name": "M1 BRK COP and RTI register semantics",
+        "seconds": 0.0002672
+      },
+      {
+        "name": "M1 24-bit long boundary absolute carry and bank-zero Direct wrapping",
+        "seconds": 0.0001281
+      },
+      {
+        "name": "M1 emulation extended PHD PLD cross stack page",
+        "seconds": 0.0001524
+      },
+      {
+        "name": "M1 seeded valid BCD arithmetic independent decimal oracle",
+        "seconds": 0.0104675
+      },
+      {
+        "name": "M1 permanently reduced upstream failure regressions",
+        "seconds": 0.0052882
+      },
+      {
+        "name": "M2 presentation pacing uses actual rational field duration",
+        "seconds": 0.0004703
+      },
+      {
+        "name": "M2 mapped access speeds are separate from 65816 cycle counts",
+        "seconds": 0.0002158
+      },
+      {
+        "name": "M2 NTSC PAL fields short long lines dots and refresh phase",
+        "seconds": 0.0023593
+      },
+      {
+        "name": "M2 independent rational APU oscillator one hour per profile has zero integer drift",
+        "seconds": 5.8845243
+      },
+      {
+        "name": "M2 stable event ordering before CPU access at exact boundary",
+        "seconds": 0.0010451
+      },
+      {
+        "name": "M2 refresh stalls CPU effects at endpoint and within a cycle",
+        "seconds": 0.0015753
+      },
+      {
+        "name": "M2 distinct read latch and completion phases for all access speeds",
+        "seconds": 0.003161
+      },
+      {
+        "name": "M2 MMIO changes between read latch and completion cannot change captured data",
+        "seconds": 0.0013123
+      },
+      {
+        "name": "M2 MMIO read side effects and latched value survive every trailing hold clock",
+        "seconds": 0.2844818
+      },
+      {
+        "name": "M2 refresh at read hold and completion delays completion without another read",
+        "seconds": 0.0011117
+      },
+      {
+        "name": "M2 IRQ NMI edges at read latch and completion preserve last-cycle polling",
+        "seconds": 0.0025255
+      },
+      {
+        "name": "M2 read hold savestate format rejects both earlier versions",
+        "seconds": 0.0156175
+      },
+      {
+        "name": "M2 exact clock chunking single clocks blocks and frames same state",
+        "seconds": 0.1311515
+      },
+      {
+        "name": "M2 savestate at every master clock around instruction refresh and field boundaries",
+        "seconds": 6.8668058
+      },
+      {
+        "name": "M2 restartable cycles preserve side effects and every-cycle continuation",
+        "seconds": 0.0295774
+      },
+      {
+        "name": "M2 interrupt polling CLI SEI delayed mask NMI priority and WAI wake",
+        "seconds": 0.0012001
+      },
+      {
+        "name": "M2 RTI IRQ polling uses restored I independently of delayed width pins",
+        "seconds": 0.0014906
+      },
+      {
+        "name": "M2 WAI STP suspend CPU clocks while scheduler and APU continue",
+        "seconds": 0.000944
+      },
+      {
+        "name": "M2 reset IRQ NMI entry continuation survives every cycle",
+        "seconds": 0.0063133
+      },
+      {
+        "name": "M2 timed cycle comparator rejects cycle address value direction and pin mutations",
+        "seconds": 0.0010678
+      },
+      {
+        "name": "M2 every opcode incremental execution matches external bus vector",
+        "seconds": 0.1344894
+      },
+      {
+        "name": "M3 recursive ROM mirror and mapper metadata manual overrides",
+        "seconds": 0.046276
+      },
+      {
+        "name": "M3 SRAM bank mirrors warm reset and deterministic power seed",
+        "seconds": 0.0006812
+      },
+      {
+        "name": "M3 CPU MDR internal IO exemptions register masks and side effects",
+        "seconds": 0.0004867
+      },
+      {
+        "name": "M3 all DMA modes forward reverse protocol and exact read hold edges",
+        "seconds": 0.0027973
+      },
+      {
+        "name": "M3 original CPU ROM all DMA modes directions and critical raster starts",
+        "seconds": 0.5132171
+      },
+      {
+        "name": "M3 DMA fixed decrement bank wrap zero means 65536 and channel priority",
+        "seconds": 0.0247686
+      },
+      {
+        "name": "M3 precise DMA forbidden A ranges and WRAM2180 conflict",
+        "seconds": 0.0012788
+      },
+      {
+        "name": "M3 DMA clock budgets chunking save every phase and refresh collision",
+        "seconds": 30.0757906
+      },
+      {
+        "name": "M3 DMA public phase observer saves committed 2180 read and write",
+        "seconds": 4.6186458
+      },
+      {
+        "name": "M3 HDMA all modes direct indirect repeat and two pass ordering",
+        "seconds": 0.0062005
+      },
+      {
+        "name": "M3 HDMA no repeat skips lines table dummy and indirect terminal low byte",
+        "seconds": 0.0036019
+      },
+      {
+        "name": "M3 HDMA preempts DMA at byte edge cancels shared channel",
+        "seconds": 0.0005493
+      },
+      {
+        "name": "M3 HDMA every clock state and observer resume during descriptors pointers transfers",
+        "seconds": 7.459105
+      },
+      {
+        "name": "M3 ALU partial multiplication division zero and busy writes",
+        "seconds": 0.000676
+      },
+      {
+        "name": "M3 CPU ALU edges read after hold write before step refresh and save",
+        "seconds": 7.6482452
+      },
+      {
+        "name": "M3 H V HV IRQ holds readclear enable disable and line spill",
+        "seconds": 1.3358978
+      },
+      {
+        "name": "M3 NMI delayed enable edge four clock read hold and field reset",
+        "seconds": 0.0089791
+      },
+      {
+        "name": "M3 H V counter latches high bit toggles status reset and PIO falling",
+        "seconds": 0.0008197
+      },
+      {
+        "name": "M3 serial four data lines live strobe falling latch and signature",
+        "seconds": 0.000346
+      },
+      {
+        "name": "M3 automatic JOY exact start busy shifts all four results and replay",
+        "seconds": 0.4360467
+      },
+      {
+        "name": "M3 IRQ NMI DMA event collisions state chunks and meaningful mutations",
+        "seconds": 0.1855483
+      },
+      {
+        "name": "M4 complete opcode sample both direct and resumable state bus",
+        "seconds": 0.0262699
+      },
+      {
+        "name": "M4 IPL underlay ports directional clears auxiliary RAM and writeonly",
+        "seconds": 0.0004361
+      },
+      {
+        "name": "M4 DSP address read mirror write suppress output and ENDX interface",
+        "seconds": 0.000189
+      },
+      {
+        "name": "M4 source adjudicated indirect Y fixed electrical worksheet",
+        "seconds": 0.0003799
+      },
+      {
+        "name": "M4 permanent immutable SPC seed regressions",
+        "seconds": 0.0004261
+      },
+      {
+        "name": "M4 TEST independent internal external wait selectors literal timing table",
+        "seconds": 0.0003764
+      },
+      {
+        "name": "M4 timers fixed boundaries target0 readclear overflow all enable edges",
+        "seconds": 0.0014431
+      },
+      {
+        "name": "M4 timer scaler free runs disabled target wrap TEST gating P restriction",
+        "seconds": 0.0002362
+      },
+      {
+        "name": "M4 RAM read latch endpoint CPUport half latch hold and dummy MMIO",
+        "seconds": 0.0003358
+      },
+      {
+        "name": "M4 every crystal continuation against untouched continuous reference",
+        "seconds": 0.0196905
+      },
+      {
+        "name": "M4 committed phase observer snapshot never repeats readclear or port hold",
+        "seconds": 0.0016774
+      },
+      {
+        "name": "M4 original SNES ROM real own IPL upload RAM program port pingpong",
+        "seconds": 0.0463555
+      },
+      {
+        "name": "M4 own IPL CPU multiblock upload index and page wraps command zero avoidance",
+        "seconds": 0.308509
+      },
+      {
+        "name": "M4 every master clock savestate active CPU SPC ports matches continuous",
+        "seconds": 6.0547926
+      },
+      {
+        "name": "M4 APU observers exactly before on after typed refresh and line endpoints",
+        "seconds": 0.2844818
+      },
+      {
+        "name": "M4 targeted APU observer snapshots across DMA IRQ Vblank NMI typed events",
+        "seconds": 12.5940682
+      },
+      {
+        "name": "M4 public APU observer system saves retain future due events CPU DMA raster",
+        "seconds": 1.2290939
+      },
+      {
+        "name": "M4 reset sleep stop firmware identity and ratios NTSC PAL chunks",
+        "seconds": 0.1858267
+      },
+      {
+        "name": "M4 own IPL reentry restores stack clears dirty page and advertises through code",
+        "seconds": 0.0008121
+      },
+      {
+        "name": "M4 savestate v5 rejects formats1 through4 and foreign IPL identity",
+        "seconds": 0.0208697
+      },
+      {
+        "name": "M4 negative comparator mutations and hardware adjudication cannot hide errors",
+        "seconds": 0.0106528
+      },
+      {
+        "name": "M5 CPU ROM VRAM prefetch old buffer increment remap and wrapped address",
+        "seconds": 0.2594433
+      },
+      {
+        "name": "M5 CPU ROM OAM low word latch high mirror and CGRAM shared flip",
+        "seconds": 0.0176066
+      },
+      {
+        "name": "M5 CPU ROM PPU MDR exact unreadable masks multiplication and shared PPU2",
+        "seconds": 0.0171792
+      },
+      {
+        "name": "M5 CPU ROM shared horizontal vertical and separate Mode7 latches",
+        "seconds": 0.0171088
+      },
+      {
+        "name": "M5 CPU ROM Mode0 palettes native RGB555 before brightness",
+        "seconds": 0.0547575
+      },
+      {
+        "name": "M5 CPU ROM Mode1 four plane decode and BG3 priority override",
+        "seconds": 0.1087864
+      },
+      {
+        "name": "M5 CPU ROM 16x16 subtiles carry and whole tile flips",
+        "seconds": 0.2180927
+      },
+      {
+        "name": "M5 CPU ROM map quadrants and 8x8 16x16 scroll wrapping",
+        "seconds": 0.2156107
+      },
+      {
+        "name": "M5 fixed mathematical color operations worksheet saturation half and lanes",
+        "seconds": 0.0008308
+      },
+      {
+        "name": "M5 CPU ROM fixed color add subtract half and transparent subscreen",
+        "seconds": 0.2719449
+      },
+      {
+        "name": "M5 CPU ROM two windows OR AND XOR XNOR inversion main sub masks",
+        "seconds": 0.2115679
+      },
+      {
+        "name": "M5 CPU ROM color window clips before math and suppresses halve",
+        "seconds": 0.0546817
+      },
+      {
+        "name": "M5 CPU ROM Mosaic horizontal and vertical block worksheet",
+        "seconds": 0.054289
+      },
+      {
+        "name": "M5 CPU ROM all OBJ size pairs geometry and native palette",
+        "seconds": 0.9707173
+      },
+      {
+        "name": "M5 CPU ROM OBJ OAM order overrides priority and priority rotation",
+        "seconds": 0.1081496
+      },
+      {
+        "name": "M5 CPU ROM OBJ range time overflow offscreen and X256 exception",
+        "seconds": 0.3250176
+      },
+      {
+        "name": "M5 CPU ROM OBJ flip name table and Y wrap",
+        "seconds": 0.4307411
+      },
+      {
+        "name": "M5 active display VRAM suppression increments buffer and blanking access",
+        "seconds": 0.0543319
+      },
+      {
+        "name": "M5 raster exact map fetch timing and irreversible output",
+        "seconds": 0.0546033
+      },
+      {
+        "name": "M5 native comparator first difference carries pixel line and bus evidence",
+        "seconds": 0.0008357
+      },
+      {
+        "name": "M5 real CPU midpixel fixed color and brightness exact master clocks",
+        "seconds": 0.1068904
+      },
+      {
+        "name": "M5 every master clock CPU color pipeline and OBJ fetch against untouched run",
+        "seconds": 14.2360104
+      },
+      {
+        "name": "M5 public fetch pixel and APU observers save only committed phases",
+        "seconds": 0.4308574
+      },
+      {
+        "name": "M5 independent native verifier rejects fresh palette fetch priority and clock mutations",
+        "seconds": 0.2538136
+      },
+      {
+        "name": "M5 every clock real DMA HDMA raster IRQ and active APU full state trace continuation",
+        "seconds": 14.7719904
+      },
+      {
+        "name": "M5 full native golden frame independent constant RGB555 worksheet and mutations",
+        "seconds": 0.1032525
+      },
+      {
+        "name": "M5 sprite descriptor and OBSEL latch at individual fetch entry with plane snapshot",
+        "seconds": 0.0878357
+      },
+      {
+        "name": "M5 Mode0 literal BG OBJ priority stack worksheet",
+        "seconds": 0.6120813
+      },
+      {
+        "name": "M5 OBJ low palettes exclude math high palettes include fixed color",
+        "seconds": 0.1994796
+      },
+      {
+        "name": "M5 CPU CGRAM subscreen write H57 is observed by shared output H58",
+        "seconds": 0.0539735
+      },
+      {
+        "name": "M5 Mosaic enable edge size update line counter and horizontal phase state",
+        "seconds": 0.090842
+      },
+      {
+        "name": "M5 active OAM redirect preserves CPU low word parity and high byte commits",
+        "seconds": 0.2144327
+      },
+      {
+        "name": "M5 external Zlib VRAM midscanline ROM independent white pixel oracle",
+        "seconds": 1.7141159
+      },
+      {
+        "name": "M5 last visible line suppresses OBJ pattern fetch time overflow",
+        "seconds": 0.2521617
+      },
+      {
+        "name": "M5 published OAM odd priority three-read example literal63 through70",
+        "seconds": 0.0419366
+      },
+      {
+        "name": "M5 digital brightness rounding worksheet and explicit frame geometry",
+        "seconds": 0.0008969
+      },
+      {
+        "name": "M5 CPU ROM inverted windows empty range and independent subscreen mask worksheet",
+        "seconds": 0.3204174
+      },
+      {
+        "name": "M5 CPU ROM color window math prevent inside outside always worksheet",
+        "seconds": 0.2163941
+      },
+      {
+        "name": "M5 savestate format6 rejects all previous formats and invalid pipeline",
+        "seconds": 0.0324184
+      },
+      {
+        "name": "M5 CPU ROM Mode1 all four planes and 8x8 bit mirror worksheet",
+        "seconds": 0.265937
+      },
+      {
+        "name": "M5 CPU ROM VRAM address FFFF wrap and Hblank still locked",
+        "seconds": 0.0498933
+      },
+      {
+        "name": "M5 BG coarse scroll fetch deadline and horizontal fine scroll H0 latch",
+        "seconds": 0.1626132
+      }
+    ]
+  },
+  "benchmark": {
+    "command": "dotnet SNESEmulator.Lab/bin/Release/net10.0/SNESEmulator.Lab.dll benchmark-apu",
+    "note": "Historical command/suite name; this clean M5 executable includes active own SPC700 and full clocked M5 PPU accuracy path.120 measured diagnostic fields after warmup. No accuracy feature disabled. Not realtime.",
+    "metadata": {
+      "host": {
+        "machine": "NILSPC1",
+        "os": "Microsoft Windows NT 10.0.26200.0",
+        "runtime": "10.0.12",
+        "processors": 24
+      },
+      "framesPerSecond": 21.616091407533414,
+      "apuEnabled": true,
+      "spcCycles": 2061671,
+      "apuFirmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "masterclocksPerSecond": 7724856.121944586,
+      "stepNopInstructionsPerSecond": 4518385.30982568,
+      "singleCycleNopInstructionsPerSecond": 232351.77873418934
+    }
+  },
+  "ui": {
+    "command": "SNESEmulator.exe --ui-smoke artifacts/m5-ui-<scene>.png <scene>",
+    "scenes": [
+      "main",
+      "demo",
+      "settings",
+      "network",
+      "saves"
+    ],
+    "result": "All processes waited sequentially, exit0, all five screenshots inspected; saved state in isolated artifacts/m5-ui-data.",
+    "images": {
+      "main": "89464a085e8fc21cba0c717750fb3346c60f8830ce7e60d3e497b55a7c570fa2",
+      "demo": "139e0d00db2134848d745b0f8aa508fae3acf400fdf03260e827dd56d5bf88d6",
+      "settings": "90e7c442bf8cfd35c493de7fa585a0a9d64d50f4dd0f0f54152ee525d13a1301",
+      "network": "5d3e96bd9ca6aa1b8fc9eed6c9e3222ddfc9f280e34677553def76b8cc64e6e3",
+      "saves": "7a1c63bd9dd22959d7d1de010e02206db5e2640c0815e98259fb114a0d293361"
+    }
+  },
+  "watchdogHistory": [
+    {
+      "path": "artifacts/m5-first-timeout/core.json",
+      "status": "timeout",
+      "seconds": 120.090386,
+      "explanation": "Original120second budget exceeded by expanded core; unchanged report archived. Passing measured suite126.557seconds now has240second watchdog."
+    },
+    {
+      "path": "artifacts/m5-intentional-reporting-restart/core.json",
+      "status": "intentionally interrupted",
+      "explanation": "Stopped after source-only reporter timing instrumentation was requested; not counted as a completed or passing full run."
+    }
+  ],
+  "reports": {
+    "core-child": {
+      "path": "artifacts/m5-implementation-evidence/core-child.json",
+      "sha256": "4dbb9e65afd044e6a630e793c303b31e53e49b01107069c028514053cc00d571",
+      "tests": 129,
+      "exitCode": 0
+    },
+    "core": {
+      "path": "artifacts/m5-implementation-evidence/core.json",
+      "sha256": "e7a868ef9e501745af0a6e14c8631c9c554a88da11fe01db05052c07a7679597",
+      "tests": 1,
+      "exitCode": 0
+    },
+    "mutations-child": {
+      "path": "artifacts/m5-implementation-evidence/mutations-child.json",
+      "sha256": "abec00caad2d12aed7eb48437defc944a65275278b0a911bfe0fd3a6be4654d2",
+      "tests": 11,
+      "exitCode": 0
+    },
+    "conformance-child": {
+      "path": "artifacts/m5-implementation-evidence/conformance-child.json",
+      "sha256": "d8cd68c6fe78d88133f1c0ef22ea1f06618e67350e835f2bf5e268015b3c6b96",
+      "tests": 512,
+      "exitCode": 0
+    },
+    "bus-conformance-child": {
+      "path": "artifacts/m5-implementation-evidence/bus-conformance-child.json",
+      "sha256": "10d4d5cac009704a4d88473e6034105303cdb8204a740ff4ac0451f5aefb7b7f",
+      "tests": 512,
+      "exitCode": 0
+    },
+    "spc-conformance-child": {
+      "path": "artifacts/m5-implementation-evidence/spc-conformance-child.json",
+      "sha256": "b9930d46d5b58b0edd2c9ba05476537f70eefba4bf044c374eb51390a71f699b",
+      "tests": 256,
+      "exitCode": 0
+    },
+    "spc-original-boot-child": {
+      "path": "artifacts/m5-implementation-evidence/spc-original-boot-child.json",
+      "sha256": "637189af4d443f7105db13b191b711059ca068fa5682fb49dcd5f9e9aac55919",
+      "tests": 4,
+      "exitCode": 0
+    },
+    "windows-integration-child": {
+      "path": "artifacts/m5-implementation-evidence/windows-integration-child.json",
+      "sha256": "a6b866f27d5fe828a16997918364b177ebb60afc38c6f290ff8c2c25cfe4564a",
+      "tests": 5,
+      "exitCode": 0
+    },
+    "native-white": {
+      "path": "artifacts/m5-implementation-evidence/native-white.json",
+      "sha256": "c1481ad378c3465eb091add74bcd22deaf66214508e2f837ac3303f636ea0e96",
+      "tests": 2,
+      "exitCode": 0
+    },
+    "m5-benchmark": {
+      "path": "artifacts/m5-implementation-evidence/m5-benchmark.json",
+      "sha256": "071c4f047af1bf9eaf04e7938cd2b95473612e158ddad806f35dfeb036c48db8",
+      "tests": 1,
+      "exitCode": 0
+    }
+  },
+  "evidenceClass": "Published research + one unmodified Zlib test ROM with source-derived native oracle + analytical/internal determinism and independent CPU/SPC software vectors. No acquired console measurements.",
+  "gaps": [
+    "Absolute console-specific PPU pipeline epoch versus published conjectural dot22 visible origin",
+    "Odd OAM priority published example/formula and software-reference conflict documented explicitly",
+    "Physical reset/power/open-bus decay and one-chip/revision bus glitches",
+    "Analog brightness/DAC transfer and pedestal",
+    "Modes2-7, hires and variable interlace/overscan output (M7)",
+    "S-DSP/native sound (M6)",
+    "Broad public hardware-test/native frame corpus and commercial title matrix (M8)",
+    "Below-realtime21.62 diagnostic fields/s; correctness-preserving optimization (M9)"
+  ]
+}
