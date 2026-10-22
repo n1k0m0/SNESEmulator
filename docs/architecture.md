@@ -60,19 +60,15 @@ bedient wurde; das Bild entsteht nicht als Frontend-Demoanimation.
 
 ## Weiterentwicklung
 
-1. CPU gegen eine unabhängige 65C816-Testsuite prüfen; Speicher-/Bankgrenzen,
-   Flags, Interrupts und tatsächliche Masterzyklen präzisieren.
-2. SPC700 einschließlich IPL-Verhalten, Timer und DSP/BRR implementieren;
-   Stereo-PCM und Netzwerk-Audioformat ergänzen.
-3. Mode-1-Renderer vervollständigen: OBJ, Prioritäten, PPU-Leseports,
-   Fenster und Color Math. Reproduzierbare Homebrew-Bildtests ergänzen.
-4. H-/V-IRQ, HDMA, DMA-Stalls und Scanline-/Dot-Scheduler entwickeln.
-5. Weitere PPU-Modi einschließlich Mode 7, PAL/NTSC-Timing und Overscan.
-6. Ausgewählte rechtmäßig bereitgestellte Homebrew-/Spiele-ROMs als lokale
-   Regressionen prüfen. Kompatibilität pro Titel mit belastbaren Ergebnissen
-   dokumentieren. Erst dann Zusatzchips und höhere Genauigkeit ausbauen.
-7. Bei vorhandenem SNES-Releaseziel Updater/Installer ergänzen; einen Manager
-   bei Bedarf aus den SNES-Cartridge-/Savestate-Verträgen aufbauen.
+Die verbindliche Arbeitsreihenfolge und die geplanten Abnahmekriterien stehen
+im [Entwicklungsplan](development-plan.md). Dieser beschreibt künftige Arbeit;
+er ändert den oben dokumentierten Implementierungsstand nicht.
+
+Zuerst entstehen Testlabor, unabhängige CPU-Prüfungen und eine präzise
+Masterclock-/Buszeitbasis. Darauf bauen DMA/HDMA, IRQ, SPC700, PPU und DSP auf.
+PAL/NTSC, Hardwareabgleich, Produktreife und Zusatzchips folgen mit jeweils
+eigenen Nachweisen. Savestates, Frontend- und Netzwerkregressionen begleiten
+die Hardwareentwicklung von Beginn an.
 
 ## Referenzen
 

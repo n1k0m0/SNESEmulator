@@ -115,6 +115,10 @@ Emulatoren können nicht gegenseitig als Client dienen.
 Weitere Details und nächste Entwicklungsschritte:
 [docs/architecture.md](docs/architecture.md).
 
+Der ausführliche [Entwicklungsplan](docs/development-plan.md) beschreibt den
+Weg zur hardwaregetreuen Basiskonsole, die Reihenfolge der Komponenten und
+konkrete Tests und Abnahmekriterien für jeden Meilenstein.
+
 ## Daten und Spielstände
 
 Einstellungen, Zertifikate, Battery-SRAM und Spielstände liegen getrennt vom C64
