@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M5 unabhängig abgenommen; M6 implementiert, unabhängige Abnahme ausstehend. M7–M10 bleiben offen. Messumfang: [Testlabor](test-laboratory.md), [M6-Vertrag](m6-dsp-contract.md), [M5-Vertrag](m5-ppu-contract.md), [M4-Vertrag](m4-apu-contract.md), [M3-Vertrag](m3-io-contract.md), [M2-Vertrag](m2-timing-contract.md). Alle5.080.400 externen CPU-Semantik- und Busfälle bestehen. Keine eigene Konsolenmessung.
+Status: M0–M6 unabhängig abgenommen; M7 implementiert, unabhängige Abnahme ausstehend. M8–M10 bleiben offen. Messumfang: [Testlabor](test-laboratory.md), [M6-Vertrag](m6-dsp-contract.md), [M5-Vertrag](m5-ppu-contract.md), [M4-Vertrag](m4-apu-contract.md), [M3-Vertrag](m3-io-contract.md), [M2-Vertrag](m2-timing-contract.md). Alle5.080.400 externen CPU-Semantik- und Busfälle bestehen. Keine eigene Konsolenmessung.
 
 ## Ziel und Nachweis
 
@@ -232,7 +232,7 @@ Abnahme:
 
 ### M5 – Grundlegende PPU vollständig
 
-Implementiert; unabhängige Root-Abnahme ausstehend. [PPU-Vertrag](m5-ppu-contract.md)
+Implementiert und unabhängig auf `2dc8cf021ef7394f38df1db9932b443a23543b30` abgenommen. [PPU-Vertrag](m5-ppu-contract.md)
 trennt quelleninformierte Fetch-/MMIO-Phasen, native Sollbilder und Grenzen
 der Hardware-Evidenz. Kein eigener Konsolenmessnachweis. Modi2–7 bleiben M7.
 
@@ -271,8 +271,7 @@ abgenommen: `python tools/test-lab.py --windows --full`, Exit0,
 
 M6 implementiert den eigenen phasengetakteten DSP und Stereo bis zum Gerät und
 TLS/Relay. Vertrag, Quellenkonflikte und digitale Evidenzgrenzen:
-[m6-dsp-contract.md](m6-dsp-contract.md). Unabhängige Abnahme steht aus;
-M7 wurde noch nicht begonnen. Der vollständige Gate bestand auf sauberem
+[m6-dsp-contract.md](m6-dsp-contract.md). M6 wurde unabhängig auf `e4645770cea052885808ca5b27a45d60de470157` abgenommen: `python tools/test-lab.py --windows --full`, Exit0, `artifacts/root-m6-validation.log`; unveränderte Berichte unter `artifacts/root-m6-evidence/`. Der vollständige Gate bestand auf sauberem
 `feb978b` mit Exit0 (147 portable und8 Windowsgruppen);
 [Messdaten](baselines/m6.json). Er läuft zusätzlich zu den
 unveränderten129 M0–M5-Gruppen in getrennt beaufsichtigten DSP-/AV-Suiten.
@@ -300,6 +299,8 @@ Abnahme:
   keine dauerhafte Drift zwischen Bild und Ton.
 
 ### M7 – Grafikmodi, Regionen und Hardwaredetails
+
+M7 ist implementiert; unabhängige Abnahme steht aus. Der saubere Vollgate auf `7cf7cc1` bestand mit182 portablen und10 Windowsgruppen. Anschließend wurden nur der Format8-Fehlertext und der Lab-Optionsadapter korrigiert und gezielt geprüft; finaler Produkt-/Toolstand `adef880`. Native Rohfelder, getrennte Display-/Timing-Interlace-Metadaten, Quellenunsicherheiten und Messumfang: [M7-Vertrag](m7-video-contract.md), [Baseline](baselines/m7.json). Kein neuer Hardwaremessnachweis und kein Echtzeitclaim.
 
 Arbeit:
 

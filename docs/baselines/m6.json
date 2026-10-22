@@ -1,6 +1,6 @@
 {
   "schema": "snes-m6-dsp-v1",
-  "status": "Clean implementation full gate passed; independent parent acceptance pending. Measurement record, not an expected-output oracle.",
+  "status": "Clean implementation full gate passed; independent parent acceptance passed on e464577. Historical M6 measurement record, not an expected-output oracle.",
   "implementationCommit": "feb978b22ed73ecef9237146bbfad760ddec3a92",
   "implementationCommits": [
     "5bdf8fe51d28822e25c8fd59d9bdccb779ce8b88",
@@ -947,11 +947,17 @@
     "Soft reset follows the selected research reference; external reset-pin behaviour and rapid DAC mute pulses remain unverified.",
     "Ten-second NTSC/PAL AV runs are executed; one-hour M2 rational clock checks remain separate analytical evidence.",
     "Laboratory SPC container is deliberately limited, not a universal music player/exact hidden-state restoration.",
-    "No general commercial-game compatibility claim; graphics modes2–7 and variable geometry remain M7.",
+    "No general commercial-game compatibility claim; graphics modes2\u20137 and variable geometry remain M7.",
     "publish/ is the old pre-M0 distribution; no release was created. M9 must refresh distribution and performance."
   ],
   "developmentAttempts": {
     "folder": "artifacts/m6-development-attempts/",
     "notes": "An early128/129 core run exposed the old M4 read-only ENVX expectation, corrected from research. Initial full-gate launch stopped at intentionally stale changed-source hashes; a subsequent precommit launch was interrupted on parent instruction to validate only committed clean code. These are not console hardware failures or acceptance passes."
+  },
+  "independentAcceptance": {
+    "commit": "e4645770cea052885808ca5b27a45d60de470157",
+    "exitCode": 0,
+    "log": "artifacts/root-m6-validation.log",
+    "frozenReports": "artifacts/root-m6-evidence/"
   }
 }

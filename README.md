@@ -6,16 +6,16 @@ Der SNES-Kern wird hier selbst entwickelt; es wird kein Snes9x-, bsnes- oder
 Libretro-Kern eingebunden.
 
 **Stand: 0.1.0-dev – eigener Entwicklungskern, noch keine allgemeine
-Spielekompatibilität.** M0–M5 sind unabhängig geprüft. Die getaktete
-Mode0/1-PPU bietet Sprites, Fenster, Farbmathematik und native RGB555-Referenzen.
-M6 ergänzt einen eigenen phasengetakteten S-DSP mit Stereo; seine unabhängige
-Abnahme steht aus. Alle5.080.400 externen CPU-Semantik- und
+Spielekompatibilität.** M0–M6 sind unabhängig geprüft. Die getaktete
+Mode0–7-PPU bietet Sprites, Fenster, Farbmathematik, OPT, Hires und Mode7.
+M7 ist implementiert, die unabhängige Abnahme steht aus. Der eigene S-DSP
+liefert phasengetaktetes natives Stereo. Alle5.080.400 externen CPU-Semantik- und
 Busfälle bestehen. Die SPC-Suite umfasst256.000 Semantik-/freigegebene Busfälle:
 249.000 passen roh,7.000 haben eine quellengestützte indirekt-Y-Adjudikation.
-Es gibt keine eigene Konsolenmessung. Modi2–7 bleiben M7;453.726 native
+Es gibt keine eigene Konsolenmessung. Native Rohfelder haben256/512×224/239Pixel;453.726 native
 Stereo-Paare bestehen den unabhängigen digitalen DSP-Referenzvergleich.
 Siehe [Testlabor](docs/test-laboratory.md), [M4](docs/m4-apu-contract.md)
-[M5-PPU-Vertrag](docs/m5-ppu-contract.md) und [M6-DSP-Vertrag](docs/m6-dsp-contract.md).
+[M5-PPU-Vertrag](docs/m5-ppu-contract.md), [M6-DSP-Vertrag](docs/m6-dsp-contract.md) und [M7-Videovertrag](docs/m7-video-contract.md).
 
 ## Starten
 
@@ -204,3 +204,8 @@ von Korrektheitsorakeln getrennt. Die aktive PPU+APU+DSP-Diagnose erreicht lokal
 Dies ist unter Echtzeit und bleibt eine M9-Optimierungsaufgabe. Der vorhandene
 `publish/`-Ordner ist noch der alte Vor-M0-Stand; für diesen Entwicklungsstand
 mit dem SDK aus den aktuellen Quellen starten. Es wurde kein Release erstellt.
+
+
+M7:182 portable und10 Windowsgruppen bestehen im sauberen Vollgate auf7cf7cc1; nachfolgende Fehlertext-/Lab-Adapterkorrekturen aufadef880 sind separat gezielt geprüft. Format8 speichert vollständige native Rohfelder und Pipelinezustände; frühere Formate werden mit verständlicher Erklärung abgewiesen. VID3 überträgt Geometrie, Feldparität und rationale Zeitdomänen verlustfrei, AUD2-Stereo bleibt erhalten. GUI und Savepreview nutzen echte Bildmaße mit4:3-Präsentation.
+
+Lokaler vollständiger PPU/APU/DSP-Diagnoseworkload:23.64Felder/s; separater Zwei-BRR-ForcedBlank-Workload:24.29. Beide liegen unter Echtzeit. Quellen-/Hardwaregrenzen, frühere rote Befunde und unveränderte Evidenz: [M7-Baseline](docs/baselines/m7.json). Die vorhandene `publish/`-Distribution bleibt vor M0; Releaseerneuerung folgt in M9.

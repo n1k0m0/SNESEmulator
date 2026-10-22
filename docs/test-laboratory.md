@@ -1,4 +1,4 @@
-# Test laboratory: M0–M6 CPU, bus, I/O, SPC700, native PPU and stereo DSP
+# Test laboratory: M0–M7 CPU, bus, I/O, SPC700, native PPU and stereo DSP
 
 M0 establishes measurement, not CPU or SNES accuracy. The original17 assertions
 are preserved as12 portable core regressions and5 Windows/network integrations.
@@ -467,4 +467,51 @@ unmodified artifacts are frozen in `artifacts/m6-implementation-evidence/`;
 all reports that record provenance have that commit and an empty working tree.
 The frozen manifest hashes the logs, native dumps, traces and structured results.
 Full counts, group durations and both distinct benchmark workloads are in
-[the M6 baseline](baselines/m6.json). Independent M6 parent acceptance is pending.
+[the M6 baseline](baselines/m6.json). Independent M6 parent acceptance passed on `e4645770cea052885808ca5b27a45d60de470157`, full gate exit0, `artifacts/root-m6-validation.log`; unchanged reports in `artifacts/root-m6-evidence/`.
+
+
+## M7 native video and variable raw fields
+
+The separate180-second video supervisor runs35 original-ROM/worksheet groups,
+106 unique ROM variants and164 full-console continuations. Together with129
+existing core,17 DSP and1 AV group, this is182 portable groups; Windows now
+has10 groups. Full native fields compare every RGB555/brightness sample and
+geometry, including parity, display/timing interlace flags and rational domains.
+No image is rescaled for native comparison. Published source and immutable
+comparison identities: `testdata/m7-video-manifest.json`; [contract](m7-video-contract.md).
+
+`tools/video-mutations.py` actually builds four modified PPU implementations
+and requires targeted native ROM assertions to fail, then restores exact bytes
+and rebuilds. These intentional dirty/red reports are negative evidence, not
+claimed clean product passes. The first ineffective start-height mutation is
+retained separately and does not count as detection. `tools/test-video-cli.py`
+checks actual `--expect-geometry` and `--expect-brightness` CLI paths using
+literal reset metadata/zero brightness at1000 clocks, plus parity/brightness
+mutations. Both scripts are permanent parts of `tools/test-lab.py`.
+
+The clean full gate on7cf7cc1 passed with exit0, including the complete CPU/SPC
+corpora, original local IPL and unchanged DSP references. Two post-gate adapter
+corrections change only the format8 error message and Lab option whitelist;
+42 existing PPU/format groups and the four actual CLI controls passed separately.
+Final product/tool commit isadef880; parent independently validates that final
+stand. The9 extra VID3 rational controls reject zero/negative/overflowing clock
+metadata while preserving22680000000/44 exactly. All raw reports, including
+earlier genuine pin/format regressions, are unchanged in
+`artifacts/m7-implementation-evidence/`; [baseline](baselines/m7.json).
+
+```powershell
+python tools/verify-video-testdata.py
+dotnet run --project SNESEmulator.Core.Tests -c Release -- --video-only
+python tools/test-video-cli.py
+python tools/video-mutations.py
+python tools/test-lab.py --windows --full
+```
+
+Raw-field metadata is emitted alongside `.rgb555le.bin`, `.brightness.bin` and
+`.argb32le.bin`. `--expect-geometry <json>` compares exact geometry/time metadata;
+`--expect-brightness <file>` reports the first brightness pixel difference.
+`--expect-native` retains first native pixel/line and register context. These
+are independent oracles only when their inputs are independently derived.
+Hardware inventory remains explicitly incomplete: absolute PPU origin, Mode7
+VRAM subslots, the first hires half-pixel and published physical INIDISP glitches
+have no new original-console measurement. M7 parent acceptance is pending.

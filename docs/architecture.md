@@ -10,7 +10,7 @@ unversionierten Manager-/IPC-Arbeiten wurden nicht kopiert.
 |---|---|
 | `C64System` / `SystemBus` | `SnesSystem` / `SystemBus` |
 | 6510 | eigener `Cpu65816` |
-| VIC-II / C64-Framebuffer | eigener `Ppu`, 256×224-Framebuffer |
+| VIC-II / C64-Framebuffer | eigener `Ppu`, native256/512×224/239-Rohfelder |
 | SID | eigene `Spc700`/`Apu`/`SnesDsp`; native32kHz-Stereoausgabe |
 | CIA-Joysticks | `ControllerPorts`, serielle und automatische Abfrage |
 | PRG/D64/EasyFlash | `Cartridge`, LoROM/HiROM und Battery-SRAM |
@@ -47,19 +47,18 @@ rekursive Chipspiegelung, SRAM, PPU-/APU-Ports und 5A22-I/O. `CpuIo` enthält
 ALU-Zwischenzustände, Timer-IRQ/NMI-Holds, Zählerlatches und serielle/automatische
 JOY-Abfrage. `DmaController` übernimmt den Bus mit eigenen gespeicherten Phasen:
 A/B-Read nach vier Clocks, Write nach weiteren vier, Priorität, Start-/End-Sync,
-HDMA-Tabellen und Präemption. Savestate v7 speichert diese Zwischenzustände und
+HDMA-Tabellen und Präemption. Savestate v8 speichert diese Zwischenzustände und
 bindet den Mapper zusätzlich zum ROM-Hash. Siehe [M3-Vertrag](m3-io-contract.md)
 für genaue Grenzen und Quellen. PowerOn definiert RAM-Testseeds; Reset erhält
 CPU-WRAM und SRAM, ist aber kein vollständiges Modell aller Reset-Pins der PPU.
 
-`Ppu` führt eigene Mode0/1-Hintergründe und alle128 OBJ über Fetch-/Pixelphasen
+`Ppu` führt eigene Mode0–7-Hintergründe und alle128 OBJ über Fetch-/Pixelphasen
 im Masterclock-Scheduler aus. Individuelle VRAM/CGRAM/OAM- und Scroll-Latches,
 getrennte PPU1/PPU2-MDRs (PPU2 gemeinsam mit Zählerports), Fenster, Main/Sub,
 Farbmathematik und Mosaic sind serialisiert. Native RGB555 und Helligkeitsphase
 werden vor ARGB ausgegeben; das Lab vergleicht native Pixel mit erstem X/Y/Zeile
 und Register-/Buskontext. PPU-Observers laufen nach vollständigem Timestamp-
-Commit. Die Geometrie trägt Metadaten, bleibt vor M7 auf256×224 begrenzt.
-Modi2–7, Hires/Interlace/Overscan-Ausgabe und breite Hardware-Evidenz sind offen.
+Commit. M7 liefert variable native Rohfeldgeometrie bis512×239, Feldparität, getrennte Display-/Timing-Interlace-Flags und rationale Zeitdomänen bis GUI, Preview, Lab und Netzwerk. Breite Hardware-Evidenz bleibt offen.
 Absolute PPU-Phasen sind ein quelleninformiertes analytisches Modell, kein neuer
 Konsolenmessnachweis. Siehe [M5-Vertrag](m5-ppu-contract.md).
 
@@ -89,7 +88,7 @@ er ändert den oben dokumentierten Implementierungsstand nicht.
 Testlabor, unabhängige CPU-Prüfungen und Masterclock sind M0–M2; M3 ergänzt
 DMA/HDMA und I/O. M4 ist unabhängig abgenommen; M5 implementiert die getaktete
 Mode0/1-PPU. M5 wurde unabhängig auf2dc8cf abgenommen (Root-Vollgate Exit0). M6 implementiert
-den eigenen S-DSP; unabhängige Abnahme steht aus.
+den eigenen S-DSP; M6 wurde unabhängig auf `e4645770cea052885808ca5b27a45d60de470157` abgenommen: `python tools/test-lab.py --windows --full`, Exit0, `artifacts/root-m6-validation.log`; unveränderte Berichte unter `artifacts/root-m6-evidence/`.
 PAL/NTSC, Hardwareabgleich, Produktreife und Zusatzchips folgen mit jeweils
 eigenen Nachweisen. Savestates, Frontend- und Netzwerkregressionen begleiten
 die Hardwareentwicklung von Beginn an.
@@ -127,4 +126,9 @@ M6 clean full gate passed on feb978b with147 portable/8 Windows groups and all
 external corpora. Comparable full PPU/APU/DSP performance is18.33 fields/s,
 versus21.62 at M5; the separate two-BRR-voice forced-blank case is19.40. Both
 remain below realtime. [M6 baseline](baselines/m6.json) records exact measurements;
-M9 must retain digital results while profiling. Independent M6 acceptance is pending.
+M9 must retain digital results while profiling. Independent M6 acceptance passed on e464577; see root-m6-validation.log.
+
+
+M7 ergänzt eigene8bpp-/OPT-/Hires-Fetchpläne, integeraffines Mode7, EXTBG und DirectColor. Ein fortlaufender Cursor konsumiert native Pixel an getrennten BELOW-/ABOVE-Phasen; Hostweave ist kein Hardwarezustand. CompletedFrame bewahrt das fertige Rohfeld vor dem nächsten Feldstart. Format8 speichert Geometrie/Arraylängen und sämtliche zusätzlichen Latches. VID3 überträgt vollständiges verlustfreies ARGB samt Feld-/Zeitmetadaten, AUD2-Stereo bleibt erhalten.
+
+Der Vollgate auf7cf7cc1 bestand mit182 portablen und10 Windowsgruppen. Die späteren reinen Fehlertext-/Lab-Adapterkorrekturen aufadef880 wurden gezielt geprüft. Vergleichbarer vollständiger Diagnostic-PPU/APU/DSP-Workload:23.64Felder/s; separater Zwei-BRR-Workload mit ForcedBlank:24.29. Das bleibt unter Echtzeit und ist eine einzelne Hostmessung. M9 muss ohne Genauigkeitsverlust profilieren. Präziser Vertrag, Feldgrenzen und Hardwareunsicherheiten: [M7](m7-video-contract.md), [Messdaten](baselines/m7.json). Unabhängige M7-Abnahme steht aus.

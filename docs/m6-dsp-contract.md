@@ -1,6 +1,6 @@
 # M6 digital S-DSP and stereo transport contract
 
-Own C# product implementation; independent parent acceptance pending. M0–M5
+Own C# product implementation; independent parent acceptance passed on `e4645770cea052885808ca5b27a45d60de470157`, full gate exit0, `artifacts/root-m6-validation.log`, unchanged reports in `artifacts/root-m6-evidence/`. M0–M5
 were independently accepted, most recently M5 on
 `2dc8cf021ef7394f38df1db9932b443a23543b30`, full gate exit0,
 `artifacts/root-m5-validation.log`. This project has no original console capture
@@ -228,3 +228,6 @@ measure19.40. Neither meets NTSC realtime; M9 must profile without removing
 accuracy. The raw CLI audio diagnostic emits4259 stereo pairs, first0/672,
 last4258/3270816, no dropped pairs; its hash is a measurement, not an oracle.
 The existing `publish/` is still pre-M0; this milestone creates no release.
+
+
+M7 supersedes the saved container with format8 raw video geometry/pipeline data and the network handshake with0x534E0003; AUD2 sample/crystal payload semantics remain unchanged. See [M7 contract](m7-video-contract.md). This M6 document retains the historical format7 implementation measurement.

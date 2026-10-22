@@ -154,3 +154,25 @@ dotnet run --project SNESEmulator.Core.Tests -c Release -- --video-only
 python tools/video-mutations.py
 python tools/test-lab.py --windows --full
 ```
+
+
+## Frozen implementation measurement
+
+Full gate `python tools/test-lab.py --windows --full` passed with exit0 on clean
+`7cf7cc18f38b0826a74d797bef73d9c0ad26af9f`:182 portable groups and10 Windows groups,
+all CPU/SPC corpora, original local IPL4/4 and unchanged DSP references. The later
+`adef880b670dd8df6a2c0657bab405d8b6557535` stand changes only error text, exposes
+the two already implemented native CLI options and permanently integrates their
+four positive/negative controls. The existing42 PPU/format groups and those CLI
+controls passed separately; no new full CPU/SPC run was attributed to that stand.
+
+406 unmodified evidence files (16,397,265bytes before the manifest) are frozen in
+`artifacts/m7-implementation-evidence/`. The earlier documentation-pin failure,
+two unchanged synthetic-ratio snapshot failures and ineffective first mutation
+remain visible. No oracle was regenerated to conceal them. Two clean120-field
+measurements onadef880:23.64fields/s full diagnostic PPU/APU/DSP,24.29fields/s
+separate two-BRR-voice forced-blank case. No accuracy features were disabled;
+these single-host observations remain below realtime and do not replace M9
+profiling. Native512×239 and4:3 GUI stripe scenes were visually inspected,
+without an in-app browser. Full identities and group times: [baseline](baselines/m7.json).
+Independent M7 parent acceptance remains pending.
