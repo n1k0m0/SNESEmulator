@@ -198,6 +198,7 @@ addition to its six existing checks (11 total). Version2 savestates include all
 clock events, rational remainder, partial CPU-cycle time, continuation and
 interrupt latches. Version1 states are explicitly rejected.
 
+The compact final measurement is recorded in [baselines/m2.json](baselines/m2.json).
 Read [the timing contract](m2-timing-contract.md) for the execution model,
 reference sources, profile epoch and remaining device limitations. The concrete
 2/1/3 separate-chip target and nominal oscillators remain unverified hardware.

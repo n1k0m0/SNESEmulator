@@ -99,10 +99,10 @@ save/load near instructions/refresh/field boundaries, side-effectful MMIO,
 interrupt entry/polling, sleeping CPU and negative comparator mutations.
 
 The locally observed benchmark on NILSPC1 / Windows10.0.26200 / .NET10.0.12 was
-118.90 diagnostic fields/s (42.49 million master clocks/s) with the resumable
-instruction path. Standalone NOP execution reached5.42 million instructions/s;
-the exception-per-cycle diagnostic API reached0.304 million instructions/s.
-Single-cycle stepping is substantially slower and intended for bounded stepping
+595.01 diagnostic fields/s (212.64 million master clocks/s) with the resumable
+instruction path. Standalone NOP execution reached4.52 million instructions/s;
+the exception-per-cycle diagnostic API reached0.292 million instructions/s.
+The diagnostic spends time in WAI; this is an idle-heavy workload. Single-cycle stepping is substantially slower and intended for bounded stepping
 and tests; normal exact-budget execution does not throw per cycle. This is one
 host/workload observation, not a commercial-game performance guarantee.
 
