@@ -152,6 +152,11 @@ public sealed partial class Ppu
 // A raw field contains only the rows emitted in this field. No host weave is in hardware state.
 public sealed record PpuGeometry(int Width,int Height,int Stride,bool Field,bool Interlace=false,bool Overscan=false,long FieldIndex=0,long StartClock=0,long EndClock=0,long MasterHzNumerator=945000000,long MasterHzDenominator=44,long ApuHzNumerator=24576000,long ApuHzDenominator=1,bool TimingInterlace=false)
 {
-    public void Validate(){if(Width is not (256 or 512)||Height is not (224 or 239)||Stride!=Width||Overscan!=(Height==239)||FieldIndex<0||StartClock<0||EndClock<StartClock||MasterHzNumerator is <=0 or >1000000000||MasterHzDenominator is <=0 or >1000000||ApuHzNumerator is <=0 or >1000000000||ApuHzDenominator is <=0 or >1000000)throw new InvalidDataException("Invalid raw video field geometry");}
+    public void Validate()
+    {
+        if(Width is not (256 or 512)||Height is not (224 or 239)||Stride!=Width||Overscan!=(Height==239)||FieldIndex<0||StartClock<0||EndClock<StartClock||
+            MasterHzNumerator<=0||MasterHzDenominator<=0||ApuHzNumerator<=0||ApuHzDenominator<=0||MasterHzNumerator>long.MaxValue/ApuHzDenominator)
+            throw new InvalidDataException("Invalid raw video field geometry");
+    }
 }
 public sealed record PpuFrame(PpuGeometry Geometry,ReadOnlyMemory<ushort> Native,ReadOnlyMemory<byte> Brightness,ReadOnlyMemory<uint> Argb);
