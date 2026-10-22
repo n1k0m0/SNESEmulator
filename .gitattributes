@@ -11,3 +11,5 @@ testdata/65816/upstream-* -whitespace
 
 SNESEmulator.Core/IoDmaDiagnosticRom.cs text eol=lf
 SNESEmulator.Core.Tests/IoDmaTests.cs text eol=lf
+
+SNESEmulator.Core/SpcUploadRom.cs text eol=lf

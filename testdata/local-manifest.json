@@ -65,12 +65,48 @@
       "path": "SNESEmulator.Core.Tests/IoDmaTests.cs",
       "source": "Original repository source; M3 analytical protocol/ROM oracle",
       "license": "Apache-2.0",
-      "version": "M3-v1",
-      "sha256": "8b769ee5e77f3e2edfd0d737f8c12c7a0ad90856949be4ffa5ac95b9c5c608f1",
+      "version": "M4-explicit-isolated-APU-electrical-fixture",
+      "sha256": "dddf689d7a9fceb9068dcac1605bc799f8e1231eb1be9e72cb20c88f5b871d43",
       "profile": "ntsc-separate-2-1-3-unverified",
-      "start": "deterministic convenience reset; no physical-reset phase claim",
+      "start": "M3 expectations unchanged; APU frozen explicitly for constant electrical port oracle after M4 activates SPC execution; deterministic convenience reset",
       "seed": null,
       "success": "independent WRAM and fixed bus-phase expectations, plus complete-state continuation equality",
+      "timeoutSeconds": 120
+    },
+    {
+      "path": "SNESEmulator.Core/SpcUploadRom.cs",
+      "source": "Own65816 upload program and SPC payload; original repository source",
+      "license": "Apache-2.0",
+      "version": "M4-v1",
+      "sha256": "570521e3166bc95e1f0ac1345f4ed106e79cf5813b0c524cd13a36f9d3065436",
+      "profile": "generic-SPC-flat-RAM or explicit real CPU/APU coupling",
+      "start": "Source-defined initial state, see M4 contract",
+      "seed": "upstream fixed case0000 where applicable",
+      "success": "exact semantic/cycle or upload RAM/port oracle, never HLE replies",
+      "timeoutSeconds": 120
+    },
+    {
+      "path": "tools/own-ipl.py",
+      "source": "Own SPC boot source and label assembler; original repository source",
+      "license": "Apache-2.0",
+      "version": "M4-v1",
+      "sha256": "588bc1868e07ed27e37c24f6de65a251ade1f67d4ac0b37da0a3484fd6c0ae74",
+      "profile": "generic-SPC-flat-RAM or explicit real CPU/APU coupling",
+      "start": "Source-defined initial state, see M4 contract",
+      "seed": "upstream fixed case0000 where applicable",
+      "success": "exact semantic/cycle or upload RAM/port oracle, never HLE replies",
+      "timeoutSeconds": 120
+    },
+    {
+      "path": "testdata/m4-regressions.json",
+      "source": "Unmodified upstream seed cases0000 at67d15f492b2740964abd4efd1229e0ec9c342228",
+      "license": "MIT; see testdata/spc700-sample/LICENSE",
+      "version": "M4-v1",
+      "sha256": "c05506ea806d83ba8dd9eb1d890feb88ed7fa98419a01a0e88a831772aa46797",
+      "profile": "generic-SPC-flat-RAM or explicit real CPU/APU coupling",
+      "start": "Source-defined initial state, see M4 contract",
+      "seed": "upstream fixed case0000 where applicable",
+      "success": "exact semantic/cycle or upload RAM/port oracle, never HLE replies",
       "timeoutSeconds": 120
     }
   ],
@@ -94,6 +130,11 @@
       "id": "M3-io-dma",
       "source": "docs/m3-io-contract.md and original IoDmaTests; pinned reference semantics, fixed ALU worksheet and protocol specification",
       "provenance": "Source-informed analytical tests and internal determinism; 80 original CPU ROM executions; no new acquired original-console measurements"
+    },
+    {
+      "id": "M4-spc-apu",
+      "source": "docs/m4-apu-contract.md; source-adjudicated indirect-Y worksheet, fixed timer/port phases and complete state comparison",
+      "provenance": "Published hardware research informed; no new console measurement; synthetic tie profile separate from nominal NTSC/PAL"
     }
   ],
   "unavailable": [
