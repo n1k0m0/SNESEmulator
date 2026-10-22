@@ -23,7 +23,8 @@ run([sys.executable,'tools/fetch-testdata.py','--verify'])
 run([sys.executable,'tools/fetch-spc700.py','--verify',*(['--full'] if args.full else [])])
 run([sys.executable,'tools/own-ipl.py'])
 run([sys.executable,'tools/verify-ppu-testdata.py'])
-supervised('core',['dotnet',str(CORE)])
+# M5 adds334 full-system PPU snapshots and42 graphics groups to87 prior groups.
+supervised('core',['dotnet',str(CORE)],timeout=240)
 supervised('mutations',['dotnet',str(LAB),'mutations'])
 for kind,status,exitcode in [('pass','pass',0),('fail','fail',1),('skipped','skipped',2),('hang','timeout',1),('crash','crash',1),('silent-success','crash',1),('green-nonzero','crash',1)]:
  # Seed an old green report; supervisor must delete it before execution.
