@@ -1,0 +1,14 @@
+SNESEmulator
+Copyright 2026 Nils Kopal
+
+SharpPixels, bitmap menu font, PCM output and TLS/relay transport are derived
+from Nils Kopal's C64Emulator (Apache-2.0), local source snapshot:
+f01750e17a2c3f4cabfd57dc0c470dac93a91a23
+https://github.com/n1k0m0/C64Emulator
+
+The SNES hardware core, cartridge loader, frontend integration, diagnostic ROM
+generator and tests were developed for this project. No C64 hardware core,
+commercial game ROM, Nintendo firmware or third-party SNES core is included.
+
+OpenTK and NAudio are restored as NuGet dependencies under their respective
+licenses. See the package metadata for third-party license information.
