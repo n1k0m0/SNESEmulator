@@ -38,8 +38,8 @@
     },
     {
       "path": "SNESEmulator.Core.Tests/PpuTests.cs",
-      "bytes": 34496,
-      "sha256": "302b38a022bfb0243168d9aea9ead557eda9c61510fb720a6d3226cc3e6ed8b6"
+      "bytes": 34494,
+      "sha256": "63991a476387795806e6ad3b5ec1e5b424da9df52879b8ea7930e43664fe319d"
     }
   ]
 }

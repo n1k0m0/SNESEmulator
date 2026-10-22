@@ -17,3 +17,5 @@ SNESEmulator.Core/SpcUploadRom.cs text eol=lf
 SNESEmulator.Core/PpuDiagnosticRom.cs text eol=lf
 SNESEmulator.Core.Tests/PpuTests.cs text eol=lf
 testdata/**/*.sfc binary
+testdata/**/*.gz binary
+tools/dsp-oracle.cpp text eol=lf

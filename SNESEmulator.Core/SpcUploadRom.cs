@@ -8,9 +8,9 @@ public static class SpcUploadRom
     public static readonly byte[] StressData=Enumerable.Range(0,520).Select(i=>(byte)((i*73)^0xa6)).ToArray();
     public static readonly byte[] WrapData=Enumerable.Range(0,257).Select(i=>(byte)(i^0x39)).ToArray();
     public static readonly byte[] ZeroCommandData=Enumerable.Range(0,255).Select(i=>(byte)(0xee-i)).ToArray();
-    public static byte[] Create(bool stress=false)
+    public static byte[] Create(bool stress=false,byte[]? payload=null)
     {
-        byte[] rom=DiagnosticRom.Create();List<byte> code=[];
+        payload??=Program;byte[] rom=DiagnosticRom.Create();List<byte> code=[];
         void Emit(params byte[] b)=>code.AddRange(b);
         void Store(int v,int address)=>Emit(0xa9,(byte)v,0x8d,(byte)address,(byte)(address>>8));
         void Wait(int v,int address){int begin=code.Count;Emit(0xad,(byte)address,(byte)(address>>8),0xc9,(byte)v,0xd0,0);code[^1]=(byte)(begin-code.Count);}
@@ -21,7 +21,7 @@ public static class SpcUploadRom
             int poll=code.Count;Emit(0xcd,0x40,0x21,0xd0,0);code[^1]=(byte)(poll-code.Count);
             Emit(0xe8,0xe0,(byte)data.Length,(byte)(data.Length>>8),0xd0,0);code[^1]=(byte)(begin-code.Count);
         }
-        Block(Program,0x1000,0x0200,0xcc);int endCommand=Program.Length+1;
+        Block(payload,0x1000,0x0200,0xcc);int endCommand=(payload.Length+1)&255;if(endCommand==0)endCommand=1;
         if(stress){Block(StressData,0x1100,0x04f0,endCommand);endCommand=(StressData.Length+1)&255;if(endCommand==0)endCommand=1;Block(WrapData,0x1400,0x08ff,endCommand);endCommand=(WrapData.Length+1)&255;if(endCommand==0)endCommand=1;Block(ZeroCommandData,0x1600,0x0b80,endCommand);endCommand=(ZeroCommandData.Length+1)&255;if(endCommand==0)endCommand=1;}
         Store(0,0x2142);Store(2,0x2143);Store(0,0x2141);Store(endCommand,0x2140);
         Wait(0xa5,0x2140);Store(0x3c,0x2141);Wait(0xc3,0x2141);Store(0xa5,0x1ff0);Emit(0xdb);

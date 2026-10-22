@@ -28,9 +28,9 @@ static class ApuTests
             a.Write(0xf0,8);a.Write(0xf8,0x41);a.Write(0xf9,0x42);Check(a.Read(0xf8)==0x41&&a.Read(0xf9)==0x42&&a.Ram[0xf8]==0);
             foreach(ushort r in new ushort[]{0xf0,0xf1,0xfa,0xfb,0xfc})Check(a.Read(r)==0,"write-only zero");
         });
-        test("M4 DSP address read mirror write suppress output and ENDX interface",()=>{
+        test("M4 DSP address read mirror high-address write suppress writable output and ENDX interface",()=>{
             var a=new Apu();a.Write(0xf2,0x0c);a.Write(0xf3,0x55);a.Write(0xf2,0x8c);Check(a.Read(0xf3)==0x55);a.Write(0xf3,0xaa);Check(a.Read(0xf3)==0x55&&a.Read(0xf2)==0x8c);
-            a.Write(0xf2,8);a.Write(0xf3,0xff);Check(a.Read(0xf3)==0);a.DspRegisters[0x7c]=0xff;a.Write(0xf2,0x7c);a.Write(0xf3,0x55);Check(a.Read(0xf3)==0);
+            a.Write(0xf2,8);a.Write(0xf3,0xff);Check(a.Read(0xf3)==0xff);a.DspRegisters[0x7c]=0xff;a.Write(0xf2,0x7c);a.Write(0xf3,0x55);Check(a.Read(0xf3)==0);
         });
         test("M4 source adjudicated indirect Y fixed electrical worksheet",()=>{
             var b=new SpcFlatBus();b.Ram[0x8000]=0x17;b.Ram[0x8001]=0x10;b.Ram[0x10]=0;b.Ram[0x11]=2;b.Ram[0x203]=0x42;

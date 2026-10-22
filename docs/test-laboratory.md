@@ -405,5 +405,54 @@ is separately archived. The completed core suite took126.56seconds with a240seco
 watchdog; no test was skipped to make the gate pass. The active APU+M5 PPU benchmark
 measured21.62 diagnostic fields/s (7.72million master clocks/s) on NILSPC1,
 .NET10.0.12, all accuracy features enabled. M9 must improve this below-realtime
-workload while preserving digital results. Independent parent M5 acceptance is
-pending; the evidence remains analytical/software-derived, not a console capture.
+workload while preserving digital results. Independent parent M5 acceptance passed on2dc8cf, full gate exit0,
+`artifacts/root-m5-validation.log`; the evidence remains analytical/software-derived, not a console capture.
+
+
+## M6 native DSP and stereo gate
+
+The [M6 contract](m6-dsp-contract.md) specifies the own32-phase DSP, rational
+crystal integration, native output, format7 and the lossless stereo protocol2.
+`tools/dsp-reference.py --verify` checks71 independently rendered fixture pairs
+against the pinned external LGPL accurate DSP. `--rebuild` alone acquires/builds
+the separate reference; the product has no reference-core dependency. Hardware
+coefficient facts also match the pinned ISC formula via
+`tools/verify-dsp-gaussian.py`; no host floating point enters the hardware core.
+Source generator/adapter identities and compressed binary fixtures use fixed
+bytes across checkouts. Extending the own M4 uploader preserves both default
+ROM images; its source pin and the format-rejection test source pin advance,
+without changing previous correctness expectations.
+
+`Core.Tests --dsp-only` runs17 targeted groups, including453726 independent
+stereo pairs, final RAM/registers,262144 per-clock register observations and2048
+ARAM digests. It separately exercises768 every-crystal and96 every-masterclock
+continuations plus106 full-console DSP observer snapshots at real/synthetic
+DMA/IRQ/PPU/event collisions. Six digital-output and four phase-bus mutations
+are rejected. `--dsp-long` independently runs ten emulated seconds each of
+NTSC/PAL with exact samples/crystals/fields, bounded queues, pause and reset.
+These suites have their own120/180second supervision; the129 older core groups
+keep their240second watchdog. Windows now has8 groups, with lossless stereo
+bounds, resampler/volume/history-reset, two TLS clients and relay PCM delivery.
+The full gate executes all of them and still requires the original local IPL.
+
+Headless `rom` always streams `PREFIX.stereo-pcm16le.bin` (interleaved signed16
+little endian) while draining the bounded presentation queue at event boundaries.
+The report records32000Hz/two channels, first/last index/crystal, pair count,
+drops and SHA256. `PREFIX.dsp.jsonl` records up to `--trace-limit` committed
+DSP phases with voice/stage and RAM context. `--expect-audio FILE` compares exact
+raw stereo and reports the first sample/channel/crystal. Supply independent
+oracle provenance; replay equality is a determinism check, never a golden.
+
+```powershell
+dotnet run --project SNESEmulator.Lab -c Release -- rom --diagnostic audio --frames 8 --output artifacts/audio-diagnostic
+# Other original/local ROMs use --rom path, with the same native dump format.
+python tools/test-lab.py --windows --full
+```
+
+`benchmark-apu` remains the active Mode0/1 graphics workload used in M5 and now
+also advances the DSP (default silent voices). `benchmark-dsp` separately
+measures actual two-voice BRR playback with forced-blank PPU. Their scores are
+not interchangeable. Both retain all digital accuracy features. Published
+hardware research and the external digital oracle support this implementation;
+original console audio captures, rapid DAC mute/reset pin behaviour and
+revision-specific electrical measurements remain unperformed evidence.

@@ -29,6 +29,39 @@ Test("Network controller includes every SNES button",()=>
         Check(SnesNetProtocol.ReadInputStatePayload(SnesNetProtocol.CreateInputStatePayload(value))==value);
     }
 });
+Test("M6 lossless stereo packet bounds metadata and malformed payload rejection",()=>
+{
+    byte[] pcm=Enumerable.Range(0,16384).Select(i=>(byte)(i*37)).ToArray();
+    byte[] payload=SnesNetProtocol.CreateAudioChunkPayload(pcm,pcm.Length,32000,9000,6912672,0xffffffff);
+    Check(SnesNetProtocol.ReadAudioChunkPayload(payload,out var block)&&block.Pcm.SequenceEqual(pcm)&&block.Frames==4096&&block.FirstSample==9000&&block.Crystal==6912672&&block.Sequence==0xffffffff,"bit-identical stereo packet");
+    foreach(int offset in new[]{0,4,8,12,36}){byte[] bad=payload.ToArray();bad[offset]^=0x80;Check(!SnesNetProtocol.ReadAudioChunkPayload(bad,out _),$"header mutation{offset}");}
+    foreach(int length in new[]{0,8,39,payload.Length-1,payload.Length+1})Check(!SnesNetProtocol.ReadAudioChunkPayload(payload.Take(length).Concat(new byte[Math.Max(0,length-payload.Length)]).ToArray(),out _),"trailing/truncated data");
+    byte[] overflow=payload.ToArray();System.Buffers.Binary.BinaryPrimitives.WriteInt64LittleEndian(overflow.AsSpan(16),long.MaxValue);Check(!SnesNetProtocol.ReadAudioChunkPayload(overflow,out _),"sample index overflow");
+    var continuity=new SnesNetAudioContinuity();Check(continuity.Accept(block,out bool flush)&&!flush,"initial");
+    var next=block with{Sequence=0,FirstSample=13096,Crystal=6912672+4096*768};Check(continuity.Accept(next,out flush)&&!flush,"sequence wrap");
+    Check(!continuity.Accept(next,out _)&&continuity.RejectedPackets==1,"duplicate");
+    Check(continuity.Accept(next with{Sequence=2,FirstSample=0,Crystal=672},out flush)&&flush&&continuity.Discontinuities==1,"gap/reset flush presentation");
+    Check(!continuity.Accept(next with{Sequence=1},out _),"older packet");
+});
+Test("M6 device stereo resampling volume and bounded presentation",()=>
+{
+    var presentation=new StereoPcmPresentation(32000);presentation.Volume=0.5f;byte[] pcm=new byte[16000];
+    for(int i=0;i<pcm.Length;i+=4){System.Buffers.Binary.BinaryPrimitives.WriteInt16LittleEndian(pcm.AsSpan(i),16384);System.Buffers.Binary.BinaryPrimitives.WriteInt16LittleEndian(pcm.AsSpan(i+2),-8192);}
+    presentation.Write(pcm,pcm.Length);float[] output=new float[6000];int read=presentation.Output.Read(output,0,output.Length);
+    Check(presentation.Output.WaveFormat.SampleRate==48000&&presentation.Output.WaveFormat.Channels==2&&read==output.Length,"device format");
+    Check(output[2000]>0.24f&&output[2000]<0.26f&&output[2001]<-0.12f&&output[2001]>-0.13f,"separate stereo channels and frontend gain");
+    for(int i=0;i<20;i++)presentation.Write(pcm,pcm.Length);Check(presentation.BufferedBytes<=presentation.Capacity&&presentation.Overflows>0,"bounded queue");presentation.Clear();Check(presentation.BufferedBytes==0,"pause/load/reset flush");
+    presentation.Write(new byte[16000],16000);Array.Fill(output,1);presentation.Output.Read(output,0,output.Length);Check(output.All(n=>n==0),"clear resets prefetched samples and resampler filter history");
+    presentation.Write(pcm,pcm.Length);presentation.Output.Read(output,0,200);for(int i=0;i<3;i++)presentation.Write(new byte[16000],16000);Array.Fill(output,1);presentation.Output.Read(output,0,output.Length);Check(output.All(n=>n==0),"overflow resets resampler history as well as source queue");
+});
+Test("M6 TLS host and two clients transmit exact native stereo",()=>
+{
+    using var host=new SnesNetServer(256,224);using var first=new SnesNetClient{PlayAudio=false};using var second=new SnesNetClient{PlayAudio=false};host.Start(0,"stereo");
+    Check(first.Connect("localhost",host.Port,"stereo",SnesNetClientRole.Player,"first",out _));Check(second.Connect("localhost",host.Port,"stereo",SnesNetClientRole.Observer,"second",out _));
+    byte[] pcm=[0xff,0x7f,0,0x80,1,0,0xfe,0xff];using var one=new ManualResetEventSlim();using var two=new ManualResetEventSlim();
+    first.AudioReceived+=b=>{if(b.Pcm.SequenceEqual(pcm)&&b.FirstSample==12&&b.Crystal==9888)one.Set();};second.AudioReceived+=b=>{if(b.Pcm.SequenceEqual(pcm)&&b.Frames==2)two.Set();};
+    host.BroadcastAudio(pcm,pcm.Length,12,9888);Check(one.Wait(3000)&&two.Wait(3000),"two-client stereo delivery");
+});
 Test("TLS host/client, permission, input, video, disconnect",()=>
 {
     using var server=new SnesNetServer(256,224); using var client=new SnesNetClient();
@@ -88,6 +121,9 @@ Test("Python relay TLS + end-to-end session + full controller input",()=>
         using var received=new ManualResetEventSlim();client.FrameReceived+=f=>{if(f.Pixels[0]==0xFFABCDEF) received.Set();};
         host.BroadcastVideoFrame(Enumerable.Repeat(0xFFABCDEFu,256*224).ToArray(),256,224);
         Check(received.Wait(3000),"Relay video missing");
+        using var audioReceived=new ManualResetEventSlim();byte[] pcm=[0x34,0x12,0xcc,0xed,0,0x80,0xff,0x7f];
+        client.AudioReceived+=b=>{if(b.Pcm.SequenceEqual(pcm)&&b.FirstSample==0&&b.Crystal==672&&b.SampleRate==32000)audioReceived.Set();};
+        host.BroadcastAudio(pcm,pcm.Length,0,672);Check(audioReceived.Wait(3000),"Relay lossless native stereo missing");
     }
     finally { if(!process.HasExited) {process.Kill(true);process.WaitForExit();} }
 });

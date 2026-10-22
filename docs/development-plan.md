@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M4 unabhängig abgenommen; M5 implementiert, unabhängige Abnahme ausstehend. M6–M10 bleiben offen. Messumfang: [Testlabor](test-laboratory.md), [M5-Vertrag](m5-ppu-contract.md), [M4-Vertrag](m4-apu-contract.md), [M3-Vertrag](m3-io-contract.md), [M2-Vertrag](m2-timing-contract.md). Alle5.080.400 externen CPU-Semantik- und Busfälle bestehen. Keine eigene Konsolenmessung.
+Status: M0–M5 unabhängig abgenommen; M6 implementiert, unabhängige Abnahme ausstehend. M7–M10 bleiben offen. Messumfang: [Testlabor](test-laboratory.md), [M6-Vertrag](m6-dsp-contract.md), [M5-Vertrag](m5-ppu-contract.md), [M4-Vertrag](m4-apu-contract.md), [M3-Vertrag](m3-io-contract.md), [M2-Vertrag](m2-timing-contract.md). Alle5.080.400 externen CPU-Semantik- und Busfälle bestehen. Keine eigene Konsolenmessung.
 
 ## Ziel und Nachweis
 
@@ -43,9 +43,9 @@ schrittweise ersetzt; kein aktueller M5-Status):
 - Historischer Ausgangsstand: DMA kopierte sofort; M3 ersetzt dies durch serialisierbare Busphasen.
 - M3 ergänzt ALU-Flanken, automatische Controllerabfrage und Timer-IRQ.
   PPU-Leseports und physischer Hardwareabgleich bleiben offen.
-- M4 implementiert SPC700 und reale Boot-/Portabläufe; S-DSP und Audio fehlen.
+- M4 implementiert SPC700 und reale Boot-/Portabläufe; M6 ergänzt S-DSP und Stereo.
 - PPU-Leseports, Sprites, weitere Grafikmodi und viele Details fehlen.
-- Das Frontend verwendet gerundete 50/60-Hz-Ziele; Netzwerk-Audio ist bisher mono.
+- Das Frontend verwendet rationale Feldzeiten; M6 versioniert Netzwerk-Audio als verlustfreies natives Stereo.
 
 Diese Punkte werden systematisch ersetzt. Titelabhängige Abkürzungen werden
 nicht zur Standardimplementierung.
@@ -262,7 +262,18 @@ Abnahme:
   zugehöriger Register-/Bustrace erklärt den Entstehungszeitpunkt.
 - Mid-scanline-Schreibtests bestehen für die als fertig markierten Funktionen.
 
+M5 wurde unabhängig auf `2dc8cf021ef7394f38df1db9932b443a23543b30`
+abgenommen: `python tools/test-lab.py --windows --full`, Exit0,
+`artifacts/root-m5-validation.log`; unveränderte Root-Berichte unter
+`artifacts/root-m5-evidence/`.
+
 ### M6 – S-DSP und vollständiger Soundpfad
+
+M6 implementiert den eigenen phasengetakteten DSP und Stereo bis zum Gerät und
+TLS/Relay. Vertrag, Quellenkonflikte und digitale Evidenzgrenzen:
+[m6-dsp-contract.md](m6-dsp-contract.md). Unabhängige Abnahme steht aus;
+M7 wurde noch nicht begonnen. Der vollständige Gate läuft zusätzlich zu den
+unveränderten129 M0–M5-Gruppen in getrennt beaufsichtigten DSP-/AV-Suiten.
 
 Arbeit:
 

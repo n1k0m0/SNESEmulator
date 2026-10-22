@@ -252,3 +252,11 @@ guarantee. The explicit clock boundaries and exception-based budget
 continuation need later profiling/optimization in M9 while preserving digital
 results. The clean implementation benchmark record is stored alongside the
 full-gate baseline.
+
+
+M6 supersedes the historical storage-only DSP interface described above with
+[S-DSP execution and native stereo](m6-dsp-contract.md), and format7.
+In particular ENVX/OUTX CPU writes update the pending readback buffers; the old
+M4 read-only placeholder is corrected using the pinned DSP research/reference.
+All raw SPC opcode fixtures and the seven explicit bus adjudications remain
+unchanged. Both original short/stress M4 upload ROMs remain byte-identical.

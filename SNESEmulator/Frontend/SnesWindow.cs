@@ -17,6 +17,8 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private readonly SnesNetServer server = new(Ppu.Width, Ppu.Height);
     private readonly SnesNetClient client = new();
     private readonly ConcurrentQueue<Action> pending = new();
+    private PcmAudioOutput? localAudio;
+    private bool audioAttempted;
     private Menu menu;
     private int selection, selectedClient;
     private bool turbo, fault, busy, capturing;
@@ -62,7 +64,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     public override void OnUserUpdate(double time)
     {
         while (pending.TryDequeue(out var action)) action();
-        PollGamepad(time);
+        PollGamepad(time);client.AudioVolume=settings.AudioVolume/100f;
         bool remote = client.IsConnected;
         if (!IsFocused) { machine.Bus.Controllers.Buttons[0] = machine.Bus.Controllers.Buttons[1] = 0; }
         ushort input = menu == Menu.None && IsFocused ? (ushort)(KeyboardButtons() | ReadPad()) : (ushort)0;
@@ -84,11 +86,11 @@ public sealed partial class SnesWindow : SharpPixelsWindow
                 while (accumulator >= machine.Profile.ClockSeconds(machine.Clock.ClocksUntilFieldEnd) && !fault)
                 {
                     long before = machine.Clock.Now;
-                    Try(() => { machine.RunFrame(); server.BroadcastVideoFrame(machine.Bus.Ppu.Pixels, Ppu.Width, Ppu.Height); }, true);
+                    Try(() => { machine.RunFrame(); PresentAudio(); server.BroadcastVideoFrame(machine.Bus.Ppu.Pixels, Ppu.Width, Ppu.Height); }, true);
                     accumulator -= machine.Profile.ClockSeconds(machine.Clock.Now-before);
                 }
             }
-            else accumulator = 0;
+            else {accumulator = 0;localAudio?.Clear();machine.Bus.Apu.Dsp.ClearPresentation();}
         }
         server.SetHostOverlayStatus(menu == Menu.None ? (fault ? "SERVER CORE STOPPED" : "") : "SERVER IN " + menu.ToString().ToUpperInvariant() + " MENU");
         DrawScreen(remote);
@@ -111,7 +113,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             Text(34,144,"F12  SAVE AND LOAD    F11 FULLSCREEN",1);
             Text(34,162,"F6   RUN ORIGINAL DIAGNOSTIC ROM",1);
             Text(34,196,"CORE: CPU / SPC700 / DMA / HDMA / PPU0-1",1);
-            Text(34,214,"SPRITES / WINDOWS / COLOR MATH - NO AUDIO",1,255,220,140);
+            Text(34,214,"SPRITES / COLOR MATH / NATIVE STEREO DSP",1,255,220,140);
         }
         Text(8,276,Clip(status,82),1,192,210,225);
         if (remote && hostMenu.Length > 0) { DrawFilledRectangleWithAlpha(8,4,496,18,10,14,24,240); Text(14,9,Clip(hostMenu,78),1); }
@@ -141,7 +143,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         Menu.Settings => [$"VIDEO FILTER    {new[]{"SHARP","CRT","TV"}[settings.Filter]}",
             $"VIDEO UPSCALE   {((SharpPixelsGpuUpscaleMode)settings.Upscale).ToString().ToUpperInvariant()}",
             $"FULLSCREEN      {settings.Fullscreen}", $"GAMEPAD         {settings.Gamepad}",
-            $"CONTROLLER PORT {settings.ControllerPort}", "CONTROLLER MAPPING", "RUN DIAGNOSTIC ROM", "S-DSP AUDIO      NOT IMPLEMENTED"],
+            $"CONTROLLER PORT {settings.ControllerPort}", "CONTROLLER MAPPING", "RUN DIAGNOSTIC ROM", $"AUDIO VOLUME    {settings.AudioVolume}%", "RUN AUDIO DIAGNOSTIC ROM"],
         Menu.Network => NetworkRows(),
         Menu.Media => entries.Select(p => p==Directory.GetParent(settings.MediaDirectory)?.FullName ? "[..] PARENT DIRECTORY" : (Directory.Exists(p) ? "[DIR] " : "") + Path.GetFileName(p)).ToArray(),
         Menu.Saves => entries.Select(Path.GetFileNameWithoutExtension).Select(n => n ?? "").ToArray(),
@@ -227,6 +229,8 @@ public sealed partial class SnesWindow : SharpPixelsWindow
                     case 4: settings.ControllerPort=3-settings.ControllerPort; break;
                     case 5: Open(Menu.Controller); break;
                     case 6: LoadDiagnostic(); break;
+                    case 7: settings.AudioVolume=Math.Clamp(settings.AudioVolume+direction*10,0,100);break;
+                    case 8: LoadAudioDiagnostic();break;
                 }
                 settings.Save(); break;
             case Menu.Controller: capturing=true; break;
@@ -240,22 +244,31 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             case Menu.Saves:
                 if (client.IsConnected || entries.Count==0) break;
                 var cart=machine.Bus.Cartridge ?? throw new InvalidOperationException("LOAD THE MATCHING ROM FIRST");
-                machine=StateSerializer.Load(cart,entries[selection]); fault=false; Open(Menu.None); status="SAVESTATE LOADED"; break;
+                localAudio?.Clear();machine=StateSerializer.Load(cart,entries[selection]); fault=false; Open(Menu.None); status="SAVESTATE LOADED"; break;
             case Menu.Reset:
-                if(selection==1 && !client.IsConnected) { machine.Reset(); fault=false; Open(Menu.None); status="RESET"; } else Open(Menu.Main); break;
+                if(selection==1 && !client.IsConnected) { machine.Reset(); localAudio?.Clear();fault=false; Open(Menu.None); status="RESET"; } else Open(Menu.Main); break;
             case Menu.Delete:
                 if(selection==1 && deletePath!=null) File.Delete(deletePath);
                 Open(Menu.Saves); break;
             case Menu.Network: ActivateNetwork(direction); break;
         }
     }
-    private void LoadDiagnostic() { if(client.IsConnected) return; FlushSram(); machine.Insert(new Cartridge(DiagnosticRom.Create())); fault=false; Open(Menu.None); status="ORIGINAL SNES DIAGNOSTIC - CPU / DMA / PPU"; }
+    private void LoadAudioDiagnostic(){if(client.IsConnected)return;FlushSram();machine.Insert(new Cartridge(AudioDiagnosticRom.Create()));localAudio?.Clear();fault=false;Open(Menu.None);status="ORIGINAL CPU -> SPC -> DSP STEREO DIAGNOSTIC";}
+    private void PresentAudio()
+    {
+        var samples=machine.Bus.Apu.Dsp.DrainSamples();if(samples.Length==0)return;
+        byte[] pcm=new byte[samples.Length*4];for(int i=0;i<samples.Length;i++){System.Buffers.Binary.BinaryPrimitives.WriteInt16LittleEndian(pcm.AsSpan(i*4),samples[i].Left);System.Buffers.Binary.BinaryPrimitives.WriteInt16LittleEndian(pcm.AsSpan(i*4+2),samples[i].Right);}
+        if(!audioAttempted){audioAttempted=true;try{localAudio=new PcmAudioOutput(32000);}catch(Exception ex){status="AUDIO DEVICE UNAVAILABLE: "+ex.Message;}}
+        if(localAudio!=null)localAudio.Volume=settings.AudioVolume/100f;
+        for(int offset=0;offset<samples.Length;offset+=2048){int frames=Math.Min(2048,samples.Length-offset);byte[] chunk=pcm.AsSpan(offset*4,frames*4).ToArray();server.BroadcastAudio(chunk,chunk.Length,samples[offset].Index,samples[offset].Crystal);localAudio?.Write(chunk,chunk.Length);}
+    }
+    private void LoadDiagnostic() { if(client.IsConnected) return; FlushSram(); machine.Insert(new Cartridge(DiagnosticRom.Create())); localAudio?.Clear();fault=false; Open(Menu.None); status="ORIGINAL SNES DIAGNOSTIC - CPU / DMA / PPU"; }
     private void LoadRom(string path)
     {
         var cartridge=new Cartridge(File.ReadAllBytes(path),path);
         string battery=BatteryPath(cartridge);
         if(File.Exists(battery)) { byte[] bytes=File.ReadAllBytes(battery); if(bytes.Length==cartridge.Sram.Length) bytes.CopyTo(cartridge.Sram,0); }
-        FlushSram(); machine.Insert(cartridge); fault=false; Open(Menu.None); status="LOADED "+cartridge.Title;
+        FlushSram(); machine.Insert(cartridge); localAudio?.Clear();fault=false; Open(Menu.None); status="LOADED "+cartridge.Title;
     }
     private static string BatteryPath(Cartridge c) => Path.Combine(UserDataPaths.GetBaseDirectory(),"battery",c.Hash+".srm");
     private void FlushSram()
@@ -294,7 +307,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     protected override void OnUnload()
     {
         Try(()=>{ FlushSram(); settings.Save(); });
-        client.Dispose(); server.Dispose(); base.OnUnload();
+        localAudio?.Dispose();client.Dispose(); server.Dispose(); base.OnUnload();
     }
     private ushort KeyboardButtons()
     {

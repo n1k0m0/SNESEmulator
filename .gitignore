@@ -83,6 +83,7 @@ testdata/65816-full/
 
 /testdata/spc700-full/
 /testdata/local-firmware/
+/testdata/local-dsp-reference/
 
 # One licensed external PPU test fixture (hash/license pinned).
 !/testdata/ppu-external/vram-mid-scanline-test.sfc

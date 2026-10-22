@@ -11,7 +11,7 @@ unversionierten Manager-/IPC-Arbeiten wurden nicht kopiert.
 | `C64System` / `SystemBus` | `SnesSystem` / `SystemBus` |
 | 6510 | eigener `Cpu65816` |
 | VIC-II / C64-Framebuffer | eigener `Ppu`, 256×224-Framebuffer |
-| SID | eigene `Spc700`/`Apu`; S-DSP-Audio noch offen |
+| SID | eigene `Spc700`/`Apu`/`SnesDsp`; native32kHz-Stereoausgabe |
 | CIA-Joysticks | `ControllerPorts`, serielle und automatische Abfrage |
 | PRG/D64/EasyFlash | `Cartridge`, LoROM/HiROM und Battery-SRAM |
 | C64Window | `SnesWindow`, auf mehrere Frontend-Dateien aufgeteilt |
@@ -47,7 +47,7 @@ rekursive Chipspiegelung, SRAM, PPU-/APU-Ports und 5A22-I/O. `CpuIo` enthält
 ALU-Zwischenzustände, Timer-IRQ/NMI-Holds, Zählerlatches und serielle/automatische
 JOY-Abfrage. `DmaController` übernimmt den Bus mit eigenen gespeicherten Phasen:
 A/B-Read nach vier Clocks, Write nach weiteren vier, Priorität, Start-/End-Sync,
-HDMA-Tabellen und Präemption. Savestate v6 speichert diese Zwischenzustände und
+HDMA-Tabellen und Präemption. Savestate v7 speichert diese Zwischenzustände und
 bindet den Mapper zusätzlich zum ROM-Hash. Siehe [M3-Vertrag](m3-io-contract.md)
 für genaue Grenzen und Quellen. PowerOn definiert RAM-Testseeds; Reset erhält
 CPU-WRAM und SRAM, ist aber kein vollständiges Modell aller Reset-Pins der PPU.
@@ -70,8 +70,8 @@ SPC-Portreads haben eine getrennte Latch-/Holdphase. Zwischenzyklen sind
 serialisierbar. Eine eigene offene64Byte-Bootroutine führt den IPL-Uploaddialog
 als SPC-Code aus. Optionales lokales Original-IPL bleibt unverteilt und durch
 seinen Hash an Spielstände gebunden. Ein echtes65816-ROM testet Uploads bis
-1048Bytes, Seiten-/Indexwraps und ausgeführte SPC-Antworten. S-DSP-Audio ist
-weiterhin offen; es gibt keine künstliche Ersatztonquelle. Der
+1048Bytes, Seiten-/Indexwraps und ausgeführte SPC-Antworten. M6 ergänzt einen eigenen DSP mit32 Mikrophasen pro Stereopaar, acht BRR-Voices,
+Gauss, Hüllkurven, Noise und Echo im gemeinsamen RAM. Der
 [M4-Vertrag](m4-apu-contract.md) trennt256000 Semantik-/freigegebene Busfälle
 von249000 rohen Buspässen und7000 quellengestützten Zyklusadjudikationen.
 
@@ -88,7 +88,8 @@ er ändert den oben dokumentierten Implementierungsstand nicht.
 
 Testlabor, unabhängige CPU-Prüfungen und Masterclock sind M0–M2; M3 ergänzt
 DMA/HDMA und I/O. M4 ist unabhängig abgenommen; M5 implementiert die getaktete
-Mode0/1-PPU. Die unabhängige M5-Abnahme steht aus. M6 ergänzt den eigenen S-DSP.
+Mode0/1-PPU. M5 wurde unabhängig auf2dc8cf abgenommen (Root-Vollgate Exit0). M6 implementiert
+den eigenen S-DSP; unabhängige Abnahme steht aus.
 PAL/NTSC, Hardwareabgleich, Produktreife und Zusatzchips folgen mit jeweils
 eigenen Nachweisen. Savestates, Frontend- und Netzwerkregressionen begleiten
 die Hardwareentwicklung von Beginn an.
@@ -107,3 +108,16 @@ M5 local performance observation:21.62 diagnostic fields/s with the own SPC700
 and clocked PPU active,7.72million master clocks/s. This is below NTSC realtime;
 M9 optimization must preserve the digital accuracy path. Full counts, group times,
 clean report identities and evidence limits: [M5 baseline](baselines/m5.json).
+
+
+M6 trennt native digitale DSP-Ausgabe (Sampleindex/Crystaltimestamp) von einer
+begrenzten Präsentationsqueue, Stereo-Geräteresampling/Lautstärke und Netzwerk.
+Format7 serialisiert sämtliche DSP-Zwischenlatches und Echo-History; physisches
+Echo-RAM ist Teil des APU-RAM. Das Netzwerkformat0x534E0002 überträgt verlustfreie
+Stereo-PCM16-Blöcke mit32000Hz, Sequenz und nativer Zeit; Clients verwerfen alte
+Sequenzen und leeren ihre Präsentation bei Lücken/Reset. Menüs, ROMwechsel und
+Load löschen auch Resampler-Prefetch/Filterhistory. Die originale Audiodiagnose
+führt65816→IPL→SPC→DSP aus. Headless-ROMs liefern zusätzlich natives Stereo-PCM
+und DSP-Phasentraces. Quellen, unabhängiger digitaler Oracle und Grenzen:
+[M6-Vertrag](m6-dsp-contract.md). Audiohardware-/ROM-Hardwaremessungen fehlen
+weiterhin; veröffentlichte Forschung ersetzt keine eigene Konsolenaufnahme.

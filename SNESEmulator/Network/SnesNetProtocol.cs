@@ -238,7 +238,7 @@ namespace SNESEmulator.Network
         /// <summary>
         /// Current wire protocol version accepted by host and client.
         /// </summary>
-        public const int Version = 0x534E0001;
+        public const int Version = 0x534E0002;
         /// <summary>
         /// Default TCP port shown in the network menu.
         /// </summary>
@@ -250,7 +250,7 @@ namespace SNESEmulator.Network
         /// <summary>
         /// PCM audio output sample rate used for host-to-client audio chunks.
         /// </summary>
-        public const int DefaultAudioSampleRate = 44100;
+        public const int DefaultAudioSampleRate = 32000;
         /// <summary>
         /// Byte size of the fixed SnesNet frame header.
         /// </summary>
@@ -263,33 +263,7 @@ namespace SNESEmulator.Network
         /// Required payload-size win before choosing compressed data.
         /// </summary>
         private const int MinimumCompressionSavings = 32;
-        /// <summary>
-        /// Raw little-endian 16-bit mono PCM audio payload format id.
-        /// </summary>
-        private const int AudioFormatPcm16 = 0;
-        /// <summary>
-        /// Self-contained 4-bit IMA ADPCM audio payload format id.
-        /// </summary>
-        private const int AudioFormatImaAdpcm4 = 1;
-
         private static readonly byte[] EmptyPayload = new byte[0];
-        private static readonly int[] ImaAdpcmStepTable =
-        {
-            7, 8, 9, 10, 11, 12, 13, 14, 16, 17,
-            19, 21, 23, 25, 28, 31, 34, 37, 41, 45,
-            50, 55, 60, 66, 73, 80, 88, 97, 107, 118,
-            130, 143, 157, 173, 190, 209, 230, 253, 279, 307,
-            337, 371, 408, 449, 494, 544, 598, 658, 724, 796,
-            876, 963, 1060, 1166, 1282, 1411, 1552, 1707, 1878, 2066,
-            2272, 2499, 2749, 3024, 3327, 3660, 4026, 4428, 4871, 5358,
-            5894, 6484, 7132, 7845, 8630, 9493, 10442, 11487, 12635, 13899,
-            15289, 16818, 18500, 20350, 22385, 24623, 27086, 29794, 32767
-        };
-        private static readonly int[] ImaAdpcmIndexTable =
-        {
-            -1, -1, -1, -1, 2, 4, 6, 8,
-            -1, -1, -1, -1, 2, 4, 6, 8
-        };
 
         /// <summary>
         /// Writes one complete framed message to the authenticated transport stream.
@@ -620,314 +594,25 @@ namespace SNESEmulator.Network
             return new SnesNetVideoFrame { Width = width, Height = height, FrameId = frameId, Pixels = pixels };
         }
 
-        public static byte[] CreateAudioChunkPayload(byte[] buffer, int count, int sampleRate)
+        public const int MaxAudioFrames = 4096;
+        // Protocol2 audio is always lossless native stereo PCM. No implicit ADPCM.
+        public static byte[] CreateAudioChunkPayload(byte[] buffer, int count, int sampleRate, long firstSample, long crystal, uint sequence)
         {
-            if (buffer == null || count <= 0)
-            {
-                return EmptyPayload;
-            }
-
-            count = Math.Min(count, buffer.Length);
-            count -= count % 2;
-            if (count <= 0)
-            {
-                return EmptyPayload;
-            }
-
-            byte[] rawPayload = CreateRawAudioChunkPayload(buffer, count, sampleRate);
-            byte[] adpcmBytes = EncodeImaAdpcmBlock(buffer, count);
-            if (adpcmBytes == null || adpcmBytes.Length == 0)
-            {
-                return rawPayload;
-            }
-
-            byte[] adpcmPayload = new byte[16 + adpcmBytes.Length];
-            // Store the sample rate with every chunk so clients can validate that
-            // their audio output still matches the host stream.
-            WriteInt32(adpcmPayload, 0, sampleRate);
-            WriteInt32(adpcmPayload, 4, AudioFormatImaAdpcm4);
-            WriteInt32(adpcmPayload, 8, count);
-            WriteInt32(adpcmPayload, 12, adpcmBytes.Length);
-            Buffer.BlockCopy(adpcmBytes, 0, adpcmPayload, 16, adpcmBytes.Length);
-            return adpcmPayload.Length + MinimumCompressionSavings < rawPayload.Length
-                ? adpcmPayload
-                : rawPayload;
+            if(buffer == null || count <= 0 || count > buffer.Length || count % 4 != 0 || count / 4 > MaxAudioFrames || sampleRate != DefaultAudioSampleRate || firstSample < 0 || firstSample > long.MaxValue-count/4 || crystal < 0 || crystal > long.MaxValue-(count/4)*768L)
+                throw new InvalidDataException("Invalid native stereo audio block.");
+            byte[] payload=new byte[40+count];
+            WriteInt32(payload,0,0x41554432);WriteInt32(payload,4,sampleRate);WriteInt32(payload,8,2);WriteInt32(payload,12,count/4);
+            WriteInt64(payload,16,firstSample);WriteInt64(payload,24,crystal);WriteUInt32(payload,32,sequence);WriteInt32(payload,36,0);
+            Buffer.BlockCopy(buffer,0,payload,40,count);return payload;
         }
-
-        /// <summary>
-        /// Parses a raw PCM or self-contained ADPCM audio chunk payload.
-        /// </summary>
-        /// <param name="payload">Serialized audio payload.</param>
-        /// <param name="sampleRate">Decoded PCM sample rate.</param>
-        /// <param name="buffer">Decoded PCM buffer.</param>
-        /// <param name="count">Number of valid bytes in <paramref name="buffer"/>.</param>
-        /// <returns>True when the payload is valid and audio bytes were decoded.</returns>
-        public static bool ReadAudioChunkPayload(byte[] payload, out int sampleRate, out byte[] buffer, out int count)
+        public static bool ReadAudioChunkPayload(byte[] payload, out SnesNetAudioChunk block)
         {
-            sampleRate = DefaultAudioSampleRate;
-            buffer = EmptyPayload;
-            count = 0;
-            if (payload == null || payload.Length < 8)
-            {
-                return false;
-            }
-
-            sampleRate = ReadInt32(payload, 0);
-            int formatOrCount = ReadInt32(payload, 4);
-            if (payload.Length >= 16 && (formatOrCount == AudioFormatPcm16 || formatOrCount == AudioFormatImaAdpcm4))
-            {
-                int decodedCount = ReadInt32(payload, 8);
-                int encodedCount = ReadInt32(payload, 12);
-                if (sampleRate <= 0 || decodedCount <= 0 || encodedCount <= 0 || payload.Length < 16 + encodedCount)
-                {
-                    count = 0;
-                    return false;
-                }
-
-                if (formatOrCount == AudioFormatPcm16)
-                {
-                    if (decodedCount != encodedCount)
-                    {
-                        count = 0;
-                        return false;
-                    }
-
-                    buffer = new byte[decodedCount];
-                    Buffer.BlockCopy(payload, 16, buffer, 0, decodedCount);
-                    count = decodedCount;
-                    return true;
-                }
-
-                buffer = DecodeImaAdpcmBlock(payload, 16, encodedCount, decodedCount);
-                if (buffer == null)
-                {
-                    buffer = EmptyPayload;
-                    count = 0;
-                    return false;
-                }
-
-                count = buffer.Length;
-                return true;
-            }
-
-            count = formatOrCount;
-            if (sampleRate <= 0 || count <= 0 || payload.Length < 8 + count)
-            {
-                // Invalid chunks are ignored instead of tearing down the whole session;
-                // video and control traffic can keep going.
-                count = 0;
-                return false;
-            }
-
-            buffer = new byte[count];
-            Buffer.BlockCopy(payload, 8, buffer, 0, count);
-            return true;
-        }
-
-        /// <summary>
-        /// Builds the legacy raw PCM audio payload used as the lossless fallback.
-        /// </summary>
-        /// <param name="buffer">Little-endian 16-bit mono PCM bytes.</param>
-        /// <param name="count">Even number of valid PCM bytes.</param>
-        /// <param name="sampleRate">PCM sample rate for this chunk.</param>
-        /// <returns>Serialized raw PCM audio payload.</returns>
-        private static byte[] CreateRawAudioChunkPayload(byte[] buffer, int count, int sampleRate)
-        {
-            byte[] payload = new byte[8 + count];
-            WriteInt32(payload, 0, sampleRate);
-            WriteInt32(payload, 4, count);
-            Buffer.BlockCopy(buffer, 0, payload, 8, count);
-            return payload;
-        }
-
-        /// <summary>
-        /// Encodes one independent 16-bit PCM block as 4-bit IMA ADPCM.
-        /// </summary>
-        /// <param name="buffer">Little-endian source PCM.</param>
-        /// <param name="count">Even number of source bytes.</param>
-        /// <returns>ADPCM block with predictor and step-index seed, or null for invalid input.</returns>
-        private static byte[] EncodeImaAdpcmBlock(byte[] buffer, int count)
-        {
-            if (buffer == null || count <= 0 || (count & 1) != 0 || buffer.Length < count)
-            {
-                return null;
-            }
-
-            int sampleCount = count / 2;
-            int predictor = ReadInt16(buffer, 0);
-            int stepIndex = EstimateImaAdpcmInitialIndex(buffer, count);
-            int nibbleCount = Math.Max(0, sampleCount - 1);
-            byte[] encoded = new byte[4 + ((nibbleCount + 1) / 2)];
-            WriteInt16(encoded, 0, (short)predictor);
-            encoded[2] = (byte)stepIndex;
-            encoded[3] = 0;
-
-            for (int sampleIndex = 1; sampleIndex < sampleCount; sampleIndex++)
-            {
-                int nibbleIndex = sampleIndex - 1;
-                int sample = ReadInt16(buffer, sampleIndex * 2);
-                int nibble = EncodeImaAdpcmNibble(sample, ref predictor, ref stepIndex);
-                int packedOffset = 4 + (nibbleIndex / 2);
-                if ((nibbleIndex & 1) == 0)
-                {
-                    encoded[packedOffset] = (byte)(nibble & 0x0F);
-                }
-                else
-                {
-                    encoded[packedOffset] |= (byte)((nibble & 0x0F) << 4);
-                }
-            }
-
-            return encoded;
-        }
-
-        /// <summary>
-        /// Decodes one independent 4-bit IMA ADPCM block back to little-endian PCM.
-        /// </summary>
-        /// <param name="buffer">Payload buffer containing the encoded block.</param>
-        /// <param name="offset">Encoded block offset.</param>
-        /// <param name="count">Encoded block byte count.</param>
-        /// <param name="decodedCount">Expected decoded PCM byte count.</param>
-        /// <returns>Decoded PCM bytes, or null when the block is malformed.</returns>
-        private static byte[] DecodeImaAdpcmBlock(byte[] buffer, int offset, int count, int decodedCount)
-        {
-            if (buffer == null || offset < 0 || count < 4 || decodedCount <= 0 || (decodedCount & 1) != 0 || offset > buffer.Length - count)
-            {
-                return null;
-            }
-
-            int sampleCount = decodedCount / 2;
-            int expectedEncodedCount = 4 + (Math.Max(0, sampleCount - 1) + 1) / 2;
-            if (count != expectedEncodedCount)
-            {
-                return null;
-            }
-
-            int predictor = ReadInt16(buffer, offset);
-            int stepIndex = buffer[offset + 2];
-            if (stepIndex < 0 || stepIndex >= ImaAdpcmStepTable.Length)
-            {
-                return null;
-            }
-
-            byte[] decoded = new byte[decodedCount];
-            WriteInt16(decoded, 0, (short)predictor);
-            for (int sampleIndex = 1; sampleIndex < sampleCount; sampleIndex++)
-            {
-                int nibbleIndex = sampleIndex - 1;
-                int packed = buffer[offset + 4 + (nibbleIndex / 2)];
-                int nibble = (nibbleIndex & 1) == 0
-                    ? packed & 0x0F
-                    : (packed >> 4) & 0x0F;
-                DecodeImaAdpcmNibble(nibble, ref predictor, ref stepIndex);
-                WriteInt16(decoded, sampleIndex * 2, (short)predictor);
-            }
-
-            return decoded;
-        }
-
-        /// <summary>
-        /// Chooses an initial IMA step index for a self-contained audio block.
-        /// </summary>
-        /// <param name="buffer">Little-endian source PCM.</param>
-        /// <param name="count">Even number of source bytes.</param>
-        /// <returns>Step table index matching the first sample transition.</returns>
-        private static int EstimateImaAdpcmInitialIndex(byte[] buffer, int count)
-        {
-            if (count < 4)
-            {
-                return 0;
-            }
-
-            int first = ReadInt16(buffer, 0);
-            int second = ReadInt16(buffer, 2);
-            int difference = Math.Abs(second - first);
-            int index = 0;
-            while (index + 1 < ImaAdpcmStepTable.Length && ImaAdpcmStepTable[index + 1] <= Math.Max(7, difference))
-            {
-                index++;
-            }
-
-            return index;
-        }
-
-        /// <summary>
-        /// Encodes one PCM sample into an IMA ADPCM nibble and advances encoder state.
-        /// </summary>
-        /// <param name="sample">Target PCM sample.</param>
-        /// <param name="predictor">Current predictor, updated to the decoded approximation.</param>
-        /// <param name="stepIndex">Current step-table index, updated after the nibble.</param>
-        /// <returns>4-bit ADPCM code.</returns>
-        private static int EncodeImaAdpcmNibble(int sample, ref int predictor, ref int stepIndex)
-        {
-            int step = ImaAdpcmStepTable[stepIndex];
-            int difference = sample - predictor;
-            int nibble = 0;
-            if (difference < 0)
-            {
-                nibble = 8;
-                difference = -difference;
-            }
-
-            int remaining = difference;
-            if (remaining >= step)
-            {
-                nibble |= 4;
-                remaining -= step;
-            }
-
-            if (remaining >= step / 2)
-            {
-                nibble |= 2;
-                remaining -= step / 2;
-            }
-
-            if (remaining >= step / 4)
-            {
-                nibble |= 1;
-            }
-
-            DecodeImaAdpcmNibble(nibble, ref predictor, ref stepIndex);
-            return nibble;
-        }
-
-        /// <summary>
-        /// Applies one IMA ADPCM nibble to the decoder state.
-        /// </summary>
-        /// <param name="nibble">4-bit ADPCM code.</param>
-        /// <param name="predictor">Current predictor, updated in place.</param>
-        /// <param name="stepIndex">Current step-table index, updated in place.</param>
-        private static void DecodeImaAdpcmNibble(int nibble, ref int predictor, ref int stepIndex)
-        {
-            int step = ImaAdpcmStepTable[stepIndex];
-            int difference = step >> 3;
-            if ((nibble & 4) != 0)
-            {
-                difference += step;
-            }
-
-            if ((nibble & 2) != 0)
-            {
-                difference += step >> 1;
-            }
-
-            if ((nibble & 1) != 0)
-            {
-                difference += step >> 2;
-            }
-
-            predictor = (nibble & 8) != 0
-                ? ClampToInt16(predictor - difference)
-                : ClampToInt16(predictor + difference);
-            stepIndex += ImaAdpcmIndexTable[nibble & 0x0F];
-            if (stepIndex < 0)
-            {
-                stepIndex = 0;
-            }
-            else if (stepIndex >= ImaAdpcmStepTable.Length)
-            {
-                stepIndex = ImaAdpcmStepTable.Length - 1;
-            }
+            block=null;
+            if(payload == null || payload.Length < 44 || ReadInt32(payload,0)!=0x41554432 || ReadInt32(payload,4)!=DefaultAudioSampleRate || ReadInt32(payload,8)!=2 || ReadInt32(payload,36)!=0)return false;
+            int frames=ReadInt32(payload,12);long sample=ReadInt64(payload,16),crystal=ReadInt64(payload,24);
+            if(frames<=0 || frames>MaxAudioFrames || payload.Length!=40+frames*4 || sample<0 || sample>long.MaxValue-frames || crystal<0 || crystal>long.MaxValue-frames*768L)return false;
+            byte[] pcm=new byte[frames*4];Buffer.BlockCopy(payload,40,pcm,0,pcm.Length);
+            block=new SnesNetAudioChunk(pcm,DefaultAudioSampleRate,frames,sample,crystal,ReadUInt32(payload,32));return true;
         }
 
         /// <summary>

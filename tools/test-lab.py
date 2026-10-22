@@ -23,15 +23,19 @@ run([sys.executable,'tools/fetch-testdata.py','--verify'])
 run([sys.executable,'tools/fetch-spc700.py','--verify',*(['--full'] if args.full else [])])
 run([sys.executable,'tools/own-ipl.py'])
 run([sys.executable,'tools/verify-ppu-testdata.py'])
+run([sys.executable,'tools/dsp-reference.py','--verify'])
+run([sys.executable,'tools/verify-dsp-gaussian.py'])
 # M5 adds334 full-system PPU snapshots and42 graphics groups to87 prior groups.
 supervised('core',['dotnet',str(CORE)],timeout=240)
+supervised('audio-conformance',['dotnet',str(CORE),'--dsp-only'],timeout=120)
+supervised('audio-long-run',['dotnet',str(CORE),'--dsp-long'],timeout=180)
 supervised('mutations',['dotnet',str(LAB),'mutations'])
 for kind,status,exitcode in [('pass','pass',0),('fail','fail',1),('skipped','skipped',2),('hang','timeout',1),('crash','crash',1),('silent-success','crash',1),('green-nonzero','crash',1)]:
  # Seed an old green report; supervisor must delete it before execution.
  (ROOT/('artifacts/watchdog-'+kind+'-child.json')).write_text(json.dumps({'Tests':[{'Status':'pass'}]}))
  result=supervised('watchdog-'+kind,['dotnet',str(LAB),'probe',kind],exitcode,2)
  assert result['Tests'][0]['Status']==status,(kind,result)
-for suite in ['audio-conformance','graphics-conformance','hardware-evidence']:
+for suite in ['graphics-conformance','hardware-evidence']:
  supervised(suite,['dotnet',str(LAB),'unavailable',suite],2)
 # Missing datasets must remain visible and return non-success.
 missing=ROOT/'artifacts/missing-fixtures';missing.mkdir(exist_ok=True)
@@ -42,10 +46,20 @@ for name in ['replay-a','replay-b']:
 a=json.loads((ROOT/'artifacts/replay-a-child.json').read_text())['Metadata']
 b=json.loads((ROOT/'artifacts/replay-b-child.json').read_text())['Metadata']
 for key in ['wramSha256','frameSha256','masterclocks','cpuState','inputEventsApplied']:assert a[key]==b[key],key
-for suffix in ['.cpu.jsonl','.bus.jsonl','.raster.jsonl']:assert (ROOT/('artifacts/replay-a-child'+suffix)).read_bytes()==(ROOT/('artifacts/replay-b-child'+suffix)).read_bytes(),suffix
+for suffix in ['.cpu.jsonl','.bus.jsonl','.raster.jsonl','.dsp.jsonl','.stereo-pcm16le.bin']:assert (ROOT/('artifacts/replay-a-child'+suffix)).read_bytes()==(ROOT/('artifacts/replay-b-child'+suffix)).read_bytes(),suffix
 result=supervised('clock-limit',['dotnet',str(LAB),'rom','--frames','100','--masterclocks','1000'])
 limit=json.loads((ROOT/'artifacts/clock-limit-child.json').read_text())['Metadata']
 assert limit['stopReason']=='masterclock-limit' and limit['masterclocks']==1000
+supervised('audio-diagnostic-rom',['dotnet',str(LAB),'rom','--diagnostic','audio','--frames','8'])
+audio=json.loads((ROOT/'artifacts/audio-diagnostic-rom-child.json').read_text())['Metadata']['audio']
+assert audio['sampleRate']==32000 and audio['channels']==2 and audio['firstIndex']==0 and audio['firstCrystal']==672 and audio['pairs']>1000 and audio['droppedPairs']==0
+audio_bytes=(ROOT/'artifacts/audio-diagnostic-rom-child.stereo-pcm16le.bin').read_bytes()
+assert any(audio_bytes) and len(audio_bytes)==audio['pairs']*4
+# Independent startup-silence oracle also verifies the native headless comparator.
+silent=ROOT/'artifacts/native-silent-oracle.bin';silent.write_bytes(bytes(4))
+supervised('audio-native-silence',['dotnet',str(LAB),'rom','--frames','100','--masterclocks','1000','--expect-audio',str(silent)])
+silent.write_bytes(bytes([1,0,0,0]))
+supervised('audio-native-mutation',['dotnet',str(LAB),'rom','--frames','100','--masterclocks','1000','--expect-audio',str(silent)],1)
 # Inventory has its own red exit status, captured without disguising it as green.
 conformance=subprocess.run(['dotnet',str(LAB),'supervise','240','artifacts/conformance','dotnet',str(LAB),*(['cpu-full','artifacts/conformance-child','testdata/65816-full'] if args.full else ['cpu'])],cwd=ROOT).returncode
 inventory=json.loads((ROOT/'artifacts/conformance-child.json').read_text())

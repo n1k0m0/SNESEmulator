@@ -4,6 +4,7 @@ namespace SNESEmulator.Core;
 
 public sealed class EmulatorSettings
 {
+    public int AudioVolume {get;set;}=80;
     public int Filter { get; set; }
     public int Upscale { get; set; }
     public bool Fullscreen { get; set; }
@@ -28,6 +29,7 @@ public sealed class EmulatorSettings
         try
         {
             var s = JsonSerializer.Deserialize<EmulatorSettings>(File.ReadAllText(UserDataPaths.GetSettingsPath())) ?? new();
+            s.AudioVolume=Math.Clamp(s.AudioVolume,0,100);
             s.Filter = Math.Clamp(s.Filter, 0, 2); s.Upscale = Math.Clamp(s.Upscale, 0, 5);
             s.ControllerPort = Math.Clamp(s.ControllerPort, 1, 2);
             s.Port = Math.Clamp(s.Port, 1, 65535); s.RelayPort = Math.Clamp(s.RelayPort, 1, 65535);

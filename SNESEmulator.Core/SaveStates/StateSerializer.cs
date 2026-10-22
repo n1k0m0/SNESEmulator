@@ -17,7 +17,7 @@ public static class StateSerializer
         using (var zip = new GZipStream(file, CompressionLevel.Fastest))
         using (var w = new BinaryWriter(zip))
         {
-            w.Write("SNESSAV"); w.Write(6); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));w.Write(machine.ProfileForced);w.Write((int)cart.Mapping);w.Write(JsonSerializer.Serialize(cart.Options));
+            w.Write("SNESSAV"); w.Write(7); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));w.Write(machine.ProfileForced);w.Write((int)cart.Mapping);w.Write(JsonSerializer.Serialize(cart.Options));
             var c = machine.Cpu; var b = machine.Bus; var p = b.Ppu;
             w.Write(c.A); w.Write(c.X); w.Write(c.Y); w.Write(c.S); w.Write(c.D); w.Write(c.PC);
             w.Write(c.P); w.Write(c.PBR); w.Write(c.DBR); w.Write(c.E); w.Write(c.Waiting); w.Write(c.Stopped); w.Write(c.Instructions);
@@ -45,8 +45,8 @@ public static class StateSerializer
         using var file = File.OpenRead(path);
         using var zip = new GZipStream(file, CompressionMode.Decompress);
         using var r = new BinaryReader(zip);
-        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 6 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
-            throw new InvalidDataException("Savestate version or cartridge does not match.");
+        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 7 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
+            throw new InvalidDataException("Savestate requires format7 (native S-DSP pipeline). Formats1–6 cannot be resumed; start the ROM again. The cartridge must also match.");
         var profile=JsonSerializer.Deserialize<HardwareProfile>(r.ReadString())??throw new InvalidDataException("Missing hardware profile");
         bool forced=r.ReadBoolean();var mapping=(CartridgeMapping)r.ReadInt32();
         var options=JsonSerializer.Deserialize<CartridgeOptions>(r.ReadString())??throw new InvalidDataException("Missing cartridge options");

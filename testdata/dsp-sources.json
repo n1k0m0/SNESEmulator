@@ -1,0 +1,11 @@
+{
+  "anomieGist": "https://gist.github.com/nyanpasu64/a0d916ce6924912a7116682bf778e9a0",
+  "anomieRevision": "8b1df7dbf426171a79464765194fc38c9d26861c",
+  "anomieSha256": "21b793b10a70ac87e245ec2da4938ec7206e6eb5cdc67b6689770f9c5e0361bc",
+  "gaussianFormulaUrl": "https://raw.githubusercontent.com/ares-emulator/ares/9408cb43d4948fc3ea6e152a307a34348df3fe04/ares/sfc/dsp/gaussian.cpp",
+  "aresCommit": "9408cb43d4948fc3ea6e152a307a34348df3fe04",
+  "formulaSha256": "6b7ffba6bfdbe1a9e04a44c5520374a53cb14c974da48bdbdd9de3c9197a3f6d",
+  "aresLicenseSha256": "a1053dec5f15ee7c851abf7716634344b9d5740b414bf5893802f9910fdc7a97",
+  "localISCNoticeSha256": "e51d8ae62c3294ccdb79f87fa6695192d191b0c6be1a138ede392ae2384e9696",
+  "policy": "Product hardware coefficient data agree with both Anomie numeric facts and the ISC formula. Only numeric table data retained, no external DSP implementation in product. Formula verification is laboratory-only."
+}

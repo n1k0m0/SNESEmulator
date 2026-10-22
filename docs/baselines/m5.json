@@ -1,6 +1,6 @@
 {
   "schema": "snes-m5-ppu-v1",
-  "status": "Clean implementation full gate passed; independent parent acceptance pending. Measurement record, not expected-output oracle.",
+  "status": "Clean implementation full gate passed; independent parent acceptance passed on2dc8cf. Measurement record, not expected-output oracle.",
   "implementationCommit": "9e5a7817af00428915e36f1171d748577e28953e",
   "implementationCommits": [
     "f0d0230488940219e4057ceaf449c4d1d954716d",
@@ -835,5 +835,12 @@
     "S-DSP/native sound (M6)",
     "Broad public hardware-test/native frame corpus and commercial title matrix (M8)",
     "Below-realtime21.62 diagnostic fields/s; correctness-preserving optimization (M9)"
-  ]
+  ],
+  "independentAcceptance": {
+    "commit": "2dc8cf021ef7394f38df1db9932b443a23543b30",
+    "command": "python tools/test-lab.py --windows --full",
+    "exitCode": 0,
+    "log": "artifacts/root-m5-validation.log",
+    "frozenReports": "artifacts/root-m5-evidence/"
+  }
 }

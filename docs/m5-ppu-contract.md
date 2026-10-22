@@ -2,7 +2,9 @@
 
 Own C# implementation. M4 was independently accepted on
 `0b1139436727c835c4fdbf944c74e3d0067c3944`, full gate exit0,
-`artifacts/root-m4-validation.log`. M5 independent parent acceptance is pending.
+`artifacts/root-m4-validation.log`. M5 independent parent acceptance passed on
+`2dc8cf021ef7394f38df1db9932b443a23543b30`, full gate exit0,
+`artifacts/root-m5-validation.log`. M6 supersedes format6 with format7 DSP state.
 No SNES hardware is owned or newly measured by this project. Published research,
 a third-party test program and software comparison are distinguished below.
 

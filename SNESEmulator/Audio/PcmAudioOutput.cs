@@ -15,58 +15,53 @@
 */
 using System;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
-namespace SNESEmulator.Core
+namespace SNESEmulator.Core;
+
+/// <summary>Bounded stereo presentation, device resampling and user volume; no hardware state.</summary>
+public sealed class StereoPcmPresentation : ISampleProvider
 {
-    /// <summary>
-    /// Plays buffered mono PCM for the inherited network audio transport.
-    /// </summary>
-    public sealed class PcmAudioOutput : IDisposable
+    private readonly BufferedWaveProvider buffered;
+    private readonly VolumeSampleProvider volume;
+    private readonly object gate=new();
+    private readonly int deviceRate;
+    private ISampleProvider resampler;
+    public ISampleProvider Output=>this;
+    public WaveFormat WaveFormat=>resampler.WaveFormat;
+    public int Read(float[] buffer,int offset,int count){lock(gate)return resampler.Read(buffer,offset,count);}
+    public long Overflows {get;private set;}
+    public int BufferedBytes=>buffered.BufferedBytes;
+    public int Capacity=>buffered.BufferLength;
+    public float Volume {get=>volume.Volume;set=>volume.Volume=Math.Clamp(value,0,1);}
+    public StereoPcmPresentation(int sourceRate,int deviceRate=48000)
     {
-        private readonly BufferedWaveProvider _bufferedProvider;
-        private readonly WaveOutEvent _waveOut;
-
-        /// <summary>
-        /// Initializes a new PcmAudioOutput instance.
-        /// </summary>
-        public PcmAudioOutput(int sampleRate)
-        {
-            _bufferedProvider = new BufferedWaveProvider(new WaveFormat(sampleRate, 16, 1))
-            {
-                BufferDuration = TimeSpan.FromMilliseconds(250),
-                DiscardOnBufferOverflow = true
-            };
-
-            _waveOut = new WaveOutEvent
-            {
-                DesiredLatency = 100,
-                NumberOfBuffers = 2
-            };
-
-            _waveOut.Init(_bufferedProvider);
-            _waveOut.Play();
-        }
-
-        /// <summary>
-        /// Handles the write operation.
-        /// </summary>
-        public void Write(byte[] buffer, int count)
-        {
-            if (count <= 0)
-            {
-                return;
-            }
-
-            _bufferedProvider.AddSamples(buffer, 0, count);
-        }
-
-        /// <summary>
-        /// Releases resources owned by the component.
-        /// </summary>
-        public void Dispose()
-        {
-            _waveOut.Stop();
-            _waveOut.Dispose();
-        }
+        if(sourceRate!=32000)throw new ArgumentOutOfRangeException(nameof(sourceRate));
+        this.deviceRate=deviceRate;
+        buffered=new BufferedWaveProvider(new WaveFormat(sourceRate,16,2)){BufferDuration=TimeSpan.FromMilliseconds(250),ReadFully=true};
+        volume=new VolumeSampleProvider(buffered.ToSampleProvider());
+        resampler=new WdlResamplingSampleProvider(volume,deviceRate);
     }
+    public void Clear(){lock(gate){buffered.ClearBuffer();resampler=new WdlResamplingSampleProvider(volume,deviceRate);}}
+    public void Write(byte[] data,int count)
+    {
+        if(data==null||count<0||count>data.Length||count%4!=0||count>Capacity)throw new ArgumentException("Expected a bounded interleaved stereo PCM16 block");
+        lock(gate){if(BufferedBytes+count>Capacity){Clear();Overflows++;}
+        buffered.AddSamples(data,0,count);}
+    }
+}
+
+public sealed class PcmAudioOutput : IDisposable
+{
+    private readonly StereoPcmPresentation presentation;
+    private readonly WaveOutEvent wave;
+    public float Volume {get=>presentation.Volume;set=>presentation.Volume=value;}
+    public PcmAudioOutput(int sampleRate)
+    {
+        presentation=new(sampleRate);wave=new WaveOutEvent{DesiredLatency=100,NumberOfBuffers=2};
+        try{wave.Init(presentation.Output);wave.Play();}catch{wave.Dispose();throw;}
+    }
+    public void Clear()=>presentation.Clear();
+    public void Write(byte[] buffer,int count)=>presentation.Write(buffer,count);
+    public void Dispose(){wave.Stop();wave.Dispose();}
 }

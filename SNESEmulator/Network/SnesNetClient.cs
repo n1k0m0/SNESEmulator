@@ -55,6 +55,12 @@ namespace SNESEmulator.Network
         private CancellationTokenSource _shutdown;
         private Task _receiveTask;
         private PcmAudioOutput _audioOutput;
+        private readonly SnesNetAudioContinuity audioContinuity=new();
+        public event Action<SnesNetAudioChunk> AudioReceived;
+        public long AudioDiscontinuities=>audioContinuity.Discontinuities;
+        public long RejectedAudioPackets=>audioContinuity.RejectedPackets;
+        public float AudioVolume {get;set;}=1;
+        public bool PlayAudio {get;set;}=true;
         /// <summary>
         /// Last joystick state sent to the server, used to suppress unchanged packets.
         /// </summary>
@@ -377,7 +383,8 @@ namespace SNESEmulator.Network
                 ClientId = clientId;
                 VideoWidth = width;
                 VideoHeight = height;
-                AudioSampleRate = audioSampleRate;
+                if(audioSampleRate!=SnesNetProtocol.DefaultAudioSampleRate)throw new InvalidDataException("Unsupported native stereo audio rate");
+                AudioSampleRate = audioSampleRate;audioContinuity.Reset();
                 Role = acceptedRole;
                 Permission = permission;
                 KeyboardEnabled = keyboardEnabled;
@@ -389,7 +396,7 @@ namespace SNESEmulator.Network
                 {
                     // Remote clients play host audio locally. If audio initialization fails,
                     // the session can still remain useful as a silent viewer/player.
-                    _audioOutput = new PcmAudioOutput(AudioSampleRate);
+                    if(PlayAudio)_audioOutput = new PcmAudioOutput(AudioSampleRate);
                 }
                 catch
                 {
@@ -700,14 +707,11 @@ namespace SNESEmulator.Network
 
                     break;
                 case SnesNetMessageType.AudioChunk:
-                    if (SnesNetProtocol.ReadAudioChunkPayload(message.Payload, out int sampleRate, out byte[] buffer, out int count))
+                    if (SnesNetProtocol.ReadAudioChunkPayload(message.Payload, out var block) && audioContinuity.Accept(block,out bool flush))
                     {
-                        if (_audioOutput != null && sampleRate == AudioSampleRate)
-                        {
-                            // Mismatched sample rates are ignored; changing the audio
-                            // device mid-session would require a new handshake.
-                            _audioOutput.Write(buffer, count);
-                        }
+                        if(flush)_audioOutput?.Clear();
+                        if(_audioOutput!=null){_audioOutput.Volume=AudioVolume;_audioOutput.Write(block.Pcm,block.Pcm.Length);}
+                        AudioReceived?.Invoke(block);
                     }
 
                     break;

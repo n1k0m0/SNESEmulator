@@ -78,7 +78,7 @@
       "source": "Own65816 upload program and SPC payload; original repository source",
       "license": "Apache-2.0",
       "version": "M4-v1",
-      "sha256": "570521e3166bc95e1f0ac1345f4ed106e79cf5813b0c524cd13a36f9d3065436",
+      "sha256": "b72fe72fad2b7c82ffadcac65a3ccf9cbf4b047dd13178864066864125d752ae",
       "profile": "generic-SPC-flat-RAM or explicit real CPU/APU coupling",
       "start": "Source-defined initial state, see M4 contract",
       "seed": "upstream fixed case0000 where applicable",
