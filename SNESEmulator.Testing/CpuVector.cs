@@ -18,6 +18,20 @@ public sealed class TraceBus : ICpuBus
 }
 public static class CpuVector
 {
+    public static string? FirstCycleDifference(IReadOnlyList<CpuCycle> actual,JsonElement expected)
+    {
+        int i=0;
+        foreach(var row in expected.EnumerateArray())
+        {
+            if(i>=actual.Count)return $"cycle {i}: missing actual cycle; expected {row}";
+            int? address=row[0].ValueKind==JsonValueKind.Null?null:row[0].GetInt32();
+            byte? value=row[1].ValueKind==JsonValueKind.Null?null:(byte)row[1].GetInt32();
+            var wanted=new CpuCycle(address,value,row[2].GetString()!);
+            if(actual[i]!=wanted)return $"cycle {i}: expected {wanted}, actual {actual[i]}";
+            i++;
+        }
+        return actual.Count==i?null:$"cycle {i}: unexpected actual {actual[i]}";
+    }
     public static void Load(Cpu65816 c, TraceBus bus, JsonElement state)
     {
         // Raw assignment deliberately preserves even unusual upstream E/M/X/S combinations.

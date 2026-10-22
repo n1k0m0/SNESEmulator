@@ -1,7 +1,7 @@
 # Entwicklungsplan: mÃ¶glichst originalgetreuer SNES-Emulator
 
 Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0-Testlabor und M1-CPU-Semantik umgesetzt; Messumfang und Grenzen siehe [Testlabor](test-laboratory.md). M2–M10 bleiben offen. Alle 5.080.400 festgeschriebenen externen CPU-Semantikfälle bestehen; Buszyklen und Timing sind noch nicht abgenommen.
+Status: M0-Testlabor, M1-CPU-Semantik und M2-Bus-/Zeitbasis implementiert (M2 zur unabhängigen Prüfung); Messumfang und Grenzen siehe [Testlabor](test-laboratory.md). M3–M10 bleiben offen. Alle 5.080.400 festgeschriebenen externen CPU-Semantikfälle bestehen; Alle externen Busvektoren bestehen zusätzlich; SNES-Timingprofile sind analytisch geprüft, ohne Originalhardware-Messnachweis. Siehe [M2-Vertrag](m2-timing-contract.md).
 
 ## Ziel und Nachweis
 

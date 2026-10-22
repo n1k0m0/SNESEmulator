@@ -12,15 +12,26 @@ static class Lab
     public static int Run(string[] args)
     {
         if(args.Length==0) {Console.WriteLine("Commands: cpu [report-prefix] [fixture-directory] [case-name], cpu-full [report-prefix] [fixture-directory] [opcode.mode], rom [options], mutations [prefix], supervise <seconds> <report-prefix> <command...>, probe <pass|fail|skipped|hang|crash>. See docs/test-laboratory.md.");return 2;}
-        try { return args[0] switch { "cpu"=>Cpu(args.Skip(1).ToArray()),"cpu-full"=>Cpu(args.Skip(1).ToArray(),true),"rom"=>Rom(args.Skip(1).ToArray()),"mutations"=>Mutations(args.ElementAtOrDefault(1)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/mutations"),"supervise"=>Supervise(args.Skip(1).ToArray()),"unavailable"=>Unavailable(args[1]),"probe"=>Probe(args[1]),_=>throw new ArgumentException("Unknown command") }; }
+        try { return args[0] switch { "cpu"=>Cpu(args.Skip(1).ToArray()),"cpu-full"=>Cpu(args.Skip(1).ToArray(),true),"cpu-bus"=>Cpu(args.Skip(1).ToArray(),false,true),"cpu-bus-full"=>Cpu(args.Skip(1).ToArray(),true,true),"benchmark"=>Benchmark(),"rom"=>Rom(args.Skip(1).ToArray()),"mutations"=>Mutations(args.ElementAtOrDefault(1)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/mutations"),"supervise"=>Supervise(args.Skip(1).ToArray()),"unavailable"=>Unavailable(args[1]),"probe"=>Probe(args[1]),_=>throw new ArgumentException("Unknown command") }; }
         catch(Exception ex) {Console.Error.WriteLine(ex);var r=new TestReport("laboratory-command");r.Add(args[0],"crash",ex.ToString());r.Save("artifacts/command-crash");return 1;}
     }
-    static int Cpu(string[] args,bool full=false)
+    static int Benchmark()
+    {
+        var report=new TestReport("M2-local-performance-observation");report.Metadata["host"]=new{machine=Environment.MachineName,os=Environment.OSVersion.ToString(),runtime=Environment.Version.ToString(),processors=Environment.ProcessorCount};
+        var machine=new SnesSystem();machine.Insert(new Cartridge(DiagnosticRom.Create()));machine.RunFrame();var watch=Stopwatch.StartNew();
+        for(int n=0;n<120;n++)machine.RunFrame();watch.Stop();report.Metadata["framesPerSecond"]=120/watch.Elapsed.TotalSeconds;report.Metadata["masterclocksPerSecond"]=(machine.Clock.Now-357368)/watch.Elapsed.TotalSeconds;
+        var bus=new TraceBus{TraceEnabled=false};Array.Fill(bus.Memory,(byte)0xea);var cpu=new Cpu65816(bus){PC=0x8000,P=0x34};
+        watch.Restart();for(int n=0;n<100000;n++)cpu.Step();watch.Stop();report.Metadata["stepNopInstructionsPerSecond"]=100000/watch.Elapsed.TotalSeconds;
+        watch.Restart();for(int n=0;n<100000;n++)while(cpu.AdvanceCycle()){}watch.Stop();report.Metadata["singleCycleNopInstructionsPerSecond"]=100000/watch.Elapsed.TotalSeconds;
+        report.Add("benchmark executed","pass","Performance observation only; no minimum performance or hardware-accuracy assertion");report.Save("artifacts/m2-benchmark");Console.WriteLine(JsonSerializer.Serialize(report.Metadata,Json));return 0;
+    }
+    static int Cpu(string[] args,bool full=false,bool timed=false)
     {
         string prefix=args.ElementAtOrDefault(0)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/conformance",directory=args.ElementAtOrDefault(1)??(full?"testdata/65816-full":"testdata/65816"), filter=args.ElementAtOrDefault(2)??"";
-        var report=new TestReport(full?"65816-full-conformance":"65816-sampled-conformance");
-        report.Metadata["accuracy"]="Register/listed RAM semantics only; timing and cycle traces NOT accepted. Generic 65816, no SNES hardware proof.";
-        report.Metadata["reproduce"]=$"dotnet run --project SNESEmulator.Lab -c Release -- {(full ? "cpu-full" : "cpu")} {prefix} {directory} {(full ? "[opcode.mode]" : "[case-name]")}";
+        string command=(timed?"cpu-bus":"cpu")+(full?"-full":"");
+        var report=new TestReport("65816-"+(full?"full":"sampled")+(timed?"-bus":"-semantics"));
+        report.Metadata["accuracy"]=timed?"Generic 65816 bus cycles, separate from SNES hardware access timing; no original hardware proof.":"Register/listed RAM semantics only; timing and cycle traces NOT accepted. Generic 65816, no SNES hardware proof.";
+        report.Metadata["reproduce"]=$"dotnet run --project SNESEmulator.Lab -c Release -- {command} {prefix} {directory} {(full ? "[opcode.mode]" : "[case-name]")}";
         string manifestPath=Path.Combine(directory,full?"manifest.json":"../manifest.json");
         if(!File.Exists(manifestPath)) { report.Add("manifest","skipped","Missing pinned manifest: "+manifestPath);report.Save(prefix);return report.ExitCode; }
         byte[] manifestBytes=File.ReadAllBytes(manifestPath);using var manifest=JsonDocument.Parse(manifestBytes);
@@ -31,7 +42,7 @@ static class Lab
         report.Metadata["sourceCommit"]=manifest.RootElement.GetProperty("commit").GetString();
         report.Metadata["representedCases"]=manifest.RootElement.GetProperty("representedCases").GetInt32();report.Metadata["upstreamCases"]=manifest.RootElement.GetProperty("upstreamCases").GetInt32();
         var files=manifest.RootElement.GetProperty("files").EnumerateArray().ToArray();
-        var bus=new TraceBus { TraceEnabled=!full };var cpu=new Cpu65816(bus);int executed=0,totalPassed=0,totalFailed=0;var coverage=new List<string>();
+        var bus=new TraceBus { TraceEnabled=!full };var cpu=new Cpu65816(bus);var cycleTrace=new List<CpuCycle>();if(timed)cpu.CycleObserved=cycleTrace.Add;int executed=0,totalPassed=0,totalFailed=0;long comparedCycles=0;var coverage=new List<string>();
         for(int op=0;op<256;op++) foreach(string mode in new[]{"e","n"})
         {
             string key=$"{op:x2}.{mode}";
@@ -55,22 +66,22 @@ static class Lab
                 count++;
                 string name=vector.GetProperty("name").GetString()!;
                 if(!full && filter!="" && filter!=name)continue;
-                bus.ClearMemory();CpuVector.Load(cpu,bus,vector.GetProperty("initial"));var effectiveInitial=CpuVector.EffectiveInitial(cpu);var watch=Stopwatch.StartNew();
+                cycleTrace.Clear();bus.ClearMemory();CpuVector.Load(cpu,bus,vector.GetProperty("initial"));var effectiveInitial=CpuVector.EffectiveInitial(cpu);var watch=Stopwatch.StartNew();
                 try
                 {
-                    int approximateCycles=CpuVector.ExecuteInstruction(cpu,bus);executed++;
-                    string? diff=CpuVector.FirstDifference(cpu,bus,vector.GetProperty("final"));
-                    if(diff==null) { passed++;totalPassed++; } else { failed++;totalFailed++; firstDiff??=name+": "+diff; firstFailure??=new {name,opcode=$"{op:X2}",mode,emulation=effectiveInitial["e"]!=0,memory8=effectiveInitial["e"]!=0||(effectiveInitial["p"]&32)!=0,index8=effectiveInitial["e"]!=0||(effectiveInitial["p"]&16)!=0,effectiveInitial,initial=vector.GetProperty("initial").Clone(),expected=vector.GetProperty("final").Clone(),actual=CpuVector.State(cpu)}; }
-                    if(!full) report.Add(name,diff==null?"pass":"fail",diff,watch.Elapsed.TotalSeconds,diff==null?null:new { opcode=$"{op:X2}",mode,effectiveInitial,initial=vector.GetProperty("initial").Clone(),expected=vector.GetProperty("final").Clone(),actual=CpuVector.State(cpu),logicalBus=bus.Trace.ToArray(),approximateCycles,reproduce=$"dotnet run --project SNESEmulator.Lab -c Release -- cpu {prefix} {directory} \"{name}\"" });
+                    int approximateCycles=CpuVector.ExecuteInstruction(cpu,bus);executed++;if(timed)comparedCycles+=cycleTrace.Count;
+                    string? diff=CpuVector.FirstDifference(cpu,bus,vector.GetProperty("final"));if(timed)diff??=CpuVector.FirstCycleDifference(cycleTrace,vector.GetProperty("cycles"));
+                    if(diff==null) { passed++;totalPassed++; } else { failed++;totalFailed++; firstDiff??=name+": "+diff; firstFailure??=new {name,opcode=$"{op:X2}",mode,emulation=effectiveInitial["e"]!=0,memory8=effectiveInitial["e"]!=0||(effectiveInitial["p"]&32)!=0,index8=effectiveInitial["e"]!=0||(effectiveInitial["p"]&16)!=0,effectiveInitial,initial=vector.GetProperty("initial").Clone(),expected=vector.GetProperty("final").Clone(),actual=CpuVector.State(cpu),expectedCycles=timed?vector.GetProperty("cycles").Clone():default,actualCycles=timed?cycleTrace.ToArray():null}; }
+                    if(!full) report.Add(name,diff==null?"pass":"fail",diff,watch.Elapsed.TotalSeconds,diff==null?null:new { opcode=$"{op:X2}",mode,effectiveInitial,initial=vector.GetProperty("initial").Clone(),expected=vector.GetProperty("final").Clone(),actual=CpuVector.State(cpu),logicalBus=bus.Trace.ToArray(),approximateCycles,reproduce=$"dotnet run --project SNESEmulator.Lab -c Release -- {command} {prefix} {directory} \"{name}\"" });
                 }
                 catch(Exception ex) {failed++;crashed++;totalFailed++;firstDiff??=name+": "+ex.Message;firstFailure??=new {name,effectiveInitial,initial=vector.GetProperty("initial").Clone(),error=ex.ToString()};if(!full)report.Add(name,"crash",ex.ToString(),watch.Elapsed.TotalSeconds,new {initial=vector.GetProperty("initial").Clone()});}
             }
             if(count!=entry.GetProperty("cases").GetInt32()) { failed++; report.Add(key+"/count","fail",$"Expected {entry.GetProperty("cases").GetInt32()} cases, read {count}"); }
-            if(full) { report.Add(key,crashed>0?"crash":failed==0?"pass":"fail",firstDiff,groupWatch.Elapsed.TotalSeconds,evidence:new {passed,failed,crashed,firstFailure,reproduce=$"dotnet run --project SNESEmulator.Lab -c Release -- cpu-full {prefix} {directory} {key}"});Console.WriteLine($"{key}: {passed} pass / {failed} fail"); }
+            if(full) { report.Add(key,crashed>0?"crash":failed==0?"pass":"fail",firstDiff,groupWatch.Elapsed.TotalSeconds,evidence:new {passed,failed,crashed,firstFailure,reproduce=$"dotnet run --project SNESEmulator.Lab -c Release -- {command} {prefix} {directory} {key}"});Console.WriteLine($"{key}: {passed} pass / {failed} fail"); }
             if(!full && filter=="")report.Add(key+"/unsampled","skipped",$"{entry.GetProperty("upstreamCases").GetInt32()-count} upstream vectors not selected; sample count {count}. Full suite available with cpu-full.");
         }
         if(executed==0)report.Add("selected-cases","skipped","No vectors executed, including any requested name filter");
-        report.Metadata["executedCases"]=executed;report.Metadata["passedCases"]=totalPassed;report.Metadata["failedCases"]=totalFailed;report.Metadata["coverageKind"]=full?(filter==""?"full":"full-file-filter"):"sample";report.Metadata["stackConvention"]="Raw upstream initial S retained in evidence; before execution E=1 maps S to 0x100|(S&255), the only valid emulation stack page. P/X/Y unchanged.";report.Metadata["opcodeModeFixturesVerified"]=coverage.Count;report.Metadata["coverage"]=coverage;
+        report.Metadata["busCyclesCompared"]=comparedCycles;report.Metadata["executedCases"]=executed;report.Metadata["passedCases"]=totalPassed;report.Metadata["failedCases"]=totalFailed;report.Metadata["coverageKind"]=full?(filter==""?"full":"full-file-filter"):"sample";report.Metadata["stackConvention"]="Raw upstream initial S retained in evidence; before execution E=1 maps S to 0x100|(S&255), the only valid emulation stack page. P/X/Y unchanged.";report.Metadata["opcodeModeFixturesVerified"]=coverage.Count;report.Metadata["coverage"]=coverage;
         report.Save(prefix);return report.ExitCode;
     }
     static int Mutations(string prefix)
@@ -97,6 +108,10 @@ static class Lab
             string? difference=CpuVector.FirstDifference(cpu,bus,semantics.RootElement);
             r.Add(mutate?"changed instruction rejected by independent oracle":"independent immediate-load oracle",(mutate?difference=="register a: expected 42, actual 0":difference==null)?"pass":"fail",difference);
         }
+        using var busOracle=JsonDocument.Parse("[[32768,234,\"dp-remx-\"],[32769,null,\"---remx-\"]]");
+        CpuCycle[] correct=[new(32768,234,"dp-remx-"),new(32769,null,"---remx-")];
+        foreach(var (label,mutation) in new (string,CpuCycle[])[]{("missing cycle",[correct[0]]),("wrong address",[correct[0] with{Address=32770},correct[1]]),("wrong pins",[correct[0] with{Pins="-p-remx-"},correct[1]]),("wrong direction",[correct[0] with{Pins="dp-wemx-"},correct[1]]),("wrong value",[correct[0] with{Value=233},correct[1]])})
+        {string? diff=CpuVector.FirstCycleDifference(mutation,busOracle.RootElement);r.Add(label+" rejected",diff!=null&&diff.StartsWith(label=="missing cycle"?"cycle 1:":"cycle 0:")?"pass":"fail",diff);}
         r.Save(prefix);return r.ExitCode;
     }
     static int Unavailable(string suite)
@@ -157,13 +172,13 @@ static class Lab
         foreach(string key in options.Keys)if(key is not ("frames" or "masterclocks" or "output" or "rom" or "replay" or "trace-limit" or "expect-wram" or "expect-frame"))throw new ArgumentException("Unknown ROM option: "+key);
         string Opt(string k,string fallback)=>options.GetValueOrDefault(k,fallback);
         long frames=long.Parse(Opt("frames","8")),clockLimit=long.Parse(Opt("masterclocks","100000000"));
-        if(frames<1||clockLimit<1)throw new ArgumentException("Positive frame and approximate masterclock limits required");
+        if(frames<1||clockLimit<1)throw new ArgumentException("Positive frame and masterclock limits required");
         string prefix=Opt("output",Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/rom");
         var report=new TestReport("headless-rom");var machine=new SnesSystem();
         byte[] rom=options.ContainsKey("rom")?File.ReadAllBytes(options["rom"]):DiagnosticRom.Create();machine.Insert(new Cartridge(rom));
-        report.Metadata["romSha256"]=Convert.ToHexString(SHA256.HashData(rom));report.Metadata["profile"]=machine.Bus.Cartridge!.Pal?"approximate-pal-proposed":"approximate-ntsc-proposed";
-        report.Metadata["accuracy"]="Approximate instruction Step()*6 + immediate DMA accounting; whole-scanline rendering. These are NOT hardware masterclocks. Limit overshoot <= one instruction plus immediate DMA debt. Trace clocks are instruction-start labels, not bus timestamps.";
-        report.Metadata["framesLimit"]=frames;report.Metadata["approximateMasterclockLimit"]=clockLimit;
+        report.Metadata["romSha256"]=Convert.ToHexString(SHA256.HashData(rom));report.Metadata["profile"]=machine.Profile;
+        report.Metadata["accuracy"]="Exact master-clock budget with individually timed CPU cycles. Generic CPU bus conformance and analytical profile timing are separate evidence. Whole-line PPU rendering and legacy immediate DMA remain incomplete M3/M5 devices; oscillator/revision target is unverified hardware.";
+        report.Metadata["framesLimit"]=frames;report.Metadata["masterclockLimit"]=clockLimit;
         ReplayEvent[] replay=[];
         if(options.TryGetValue("replay",out string? replayPath))
         {
@@ -173,30 +188,25 @@ static class Lab
         }
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(prefix))!);
         using var cpuTrace=new StreamWriter(prefix+".cpu.jsonl");using var busTrace=new StreamWriter(prefix+".bus.jsonl");using var rasterTrace=new StreamWriter(prefix+".raster.jsonl");
-        long clocks=0,busEvents=0,instructions=0;int previousRemainder=0,lastLine=-1,replayIndex=0,traceLimit=int.Parse(Opt("trace-limit","4096"));
+        long clocks=0,busEvents=0,instructions=0;int replayIndex=0,traceLimit=int.Parse(Opt("trace-limit","4096"));
         if(traceLimit<0)throw new ArgumentException("Trace limit must not be negative");
-        machine.Bus.AccessObserved=(direction,address,value)=>{if(busEvents++<traceLimit)busTrace.WriteLine(JsonSerializer.Serialize(new {sequence=busEvents,approximateInstructionStart=clocks,direction,address,value}));};
+        machine.Cpu.CycleObserved=cycle=>{if(busEvents++<traceLimit)busTrace.WriteLine(JsonSerializer.Serialize(new {sequence=busEvents,masterClock=machine.Clock.Now,origin="CPU",cycle}));};
+        machine.Clock.EventObserved=e=>rasterTrace.WriteLine(JsonSerializer.Serialize(new {masterClock=machine.Clock.Now,h=machine.Clock.H,v=machine.Clock.V,field=machine.Clock.Field,kind=e.Kind.ToString()}));
         var watch=Stopwatch.StartNew();
-        try
+        while(machine.Frames<frames && machine.Clock.Now<clockLimit)
         {
-            while(machine.Frames<frames && clocks<clockLimit)
+            while(replayIndex<replay.Length && replay[replayIndex].Frame==machine.Frames) {var e=replay[replayIndex++];machine.Bus.Controllers.Buttons[e.Port]=e.Buttons;}
+            machine.RunUntil(Math.Min(clockLimit,machine.Clock.NextEventClock),m=>
             {
-                while(replayIndex<replay.Length && replay[replayIndex].Frame==machine.Frames) {var e=replay[replayIndex++];machine.Bus.Controllers.Buttons[e.Port]=e.Buttons;}
-                machine.RunFrame(m=>
-                {
-                    previousRemainder=m.MasterRemainder;
-                    if(m.Bus.Ppu.Scanline!=lastLine) {lastLine=m.Bus.Ppu.Scanline;rasterTrace.WriteLine(JsonSerializer.Serialize(new {frame=m.Frames,line=lastLine,approximateClock=clocks}));}
-                    if(instructions++<traceLimit)cpuTrace.WriteLine(JsonSerializer.Serialize(new {frame=m.Frames,line=lastLine,approximateClock=clocks,state=CpuVector.State(m.Cpu)}));
-                },m=>{clocks+=m.MasterRemainder-previousRemainder;if(clocks>=clockLimit)throw new LimitReached();});
-            }
+                if(instructions++<traceLimit)cpuTrace.WriteLine(JsonSerializer.Serialize(new {frame=m.Frames,line=m.Clock.V,masterClock=m.Clock.Now,state=CpuVector.State(m.Cpu)}));
+            });
         }
-        catch(LimitReached) { }
-        machine.Bus.AccessObserved=null;
+        clocks=machine.Clock.Now;machine.Cpu.CycleObserved=null;machine.Clock.EventObserved=null;
         File.WriteAllBytes(prefix+".wram.bin",machine.Bus.Wram);
         using(var output=new BinaryWriter(File.Create(prefix+".argb32le.bin")))foreach(uint pixel in machine.Bus.Ppu.Pixels)output.Write(pixel);
-        report.Metadata["cpuState"]=CpuVector.State(machine.Cpu);report.Metadata["completedFrames"]=machine.Frames;report.Metadata["approximateMasterclocks"]=clocks;report.Metadata["instructionsAttempted"]=instructions;
+        report.Metadata["cpuState"]=CpuVector.State(machine.Cpu);report.Metadata["completedFrames"]=machine.Frames;report.Metadata["masterclocks"]=clocks;report.Metadata["instructionsAttempted"]=instructions;
         report.Metadata["traceLimit"]=traceLimit;report.Metadata["busEvents"]=busEvents;report.Metadata["traceTruncated"]=busEvents>traceLimit||instructions>traceLimit;
-        report.Metadata["stopReason"]=machine.Frames>=frames?"frame-limit":"approximate-masterclock-limit";
+        report.Metadata["stopReason"]=machine.Frames>=frames?"frame-limit":"masterclock-limit";
         report.Metadata["wramSha256"]=Convert.ToHexString(SHA256.HashData(machine.Bus.Wram));
         report.Metadata["frameSha256"]=Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(prefix+".argb32le.bin")));
         report.Metadata["inputEventsApplied"]=replayIndex;report.Metadata["inputEventsNotReached"]=replay.Length-replayIndex;

@@ -195,6 +195,7 @@ Test("M1 permanently reduced upstream failure regressions",()=>
         string? diff=SNESEmulator.Testing.CpuVector.FirstDifference(cpu,bus,v.GetProperty("final"));Check(diff==null,v.GetProperty("name").GetString()+": "+diff);
     }
 });
+TimingTests.Run(Test,testRoot);
 Console.WriteLine($"{passed} passed, {failed} failed. Temporary test data: {testRoot}");
 report.Save(args.Length>0?args[0]:Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/core-regression");
 return failed==0?0:1;

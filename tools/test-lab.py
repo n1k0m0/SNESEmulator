@@ -37,11 +37,11 @@ for name in ['replay-a','replay-b']:
  supervised(name,['dotnet',str(LAB),'rom','--frames','8','--replay','testdata/replay-example.json'])
 a=json.loads((ROOT/'artifacts/replay-a-child.json').read_text())['Metadata']
 b=json.loads((ROOT/'artifacts/replay-b-child.json').read_text())['Metadata']
-for key in ['wramSha256','frameSha256','approximateMasterclocks','cpuState','inputEventsApplied']:assert a[key]==b[key],key
+for key in ['wramSha256','frameSha256','masterclocks','cpuState','inputEventsApplied']:assert a[key]==b[key],key
 for suffix in ['.cpu.jsonl','.bus.jsonl','.raster.jsonl']:assert (ROOT/('artifacts/replay-a-child'+suffix)).read_bytes()==(ROOT/('artifacts/replay-b-child'+suffix)).read_bytes(),suffix
 result=supervised('clock-limit',['dotnet',str(LAB),'rom','--frames','100','--masterclocks','1000'])
 limit=json.loads((ROOT/'artifacts/clock-limit-child.json').read_text())['Metadata']
-assert limit['stopReason']=='approximate-masterclock-limit' and limit['approximateMasterclocks']>=1000
+assert limit['stopReason']=='masterclock-limit' and limit['masterclocks']==1000
 # Inventory has its own red exit status, captured without disguising it as green.
 conformance=subprocess.run(['dotnet',str(LAB),'supervise','240','artifacts/conformance','dotnet',str(LAB),*(['cpu-full','artifacts/conformance-child','testdata/65816-full'] if args.full else ['cpu'])],cwd=ROOT).returncode
 inventory=json.loads((ROOT/'artifacts/conformance-child.json').read_text())
@@ -50,7 +50,12 @@ if args.full:
 else:
  assert conformance==2 and inventory['Metadata']['executedCases']==2048 and inventory['Metadata']['failedCases']==0, 'Sample semantics failed or missing vectors'
  assert sum(t['Status']=='skipped' for t in inventory['Tests'])==512, 'Sample-only unsampled markers must remain explicit'
+# Generic electrical bus conformance is reported independently of semantic state.
+bus_exit=subprocess.run(['dotnet',str(LAB),'supervise','240','artifacts/bus-conformance','dotnet',str(LAB),*(['cpu-bus-full','artifacts/bus-conformance-child','testdata/65816-full'] if args.full else ['cpu-bus'])],cwd=ROOT).returncode
+bus_report=json.loads((ROOT/'artifacts/bus-conformance-child.json').read_text())
+assert bus_exit==(0 if args.full else 2) and bus_report['Metadata']['executedCases']==(5080400 if args.full else 2048) and bus_report['Metadata']['failedCases']==0, 'M2 generic bus conformance failed'
+assert bus_report['Metadata']['busCyclesCompared']>0
 if args.windows:
  run(['dotnet','build','SNESEmulator.Tests','-c','Release','--nologo'])
  supervised('windows-integration',['dotnet',str(ROOT/'SNESEmulator.Tests/bin/Release/net10.0-windows/SNESEmulator.Tests.dll')])
-print('Laboratory checks passed. '+('Full M1 CPU semantics verified.' if args.full else '2048 sampled semantics pass; 5,078,352 upstream cases remain explicitly unsampled.')+' No timing or hardware accuracy claim.')
+print('Laboratory checks passed. '+('Full M1 CPU semantics verified.' if args.full else '2048 sampled semantics pass; 5,078,352 upstream cases remain explicitly unsampled.')+' Generic 65816 bus cycles verified separately; SNES profiles are analytical targets, not original-hardware measurements.')

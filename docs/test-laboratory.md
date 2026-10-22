@@ -1,11 +1,11 @@
-# Test laboratory: M0 infrastructure and M1 CPU semantics
+# Test laboratory: M0–M2 CPU semantics, bus cycles and analytical timing
 
 M0 establishes measurement, not CPU or SNES accuracy. The original17 assertions
 are preserved as12 portable core regressions and5 Windows/network integrations.
 `SNESEmulator.Core.Tests` references only the core and portable testing library;
 it does not load Windows Forms, OpenTK, the frontend, audio devices or TLS.
 `SNESEmulator.Tests` retains the existing Windows frontend/transport dependency.
-M1 adds12 portable semantic regression groups (24 total portable tests).
+M1 adds12 portable semantic regression groups; M2 adds15 timing/continuation groups (39 total portable tests).
 No sibling C64 repository is modified.
 
 ## Reproduce locally
@@ -26,8 +26,8 @@ python tools/test-lab.py --windows --full
 The standard script checks the complete laboratory contract and green sampled
 semantics while preserving512 unsampled markers. Its zero exit does not claim
 full coverage. `--full` requires all5,080,400 cases,512 verified source files and
-zero failures/skips. Missing data is non-success. The separate full CPU CI job
-fetches the pinned data and fails on missing/failed semantics; remote CI has not
+zero failures/skips, independently for semantics and bus conformance. Missing data is non-success. The separate full CPU CI job
+fetches the pinned data and fails on missing/failed semantics or bus cycles; remote CI has not
 been executed because no remote is configured. GUI/window interaction remains
 outside these automated cases.
 
@@ -107,8 +107,7 @@ final registers/status and listed RAM; any unexpected write that changes another
 address is also rejected. For MVN/MVP, upstream expects a complete block move,
 while this core exposes one byte per `Step`: the adapter repeats only those
 opcodes until PC advances, with a65537-iteration ceiling. M1 corrects CPU semantics separately from the adapter conventions described below.
-Logical read/write traces are diagnostic only: dummy cycles, pins and
-hardware timing are deferred to M2. These vectors are independently generated
+M2 compares complete cycle rows independently, including dummy cycles, address, nullable data, direction and all pins. SNES clock durations are separately checked against analytical profiles. These vectors are independently generated
 software expectations, not an original-SNES hardware measurement.
 
 Frozen sampled results and first differences are in`docs/baselines/m0.json`.
@@ -169,11 +168,47 @@ remain green.
 
 `Irq()` and `ServiceInterrupts()` provide instruction-boundary entry/arbitration.
 They do not implement interrupt-pin sampling/latches or polling-cycle timing.
-M2 must still validate exact bus/dummy-cycle address order and values, pins,
-internal cycles, clock durations, interrupt polling and DMA/raster interactions.
+The historical M1 acceptance did not validate bus/dummy-cycle order, pins or clock durations; the M2 section below records the additional checks. Full DMA/raster interactions remain M3.
 M1 establishes register/memory semantics for a generic65816, with deterministic
 test initialization; power-on register randomness, original5A22 measurements and
 commercial-game compatibility remain outside this acceptance.
+
+## M2 bus and timing gate
+
+`cpu-bus` and `cpu-bus-full` run the immutable corpus through the same independent
+C# CPU, comparing every upstream `cycles` row. The full gate checks5,080,400
+vectors in512 hash-verified files, separately from the unchanged semantic gate.
+All addresses, order, direction, values (including null idle data), VDA/VPA/VPB,
+E/M/X and MLB pins must match. No expected cycle drives CPU execution. The all-low
+terminal WAI/STP row is a quiescent marker with zero hardware-clock duration.
+These are external software-generated generic65816 expectations, not a measured
+5A22 trace. Source pin semantics are specified in the retained upstream README.
+
+The39 portable cases include15 M2 groups: exact mapped access speeds; NTSC/PAL
+fields/interlace/short/long lines and dots; refresh phase; one emulated hour per
+profile with exact rational APU accumulation; stable event ordering; refresh at
+and within a CPU cycle; one-master-clock versus block versus frame complete
+state equality; save/load at192 instruction/refresh/frame boundary clock points;
+side-effectful MMIO and every-cycle continuation; old-I IRQ polling and NMI/WAI
+priority; RTI restored-I polling in both modes; WAI/STP clock suspension; every
+cycle of reset/IRQ/NMI entry; negative cycle/address/value/direction/pin mutations;
+and the first independent vector in all512 opcode/mode files through the
+single-cycle API. The mutation command separately reports five bus mutations in
+addition to its six existing checks (11 total). Version2 savestates include all
+clock events, rational remainder, partial CPU-cycle time, continuation and
+interrupt latches. Version1 states are explicitly rejected.
+
+Read [the timing contract](m2-timing-contract.md) for the execution model,
+reference sources, profile epoch and remaining device limitations. The concrete
+2/1/3 separate-chip target and nominal oscillators remain unverified hardware.
+Physical reset-release alignment and warm-reset/power-on distinctions have not
+been measured. The M2 profile epoch is H0/V0/field0 after convenience reset.
+
+```powershell
+dotnet run --project SNESEmulator.Lab -c Release -- cpu-bus
+dotnet run --project SNESEmulator.Lab -c Release -- cpu-bus-full artifacts/bus testdata/65816-full
+dotnet run --project SNESEmulator.Lab -c Release -- benchmark
+```
 
 ## Headless limits, replay and artifacts
 
@@ -181,9 +216,9 @@ commercial-game compatibility remain outside this acceptance.
 
 - `--rom path` selects a local cartridge; commercial ROMs remain local.
 - `--frames N` and `--masterclocks N` are positive execution ceilings; the first
-  reached wins. Default limits are8 frames and100,000,000 approximate clocks.
+  reached wins. Default limits are8 fields and100,000,000 exact master clocks.
 - `--replay path` loads JSON events `{ "Frame":0,"Port":0,"Buttons":256 }`.
-  Events are applied before the first instruction of that frame, sorted by frame;
+  Events are applied at the requested field boundary, sorted by frame;
   ports are0/1 and Buttons uses active-high `SnesButtons` bits. Values persist
   until changed. Unreached events are counted. There is no sub-frame replay yet.
 - `--trace-limit N` limits CPU/bus trace records (default4096). Truncation and
@@ -193,19 +228,22 @@ commercial-game compatibility remain outside this acceptance.
   first wrong pixel. Supply independently acquired reference provenance separately.
 - `--output prefix` selects the artifact prefix (normally set by supervisor).
 
-Artifacts: WRAM binary dump,256x224 ARGB32LE frame, CPU JSONL, logical bus JSONL,
+Artifacts: WRAM binary dump,256x224 ARGB32LE frame, CPU JSONL, timed CPU cycle JSONL,
 raster JSONL and JSON/JUnit results. Hashes include ROM, replay, WRAM, image and
 any explicit oracle files. Replay checks compare CPU state, clocks, frame/WRAM
 hashes AND byte-identical CPU/bus/raster traces across two runs.
 
-**Clock limitation:** the current core remains`Step()*6` with immediate DMA debt
-and1364 approximate clocks per line. The limit can overshoot by one complete
-instruction and its immediate DMA charge. A partial frame is dumped as partial;
-completed-frame count is separate. Trace clock labels denote instruction starts,
-not individual bus-cycle timestamps. This preserves existing approximate
-execution and is not M2 timing correctness. Frames use the existing whole-line
-renderer and output host ARGB pixels, not native15-bit PPU output. No native audio
-samples exist while SPC700/DSP are absent.
+**Device limitation:** CPU bus effects carry their real master-clock endpoint.
+The exact budget can end inside a CPU cycle, refresh stall or instruction, with
+serialized remaining time. Events at the same timestamp execute before the bus
+effect in priority/creation order. CPU architectural registers commit at
+instruction boundaries; cycle rows carry the in-flight pin values. Partial
+frames remain partial and completed-field count is separate. PPU rendering is
+still whole-line host ARGB output; DMA transfers remain immediate legacy code
+followed by serialized stall debt, not accurate DMA timing. No SPC700/DSP or
+native audio samples exist. The rational oscillator counter is only the APU
+scheduling foundation. These limitations remain visible in hardware/graphics/
+audio evidence reports as skipped, never passing accuracy claims.
 
 ## Evidence limitations and hardware profiles
 
@@ -217,9 +255,7 @@ maps 5A22-02,5C77-01 and5C78-03 to those values, while explaining that version
 numbers stopped changing after2/1/3. Those bits also appear on1-CHIP hardware
 and do not identify an architecture. CPU A/B and PPU2 B/C distinctions and named
 regional motherboard evidence remain unresolved. This is target selection, not
-a verified hardware profile or proof of implemented errata. The scanline constants
-describe current implementation only, without measured oscillator, short-line,
-interlace or refresh evidence. Candidate revision/specification sources are
+a verified hardware profile or proof of implemented errata. The timing constants now drive explicit analytical profiles and tests for oscillators, short/long lines, interlace and refresh. None constitutes original-console measurement evidence. Candidate revision/specification sources are
 listed as research sources, not as evidence proving the implementation.
 
 `testdata/local-manifest.json` pins original diagnostic source, replay and profile

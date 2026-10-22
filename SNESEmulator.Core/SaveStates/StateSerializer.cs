@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using System.Text.Json;
 using SNESEmulator.Core;
 
 namespace SNESEmulator.SaveStates;
@@ -16,7 +17,7 @@ public static class StateSerializer
         using (var zip = new GZipStream(file, CompressionLevel.Fastest))
         using (var w = new BinaryWriter(zip))
         {
-            w.Write("SNESSAV"); w.Write(1); w.Write(cart.Hash); w.Write(cart.Sram.Length);
+            w.Write("SNESSAV"); w.Write(2); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));
             var c = machine.Cpu; var b = machine.Bus; var p = b.Ppu;
             w.Write(c.A); w.Write(c.X); w.Write(c.Y); w.Write(c.S); w.Write(c.D); w.Write(c.PC);
             w.Write(c.P); w.Write(c.PBR); w.Write(c.DBR); w.Write(c.E); w.Write(c.Waiting); w.Write(c.Stopped); w.Write(c.Instructions);
@@ -32,6 +33,8 @@ public static class StateSerializer
             foreach (ushort value in b.Controllers.Latched) w.Write(value);
             foreach (int value in b.Controllers.Position) w.Write(value);
             w.Write(b.Controllers.Strobe);
+            w.Write(JsonSerializer.Serialize(machine.Clock.Capture()));w.Write(JsonSerializer.Serialize(machine.CapturePhase()));
+            w.Write(JsonSerializer.Serialize(c.CaptureContinuation()));w.Write(JsonSerializer.Serialize(c.CaptureInterrupts()));
         }
         File.Move(temporary, path, true);
     }
@@ -40,13 +43,14 @@ public static class StateSerializer
         using var file = File.OpenRead(path);
         using var zip = new GZipStream(file, CompressionMode.Decompress);
         using var r = new BinaryReader(zip);
-        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 1 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
+        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 2 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
             throw new InvalidDataException("Savestate version or cartridge does not match.");
-        var m = new SnesSystem(); m.Insert(new Cartridge(cartridge.Rom, cartridge.SourcePath));
+        var profile=JsonSerializer.Deserialize<HardwareProfile>(r.ReadString())??throw new InvalidDataException("Missing hardware profile");
+        var m = new SnesSystem(profile); m.Insert(new Cartridge(cartridge.Rom, cartridge.SourcePath));
         var c = m.Cpu; var b = m.Bus; var p = b.Ppu;
         c.A = r.ReadUInt16(); c.X = r.ReadUInt16(); c.Y = r.ReadUInt16(); c.S = r.ReadUInt16(); c.D = r.ReadUInt16(); c.PC = r.ReadUInt16();
         c.P = r.ReadByte(); c.PBR = r.ReadByte(); c.DBR = r.ReadByte(); c.E = r.ReadBoolean(); c.Waiting = r.ReadBoolean(); c.Stopped = r.ReadBoolean(); c.Instructions = r.ReadInt64();
-        m.Frames = r.ReadInt64(); m.MasterRemainder = r.ReadInt32();
+        long frames=r.ReadInt64();int remainder=r.ReadInt32();
         Read(r, b.Wram); Read(r, b.Io); Read(r, b.DmaRegisters); Read(r, b.Cartridge!.Sram);
         b.OpenBus = r.ReadByte(); b.WramAddress = r.ReadInt32(); b.NmiFlag = r.ReadBoolean(); b.NmiPending = r.ReadBoolean(); b.DmaMasterCycles = r.ReadInt32();
         Read(r, p.Vram); Read(r, p.Cgram); Read(r, p.Oam); Read(r, p.Registers);
@@ -58,6 +62,11 @@ public static class StateSerializer
         for (int i = 0; i < 2; i++) b.Controllers.Latched[i] = r.ReadUInt16();
         for (int i = 0; i < 2; i++) b.Controllers.Position[i] = r.ReadInt32();
         b.Controllers.Restore(r.ReadBoolean());
+        m.Clock.Restore(JsonSerializer.Deserialize<ClockState>(r.ReadString())??throw new InvalidDataException("Missing clock state"));
+        m.RestorePhase(JsonSerializer.Deserialize<ExecutionPhase>(r.ReadString())??throw new InvalidDataException("Missing CPU phase"));
+        c.RestoreContinuation(JsonSerializer.Deserialize<CpuContinuation>(r.ReadString()));
+        c.RestoreInterrupts(JsonSerializer.Deserialize<CpuInterruptState>(r.ReadString())??throw new InvalidDataException("Missing interrupt state"));
+        if(frames!=m.Frames||remainder!=m.MasterRemainder)throw new InvalidDataException("Inconsistent clock state");
         if (b.WramAddress is < 0 or > 0x1FFFF || p.Scanline is < 0 or > 311 ||
             b.Controllers.Position.Any(v => v is < 0 or > 16) || m.MasterRemainder is < 0 or > 600000 || zip.ReadByte() != -1)
             throw new InvalidDataException("Invalid savestate values.");

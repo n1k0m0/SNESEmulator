@@ -79,12 +79,13 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             machine.Bus.Controllers.Buttons[settings.ControllerPort - 1] |= input;
             if (menu == Menu.None && !fault && machine.Bus.Cartridge != null)
             {
-                double frameTime = machine.Bus.Cartridge.Pal ? 1.0 / 50 : 1.0 / 60;
-                accumulator = Math.Min(accumulator + time * (turbo ? 4 : 1), frameTime * 4);
-                while (accumulator >= frameTime && !fault)
+                double fieldTime = machine.Profile.ClockSeconds(machine.Profile.FieldMasterClocks(machine.Clock.Field,machine.Clock.Interlace));
+                accumulator = Math.Min(accumulator + time * (turbo ? 4 : 1), fieldTime * 4);
+                while (accumulator >= machine.Profile.ClockSeconds(machine.Clock.ClocksUntilFieldEnd) && !fault)
                 {
+                    long before = machine.Clock.Now;
                     Try(() => { machine.RunFrame(); server.BroadcastVideoFrame(machine.Bus.Ppu.Pixels, Ppu.Width, Ppu.Height); }, true);
-                    accumulator -= frameTime;
+                    accumulator -= machine.Profile.ClockSeconds(machine.Clock.Now-before);
                 }
             }
             else accumulator = 0;

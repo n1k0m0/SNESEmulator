@@ -15,7 +15,7 @@ public sealed class Ppu
     public ushort OamAddress { get; set; }
     public byte ScrollLatch { get; set; }
     public int Scanline { get; set; }
-    public bool InVblank => Scanline >= Height;
+    public bool InVblank => Scanline >= ((Registers[0x33]&4)!=0?240:225);
 
     public void Reset()
     {
