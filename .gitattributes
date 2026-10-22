@@ -2,3 +2,9 @@
 *.sh text eol=lf
 *.py text eol=lf
 *.png binary
+
+# Hash-pinned laboratory inputs must have identical bytes across OS checkouts.
+testdata/** text eol=lf
+SNESEmulator.Core/DiagnosticRom.cs text eol=lf
+
+testdata/65816/upstream-* -whitespace

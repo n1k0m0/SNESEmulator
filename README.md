@@ -172,3 +172,7 @@ SharpPixels, die Bitmap-MenÃ¼schrift, der PCM-Ausgang und die Netzwerk-/Relay-
 Infrastruktur des C64Emulators. Der C64-Hardwarekern wurde nicht kopiert und das
 Originalrepository nicht verÃ¤ndert. Es sind keine kommerziellen Spiel-ROMs
 oder Nintendo-Firmware enthalten.
+
+## Testlabor
+
+`python tools/test-lab.py --windows` prüft die bisherigen17 Fälle (12 Kern +5 Netzwerk) und das M0-Testlabor. Die externe CPU-Bestandsaufnahme bleibt getrennt sichtbar rot. Details, Limits und reproduzierbare Befehle: [Testlabor](docs/test-laboratory.md).

@@ -1,0 +1,58 @@
+{
+  "schema": "snes-local-testdata-v1",
+  "files": [
+    {
+      "path": "testdata/replay-example.json",
+      "source": "Original laboratory input sequence",
+      "license": "Apache-2.0",
+      "version": "M0-v1",
+      "sha256": "5099936fd9f9027b0cd0a2176b5ea2d96a801af2651021508334dfda150a3dd7",
+      "profile": "approximate-ntsc-proposed or explicitly selected PAL",
+      "start": "diagnostic reset; frame0 applies Right,3 Left,6 neutral",
+      "seed": null,
+      "success": "two runs produce equal CPU, WRAM, ARGB output and logical traces",
+      "timeoutSeconds": 120
+    },
+    {
+      "path": "SNESEmulator.Core/DiagnosticRom.cs",
+      "source": "Original C# diagnostic ROM generator; repository source",
+      "license": "Apache-2.0",
+      "version": "M0-v1",
+      "sha256": "9cfdba9830f92566305515977b8fee478716085fdcae6d09b375561b01747ff8",
+      "profile": "approximate-ntsc-proposed or explicitly selected PAL",
+      "start": "reset via generated ROM vector",
+      "seed": null,
+      "success": "execution limit reached only; internal regressions separately assert NMI/VRAM/controller properties",
+      "timeoutSeconds": 120
+    },
+    {
+      "path": "testdata/hardware-profiles.json",
+      "source": "Current source constants and proposed future targets",
+      "license": "Apache-2.0",
+      "version": "M0-v1",
+      "sha256": "75aff1dfc7944f21e9e4be160324ea5c3cbf47b00eed52dd9d18c380730a7dda",
+      "profile": "approximate-ntsc-proposed or explicitly selected PAL",
+      "start": "profile selection from cartridge region",
+      "seed": null,
+      "success": "no hardware verification implied",
+      "timeoutSeconds": 120
+    }
+  ],
+  "analyticalOracles": [
+    {
+      "id": "register-mutation",
+      "source": "explicitly constructed a=0x1234, mutated to0x1235 in SNESEmulator.Lab/Program.cs",
+      "provenance": "synthetic comparator test, no hardware claim"
+    },
+    {
+      "id": "pixel-mutation",
+      "source": "explicit black2x2 expected ARGB array; pixel(1,0) changed by1",
+      "provenance": "synthetic comparator test, no PPU correctness claim"
+    }
+  ],
+  "unavailable": [
+    "Independent native graphics frames",
+    "Independent raw native DSP samples",
+    "Original console measurements"
+  ]
+}

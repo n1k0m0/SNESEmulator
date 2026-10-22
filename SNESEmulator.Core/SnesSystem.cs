@@ -9,7 +9,7 @@ public sealed class SnesSystem
     public SnesSystem() { Cpu = new(Bus); Bus.Reset(); }
     public void Insert(Cartridge cartridge) { Bus.Cartridge = cartridge; Reset(); }
     public void Reset() { Bus.Reset(); Cpu.Reset(); Frames = 0; MasterRemainder = 0; }
-    public void RunFrame()
+    public void RunFrame(Action<SnesSystem>? beforeInstruction = null, Action<SnesSystem>? afterInstruction = null)
     {
         if (Bus.Cartridge == null) return;
         int lines = Bus.Cartridge.Pal ? 312 : 262;
@@ -20,9 +20,11 @@ public sealed class SnesSystem
             if (line == Ppu.Height) Bus.BeginVblank();
             while (MasterRemainder < 1364)
             {
+                beforeInstruction?.Invoke(this);
                 if (Bus.NmiPending) { Bus.NmiPending = false; Cpu.Nmi(); }
                 MasterRemainder += Cpu.Step() * 6 + Bus.DmaMasterCycles;
                 Bus.DmaMasterCycles = 0;
+                afterInstruction?.Invoke(this);
             }
             MasterRemainder -= 1364;
             Bus.Ppu.RenderScanline(line);

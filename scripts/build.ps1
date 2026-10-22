@@ -5,7 +5,7 @@ try {
     dotnet build SNESEmulator.sln -c Release --nologo
     if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
     if ($Test) {
-        dotnet run --project SNESEmulator.Tests -c Release --no-build
+        python tools/test-lab.py --windows
         if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
     }
 } finally { Pop-Location }

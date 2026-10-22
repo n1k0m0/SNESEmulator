@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: geplant; die unten beschriebenen Erweiterungen sind noch nicht umgesetzt.
+Status: M0-Testlabor umgesetzt; Messumfang und Grenzen siehe [Testlabor](test-laboratory.md). M1�M10 bleiben offen. Der externe CPU-Samplelauf weist bekannte Fehler aus und ist kein Konformit�tsnachweis.
 
 ## Ziel und Nachweis
 
@@ -403,10 +403,10 @@ gewählten Profile in Echtzeit ohne wachsende Warteschlangen ausführen.
 
 ## Erste konkrete Arbeitspakete
 
-- [ ] Testdaten-/Referenzmanifest und Ergebnisformat definieren.
-- [ ] Hardwareprofile mit Quellen, Region und Revisionsangaben festlegen.
-- [ ] CPU-Testadapter mit beliebigem Initialzustand und Trace-Bus erstellen.
-- [ ] Festgeschriebenen 65816-Datensatz einlesen und einen Fehlerbericht pro
+- [x] Testdaten-/Referenzmanifest und Ergebnisformat definieren (M0).
+- [x] Vorgeschlagene Hardwareprofile mit Region und offenen/unverifizierten Revisionen dokumentieren (M0; Hardwarebeleg offen).
+- [x] CPU-Testadapter mit beliebigem Initialzustand und logischem Trace-Bus erstellen (M0; Zyklusabnahme erst M2).
+- [x] Festgeschriebenen 65816-Sampledatensatz einlesen und einen Fehlerbericht pro
       Opcode/Modus erzeugen; zunächst keine Genauigkeitsquote erfinden.
 - [ ] Erste unabhängige CPU-Fehler beheben und kleine Regressionen hinzufügen.
 - [ ] Den Vertrag für Masterclock, Buszugriff und Ereignisreihenfolge anhand

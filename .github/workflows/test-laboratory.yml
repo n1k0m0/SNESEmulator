@@ -1,0 +1,50 @@
+name: Local test laboratory definition
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  portable-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python tools/test-lab.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: portable-core-reports
+          path: artifacts/
+  external-conformance-inventory:
+    runs-on: ubuntu-latest
+    # M0 records known failures visibly. Remove continue-on-error at M1 acceptance.
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - run: python tools/test-lab.py --inventory-only
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: external-conformance-inventory
+          path: artifacts/
+  windows-integration:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python tools/test-lab.py --windows
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-integration-reports
+          path: artifacts/

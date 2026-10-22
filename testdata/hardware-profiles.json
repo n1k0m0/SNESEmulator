@@ -1,0 +1,76 @@
+{
+  "schema": "snes-proposed-profiles-v1",
+  "status": "Proposed and unverified. Neither profile is an original-hardware identification or timing-conformance claim.",
+  "profiles": [
+    {
+      "id": "approximate-ntsc-proposed",
+      "region": "NTSC",
+      "cpuFamily": "Ricoh 5A22-02; A/B silicon distinction unresolved",
+      "ppuFamily": "two separate PPU ICs: 5C77-01 and 5C78-03; B/C silicon distinction unresolved",
+      "currentImplementation": {
+        "lines": 262,
+        "approximateClocksPerLine": 1364,
+        "cpuInstructionMultiplier": 6
+      },
+      "hardwareEvidence": null,
+      "currentReportedVersionIds": {
+        "RDNMI_4210": 2,
+        "STAT77_213E": 1,
+        "STAT78_213F": 3,
+        "provenance": "hardcoded current SystemBus.cs and Ppu.cs return values; not measurements"
+      },
+      "proposedDigitalTarget": {
+        "architecture": "separate CPU plus two-chip PPU (not 1-CHIP)",
+        "cpuVersion": 2,
+        "ppu1Version": 1,
+        "ppu2Version": 3,
+        "status": "source-informed target selection only; no behavior or physical mainboard verified"
+      }
+    },
+    {
+      "id": "approximate-pal-proposed",
+      "region": "PAL",
+      "cpuFamily": "Ricoh 5A22-02; A/B silicon distinction unresolved",
+      "ppuFamily": "two separate PPU ICs: 5C77-01 and 5C78-03; B/C silicon distinction unresolved",
+      "currentImplementation": {
+        "lines": 312,
+        "approximateClocksPerLine": 1364,
+        "cpuInstructionMultiplier": 6
+      },
+      "hardwareEvidence": null,
+      "currentReportedVersionIds": {
+        "RDNMI_4210": 2,
+        "STAT77_213E": 1,
+        "STAT78_213F": 3,
+        "provenance": "hardcoded current SystemBus.cs and Ppu.cs return values; not measurements"
+      },
+      "proposedDigitalTarget": {
+        "architecture": "separate CPU plus two-chip PPU (not 1-CHIP)",
+        "cpuVersion": 2,
+        "ppu1Version": 1,
+        "ppu2Version": 3,
+        "status": "source-informed target selection only; no behavior or physical mainboard verified"
+      }
+    }
+  ],
+  "researchSources": [
+    {
+      "url": "https://snes.nesdev.org/wiki/Version_differences",
+      "use": "Published revision/version mapping: 5A22-02 reports2, 5C77-01 reports1, 5C78-03 reports3. Numbers ceased changing after2/1/3 and cannot identify 1-CHIP versus separate chips. Supports proposed digital target; does not verify emulation or regional motherboard."
+    },
+    {
+      "url": "https://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf",
+      "use": "generic CPU specification candidate; does not prove 5A22 behavior"
+    }
+  ],
+  "limitations": [
+    "No short scanline, interlace, exact oscillator, CPU access speed or refresh model",
+    "PAL/NTSC selection currently follows cartridge metadata",
+    "Pixel buffer is host ARGB32, not native SNES color output",
+    "Approximate clock accounting is an execution budget, not hardware time"
+  ],
+  "openQuestions": [
+    "Acquire named NTSC and PAL motherboard/revision evidence and measurements for the separate-CPU/two-PPU target.",
+    "Disambiguate 5A22 A/B and PPU2 B/C behavior; returned version bits alone are insufficient."
+  ]
+}

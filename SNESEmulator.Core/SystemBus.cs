@@ -8,6 +8,8 @@ public interface ICpuBus
 
 public sealed class SystemBus : ICpuBus
 {
+    /// <summary>Logical access observer. No cycle timing or CPU/DMA-origin guarantee.</summary>
+    public Action<string, int, byte>? AccessObserved { get; set; }
     public byte[] Wram { get; } = new byte[128 * 1024];
     public byte[] Io { get; } = new byte[0x400];
     public byte[] DmaRegisters { get; } = new byte[128];
@@ -50,11 +52,13 @@ public sealed class SystemBus : ICpuBus
             if (sram >= 0) result = cart.Sram[sram];
             else if (a >= 0x8000 || (bank & 0x7F) >= 0x40) result = cart.Rom[cart.RomOffset(address)];
         }
+        AccessObserved?.Invoke("read", address, result);
         return OpenBus = result;
     }
 
     public void Write(int address, byte value)
     {
+        AccessObserved?.Invoke("write", address & 0xFFFFFF, value);
         address &= 0xFFFFFF; OpenBus = value;
         int bank = address >> 16, a = address & 0xFFFF;
         if (bank is 0x7E or 0x7F) Wram[address & 0x1FFFF] = value;
