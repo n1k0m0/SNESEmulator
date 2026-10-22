@@ -12,7 +12,7 @@ public sealed class SystemBus : ICpuBus
     public byte[] Io {get;}=new byte[0x400];
     public byte[] DmaRegisters {get;}=new byte[128];
     public Ppu Ppu {get;}=new();
-    public Apu Apu {get;}=new();
+    public Apu Apu {get;}=new(Apu.ResolveLocalFirmware());
     public ControllerPorts Controllers {get;}=new();
     public CpuIo CpuIo {get;}
     public DmaController Dma {get;}
@@ -99,7 +99,7 @@ public sealed class SystemBus : ICpuBus
     {
         if(powerOn)Array.Clear(Wram);
         Array.Clear(Io);Array.Fill(DmaRegisters,(byte)255);Io[1]=255;Io[7]=Io[9]=255;Io[8]=Io[10]=1;
-        Ppu.Reset();Apu.Reset();CpuIo.Reset();Dma.Reset();WramAddress=0;OpenBus=0;NmiPending=NmiFlag=false;
+        Ppu.Reset();Apu.Reset(powerOn);CpuIo.Reset();Dma.Reset();WramAddress=0;OpenBus=0;NmiPending=NmiFlag=false;
         if(powerOn)Array.Clear(Controllers.Buttons);
         Controllers.Latch();Controllers.Write(0);
     }

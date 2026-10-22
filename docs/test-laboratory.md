@@ -1,4 +1,4 @@
-# Test laboratory: M0–M3 CPU, bus, timing and 5A22 I/O
+# Test laboratory: M0–M4 CPU, bus, timing, 5A22 I/O and SPC700
 
 M0 establishes measurement, not CPU or SNES accuracy. The original17 assertions
 are preserved as12 portable core regressions and5 Windows/network integrations.
@@ -6,8 +6,9 @@ are preserved as12 portable core regressions and5 Windows/network integrations.
 it does not load Windows Forms, OpenTK, the frontend, audio devices or TLS.
 `SNESEmulator.Tests` retains the existing Windows frontend/transport dependency.
 M1 adds12 portable semantic groups; M2 adds21 timing/continuation groups.
-M3 adds21 I/O/DMA groups (66 total portable tests); independent M3 acceptance
-remains pending. M0–M2 were independently accepted by the parent full gate.
+M3 adds21 I/O/DMA groups (66 total through M3); M0–M3 were independently
+accepted (`artifacts/root-m3-validation.log`). M4 adds21 groups (87 total
+portable groups); independent M4 acceptance pending.
 No sibling C64 repository is modified.
 
 ## Reproduce locally
@@ -22,6 +23,8 @@ python tools/test-lab.py
 python tools/test-lab.py --inventory-only
 # all5,080,400 pinned cases; fetch once, then entirely offline:
 python tools/fetch-full-testdata.py
+python tools/fetch-spc700.py --full
+# Supply local original IPL input as documented in m4-apu-contract.md
 python tools/test-lab.py --windows --full
 ```
 
@@ -313,3 +316,38 @@ console measurements have been acquired. These gaps block accuracy claims, not
 M0's measurement infrastructure. M1/M2/M5/M6/M8 must fill their corresponding
 reference and hardware evidence requirements. The original diagnostic-ROM tests
 remain useful internal regressions, not proof of commercial-game compatibility.
+
+
+## M4 SPC700 and real IPL gate
+
+See [M4 contract](m4-apu-contract.md) for timing, primary research and limits.
+`fetch-spc700.py --full` downloads the immutable MIT corpus: 256 files,
+256000 vectors, 83786798 JSON bytes. `--verify` checks hashes/counts. Samples
+contain1024 cases and256 explicit unsampled markers. Full manifests are
+source-controlled; full data and firmware stay ignored. Firmware is never
+downloaded by the gate.
+
+`spc-full artifacts/spc testdata/spc700-full` verifies semantic states and
+all electrical rows, reporting rawBusPassed249000, rawBusMismatches7000,
+sourceAdjudicatedCases7000 and approvedBusPassed256000. Seven indirect-Y read
+opcodes have a documented source-informed ordering adjudication. Raw vectors
+remain unchanged; first raw differences are retained. This does not claim
+that all raw JSMoo bus rows match.
+
+`spc-boot-original artifacts/original [local-ipl-path]` verifies the known
+original firmware hash, actual65816 upload/SPC execution, same-firmware state
+continuation, foreign-firmware rejection and1048-byte multiblock transfers.
+Missing original IPL returns skipped/exit2. Full mode requires this evidence.
+The own replacement boot routine has its own real-execution/source tests.
+Both boot paths exercise8-bit index wrap, destination page crossing, multiple
+blocks and command-counter zero avoidance. Neither has host handshake code.
+
+Continuations are tested at every crystal/master clock in bounded windows
+against an untouched continuous run. Full-system byte comparisons include
+CPU, ports/RAM, timers, DMA, PPU and events. Public-observer tests force exact
+event ties using an explicitly SYNTHETIC oscillator ratio, with20 asserted
+capture points around DMA, IRQ, refresh, line end and VBlank/NMI. These are
+analytical scheduling fixtures, not console frequencies. Normal NTSC/PAL
+rational clock and one-clock chunking run separately. Eight comparator
+mutations use the real verifiers. M3 constant APU-pin fixtures explicitly
+freeze the APU so their independent expected values stay valid.

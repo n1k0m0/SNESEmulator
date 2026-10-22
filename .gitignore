@@ -80,3 +80,6 @@ relay_server/*.log
 
 # Complete upstream corpus is a local, reproducible test input.
 testdata/65816-full/
+
+/testdata/spc700-full/
+/testdata/local-firmware/

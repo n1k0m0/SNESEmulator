@@ -198,6 +198,7 @@ Test("M1 permanently reduced upstream failure regressions",()=>
 });
 TimingTests.Run(Test,testRoot);
 IoDmaTests.Run(Test,testRoot);
+ApuTests.Run(Test,testRoot);
 Console.WriteLine($"{passed} passed, {failed} failed. Temporary test data: {testRoot}");
 report.Save(args.Length>0?args[0]:Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/core-regression");
 return failed==0?0:1;

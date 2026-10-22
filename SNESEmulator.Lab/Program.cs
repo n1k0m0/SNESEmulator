@@ -12,18 +12,18 @@ static class Lab
     public static int Run(string[] args)
     {
         if(args.Length==0) {Console.WriteLine("Commands: cpu [report-prefix] [fixture-directory] [case-name], cpu-full [report-prefix] [fixture-directory] [opcode.mode], rom [options], mutations [prefix], supervise <seconds> <report-prefix> <command...>, probe <pass|fail|skipped|hang|crash>. See docs/test-laboratory.md.");return 2;}
-        try { return args[0] switch { "cpu"=>Cpu(args.Skip(1).ToArray()),"cpu-full"=>Cpu(args.Skip(1).ToArray(),true),"cpu-bus"=>Cpu(args.Skip(1).ToArray(),false,true),"cpu-bus-full"=>Cpu(args.Skip(1).ToArray(),true,true),"benchmark"=>Benchmark(),"rom"=>Rom(args.Skip(1).ToArray()),"mutations"=>Mutations(args.ElementAtOrDefault(1)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/mutations"),"supervise"=>Supervise(args.Skip(1).ToArray()),"unavailable"=>Unavailable(args[1]),"probe"=>Probe(args[1]),_=>throw new ArgumentException("Unknown command") }; }
+        try { return args[0] switch { "spc-boot-original"=>SpcVector.Boot(args.Skip(1).ToArray()), "spc"=>SpcVector.Run(args.Skip(1).ToArray(),false),"spc-full"=>SpcVector.Run(args.Skip(1).ToArray(),true), "cpu"=>Cpu(args.Skip(1).ToArray()),"cpu-full"=>Cpu(args.Skip(1).ToArray(),true),"cpu-bus"=>Cpu(args.Skip(1).ToArray(),false,true),"cpu-bus-full"=>Cpu(args.Skip(1).ToArray(),true,true),"benchmark"=>Benchmark(),"benchmark-apu"=>Benchmark(true),"rom"=>Rom(args.Skip(1).ToArray()),"mutations"=>Mutations(args.ElementAtOrDefault(1)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/mutations"),"supervise"=>Supervise(args.Skip(1).ToArray()),"unavailable"=>Unavailable(args[1]),"probe"=>Probe(args[1]),_=>throw new ArgumentException("Unknown command") }; }
         catch(Exception ex) {Console.Error.WriteLine(ex);var r=new TestReport("laboratory-command");r.Add(args[0],"crash",ex.ToString());r.Save("artifacts/command-crash");return 1;}
     }
-    static int Benchmark()
+    static int Benchmark(bool apu=false)
     {
-        var report=new TestReport("M2-local-performance-observation");report.Metadata["host"]=new{machine=Environment.MachineName,os=Environment.OSVersion.ToString(),runtime=Environment.Version.ToString(),processors=Environment.ProcessorCount};
+        var report=new TestReport(apu?"M4-active-APU-local-performance-observation":"M2-local-performance-observation");report.Metadata["host"]=new{machine=Environment.MachineName,os=Environment.OSVersion.ToString(),runtime=Environment.Version.ToString(),processors=Environment.ProcessorCount};
         var machine=new SnesSystem();machine.Insert(new Cartridge(DiagnosticRom.Create()));machine.RunFrame();var watch=Stopwatch.StartNew();
-        for(int n=0;n<120;n++)machine.RunFrame();watch.Stop();report.Metadata["framesPerSecond"]=120/watch.Elapsed.TotalSeconds;report.Metadata["masterclocksPerSecond"]=(machine.Clock.Now-357368)/watch.Elapsed.TotalSeconds;
+        for(int n=0;n<120;n++)machine.RunFrame();watch.Stop();report.Metadata["framesPerSecond"]=120/watch.Elapsed.TotalSeconds;report.Metadata["apuEnabled"]=!machine.Bus.Apu.Isolated;report.Metadata["spcCycles"]=machine.Bus.Apu.Cycles;report.Metadata["apuFirmwareSha256"]=machine.Bus.Apu.FirmwareHash;report.Metadata["masterclocksPerSecond"]=(machine.Clock.Now-357368)/watch.Elapsed.TotalSeconds;
         var bus=new TraceBus{TraceEnabled=false};Array.Fill(bus.Memory,(byte)0xea);var cpu=new Cpu65816(bus){PC=0x8000,P=0x34};
         watch.Restart();for(int n=0;n<100000;n++)cpu.Step();watch.Stop();report.Metadata["stepNopInstructionsPerSecond"]=100000/watch.Elapsed.TotalSeconds;
         watch.Restart();for(int n=0;n<100000;n++)while(cpu.AdvanceCycle()){}watch.Stop();report.Metadata["singleCycleNopInstructionsPerSecond"]=100000/watch.Elapsed.TotalSeconds;
-        report.Add("benchmark executed","pass","Performance observation only; no minimum performance or hardware-accuracy assertion");report.Save("artifacts/m2-benchmark");Console.WriteLine(JsonSerializer.Serialize(report.Metadata,Json));return 0;
+        report.Add("benchmark executed","pass","Performance observation only; no minimum performance or hardware-accuracy assertion");report.Save(apu?"artifacts/m4-benchmark":"artifacts/m2-benchmark");Console.WriteLine(JsonSerializer.Serialize(report.Metadata,Json));return 0;
     }
     static int Cpu(string[] args,bool full=false,bool timed=false)
     {

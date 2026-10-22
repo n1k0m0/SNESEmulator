@@ -7,7 +7,8 @@ static class TimingTests
 {
     static void Check(bool yes,string message="Timing assertion failed") {if(!yes)throw new Exception(message);}
     static string Json<T>(T value)=>JsonSerializer.Serialize(value);
-    static SnesSystem Machine() {var m=new SnesSystem();m.Insert(new Cartridge(DiagnosticRom.Create()));return m;}
+    // Isolate CPU latch electrical fixtures from an executing SPC; M4 tests coupled execution.
+    static SnesSystem Machine() {var m=new SnesSystem();m.Insert(new Cartridge(DiagnosticRom.Create()));m.Bus.Apu.Isolated=true;return m;}
     static SnesSystem Program(params byte[] bytes) {var m=Machine();m.Cpu.PC=0;m.Cpu.PBR=m.Cpu.DBR=0;bytes.CopyTo(m.Bus.Wram,0);return m;}
     public static void Run(Action<string,Action> test,string directory)
     {

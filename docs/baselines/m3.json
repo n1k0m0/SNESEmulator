@@ -1,6 +1,6 @@
 {
   "schema": "snes-m3-io-dma-v1",
-  "status": "All implementation gates passed on clean implementation commit; independent parent acceptance pending. Measurement record, not expected-output oracle.",
+  "status": "Independent parent full gate accepted on56fb6d49571875bb90f1b6b8efed49af5af2b6e7; no original-console measurement claimed.",
   "implementationCommit": "127c6688ac832a6e34a38165e18594cebe914bfd",
   "command": "python tools/test-lab.py --windows --full",
   "log": "artifacts/m3-counter-full-validation.log",
@@ -78,5 +78,11 @@
     "Auxiliary controller data lines are electrical fixtures, not multitap support; simultaneous manual/auto serial electrical behavior is source-modelled but unmeasured.",
     "Mid-frame HDMA transfer seed and timer-write behavior carry the pinned reference own unverified labels.",
     "No SPC700/DSP/native audio; whole-line graphics and commercial game compatibility remain future milestones."
-  ]
+  ],
+  "parentAcceptance": {
+    "commit": "56fb6d49571875bb90f1b6b8efed49af5af2b6e7",
+    "command": "python tools/test-lab.py --windows --full",
+    "log": "artifacts/root-m3-validation.log",
+    "exitCode": 0
+  }
 }

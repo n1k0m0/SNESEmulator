@@ -20,6 +20,8 @@ if args.inventory_only:
  sys.exit(subprocess.run(['dotnet',str(LAB),'supervise','240','artifacts/conformance','dotnet',str(LAB),*(['cpu-full','artifacts/conformance-child','testdata/65816-full'] if args.full else ['cpu'])],cwd=ROOT).returncode)
 run(['dotnet','build','SNESEmulator.Core.Tests','-c','Release','--nologo'])
 run([sys.executable,'tools/fetch-testdata.py','--verify'])
+run([sys.executable,'tools/fetch-spc700.py','--verify',*(['--full'] if args.full else [])])
+run([sys.executable,'tools/own-ipl.py'])
 supervised('core',['dotnet',str(CORE)])
 supervised('mutations',['dotnet',str(LAB),'mutations'])
 for kind,status,exitcode in [('pass','pass',0),('fail','fail',1),('skipped','skipped',2),('hang','timeout',1),('crash','crash',1),('silent-success','crash',1),('green-nonzero','crash',1)]:
@@ -55,6 +57,18 @@ bus_exit=subprocess.run(['dotnet',str(LAB),'supervise','240','artifacts/bus-conf
 bus_report=json.loads((ROOT/'artifacts/bus-conformance-child.json').read_text())
 assert bus_exit==(0 if args.full else 2) and bus_report['Metadata']['executedCases']==(5080400 if args.full else 2048) and bus_report['Metadata']['failedCases']==0, 'M2 generic bus conformance failed'
 assert bus_report['Metadata']['busCyclesCompared']>0
+spc_exit=subprocess.run(['dotnet',str(LAB),'supervise','120','artifacts/spc-conformance','dotnet',str(LAB),*(['spc-full','artifacts/spc-conformance-child','testdata/spc700-full'] if args.full else ['spc'])],cwd=ROOT).returncode
+spc=json.loads((ROOT/'artifacts/spc-conformance-child.json').read_text())
+assert spc_exit==(0 if args.full else 2)
+assert spc['Metadata']['executedCases']==(256000 if args.full else 1024) and spc['Metadata']['failedCases']==0 and spc['Metadata']['fixturesVerified']==256
+assert spc['Metadata']['semanticFailures']==0 and spc['Metadata']['approvedBusFailures']==0
+assert spc['Metadata']['rawBusMismatches']==(7000 if args.full else 28), 'Only source-adjudicated indirect-Y order may differ from raw corpus'
+# Original firmware stays local. Full acceptance requires the published original identity;
+# sample-only use reports an explicit skip when no local firmware was supplied.
+original_path=__import__('os').environ.get('SNESEMULATOR_IPL',str(ROOT/'testdata/local-firmware/ipl.bin'))
+original_expected=0 if pathlib.Path(original_path).is_file() else 2
+supervised('spc-original-boot',['dotnet',str(LAB),'spc-boot-original','artifacts/spc-original-boot-child',original_path],original_expected)
+if args.full:assert original_expected==0, 'Original IPL execution unperformed: supply local64-byte firmware with SNESEMULATOR_IPL'
 if args.windows:
  run(['dotnet','build','SNESEmulator.Tests','-c','Release','--nologo'])
  supervised('windows-integration',['dotnet',str(ROOT/'SNESEmulator.Tests/bin/Release/net10.0-windows/SNESEmulator.Tests.dll')])

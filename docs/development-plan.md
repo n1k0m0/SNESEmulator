@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M2 unabhängig abgenommen; M3 implementiert, unabhängige Abnahme ausstehend; Messumfang und Grenzen siehe [Testlabor](test-laboratory.md). M4–M10 bleiben offen. M3-Vertrag und Evidenzgrenzen: [5A22-I/O](m3-io-contract.md). Alle 5.080.400 festgeschriebenen externen CPU-Semantikfälle bestehen; Alle externen Busvektoren bestehen zusätzlich; SNES-Timingprofile sind analytisch geprüft, ohne Originalhardware-Messnachweis. Siehe [M2-Vertrag](m2-timing-contract.md).
+Status: M0–M3 unabhängig abgenommen; M4 implementiert, unabhängige Abnahme ausstehend; Messumfang und Grenzen siehe [Testlabor](test-laboratory.md). M5–M10 bleiben offen. M4-Vertrag: [SPC700/APU](m4-apu-contract.md). M3-Vertrag und Evidenzgrenzen: [5A22-I/O](m3-io-contract.md). Alle 5.080.400 festgeschriebenen externen CPU-Semantikfälle bestehen; Alle externen Busvektoren bestehen zusätzlich; SNES-Timingprofile sind analytisch geprüft, ohne Originalhardware-Messnachweis. Siehe [M2-Vertrag](m2-timing-contract.md).
 
 ## Ziel und Nachweis
 
@@ -42,7 +42,7 @@ Die größten technischen Lücken im aktuellen Code:
 - Historischer Ausgangsstand: DMA kopierte sofort; M3 ersetzt dies durch serialisierbare Busphasen.
 - M3 ergänzt ALU-Flanken, automatische Controllerabfrage und Timer-IRQ.
   PPU-Leseports und physischer Hardwareabgleich bleiben offen.
-- Die APU speichert nur Kommunikationsports; SPC700 und DSP fehlen.
+- M4 implementiert SPC700 und reale Boot-/Portabläufe; S-DSP und Audio fehlen.
 - PPU-Leseports, Sprites, weitere Grafikmodi und viele Details fehlen.
 - Das Frontend verwendet gerundete 50/60-Hz-Ziele; Netzwerk-Audio ist bisher mono.
 
@@ -175,8 +175,8 @@ Abnahme:
 
 ### M3 – Bus, DMA/HDMA, Interrupts und Eingaben
 
-Implementiert mit analytischen und quellengestützten Tests; unabhängige Abnahme
-ausstehend. Vertrag, Quellenrevisionen und verbleibende Hardware-Evidenzgrenzen:
+Unabhängig abgenommen durch den Root-Fullgate auf `56fb6d4`, Exit0,
+`artifacts/root-m3-validation.log`. Vertrag und Hardware-Evidenzgrenzen:
 [m3-io-contract.md](m3-io-contract.md). Die folgenden Arbeiten beschreiben den
 M3-Sollumfang; sie behaupten keine Originalkonsolenmessung.
 
@@ -204,6 +204,10 @@ Abnahme:
 - Cartridge-/SRAM-Tests prüfen Spiegelungen, Bankgrenzen und Reset/Persistenz.
 
 ### M4 – SPC700 und APU-Kommunikation
+
+Implementiert; unabhängige Abnahme ausstehend. [Vertrag](m4-apu-contract.md)
+mit Trennung roher/adjudizierter SPC-Busfälle, eigener Bootroutine und lokaler
+Original-IPL-Eingabe. S-DSP-Audio bleibt M6.
 
 Arbeit:
 

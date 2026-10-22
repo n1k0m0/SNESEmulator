@@ -27,6 +27,13 @@ public sealed class SnesSystem
     {forcedProfile=forceProfile??profile!=null;Profile=profile??HardwareProfile.Ntsc;Clock=new(Profile);Cpu=new(Bus);ConfigureClock();Bus.Reset();Clock.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;Cpu.InterruptPollingAllowed=()=>!Bus.CpuIo.State.IrqLock;}
     private void ConfigureClock()
     {
+        Clock.PeripheralBoundary=()=>{
+            long tick=Bus.Apu.NextBoundary;if(tick==long.MaxValue)return long.MaxValue;
+            Int128 numerator=(Int128)tick*Profile.MasterHzNumerator*Profile.ApuHzDenominator;
+            long denominator=checked(Profile.ApuHzNumerator*Profile.MasterHzDenominator);
+            return (long)((numerator+denominator-1)/denominator);
+        };
+        Clock.PeripheralAdvanced=()=>Bus.Apu.RunUntil(Clock.ApuTicks);
         Clock.RefreshStarted=()=>{for(int i=1;i<=5;i++)Clock.Schedule(Clock.Now+i*8,HardwareEventKind.Device,1,-6);};
         Clock.LineCompleted=line=>{if(line>0)Bus.Ppu.RenderScanline(line-1);};
         Bus.CpuIo.Clock=Clock;Bus.DeferCpuMdr=true;
@@ -70,7 +77,7 @@ public sealed class SnesSystem
             if(Bus.Dma.CpuBoundary(clocks,Clock.Now))AdvanceDma();
             cycleStart=Clock.Now;cycleRemaining=clocks-(cycle.Valid&&cycle.Read?4:0);cycleActive=true;
         }
-        AdvanceActive(ref cycleRemaining);
+        AdvanceActive(ref cycleRemaining,false);
         cycleActive=false;
     }
     private void OnBusEffect(CpuCycle cycle)
@@ -94,7 +101,7 @@ public sealed class SnesSystem
     private void FinishReadHold()
     {
         if(heldRead==null)return;
-        AdvanceActive(ref holdRemaining);
+        AdvanceActive(ref holdRemaining,true);
         var cycle=heldRead;heldRead=null;Bus.CpuIo.AluEdge();
         if(cycle.Address is {} address&&(address&0x40fc00)!=0x4000)Bus.OpenBus=cycle.Value!.Value;
         CyclePhaseObserved?.Invoke(new("cycle-complete",Clock.Now,cycleStart,latchClock,cycle));
@@ -106,11 +113,11 @@ public sealed class SnesSystem
             if(Clock.StallUntil>Clock.Now){Clock.AdvanceTo(Math.Min(target,Math.Min(Clock.StallUntil,Clock.NextEventClock)));SyncInterrupts();continue;}
             int remaining=Bus.Dma.State.Remaining;
             long next=Math.Min(target,Math.Min(Clock.Now+remaining,Clock.NextEventClock));
-            int elapsed=(int)(next-Clock.Now);Bus.Dma.Elapse(elapsed);Clock.AdvanceTo(next);SyncInterrupts();
+            Clock.ActiveTimeElapsed=elapsed=>Bus.Dma.Elapse(elapsed);try{Clock.AdvanceTo(next);}finally{Clock.ActiveTimeElapsed=null;}SyncInterrupts();
             if(Bus.Dma.State.Remaining==0&&Clock.StallUntil<=Clock.Now)Bus.Dma.Boundary(Clock.Now);
         }
     }
-    private void AdvanceActive(ref int remaining)
+    private void AdvanceActive(ref int remaining,bool hold)
     {
         while(remaining>0||Clock.StallUntil>Clock.Now)
         {
@@ -122,12 +129,15 @@ public sealed class SnesSystem
                 Clock.AdvanceTo(next);SyncInterrupts();continue;
             }
             long until=Math.Min(target,Math.Min(Clock.Now+remaining,Clock.NextEventClock));int delta=(int)(until-Clock.Now);
-            remaining-=delta;Clock.AdvanceTo(until);SyncInterrupts();
+            Clock.ActiveTimeElapsed=elapsed=>{if(hold)holdRemaining-=elapsed;else cycleRemaining-=elapsed;};
+            try{Clock.AdvanceTo(until);}finally{Clock.ActiveTimeElapsed=null;}SyncInterrupts();
         }
     }
     public void RunUntil(long masterClock,Action<SnesSystem>? beforeInstruction=null,Action<SnesSystem>? afterInstruction=null)
     {
         if(masterClock<Clock.Now)throw new ArgumentOutOfRangeException(nameof(masterClock));target=masterClock;
+        // A snapshot from an APU phase may precede a same-timestamp typed event.
+        Clock.AdvanceTo(Clock.Now);Bus.Apu.RunUntil(Clock.ApuTicks);SyncInterrupts();
         while(Clock.Now<target)
         {
             Bus.Ppu.Scanline=Clock.V;Clock.Interlace=(Bus.Ppu.Registers[0x33]&1)!=0;Clock.VblankLine=(Bus.Ppu.Registers[0x33]&4)!=0?240:225;

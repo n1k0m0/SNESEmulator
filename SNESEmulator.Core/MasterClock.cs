@@ -27,6 +27,9 @@ public sealed class MasterClock(HardwareProfile profile)
     public Action<int>? LineStarted {get;set;}
     public Action? FieldStarted {get;set;}
     public Action? VblankStarted {get;set;}
+    public Func<long>? PeripheralBoundary {get;set;}
+    public Action? PeripheralAdvanced {get;set;}
+    public Action<int>? ActiveTimeElapsed {get;set;}
     public int VblankLine {get;set;}=225;
     public int Dot
     {
@@ -68,7 +71,7 @@ public sealed class MasterClock(HardwareProfile profile)
         if(target<Now)throw new ArgumentOutOfRangeException(nameof(target));
         while(events.Count>0&&events[0].Clock<=target)
         {
-            var e=events[0];events.RemoveAt(0);AdvanceRaw(e.Clock);
+            var e=events[0];AdvanceRaw(e.Clock,true);events.Remove(e);
             switch(e.Kind)
             {
                 case HardwareEventKind.Device:DeviceEvent?.Invoke(e);break;
@@ -82,12 +85,20 @@ public sealed class MasterClock(HardwareProfile profile)
                 case HardwareEventKind.VblankNmi:VblankStarted?.Invoke();break;
             }
             EventObserved?.Invoke(e);
+            if(events.Count==0||events[0].Clock!=Now)PeripheralAdvanced?.Invoke();
         }
         AdvanceRaw(target);
     }
-    private void AdvanceRaw(long to)
+    private void AdvanceRaw(long to,bool deferAtTarget=false)
+    {
+        if(PeripheralBoundary!=null){
+            while(Now<to){long boundary=PeripheralBoundary();long next=Math.Min(to,Math.Max(Now+1,boundary));AdvanceRawPart(next);if(!deferAtTarget||next!=to)PeripheralAdvanced?.Invoke();}
+        }else AdvanceRawPart(to);
+    }
+    private void AdvanceRawPart(long to)
     {
         long delta=to-Now;
+        ActiveTimeElapsed?.Invoke(checked((int)delta));
         Int128 sum=(Int128)ApuRemainder+(Int128)delta*Profile.ApuHzNumerator*Profile.MasterHzDenominator;
         long denominator=checked(Profile.MasterHzNumerator*Profile.ApuHzDenominator);
         ApuTicks+=(long)(sum/denominator);ApuRemainder=(long)(sum%denominator);H=checked(H+(int)delta);Now=to;

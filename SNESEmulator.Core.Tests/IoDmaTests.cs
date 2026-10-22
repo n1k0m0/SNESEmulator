@@ -5,7 +5,8 @@ using SNESEmulator.SaveStates;
 static class IoDmaTests
 {
     static void Check(bool yes,string reason="M3 assertion failed"){if(!yes)throw new Exception(reason);}
-    static SnesSystem Machine(bool stopped=true){var m=new SnesSystem();m.Insert(new Cartridge(DiagnosticRom.Create()));m.Cpu.Stopped=stopped;return m;}
+    // These M3 oracles drive constant electrical APU pins; real SPC execution is tested in M4.
+    static SnesSystem Machine(bool stopped=true){var m=new SnesSystem();m.Insert(new Cartridge(DiagnosticRom.Create()));m.Cpu.Stopped=stopped;m.Bus.Apu.Isolated=true;return m;}
     static void Channel(SnesSystem m,int ch,int control,int b,int a,int count,int indirectBank=0)
     {
         int d=0x4300+ch*16;
@@ -82,7 +83,7 @@ static class IoDmaTests
         });
         test("M3 original CPU ROM all DMA modes directions and critical raster starts",()=>{
             foreach(var position in Enum.GetValues<IoDmaDiagnosticRom.StartPosition>())for(int mode=0;mode<8;mode++)foreach(bool reverse in new[]{false,true}) {
-                var m=new SnesSystem();m.Insert(new Cartridge(IoDmaDiagnosticRom.Create(mode,reverse,position)));var rows=Trace(m);
+                var m=new SnesSystem();m.Insert(new Cartridge(IoDmaDiagnosticRom.Create(mode,reverse,position)));m.Bus.Apu.Isolated=true;var rows=Trace(m);
                 long requestClock=-1,acknowledgeClock=-1;
                 m.Bus.AccessOriginObserved=access=>{if(access.Origin==AccessOrigin.Cpu&&access.Address==0x420b&&access.Direction=="write")requestClock=m.Clock.Now;if(access.Address==0x4211&&access.Direction=="read")acknowledgeClock=m.Clock.Now;};
                 m.RunUntil(310000);

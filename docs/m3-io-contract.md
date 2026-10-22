@@ -1,7 +1,7 @@
 # M3 5A22 I/O and DMA contract
 
-M3 is implemented against the analytical target below; independent parent
-acceptance remains pending. These tests are not acquired original-console traces.
+M3 is independently accepted on `56fb6d49571875bb90f1b6b8efed49af5af2b6e7`,
+full gate exit0 (`artifacts/root-m3-validation.log`). These tests are not acquired original-console traces.
 M0–M2 were independently accepted by the parent full gate, including the corrected
 read phases (`artifacts/root-m2-phase-validation.log`). No external core or GPL
 implementation is embedded or transplanted into this own C# emulator.

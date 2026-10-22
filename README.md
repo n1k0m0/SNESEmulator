@@ -6,14 +6,15 @@ Der SNES-Kern wird hier selbst entwickelt; es wird kein Snes9x-, bsnes- oder
 Libretro-Kern eingebunden.
 
 **Stand: 0.1.0-dev – eigener Entwicklungskern, noch keine allgemeine
-Spielekompatibilität.** M0–M2 sind unabhängig geprüft; M3 implementiert 5A22-I/O,
-DMA/HDMA, Timer-IRQ, zeitlich laufende Rechenoperationen und Controller. Die
-unabhängige M3-Abnahme steht aus. Alle 5.080.400 festgeschriebenen externen
-65C816-Semantikfälle und die zugehörigen generischen Busvektoren bestehen.
-SNES-spezifische Clocks und I/O bleiben quellengestützte analytische Ziele,
-ohne eigene Originalkonsolenmessung. SPC700/DSP, Sprites und weitere PPU-Modi
-fehlen weiterhin. Siehe [Testlabor](docs/test-laboratory.md) und
-[M3-Vertrag](docs/m3-io-contract.md).
+Spielekompatibilität.** M0–M3 sind unabhängig geprüft. M4 ergänzt eine eigene
+SPC700, Timer, reale IPL-Ausführung und CPU/APU-Uploads; unabhängige M4-Abnahme
+ausstehend. Alle 5.080.400 externen 65C816-Semantik- und Busfälle bestehen.
+Die SPC-Suite umfasst 256.000 Semantik- und freigegebene Busfälle: 249.000
+passen roh, 7.000 haben eine dokumentierte indirekt-Y-Zyklusadjudikation anhand
+veröffentlichter Hardwareforschung. Es gibt keine eigene Konsolenmessung.
+S-DSP-Audio, Sprites und weitere PPU-Modi bleiben offen. Siehe
+[Testlabor](docs/test-laboratory.md), [M3-Vertrag](docs/m3-io-contract.md)
+und [M4-APU-Vertrag](docs/m4-apu-contract.md).
 
 ## Starten
 
@@ -88,7 +89,7 @@ Eine separate C64-Tastaturfreigabe ist für das SNES nicht im Menü enthalten.
 - Filter und Upscaling bleiben lokal. Sitzungs- und Relay-Passwörter bleiben
   nur im Arbeitsspeicher.
 - Der übernommene Mono-PCM/ADPCM-Audiotransport ist vorhanden. Da der eigene
-  SPC700/DSP noch fehlt, erzeugt dieser Entwicklungsstand **keinen SNES-Ton**.
+  S-DSP noch fehlt, erzeugt dieser Entwicklungsstand **keinen SNES-Ton**.
   Für SNES-Stereo muss der Audiopfad später erweitert werden.
 
 Im NETWORK-Menü Text direkt eintippen, mit Backspace bearbeiten oder mit Entf
@@ -106,7 +107,7 @@ Emulatoren können nicht gegenseitig als Client dienen.
 
 | Projekt / Verzeichnis | Verantwortung |
 |---|---|
-| `SNESEmulator.Core` | Plattformunabhängiger C#-Kern: CPU, Bus, Cartridge, PPU, Controller, DMA, APU-Schnittstelle und Savestates |
+| `SNESEmulator.Core` | Plattformunabhängiger C#-Kern: CPU, Bus, Cartridge, PPU, Controller, DMA, SPC700/APU und Savestates |
 | `SNESEmulator/Frontend` | SharpPixels-Fenster, Pixelmenüs, Eingaben und Präsentation |
 | `SNESEmulator/Network` | TLS, Host/Client, Frame-/Input-Protokoll, Relay und E2E-Verschlüsselung |
 | `SNESEmulator/Audio` | Übernommener PCM-Ausgang für den Netzwerk-Audiopfad |
@@ -182,3 +183,12 @@ oder Nintendo-Firmware enthalten.
 fünf Windows-/Netzwerkgruppen und die vollständigen, festgeschriebenen externen
 CPU-Semantik- und Busdaten getrennt. Ohne `--full` bleiben die nicht ausgeführten
 Daten ausdrücklich sichtbar. Details: [Testlabor](docs/test-laboratory.md).
+
+Die Standard-APU startet eine eigene offene 64-Byte-Bootroutine und führt
+SPC-Programme tatsächlich aus. Originale Nintendo-IPL-Firmware wird nicht
+verteilt. Eine lokale 64-Byte-Datei kann über `SNESEMULATOR_IPL` konfiguriert
+werden; Spielstände sind an ihren Hash gebunden. Der vollständige M4-Lauf
+benötigt die lokale Original-IPL-Testeingabe; ohne sie bleibt dieser Nachweis
+ausdrücklich unausgeführt. MIT-SPC-Testdaten beziehen:
+`python tools/fetch-spc700.py --full`. Herkunft und Reproduktion:
+[M4-Vertrag](docs/m4-apu-contract.md).

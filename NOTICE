@@ -12,3 +12,8 @@ commercial game ROM, Nintendo firmware or third-party SNES core is included.
 
 OpenTK and NAudio are restored as NuGet dependencies under their respective
 licenses. See the package metadata for third-party license information.
+
+SingleStepTests SPC700 test vectors are MIT-licensed, Copyright2024
+SingleStepTests. The redistributed offline samples retain their license at
+testdata/spc700-sample/LICENSE. Full vectors are local test inputs, not shipped
+with the emulator. No external SPC700 implementation source was incorporated.
