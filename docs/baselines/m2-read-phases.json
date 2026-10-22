@@ -1,0 +1,199 @@
+{
+  "schema": "snes-m2-read-phase-correction-v1",
+  "status": "All implementation gates passed on a clean commit; independent parent review pending. Measurement record, not an expected-output oracle.",
+  "implementationCommit": "bfabb2762a7647ced10a5dac56990a4256d219b3",
+  "command": "python tools/test-lab.py --windows --full",
+  "correction": "The previous all-effects-at-endpoint timing model was materially wrong. Generic generated65816 vectors do not encode SNES master-clock latch phases and therefore could not detect it. Read sampling now occurs after accessClocks-4 active clocks, followed by four active hold clocks; writes latch at completion.",
+  "supersedes": "docs/baselines/m2.json timing model only; historical generic semantic/bus measurements remain valid.",
+  "reference": {
+    "url": "https://github.com/bsnes-emu/bsnes/blob/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/cpu/memory.cpp",
+    "revision": "78474e5d39f58872dc21aca18cf9eb583b147fe7",
+    "scope": "Independently inspected read/hold versus write phase behavior. No source code transplant; no newly acquired original-hardware measurement.",
+    "analyticalPhaseExpectations": {
+      "6clockRead": {
+        "latch": 2,
+        "complete": 6
+      },
+      "8clockRead": {
+        "latch": 4,
+        "complete": 8
+      },
+      "12clockRead": {
+        "latch": 8,
+        "complete": 12
+      },
+      "writes": "latch at6/8/12-clock completion"
+    }
+  },
+  "sourceCommit": "307c63f5673c8c6b861c52f71ddb89212a227480",
+  "manifestSha256": "609272ECB3E2516D9B2566D14B84D2C38264D84AD33270122EE48228B4BB1192",
+  "semantics": {
+    "executed": 5080400,
+    "passed": 5080400,
+    "failed": 0,
+    "skipped": 0,
+    "files": 512,
+    "seconds": 36.53330709999998
+  },
+  "genericBus": {
+    "executed": 5080400,
+    "passed": 5080400,
+    "failed": 0,
+    "skipped": 0,
+    "files": 512,
+    "cycleRows": 26184846,
+    "seconds": 37.85856299999998,
+    "exceptions": []
+  },
+  "regression": {
+    "portablePassed": 45,
+    "windowsPassed": 5,
+    "mutationChecksPassed": 11,
+    "priorPortableTestsPreserved": 39,
+    "newReadPhaseGroups": 6,
+    "readHoldSaveClocks": [
+      26,
+      27,
+      28,
+      29,
+      30
+    ],
+    "saveFromPublicLatchObserver": true,
+    "readSideEffectsRepeated": 0,
+    "dynamicMmioChangesAtClocks": [
+      25,
+      26,
+      27,
+      29,
+      30
+    ],
+    "joyserDynamicChangeClock": 34,
+    "irqNmiEdges": [
+      24,
+      26,
+      28,
+      30
+    ],
+    "irqRefreshCollisionClocks": [
+      26,
+      30
+    ],
+    "refreshHoldCollisionClocks": [
+      5,
+      7,
+      8
+    ],
+    "exactStateAndTimedTraceChunking": "one master clock, block and whole field identical",
+    "savestateVersion": 3,
+    "olderSavestateVersionsRejected": [
+      1,
+      2
+    ],
+    "analyticalLongRunSecondsPerProfile": 3600
+  },
+  "phaseTraceExamples": {
+    "m2-read-latch-five": [
+      {
+        "sequence": 1,
+        "origin": "CPU",
+        "phase": {
+          "Phase": "read-latch",
+          "MasterClock": 4,
+          "StartClock": 0,
+          "LatchClock": 4,
+          "Cycle": {
+            "Address": 32768,
+            "Value": 120,
+            "Pins": "dp-remx-",
+            "Read": true,
+            "Valid": true
+          }
+        }
+      }
+    ],
+    "m2-read-complete-eight": [
+      {
+        "sequence": 1,
+        "origin": "CPU",
+        "phase": {
+          "Phase": "read-latch",
+          "MasterClock": 4,
+          "StartClock": 0,
+          "LatchClock": 4,
+          "Cycle": {
+            "Address": 32768,
+            "Value": 120,
+            "Pins": "dp-remx-",
+            "Read": true,
+            "Valid": true
+          }
+        }
+      },
+      {
+        "sequence": 2,
+        "origin": "CPU",
+        "phase": {
+          "Phase": "cycle-complete",
+          "MasterClock": 8,
+          "StartClock": 0,
+          "LatchClock": 4,
+          "Cycle": {
+            "Address": 32768,
+            "Value": 120,
+            "Pins": "dp-remx-",
+            "Read": true,
+            "Valid": true
+          }
+        }
+      }
+    ]
+  },
+  "reportSha256": {
+    "core-child": "c83e96187b8c38ad1c87a9989a8119ce41cb941cf3e3a47000d8f4cbbd7f884b",
+    "conformance-child": "eaef8238808d66ca22770c25132fb6572d6b8463d0a7cc025e98e56f7426003a",
+    "bus-conformance-child": "9d608286ef71173f6a798914b80825574ffe0ed9a4a2d1befe01edeffada86c1",
+    "windows-integration-child": "a8a000c6683267c7effd683ca23c8c4a58b3be5efb3386c3b731589a1a9cf026",
+    "mutations-child": "01c33da7a8128cb820c03db665ccbe4df1702938cd0e98c0738cfce80b049d2b",
+    "m2-benchmark": "98085e0583553ffbd6a96bd990bce1cdba5846521186ea807c1fbfb5edaa027f"
+  },
+  "performanceObservation": {
+    "host": {
+      "machine": "NILSPC1",
+      "os": "Microsoft Windows NT 10.0.26200.0",
+      "runtime": "10.0.12",
+      "processors": 24
+    },
+    "framesPerSecond": 498.14751393256324,
+    "masterclocksPerSecond": 178020984.4640244,
+    "stepNopInstructionsPerSecond": 4862819.851975763,
+    "singleCycleNopInstructionsPerSecond": 292967.7486453904
+  },
+  "uiSmoke": {
+    "scenes": [
+      "demo",
+      "main",
+      "settings",
+      "network",
+      "saves"
+    ],
+    "allExitCodes": 0,
+    "inspected": [
+      "demo",
+      "saves"
+    ],
+    "isolatedData": "artifacts/m2-read-phase-ui-data",
+    "imageSha256": {
+      "demo": "4b2c174f33e1663c5dc5edc71b411cf697d679389d5d590fbba12e6cb85b64fb",
+      "main": "dd633fc85cf8e35e2969fcb9169f4ca4a1ec20f34557a40f2c5fdc145a07066c",
+      "settings": "1472e76c87f95b6aff6e48dd22a2732faf84f4c47c70d967b3997342854208f5",
+      "network": "00d7a7708754612364781b7686725d6462037773e63ce22cdac09cf726e471da",
+      "saves": "f51fb352a9372dcae83d279b6adca0da660ae330374da0e87a6ab6c28086c12d"
+    }
+  },
+  "limitations": [
+    "Reference-informed analytical phases are not original5A22 hardware measurements",
+    "MDR/OpenBus precision remains M3, including4000-43FF internal CPU reads that preserve MDR in the reference",
+    "Existing M3 DMA/HDMA/I/O and M5/M7 whole-line rendering limitations remain unchanged",
+    "No SPC700/DSP sound core; independent native audio/graphics/hardware evidence remains explicitly skipped"
+  ]
+}

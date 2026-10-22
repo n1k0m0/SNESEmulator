@@ -138,9 +138,9 @@ save/load with read side effects, refresh at both phases, IRQ/NMI and refresh
 collisions, and rejection of both older savestate versions.
 
 The locally observed benchmark on NILSPC1 / Windows10.0.26200 / .NET10.0.12 was
-595.01 diagnostic fields/s (212.64 million master clocks/s) with the resumable
-instruction path. Standalone NOP execution reached4.52 million instructions/s;
-the exception-per-cycle diagnostic API reached0.292 million instructions/s.
+498.15 diagnostic fields/s (178.02 million master clocks/s) with the resumable
+instruction path. Standalone NOP execution reached4.86 million instructions/s;
+the exception-per-cycle diagnostic API reached0.293 million instructions/s.
 The diagnostic spends time in WAI; this is an idle-heavy workload. Single-cycle stepping is substantially slower and intended for bounded stepping
 and tests; normal exact-budget execution does not throw per cycle. This is one
 host/workload observation, not a commercial-game performance guarantee.

@@ -200,7 +200,9 @@ interrupt latches, captured read data and four-clock trailing hold. Versions1/2
 states are explicitly rejected. Additional tests change MMIO after read latch,
 save/load during each hold clock, and collide interrupts/refresh at both phases.
 
-The compact final measurement is recorded in [baselines/m2.json](baselines/m2.json).
+The original pending measurement is retained in [baselines/m2.json](baselines/m2.json).
+The corrected read-phase gate supersedes its timing model and is recorded in
+[baselines/m2-read-phases.json](baselines/m2-read-phases.json).
 Read [the timing contract](m2-timing-contract.md) for the execution model,
 reference sources, profile epoch and remaining device limitations. The concrete
 2/1/3 separate-chip target and nominal oscillators remain unverified hardware.
