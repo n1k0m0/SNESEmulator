@@ -1,6 +1,6 @@
 {
   "schema": "snes-m8-software-hardware-evidence-v1",
-  "status": "Implementation validation complete; independent parent acceptance pending",
+  "status": "Implementation validation complete; independently accepted by parent",
   "fullGateCommit": "47f91cb5deb26282c27aa4f26803e21dc24ce4db",
   "implementationCommits": [
     "328eb96",
@@ -39,7 +39,7 @@
     "threadParameterRuns": 8,
     "threadParameterHypothesis": "First divergence unchanged in all tested variants; scalar tie separation remains undecided",
     "ownHardwareMeasurement": false,
-    "parentAcceptance": "pending independent review",
+    "parentAcceptance": "accepted independently on10164c7",
     "archives": 12,
     "files": 7724
   },
@@ -307,5 +307,14 @@
   "accuracyCommand": "replace --verify with --accuracy-only; observed red accuracy exits1",
   "earlierCancelledRun": "artifacts/m8-full-validation-1.cancelled.json; not a passing fullgate",
   "M9": "Not started; realtime/UI/persistence/security/queues/distribution remain separate. publish/ is PRE-M0.",
-  "M10": "Enhancement chips and peripherals remain untested/unimplemented."
+  "M10": "Enhancement chips and peripherals remain untested/unimplemented.",
+  "parentAcceptance": {
+    "commit": "10164c78e24124dfc613764cffd859409aeed1f8",
+    "command": "python tools/test-lab.py --windows --full",
+    "exitCode": 0,
+    "log": "artifacts/root-m8-validation.log",
+    "evidence": "artifacts/root-m8-evidence/acceptance.json",
+    "manifestSha256": "c0fc6820a861ba406e18df0cea450f6e1b860a94ed59f4d32bc54f71fc12a60c",
+    "acceptanceSha256": "e966162990912e614f2d38e476be12a9b463e2eba996ebc2be4e931e5bc421ad"
+  }
 }

@@ -88,10 +88,10 @@ public sealed partial class Ppu
                 int index=(Scanline-1)*FrameGeometry.Stride+x*(FrameGeometry.Width/256);
                 if(FrameGeometry.Width==512){StorePixel(index,wide?left:color,light);StorePixel(index+1,color,light);}
                 else StorePixel(index,color,light);
-                Notice(new(Clock.Now,h,Scanline,"pixel",x));
+                if(PhaseObserved!=null)Notice(new(Clock.Now,h,Scanline,"pixel",x));
             }
         }
-        if(h==0||h==1080)Notice(new(Clock.Now,h,Scanline,h==0?"line":"obj-fetch",selectedCount));
+        if(h==0||h==1080)if(PhaseObserved!=null)Notice(new(Clock.Now,h,Scanline,h==0?"line":"obj-fetch",selectedCount));
         if(publish)PublishNotifications();
     }
     public void PublishNotifications(){foreach(var notice in notifications)PhaseObserved?.Invoke(notice);notifications.Clear();}
@@ -117,7 +117,7 @@ public sealed partial class Ppu
         {
             int word=MapWord(2,group*8+(Scroll[4]&~7),Scroll[5]+(slot.Plane==-3?8:0),Hires?8:0);
             if(slot.Plane==-2)offsetHorizontal=word;else offsetVertical=word;
-            Notice(new(Clock!.Now,h,Scanline,slot.Plane==-2?"opt-h":"opt-v",group));return;
+            if(PhaseObserved!=null)Notice(new(Clock!.Now,h,Scanline,slot.Plane==-2?"opt-h":"opt-v",group));return;
         }
         int ti=bg*66+group*(Hires?2:1)+slot.Half;if(ti>=backgroundTiles.Length)return;
         if(slot.Plane==-1)
@@ -131,7 +131,7 @@ public sealed partial class Ppu
             ushort word=(ushort)(Vram[address]|Vram[(address+1)&65535]<<8);
             switch(slot.Plane){case 0:t.Low=word;break;case 1:t.High=word;break;case 2:t.UpperLow=word;break;case 3:t.UpperHigh=word;break;}
         }
-        Notice(new(Clock!.Now,h,Scanline,slot.Plane<0?"bg-map":"bg-plane",ti));
+        if(PhaseObserved!=null)Notice(new(Clock!.Now,h,Scanline,slot.Plane<0?"bg-map":"bg-plane",ti));
     }
     private int MapWord(int bg,int sx,int sy,int widthOverride=0)
     {

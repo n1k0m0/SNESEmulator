@@ -20,18 +20,23 @@ public sealed class SnesSystem
     private long target;
     private bool writeAluDone;
     private readonly bool forcedProfile;
+    private readonly Action<int> cycleElapsed,holdElapsed,dmaElapsed;
     public bool ProfileForced=>forcedProfile;
     private sealed class ClockBudget : Exception;
     private readonly ClockBudget budget=new();
     public SnesSystem(HardwareProfile? profile=null,bool? forceProfile=null)
-    {forcedProfile=forceProfile??profile!=null;Profile=profile??HardwareProfile.Ntsc;Clock=new(Profile);Cpu=new(Bus);ConfigureClock();Bus.Reset();Clock.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;Cpu.InterruptPollingAllowed=()=>!Bus.CpuIo.State.IrqLock;}
+    {cycleElapsed=elapsed=>cycleRemaining-=elapsed;holdElapsed=elapsed=>holdRemaining-=elapsed;dmaElapsed=elapsed=>Bus.Dma.Elapse(elapsed);forcedProfile=forceProfile??profile!=null;Profile=profile??HardwareProfile.Ntsc;Clock=new(Profile);Cpu=new(Bus);ConfigureClock();Bus.Reset();Clock.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;Cpu.InterruptPollingAllowed=()=>!Bus.CpuIo.State.IrqLock;}
     private void ConfigureClock()
     {
+        long cachedTick=-1,cachedMaster=0;
         Clock.PeripheralBoundary=()=>{
             long tick=Bus.Apu.NextBoundary;if(tick==long.MaxValue)return Bus.Ppu.NextBoundary;
-            Int128 numerator=(Int128)tick*Profile.MasterHzNumerator*Profile.ApuHzDenominator;
-            long denominator=checked(Profile.ApuHzNumerator*Profile.MasterHzDenominator);
-            return Math.Min(Bus.Ppu.NextBoundary,(long)((numerator+denominator-1)/denominator));
+            if(tick!=cachedTick){
+                Int128 numerator=(Int128)tick*Profile.MasterHzNumerator*Profile.ApuHzDenominator;
+                long denominator=checked(Profile.ApuHzNumerator*Profile.MasterHzDenominator);
+                cachedMaster=(long)((numerator+denominator-1)/denominator);cachedTick=tick;
+            }
+            return Math.Min(Bus.Ppu.NextBoundary,cachedMaster);
         };
         Clock.PeripheralAdvanced=SynchronizeDevices;
         Clock.RefreshStarted=()=>{for(int i=1;i<=5;i++)Clock.Schedule(Clock.Now+i*8,HardwareEventKind.Device,1,-6);};
@@ -126,7 +131,7 @@ public sealed class SnesSystem
             if(Clock.StallUntil>Clock.Now){Clock.AdvanceTo(Math.Min(target,Math.Min(Clock.StallUntil,Clock.NextEventClock)));SyncInterrupts();continue;}
             int remaining=Bus.Dma.State.Remaining;
             long next=Math.Min(target,Math.Min(Clock.Now+remaining,Clock.NextEventClock));
-            Clock.ActiveTimeElapsed=elapsed=>Bus.Dma.Elapse(elapsed);try{Clock.AdvanceTo(next);}finally{Clock.ActiveTimeElapsed=null;}SyncInterrupts();
+            Clock.ActiveTimeElapsed=dmaElapsed;try{Clock.AdvanceTo(next);}finally{Clock.ActiveTimeElapsed=null;}SyncInterrupts();
             if(Bus.Dma.State.Remaining==0&&Clock.StallUntil<=Clock.Now){Bus.Dma.Boundary(Clock.Now);CommitPpuEndpoint();}
         }
     }
@@ -142,7 +147,7 @@ public sealed class SnesSystem
                 Clock.AdvanceTo(next);SyncInterrupts();continue;
             }
             long until=Math.Min(target,Math.Min(Clock.Now+remaining,Clock.NextEventClock));int delta=(int)(until-Clock.Now);
-            Clock.ActiveTimeElapsed=elapsed=>{if(hold)holdRemaining-=elapsed;else cycleRemaining-=elapsed;};
+            Clock.ActiveTimeElapsed=hold?holdElapsed:cycleElapsed;
             try{Clock.AdvanceTo(until);}finally{Clock.ActiveTimeElapsed=null;}SyncInterrupts();
         }
     }
@@ -179,6 +184,13 @@ public sealed class SnesSystem
     public void RunFrame(Action<SnesSystem>? beforeInstruction=null,Action<SnesSystem>? afterInstruction=null)
     {
         if(Bus.Cartridge==null)return;long frame=Frames;
-        while(Frames==frame)RunUntil(Clock.NextEventClock,beforeInstruction,afterInstruction);
+        while(Frames==frame){
+            // Events are already executed inside RunUntil. Stop only at a safe
+            // field horizon instead of forcing a continuation/exception at each
+            // refresh, HDMA and line event. V128 must commit its interlace tap
+            // before predicting the field tail (H0 may still be pending).
+            long end=Clock.V<129?Clock.Now-Clock.H+(129L-Clock.V)*1364:Clock.Now+Clock.ClocksUntilFieldEnd;
+            RunUntil(end,beforeInstruction,afterInstruction);
+        }
     }
 }

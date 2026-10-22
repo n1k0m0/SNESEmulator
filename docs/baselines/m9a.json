@@ -1,0 +1,9 @@
+{
+  "schema": "m9a-performance-baseline-v1",
+  "status": "Implementation in progress; clean full/extended/sustained validation and independent parent acceptance pending",
+  "startingCoreCommit": "10164c78e24124dfc613764cffd859409aeed1f8",
+  "baseline": "artifacts/m9a/baseline",
+  "contract": "docs/m9-performance-contract.md",
+  "noHardwareAccuracyUpgrade": true,
+  "knownRedM8WholeConsoleAudioRows": 18
+}

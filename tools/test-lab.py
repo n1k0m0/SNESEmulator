@@ -25,6 +25,8 @@ run([sys.executable,'tools/own-ipl.py'])
 run([sys.executable,'tools/verify-ppu-testdata.py'])
 run([sys.executable,'tools/verify-video-testdata.py'])
 run([sys.executable,'tools/verify-m8-testdata.py'])
+# M9 frozen preoptimization state/trace regression, separate from accuracy oracles.
+run([sys.executable,'tools/test-performance.py'])
 run([sys.executable,'tools/dsp-reference.py','--verify'])
 run([sys.executable,'tools/verify-dsp-gaussian.py'])
 # M5 adds334 full-system PPU snapshots and42 graphics groups to87 prior groups.

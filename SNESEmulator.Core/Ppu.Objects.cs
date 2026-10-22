@@ -52,7 +52,7 @@ public sealed partial class Ppu
                 int color=((f.Low>>bit)&1)|((f.Low>>(bit+8))&1)<<1|((high>>bit)&1)<<2|((high>>(bit+8))&1)<<3;
                 if(color!=0){nextObjectPalette[x]=f.Palette+color;nextObjectPriority[x]=f.Priority;}
             }
-            objectFetchIndex++;objectNextH=h+4;Notice(new(Clock!.Now,h,Scanline,"obj-high",objectFetchIndex-1));return;
+            objectFetchIndex++;objectNextH=h+4;if(PhaseObserved!=null)Notice(new(Clock!.Now,h,Scanline,"obj-high",objectFetchIndex-1));return;
         }
         while(true)
         {
@@ -77,7 +77,7 @@ public sealed partial class Ppu
             int tile=(((d.Tile>>4)+(d.Row>>3))&15)*16+((d.Tile+tx)&15);
             var f=new ObjFetch{X=signed,Address=(d.Origin+tile*32+(d.Row&7)*2)&65535,Palette=128+((d.Flags>>1)&7)*16,Priority=(d.Flags>>4)&3,Flip=(d.Flags&64)!=0};
             f.Low=ForcedBlank?(ushort)0:(ushort)(Vram[f.Address]|Vram[(f.Address+1)&65535]<<8);
-            objectFetches=[..objectFetches,f];objectFetchCount++;objectNextH=h+4;Notice(new(Clock!.Now,h,Scanline,"obj-low",objectFetchCount-1));return;
+            objectFetches=[..objectFetches,f];objectFetchCount++;objectNextH=h+4;if(PhaseObserved!=null)Notice(new(Clock!.Now,h,Scanline,"obj-low",objectFetchCount-1));return;
         }
     }
 }

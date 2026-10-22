@@ -1,0 +1,15 @@
+{
+  "schema": "m9-performance-regression-identities-v1",
+  "originCommit": "10164c78e24124dfc613764cffd859409aeed1f8",
+  "baselineCoreDllSha256": "d0d6af87a2ddb6549fd31ae77361960fb66a546441b3b692cce0468f4482dc9e",
+  "originalSuspendHarnessSha256": "a68b8329b7dbdc08dbb4811068c6b764c2e546f02522613ab91fa4ac5d3f108e",
+  "files": {
+    "SNESEmulator.Lab/Performance.cs": "5b9a42b343bfae60eb08bddbc91d4e2edf609a6a09194abcd38498ec1ffa4765",
+    "SNESEmulator.Lab/SuspendProof.cs": "b04dfb9bc9258f53ef8ce12a67e040959e7fcf2636ec370c52c44911b33a0763",
+    "SNESEmulator.Lab/FrameProof.cs": "126271cdb148cd7971da9f846e3b3c94132453ea62ae4d6b907c30a6c7c7dda3",
+    "testdata/m9-performance-replay.json": "c5e7e91e565ee6feaf3a3bf377d8a068f60581e737f72dbb8ae35b140309bde6",
+    "testdata/m9-performance-baseline.json": "11c9c7a2b6ae55cfaa102c291fb7e76a02ead3e90e00cf08efa1ef582f622377",
+    "testdata/m9-spc-suspension-reference.jsonl.gz": "837e898f015a401db0be290794d7938b507a5eb0c95d4b9248d301f54bc3ff84",
+    "tools/test-performance.py": "548828b9d8f43de8149cb03874326810fa00fddf2e99082fbba44f01553066aa"
+  }
+}

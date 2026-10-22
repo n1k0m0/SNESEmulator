@@ -20,6 +20,10 @@ public sealed class MasterClock(HardwareProfile profile)
     public long ApuRemainder {get;private set;}
     public long StallUntil {get;private set;}
     private long sequence;
+    private static Int128 ValidatedRate(HardwareProfile p){p.Validate();return (Int128)p.ApuHzNumerator*p.MasterHzDenominator;}
+    private readonly Int128 apuRate=ValidatedRate(profile);
+    private readonly long apuDenominator=checked(profile.MasterHzNumerator*profile.ApuHzDenominator);
+    private readonly long safeApuDelta=(long)Int128.Min(long.MaxValue,((Int128)long.MaxValue-(checked(profile.MasterHzNumerator*profile.ApuHzDenominator)-1))/((Int128)profile.ApuHzNumerator*profile.MasterHzDenominator));
     private readonly List<HardwareEvent> events=[];
     public Action? RefreshStarted {get;set;}
     public Action<HardwareEvent>? DeviceEvent {get;set;}
@@ -100,9 +104,11 @@ public sealed class MasterClock(HardwareProfile profile)
     {
         long delta=to-Now;
         ActiveTimeElapsed?.Invoke(checked((int)delta));
-        Int128 sum=(Int128)ApuRemainder+(Int128)delta*Profile.ApuHzNumerator*Profile.MasterHzDenominator;
-        long denominator=checked(Profile.MasterHzNumerator*Profile.ApuHzDenominator);
-        ApuTicks+=(long)(sum/denominator);ApuRemainder=(long)(sum%denominator);H=checked(H+(int)delta);Now=to;
+        // The serialized remainder stays in the original, unreduced domain.
+        // Bound the entire sum in advance; unusual wide profiles retain Int128.
+        if(delta<=safeApuDelta){long sum=ApuRemainder+delta*(long)apuRate;ApuTicks+=sum/apuDenominator;ApuRemainder=sum%apuDenominator;}
+        else {Int128 sum=ApuRemainder+(Int128)delta*apuRate;ApuTicks+=(long)(sum/apuDenominator);ApuRemainder=(long)(sum%apuDenominator);}
+        H=checked(H+(int)delta);Now=to;
     }
     public long NextEventClock => events.Count==0?long.MaxValue:events[0].Clock;
     public long ClocksUntilFieldEnd

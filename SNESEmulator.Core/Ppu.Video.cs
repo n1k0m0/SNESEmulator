@@ -69,7 +69,7 @@ public sealed partial class Ppu
             if(bg==1)color&=127;
             samplePalette[bg]=color;samplePriority[bg]=color==0?-1:rank;sampleGroup[bg]=0;
         }
-        Notice(new(Clock!.Now,Clock.H,Scanline,"mode7-affine",x));
+        if(PhaseObserved!=null)Notice(new(Clock!.Now,Clock.H,Scanline,"mode7-affine",x));
     }
     private static int Signed13(int value)=>(value&4096)!=0?(value&8191)-8192:value&8191;
     private static int Mode7Clip(int value)=>(value&8192)!=0?(value&1023)-1024:value&1023;

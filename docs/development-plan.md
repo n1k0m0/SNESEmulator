@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M7 unabhängig abgenommen. M8 wird implementiert; M9–M10 bleiben offen. Messumfang: [Testlabor](test-laboratory.md), [M6-Vertrag](m6-dsp-contract.md), [M5-Vertrag](m5-ppu-contract.md), [M4-Vertrag](m4-apu-contract.md), [M3-Vertrag](m3-io-contract.md), [M2-Vertrag](m2-timing-contract.md). Alle5.080.400 externen CPU-Semantik- und Busfälle bestehen. Keine eigene Konsolenmessung.
+Status: M0–M8 unabhängig abgenommen. M9a Performance wird implementiert; weitere M9-Phasen und M10 bleiben offen.
 
 ## Ziel und Nachweis
 
@@ -474,7 +474,7 @@ C#-Kern und die vorhandenen Lizenzgrenzen bleiben erhalten.
 
 M8-Implementierungsvollgate: sauberer Commit `47f91cb`,
 `python tools/test-lab.py --windows --full` mit Exit 0, 209 portable und
-10 Windows-Gruppen. Die unabhängige Root-Abnahme steht aus. Genauigkeitsfehler
+10 Windows-Gruppen. Die unabhängige Root-Abnahme auf `10164c7` bestand mit Exit0 (`artifacts/root-m8-validation.log`). Genauigkeitsfehler
 bleiben in den gesonderten Berichten rot; [Baseline M8](baselines/m8.json) und
 [M8-Vertrag](m8-compatibility-contract.md) halten Repros und Nachweisgrenzen fest.
-M9 und M10 wurden in dieser Phase nicht begonnen.
+M9a Performance wird implementiert; weitere M9-Produktphasen und M10 bleiben offen.

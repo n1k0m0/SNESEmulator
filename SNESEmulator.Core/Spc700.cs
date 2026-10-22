@@ -15,8 +15,10 @@ public sealed class Spc700(ISpcBus bus)
     public long Instructions {get;set;}
     public Action<SpcCycle>? BeforeCycle {get;set;}
     public Action<SpcCycle>? CycleObserved {get;set;}
-    internal Action<SpcCycle>? PrepareCycle {get;set;}
-    internal Action<SpcCycle>? EffectCompleted {get;set;}
+    internal Func<SpcCycle,bool>? PrepareCycle {get;set;}
+    private SpcRegisters? suspended;
+    private bool cooperative;
+    internal Func<SpcCycle,bool>? EffectCompleted {get;set;}
     private SpcRegisters? entry;
     private readonly List<SpcCycle> completed=[];
     private int cursor;
@@ -33,14 +35,25 @@ public sealed class Spc700(ISpcBus bus)
     // A completed cycle is appended before observation, so snapshots never repeat an MMIO effect.
     private byte Cycle(ushort? address,byte? value,string direction)
     {
+        if(suspended!=null)return 0;
         if(entry!=null&&cursor<completed.Count){var c=completed[cursor++];if(c.Address!=address||c.Direction!=direction||(direction=="write"&&c.Value!=value))throw new InvalidDataException("SPC replay diverged");return c.Value??0;}
         if(single&&cursor>=limit)throw yielded;
-        var next=new SpcCycle(address,value,direction);PrepareCycle?.Invoke(next);BeforeCycle?.Invoke(next);
+        var next=new SpcCycle(address,value,direction);
+        if(PrepareCycle!=null&&!PrepareCycle(next)){
+            // Keep exactly the register point formerly exposed by budget throw.
+            // Remaining decoder operations are private speculation: all bus and
+            // observer calls are suppressed, then every architectural field is
+            // restored. The finite decoder has no host effects outside Cycle.
+            return Suspend();
+        }
+        BeforeCycle?.Invoke(next);
         if(direction=="read")value=bus.Read(address!.Value);
         if(direction=="write")bus.Write(address!.Value,value!.Value);
         next=next with {Value=value};if(entry!=null)completed.Add(next);cursor++;
-        EffectCompleted?.Invoke(next);CycleObserved?.Invoke(next);return value??0;
+        if(EffectCompleted!=null&&!EffectCompleted(next)){return Suspend();}
+        CycleObserved?.Invoke(next);return value??0;
     }
+    private byte Suspend(){if(!cooperative)throw yielded;suspended=Capture();return 0;}
     private byte R(int a)=>Cycle((ushort)a,0,"read");
     private void W(int a,int v)=>Cycle((ushort)a,(byte)v,"write");
     private void Idle()=>Cycle(null,null,"wait");
@@ -75,10 +88,15 @@ public sealed class Spc700(ISpcBus bus)
         single=true;entry??=Capture();limit=completed.Count+1;Restore(entry);cursor=0;
         try{Execute();entry=null;completed.Clear();return false;}catch(Yield){return true;}finally{single=false;}
     }
-    // Run through cycles until the timing callback suspends. Completed reads/writes are replayed only from data.
-    public void RunInstruction()
+    // Returns false at a cooperative timing boundary. Completed reads/writes are replayed only from data.
+    public bool RunInstruction()
     {
-        entry??=Capture();Restore(entry);cursor=0;Execute();entry=null;completed.Clear();
+        entry??=Capture();Restore(entry);cursor=0;suspended=null;cooperative=true;
+        try {
+            Execute();
+            if(suspended!=null){Restore(suspended);return false;}
+            entry=null;completed.Clear();return true;
+        } finally {suspended=null;cooperative=false;}
     }
     private void Execute()
     {

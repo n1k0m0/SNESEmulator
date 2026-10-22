@@ -30,7 +30,17 @@ public sealed partial class Cpu65816
     private sealed class CycleBoundary : Exception;
     private readonly CycleBoundary boundary = new();
     public bool AtInstructionBoundary => initial == null;
-    public CpuRegisters Registers => new(A,X,Y,S,D,PC,P,PBR,DBR,E,Waiting,Stopped,Instructions);
+    private CpuRegisters? registerCache;
+    private CpuCycle? idleCache;
+    private static readonly InterruptSample[] interruptSamples=[new(false,false),new(true,false),new(false,true),new(true,true)];
+    private static InterruptSample Sample(bool nmi,bool irq)=>interruptSamples[(nmi?1:0)+(irq?2:0)];
+    public CpuRegisters Registers {
+        get {
+            var r=registerCache;
+            if(r!=null&&r.PC==PC&&r.Instructions==Instructions&&r.A==A&&r.X==X&&r.Y==Y&&r.S==S&&r.D==D&&r.P==P&&r.PBR==PBR&&r.DBR==DBR&&r.E==E&&r.Waiting==Waiting&&r.Stopped==Stopped)return r;
+            return registerCache=new(A,X,Y,S,D,PC,P,PBR,DBR,E,Waiting,Stopped,Instructions);
+        }
+    }
     private void Restore(CpuRegisters r)
     { A=r.A;X=r.X;Y=r.Y;S=r.S;D=r.D;PC=r.PC;P=r.P;PBR=r.PBR;DBR=r.DBR;E=r.E;Waiting=r.Waiting;Stopped=r.Stopped;Instructions=r.Instructions; }
     public CpuContinuation? CaptureContinuation() => initial == null ? null : new(initial,completed.ToArray(),entry,samples.ToArray());
@@ -85,7 +95,9 @@ public sealed partial class Cpu65816
         {Idle(PBR<<16|PC);Idle();if(entry==CpuEntry.WakeOnly)return;}
         CycleRead(PBR<<16|PC,"dp-");Idle(PBR<<16|PC);Interrupt(entry is CpuEntry.Nmi or CpuEntry.WakeNmi?(E?0xfffa:0xffea):(E?0xfffe:0xffee),false);
     }
-    private string Pins(string select, bool read) => select+(read?"r":"w")+(E?"e":"-")+((P&Memory8)!=0?"m":"-")+((P&Index8)!=0?"x":"-")+(locked?"l":"-");
+    private static readonly string[] pinNames=CreatePinNames();
+    private static string[] CreatePinNames(){var names=new string[160];string[] selects=["d--","dp-","-p-","d-v","---"];for(int s=0;s<5;s++)for(int f=0;f<32;f++)names[s*32+f]=selects[s]+((f&1)!=0?"r":"w")+((f&2)!=0?"e":"-")+((f&4)!=0?"m":"-")+((f&8)!=0?"x":"-")+((f&16)!=0?"l":"-");return names;}
+    private string Pins(string select,bool read){int s=select switch{"d--"=>0,"dp-"=>1,"-p-"=>2,"d-v"=>3,"---"=>4,_=>throw new InvalidOperationException("Unknown CPU pin selection")};return pinNames[s*32+(read?1:0)+(E?2:0)+((P&Memory8)!=0?4:0)+((P&Index8)!=0?8:0)+(locked?16:0)];}
     private byte CycleRead(int address,string select="d--") => Cycle(address,null,Pins(vector?"d-v":select,true));
     private byte Read(int address) {lastRead=CycleRead(address);return lastRead;}
     private byte ReadLatchedValue(int address) => lastRead;
@@ -101,15 +113,20 @@ public sealed partial class Cpu65816
     {
         count++;if(address.HasValue)address &= 0xffffff;
         if(initial!=null && cursor<completed.Count) {ResumeCycle?.Invoke();var prior=completed[cursor];var sampled=samples[cursor++];sampleNmi=sampled.Nmi;sampleIrq=sampled.Irq;lastAddress=address??0;return prior.Value??0;}
-        var pending=new CpuCycle(address,value,pins);
-        pendingSample??=new(nmiLatched&&(InterruptPollingAllowed?.Invoke()??true),irqLine&&(P&I)==0&&(InterruptPollingAllowed?.Invoke()??true));
+        // Invalid idle pins often repeat unchanged throughout WAI. These immutable
+        // observations and register caches contain only derived data; saves
+        // retain exactly the original architectural state and journal bytes.
+        bool idle=pins.StartsWith("---",StringComparison.Ordinal);
+        var pending=idle&&idleCache is {} cached&&cached.Address==address&&cached.Value==value&&cached.Pins==pins?cached:new CpuCycle(address,value,pins);
+        if(idle)idleCache=pending;
+        pendingSample??=Sample(nmiLatched&&(InterruptPollingAllowed?.Invoke()??true),irqLine&&(P&I)==0&&(InterruptPollingAllowed?.Invoke()??true));
         sampleNmi=pendingSample.Nmi;sampleIrq=pendingSample.Irq;
         BeforeCycle?.Invoke(pending);
         byte? data=value;
         if(pending.Valid && address.HasValue) {if(pending.Read)data=bus.Read(address.Value);else bus.Write(address.Value,value!.Value);}
-        var actual=pending with {Value=data};lastAddress=address??0;
+        var actual=data==value?pending:pending with {Value=data};lastAddress=address??0;
         pendingSample=null;
-        if(initial!=null) {completed.Add(actual);samples.Add(new(sampleNmi,sampleIrq));cursor++;}
+        if(initial!=null) {completed.Add(actual);samples.Add(Sample(sampleNmi,sampleIrq));cursor++;}
         EffectCompleted?.Invoke(actual);CycleObserved?.Invoke(actual);AfterCycle?.Invoke(actual);
         if(incremental)throw boundary;
         return data??0;

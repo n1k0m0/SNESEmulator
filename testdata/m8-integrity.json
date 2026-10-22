@@ -19,8 +19,8 @@
     },
     {
       "path": "SNESEmulator.Lab/Program.cs",
-      "bytes": 33718,
-      "sha256": "8268a3ca04622ff88cda1be253ef41ca3377d5ed60673451cd40c238cd368a8a"
+      "bytes": 33885,
+      "sha256": "9d8c15463e94b922cb7e69223fa6b439268280fb50cb8ed33a515a59d438f427"
     },
     {
       "path": "testdata/m5-ppu-manifest.json",
@@ -7169,8 +7169,8 @@
     },
     {
       "path": "tools/test-lab.py",
-      "bytes": 9409,
-      "sha256": "849147fefef11b0149105d7fca747c6d9ee15308d2f0f3be1d456f1b80572c1a"
+      "bytes": 9543,
+      "sha256": "7707bdd30c2142c997a105666578ee50af0aee3918269667a41e5c0ba3f199e2"
     },
     {
       "path": "tools/verify-m8-testdata.py",

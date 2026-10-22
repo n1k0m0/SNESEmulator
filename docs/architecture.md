@@ -151,3 +151,9 @@ Parametervergleiche erklären die erste Audioabweichung damit nicht. Diese
 Diagnose verändert keine Produktzeitbasis und kein erworbenes Sollbild.
 [Baseline M8](baselines/m8.json) verweist auf den unveränderten Evidenzfreeze;
 die unabhängige Abnahme bleibt ein eigener Schritt.
+
+
+M9a preserves format9 and all digital output while reducing scheduler suspension
+and observation allocation costs; see [performance contract](m9-performance-contract.md).
+The frontend still runs synchronously; threading and product/distribution work
+remain subsequent M9 phases. M8 was independently accepted on10164c7.

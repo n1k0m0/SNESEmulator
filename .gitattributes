@@ -41,3 +41,11 @@ testdata/m8-console-own-ipl/*LICENSE* -text -whitespace
 testdata/m8-console-own-ipl/bsnes-GPLv3.txt -text -whitespace
 testdata/m8-game/*.md -text -whitespace
 testdata/m8-game/*LICENSE -text -whitespace
+
+# M9 frozen suspension/performance adapter fingerprints.
+SNESEmulator.Lab/Performance.cs text eol=lf
+SNESEmulator.Lab/SuspendProof.cs text eol=lf
+SNESEmulator.Lab/FrameProof.cs text eol=lf
+
+# Preserve the exact preoptimization replay bytes (CRLF).
+testdata/m9-performance-replay.json -text

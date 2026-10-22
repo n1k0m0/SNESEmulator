@@ -1,0 +1,694 @@
+{
+  "schema": "m9-preoptimization-regression-v1",
+  "coreCommit": "10164c78e24124dfc613764cffd859409aeed1f8",
+  "coreDllSha256": "d0d6af87a2ddb6549fd31ae77361960fb66a546441b3b692cce0468f4482dc9e",
+  "accuracy": "Frozen prior implementation outputs only; independent M0-M8 hardware/software oracles remain separate and unchanged",
+  "entries": [
+    {
+      "fields": 120,
+      "expected": {
+        "name": "audio-ntsc",
+        "mode": "untraced",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 120,
+        "masterClocks": 42883920,
+        "dspSamples": 69237,
+        "presentationDrops": 0,
+        "videoSha256": "0b146276f4a8dc437d5f9297f03d75e104ef314ff3a2e2502a8e3db0a5225211",
+        "traceRows": 0,
+        "traceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pcmSha256": "52bd49062726c47943ded176da349be947985e91a06e7b7fd789049781c03798",
+        "stateSha256": "99649671110d72942bb3290322e994fbd254a769ea08a3c0f04fd5eec8c0e5a3",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd"
+          },
+          {
+            "field": 9,
+            "clock": 3573660,
+            "stateSha256": "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725"
+          },
+          {
+            "field": 129,
+            "clock": 46457580,
+            "stateSha256": "945e716496f7e5539928de25ea3737469b5ea4dd1f00c5a7a2f506278dec89d0"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 120,
+      "expected": {
+        "name": "diagnostic-ntsc",
+        "mode": "untraced",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "35f3537026357b74d14ec7d1e99c509cc0086ba305431c57d5cc6c5d03d90d00",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 120,
+        "masterClocks": 42883920,
+        "dspSamples": 69237,
+        "presentationDrops": 0,
+        "videoSha256": "1b255fb93a3834c487a7ce4cc55271f44398e7103529cd6f367521ac04208aad",
+        "traceRows": 0,
+        "traceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pcmSha256": "179f6db844c9a1d1b8338a6530589c9f935d9b9e2357423806f082e750427bc1",
+        "stateSha256": "963be3c6d93d78b31f88339776f65d8f766fc7f6915dd3fe340b25a6ab88d780",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e"
+          },
+          {
+            "field": 9,
+            "clock": 3573660,
+            "stateSha256": "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc"
+          },
+          {
+            "field": 129,
+            "clock": 46457580,
+            "stateSha256": "a33b57a85e2788c0210030674247f77cc408031265e2eadac6411586fca7cf82"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 120,
+      "expected": {
+        "name": "game-ntsc",
+        "mode": "untraced",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+        "replaySha256": "c5e7e91e565ee6feaf3a3bf377d8a068f60581e737f72dbb8ae35b140309bde6",
+        "warmupFields": 10,
+        "measuredFields": 320,
+        "masterClocks": 114357120,
+        "dspSamples": 175729,
+        "presentationDrops": 0,
+        "videoSha256": "936fb6ce15cf3315eb7616621895942340d8678916daf11699f00d4053931072",
+        "traceRows": 0,
+        "traceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pcmSha256": "56ef6e8a2722b0388ec9dddf2e8f3211513f0286a707058a9d25170d37a603d9",
+        "stateSha256": "eca8b2fe64f64f86901b90324f835469727663b60ef5e77526c689b2b40c90be",
+        "sramSha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "f9bd5ae1b3b024e97ee858fdb5f63ead3ec0f9373ccfdc0ecc02b70863071e6b"
+          },
+          {
+            "field": 9,
+            "clock": 3573660,
+            "stateSha256": "c2fa789c162c346d4c2580bfc05922bfb76ecbe77b2928b5a0c07d96ccac1227"
+          },
+          {
+            "field": 329,
+            "clock": 117930780,
+            "stateSha256": "74a32360ebcfd7f4fc7fccbc311141add74da97dbe85f3215912b8c1843ffed4"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 120,
+      "expected": {
+        "name": "game-pal",
+        "mode": "untraced",
+        "profile": {
+          "Id": "pal-separate-2-1-3-unverified",
+          "Pal": true,
+          "MasterHzNumerator": 21281370,
+          "MasterHzDenominator": 1,
+          "Lines": 312,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+        "replaySha256": "c5e7e91e565ee6feaf3a3bf377d8a068f60581e737f72dbb8ae35b140309bde6",
+        "warmupFields": 10,
+        "measuredFields": 320,
+        "masterClocks": 136181760,
+        "dspSamples": 211189,
+        "presentationDrops": 0,
+        "videoSha256": "2ea69e84b9c4f7de6aadd76e170d19968c46bae1e52d0ad25bdca2627ded896e",
+        "traceRows": 0,
+        "traceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pcmSha256": "c1af48b81eee0469c4411fd45cc4397732ca30d6fc2a86516b610adfb85333be",
+        "stateSha256": "31bb450adbd07c77abe46c97a2653292bc439900024ad9a1c577880129a82ec1",
+        "sramSha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 425568,
+            "stateSha256": "16eab4f61ca632b613fa998565e3692592fbeacfdd37f552906fd0182ac721cc"
+          },
+          {
+            "field": 9,
+            "clock": 4255680,
+            "stateSha256": "762e01d15a862696ada5cdd19fcb965ac60bd101b512fd0a2efb49e218404e4f"
+          },
+          {
+            "field": 329,
+            "clock": 140437440,
+            "stateSha256": "5c9168356ba209c80a1b8efa3e222a5fc84d473be8bc5407abf0d4d45ef26a4d"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 120,
+      "expected": {
+        "name": "geometry-ntsc",
+        "mode": "untraced",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 120,
+        "masterClocks": 42966000,
+        "dspSamples": 69368,
+        "presentationDrops": 0,
+        "videoSha256": "2fadc33fb29f668e46235ee35dd13a24ffb53d21bca044a69f404435a78eaa1c",
+        "traceRows": 0,
+        "traceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pcmSha256": "820bcfbc84985ac2ebfff9bccdecacc5ea10d1fc5da0bf6d61daacd4f74c624f",
+        "stateSha256": "56d12ad52b42578a4681ea0a872255f9f6ceb193ec81286d8e9ae1415386ad18",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "a6952d68e53767dc5e5b0d1064828167af82505f133ee1c86cea7450cfdc0b53"
+          },
+          {
+            "field": 9,
+            "clock": 3579136,
+            "stateSha256": "4751c827b576bf1fc9c1ccc2264124a035d2343d17e448e379e7f899dcc4707d"
+          },
+          {
+            "field": 129,
+            "clock": 46545136,
+            "stateSha256": "2b25d695f45752754b3b412522017287799e473253dcf7e646e3d2e15a1af2f8"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 120,
+      "expected": {
+        "name": "geometry-pal",
+        "mode": "untraced",
+        "profile": {
+          "Id": "pal-separate-2-1-3-unverified",
+          "Pal": true,
+          "MasterHzNumerator": 21281370,
+          "MasterHzDenominator": 1,
+          "Lines": 312,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 120,
+        "masterClocks": 51150240,
+        "dspSamples": 83338,
+        "presentationDrops": 0,
+        "videoSha256": "beac8fd6aac192b60740f42b2e70650e5438d103909f5243db3fb4c3079492c8",
+        "traceRows": 0,
+        "traceSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "pcmSha256": "e780e192c7ecf36b6890589881a045e4c1a3009b5e03088a99637e8d6d1130ba",
+        "stateSha256": "9b77dac11f34b3151b0bcd6437eb918b3278df8bf29065360308d46c0a7e459a",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 425568,
+            "stateSha256": "740b3bdbdf5aa3ccd9a185b7c99e7240e15ea1a5b3e4f6d3571533034cde2689"
+          },
+          {
+            "field": 9,
+            "clock": 4261156,
+            "stateSha256": "157785fb5b912d74523e60308b34dbd35399a2190c14859ee7fc5c551669e956"
+          },
+          {
+            "field": 129,
+            "clock": 55411396,
+            "stateSha256": "dfbc285060be56b317ff0b744394d4ba3f546dbbf78e18bc87ae76aa7b3bbf98"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 16,
+      "expected": {
+        "name": "audio-ntsc",
+        "mode": "traced",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 16,
+        "masterClocks": 5717856,
+        "dspSamples": 13862,
+        "presentationDrops": 0,
+        "videoSha256": "f6e43fe360604ce7b3973458f4566611d83b1c7836269bd97b061f88f720975d",
+        "traceRows": 131673,
+        "traceSha256": "3865043328709238dafab3d9fa10116cca51119a0c91205b36be7297e1491b2d",
+        "pcmSha256": "623eac03299baff45a7f72ff76e39c83f971baca56330635115d97ea2c71b2e4",
+        "stateSha256": "ed2a9454de1b8f08e098ef10d5111d6f27a518d15aeba8eedd9c4ed7a50584ce",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd"
+          },
+          {
+            "field": 9,
+            "clock": 3573660,
+            "stateSha256": "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725"
+          },
+          {
+            "field": 25,
+            "clock": 9291516,
+            "stateSha256": "b97419d3ecaaf27ec29a95bde5b010ee7d942d87d79bd4f6ed12486da8baedbf"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 16,
+      "expected": {
+        "name": "diagnostic-ntsc",
+        "mode": "traced",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "35f3537026357b74d14ec7d1e99c509cc0086ba305431c57d5cc6c5d03d90d00",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 16,
+        "masterClocks": 5717856,
+        "dspSamples": 13862,
+        "presentationDrops": 0,
+        "videoSha256": "eb0514f695f03bc53d92b485405daa5ddb8c4ce52b89c547ea6dcbc72ac4a4c9",
+        "traceRows": 1585134,
+        "traceSha256": "67ffd842bc4c30c4236bfb8c824966371544925dc1b5208a2465f851deacb6f1",
+        "pcmSha256": "ce06aa2638b01f2d3f0bdb6eca3c6d98f1051d5bba68935abaefe929541c4a4e",
+        "stateSha256": "66ebf79bfd62f557f3141b20c3a200eed8603f5feb1cbf1fac6c24a5c8e0127c",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e"
+          },
+          {
+            "field": 9,
+            "clock": 3573660,
+            "stateSha256": "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc"
+          },
+          {
+            "field": 25,
+            "clock": 9291516,
+            "stateSha256": "98e6f3bb17202faeba35a0411111a79438852178fe1246737b0f0ec944d686df"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 16,
+      "expected": {
+        "name": "game-ntsc",
+        "mode": "traced",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+        "replaySha256": "c5e7e91e565ee6feaf3a3bf377d8a068f60581e737f72dbb8ae35b140309bde6",
+        "warmupFields": 10,
+        "measuredFields": 320,
+        "masterClocks": 114357120,
+        "dspSamples": 175729,
+        "presentationDrops": 0,
+        "videoSha256": "936fb6ce15cf3315eb7616621895942340d8678916daf11699f00d4053931072",
+        "traceRows": 24898866,
+        "traceSha256": "c13726df21efac7a1907a74af4208270308adab0a334a09499c4a71846555f0b",
+        "pcmSha256": "56ef6e8a2722b0388ec9dddf2e8f3211513f0286a707058a9d25170d37a603d9",
+        "stateSha256": "eca8b2fe64f64f86901b90324f835469727663b60ef5e77526c689b2b40c90be",
+        "sramSha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "f9bd5ae1b3b024e97ee858fdb5f63ead3ec0f9373ccfdc0ecc02b70863071e6b"
+          },
+          {
+            "field": 9,
+            "clock": 3573660,
+            "stateSha256": "c2fa789c162c346d4c2580bfc05922bfb76ecbe77b2928b5a0c07d96ccac1227"
+          },
+          {
+            "field": 329,
+            "clock": 117930780,
+            "stateSha256": "74a32360ebcfd7f4fc7fccbc311141add74da97dbe85f3215912b8c1843ffed4"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 16,
+      "expected": {
+        "name": "game-pal",
+        "mode": "traced",
+        "profile": {
+          "Id": "pal-separate-2-1-3-unverified",
+          "Pal": true,
+          "MasterHzNumerator": 21281370,
+          "MasterHzDenominator": 1,
+          "Lines": 312,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+        "replaySha256": "c5e7e91e565ee6feaf3a3bf377d8a068f60581e737f72dbb8ae35b140309bde6",
+        "warmupFields": 10,
+        "measuredFields": 320,
+        "masterClocks": 136181760,
+        "dspSamples": 211189,
+        "presentationDrops": 0,
+        "videoSha256": "2ea69e84b9c4f7de6aadd76e170d19968c46bae1e52d0ad25bdca2627ded896e",
+        "traceRows": 28633130,
+        "traceSha256": "b93a483d21e51e9d93a325ff7315ed59016f22dc7b03407d09cd76b959ad1081",
+        "pcmSha256": "c1af48b81eee0469c4411fd45cc4397732ca30d6fc2a86516b610adfb85333be",
+        "stateSha256": "31bb450adbd07c77abe46c97a2653292bc439900024ad9a1c577880129a82ec1",
+        "sramSha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 425568,
+            "stateSha256": "16eab4f61ca632b613fa998565e3692592fbeacfdd37f552906fd0182ac721cc"
+          },
+          {
+            "field": 9,
+            "clock": 4255680,
+            "stateSha256": "762e01d15a862696ada5cdd19fcb965ac60bd101b512fd0a2efb49e218404e4f"
+          },
+          {
+            "field": 329,
+            "clock": 140437440,
+            "stateSha256": "5c9168356ba209c80a1b8efa3e222a5fc84d473be8bc5407abf0d4d45ef26a4d"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 16,
+      "expected": {
+        "name": "geometry-ntsc",
+        "mode": "traced",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 16,
+        "masterClocks": 5728800,
+        "dspSamples": 13886,
+        "presentationDrops": 0,
+        "videoSha256": "b9d9a0e66f823d519c01c23a008c04548f7e52bada09e834aabb1ada9c5f57d0",
+        "traceRows": 63297,
+        "traceSha256": "596e20d9ac8c746f3ec24885fc3dacd02b5af239fd0a37d932672b303eb92d2d",
+        "pcmSha256": "474dd6f1f003465ab6e54abd3dd5b4a822408fec9f0c096aff0bc68ce876a75f",
+        "stateSha256": "399770960834ba37ddd36737e57831895397bd7c2fc6410c18b491a9dcfc7dcf",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "a6952d68e53767dc5e5b0d1064828167af82505f133ee1c86cea7450cfdc0b53"
+          },
+          {
+            "field": 9,
+            "clock": 3579136,
+            "stateSha256": "4751c827b576bf1fc9c1ccc2264124a035d2343d17e448e379e7f899dcc4707d"
+          },
+          {
+            "field": 25,
+            "clock": 9307936,
+            "stateSha256": "0c3761c436669815d03f711dda77f15c056bb2999d06fd32c61b567c70ca2583"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 16,
+      "expected": {
+        "name": "geometry-pal",
+        "mode": "traced",
+        "profile": {
+          "Id": "pal-separate-2-1-3-unverified",
+          "Pal": true,
+          "MasterHzNumerator": 21281370,
+          "MasterHzDenominator": 1,
+          "Lines": 312,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 16,
+        "masterClocks": 6820032,
+        "dspSamples": 16681,
+        "presentationDrops": 0,
+        "videoSha256": "097936e823ec6f2d6825c08ebe83e56425e38746e609384c602c5d7aebf2c32d",
+        "traceRows": 72397,
+        "traceSha256": "01a186c12c03c2398d9728cf93c2e06f622d209e36329b1ad7c6f2e9ff4ffa4d",
+        "pcmSha256": "14bfdc979f6fe11347aedc3435f6cae8f6eaba81bb4f097c5984330ae2af529f",
+        "stateSha256": "1e5eb6af3509de87c1dc687864992b312823b707d50cce19d113588306e5fc5d",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 425568,
+            "stateSha256": "740b3bdbdf5aa3ccd9a185b7c99e7240e15ea1a5b3e4f6d3571533034cde2689"
+          },
+          {
+            "field": 9,
+            "clock": 4261156,
+            "stateSha256": "157785fb5b912d74523e60308b34dbd35399a2190c14859ee7fc5c551669e956"
+          },
+          {
+            "field": 25,
+            "clock": 11081188,
+            "stateSha256": "c5e62f6923dcf64c162073ee108ce2998abb0c92db80d2f6446b340516a2e77f"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 4,
+      "expected": {
+        "name": "audio-ntsc",
+        "mode": "devices",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 4,
+        "masterClocks": 1429464,
+        "dspSamples": 7472,
+        "presentationDrops": 0,
+        "videoSha256": "fefc1b2fbd909cc5add8170c14273e0aecbf42d386fa6fcde6e79d7a1d6b0b61",
+        "traceRows": 2211342,
+        "traceSha256": "65386615e89fe39f5a3acbe1e7203bc36409d28422961bbea29033283186c688",
+        "pcmSha256": "55233dce2e516ce7d3ff721f8a525bdb5fd3c6a0afc3671eb653d85c72907ceb",
+        "stateSha256": "b8cef407b6d81e263a76a1bab174def506e0b00be012f29ac4b62f2c1c79755b",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd"
+          },
+          {
+            "field": 9,
+            "clock": 3573660,
+            "stateSha256": "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725"
+          },
+          {
+            "field": 13,
+            "clock": 5003124,
+            "stateSha256": "5f6cb64d8020fad866d56c430963e5bd417cf7e231882e049723049f0af49125"
+          }
+        ]
+      }
+    },
+    {
+      "fields": 4,
+      "expected": {
+        "name": "diagnostic-ntsc",
+        "mode": "devices",
+        "profile": {
+          "Id": "ntsc-separate-2-1-3-unverified",
+          "Pal": false,
+          "MasterHzNumerator": 945000000,
+          "MasterHzDenominator": 44,
+          "Lines": 262,
+          "CpuRevision": 2,
+          "Ppu1Revision": 1,
+          "Ppu2Revision": 3,
+          "ApuHzNumerator": 24576000,
+          "ApuHzDenominator": 1
+        },
+        "romSha256": "35f3537026357b74d14ec7d1e99c509cc0086ba305431c57d5cc6c5d03d90d00",
+        "replaySha256": null,
+        "warmupFields": 10,
+        "measuredFields": 4,
+        "masterClocks": 1429464,
+        "dspSamples": 7472,
+        "presentationDrops": 0,
+        "videoSha256": "3569d58e5bdfb087f07002e59dec72d3f5c9f92bb0158516b05251e62b486f8f",
+        "traceRows": 2209259,
+        "traceSha256": "442ea9505ff569b8ff374b0dce163a1b32372d1f1f57b3c43c6b16d57bc0ba98",
+        "pcmSha256": "644744402e3e2934a74d0e60a43d203395472cefc4202cc4fa65207d31b3ad6c",
+        "stateSha256": "d33538e2f5b0b71c6e9816bdc720a2124a48259bf816cfe0bb2df9b3156c7a61",
+        "sramSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "checkpoints": [
+          {
+            "field": 0,
+            "clock": 357368,
+            "stateSha256": "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e"
+          },
+          {
+            "field": 9,
+            "clock": 3573660,
+            "stateSha256": "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc"
+          },
+          {
+            "field": 13,
+            "clock": 5003124,
+            "stateSha256": "f00d49227ecb619d84248c861920c4b4067f361518ec4f7699f795b2e2c4dbe8"
+          }
+        ]
+      }
+    }
+  ]
+}

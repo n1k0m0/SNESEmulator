@@ -38,8 +38,6 @@ public sealed class Apu : ISpcBus
     private int hold,cycleLength,timerLength;
     private bool cycleActive,holding;
     private SpcCycle? heldCycle;
-    private sealed class Budget : Exception;
-    private readonly Budget exhausted=new();
     private sealed class Timer
     {
         public byte Target,Counter,Output;public int Divider;public bool Level,Line,Enabled;
@@ -117,27 +115,28 @@ public sealed class Apu : ISpcBus
             while(t.Divider>=half){t.Divider-=half;t.Level=!t.Level;SyncLine(t);}}
     }
     private int Selector(SpcCycle c)=>c.Address==null||c.Address is >=0xf0 and <=0xff||c.Address>=0xffc0&&(Control&128)!=0?Test>>6:(Test>>4)&3;
-    private void BeforeCycle(SpcCycle c)
+    private bool BeforeCycle(SpcCycle c)
     {
-        FinishHold();
+        if(!FinishHold())return false;
         if(!cycleActive){int s=Selector(c);cycleLength=(s switch {0=>2,1=>4,2=>10,_=>20})*12;timerLength=2<<s;hold=c.Direction=="read"&&c.Address is >=0xf4 and <=0xf7?cycleLength/2:0;nextEffect=Crystal+cycleLength-hold;cycleActive=true;}
-        AdvanceSegment(nextEffect,hold>0?timerLength/2:timerLength);cycleActive=false;
+        if(nextEffect>budget){AdvanceCrystal(budget,false);return false;}
+        AdvanceSegment(nextEffect,hold>0?timerLength/2:timerLength);cycleActive=false;return true;
     }
-    private void AdvanceSegment(long end,int timersAtEnd)
+    private bool AdvanceSegment(long end,int timersAtEnd)
     {
-        if(end>budget){AdvanceCrystal(budget,false);throw exhausted;}AdvanceCrystal(end,true);AdvanceTimers(timersAtEnd);
+        if(end>budget){AdvanceCrystal(budget,false);return false;}AdvanceCrystal(end,true);AdvanceTimers(timersAtEnd);return true;
     }
-    private void AfterCycle(SpcCycle c)
+    private bool AfterCycle(SpcCycle c)
     {
         Cycles++;holding=hold>0;if(holding){nextEffect=Crystal+hold;heldCycle=c;}
         FlushDsp();
         PhaseObserved?.Invoke(new(c.Direction=="read"?"read-latch":c.Direction=="write"?"write-latch":"internal-complete",Crystal,c));
-        FinishHold();
+        return FinishHold();
     }
-    private void FinishHold()
+    private bool FinishHold()
     {
-        if(!holding)return;AdvanceSegment(nextEffect,timerLength/2);holding=false;hold=0;var c=heldCycle;heldCycle=null;
-        FlushDsp();if(c!=null)PhaseObserved?.Invoke(new("read-complete",Crystal,c));
+        if(!holding)return true;if(!AdvanceSegment(nextEffect,timerLength/2))return false;holding=false;hold=0;var c=heldCycle;heldCycle=null;
+        FlushDsp();if(c!=null)PhaseObserved?.Invoke(new("read-complete",Crystal,c));return true;
     }
     public void RunUntil(long crystal)
     {
@@ -146,7 +145,7 @@ public sealed class Apu : ISpcBus
         // No segment endpoint: timer input and MMIO stay untouched. Avoid replaying
         // the SPC continuation at every intervening PPU half-dot.
         if((cycleActive||holding)&&nextEffect>crystal){AdvanceCrystal(crystal,false);return;}
-        try{while(true){FinishHold();Cpu.RunInstruction();}}catch(Budget){FlushDsp();}
+        while(true){if(!FinishHold()||!Cpu.RunInstruction()){FlushDsp();return;}}
     }
     private void FlushDsp(){var row=pendingDsp;pendingDsp=null;if(row!=null)dspObserved?.Invoke(row);}
     private void AdvanceCrystal(long target,bool deferFinal)

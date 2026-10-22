@@ -1,0 +1,52 @@
+[
+  {
+    "Frame": 150,
+    "Port": 0,
+    "Buttons": 4096
+  },
+  {
+    "Frame": 152,
+    "Port": 0,
+    "Buttons": 0
+  },
+  {
+    "Frame": 210,
+    "Port": 0,
+    "Buttons": 32768
+  },
+  {
+    "Frame": 212,
+    "Port": 0,
+    "Buttons": 0
+  },
+  {
+    "Frame": 270,
+    "Port": 0,
+    "Buttons": 256
+  },
+  {
+    "Frame": 290,
+    "Port": 0,
+    "Buttons": 0
+  },
+  {
+    "Frame": 310,
+    "Port": 0,
+    "Buttons": 32768
+  },
+  {
+    "Frame": 312,
+    "Port": 0,
+    "Buttons": 0
+  },
+  {
+    "Frame": 340,
+    "Port": 0,
+    "Buttons": 1024
+  },
+  {
+    "Frame": 360,
+    "Port": 0,
+    "Buttons": 0
+  }
+]

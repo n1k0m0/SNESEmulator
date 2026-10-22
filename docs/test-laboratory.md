@@ -539,3 +539,13 @@ change the first divergence, and ares's SMP/DSP scalar tie separation is undecid
 See [M8 baseline](baselines/m8.json) and its7724-file/12-archive hashmanifest.
 Only documentation follows that code/data commit; independent parent acceptance
 remains pending. No current release package or new hardware certificate is implied.
+
+
+## M9a performance regression
+
+`tools/test-lab.py` additionally invokes `tools/test-performance.py`:18952 frozen
+pre-M9 SPC suspension cases,128 field-horizon comparisons,8 derived-cache cases,
+40 BigInteger clock cases and14 whole-console untraced/traced/device-observer
+comparisons. These prior-core regressions do not change independent hardware or
+software accuracy evidence. Exact benchmark boundaries, extended/sustained flags,
+20-byte timestamped PCM records and limitations: [contract](m9-performance-contract.md).
