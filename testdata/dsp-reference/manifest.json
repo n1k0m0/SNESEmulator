@@ -3,7 +3,7 @@
   "commit": "ec8ee2bbe30451614c1d02a83f7af1c97d497d45",
   "license": "LGPL-2.1-or-later, external executable only; no product linkage",
   "adapterSha256": "e98e40562fcbbb16d5cf713ec29638a775d9b24c2c8778d1434f42fb9f5a6f93",
-  "generatorSha256": "ba926c7b9870e9db98a6f84e80e056bffb266a6be3e765f49f25ca99d71343e7",
+  "generatorSha256": "1f9385e7470bb8726cd91aaea8fa7fc4c2e7886b0c55d63e5c1f20c9573da859",
   "cases": 71,
   "clocksPerCase": "65536; long/phase/reset cases64..69 explicitly specified by generator",
   "pcm": "signed16 stereo LE; count(int32), PCM, final64KiB RAM,128 registers; case68 appends128regs+FNV64ARAM per clock",
@@ -719,6 +719,6 @@
       "rawBytes": 73860
     }
   ],
-  "referenceLicenseSha256": "319daefe38ebeead3df178e5937898a52d67c0c795f54f1c0bb10ac3b9cffb63",
+  "referenceLicenseSha256": "5df07007198989c622f5d41de8d703e7bef3d0e79d62e24332ee739a452af62a",
   "sourceSha256": "e273264b570c6de8e66e115c85f61b21be00af75ef22fa474ddea06d3f48c72d"
 }

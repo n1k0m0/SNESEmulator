@@ -83,7 +83,7 @@ def main():
    subprocess.run([str(oracle),str(ip),str(op)],check=True)
    for name,content in [(f'{case:02}.input.gz',raw),(f'{case:02}.expected.gz',op.read_bytes())]:
     dest=DATA/name;dest.write_bytes(gzip.compress(content,mtime=0));entries.append({'file':name,'sha256':sha(dest),'rawBytes':len(content)})
-  shutil.copyfile(REPO/'license.txt',DATA/'reference-license.txt')
+  (DATA/'reference-license.txt').write_bytes(subprocess.check_output(['git','show',PIN+':license.txt'],cwd=REPO))
   manifest={'reference':'https://github.com/blarggs-audio-libraries/snes_spc','commit':PIN,'license':'LGPL-2.1-or-later, external executable only; no product linkage','adapterSha256':sha(ROOT/'tools/dsp-oracle.cpp'),'generatorSha256':sha(pathlib.Path(__file__)),'cases':71,'clocksPerCase':'65536; long/phase/reset cases64..69 explicitly specified by generator','pcm':'signed16 stereo LE; count(int32), PCM, final64KiB RAM,128 registers; case68 appends128regs+FNV64ARAM per clock','files':entries,'referenceLicenseSha256':sha(DATA/'reference-license.txt'),'sourceSha256':sha(REPO/'snes_spc/SPC_DSP.cpp')}
   (DATA/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n',newline='\n')
  m=json.loads((DATA/'manifest.json').read_text());assert m['commit']==PIN

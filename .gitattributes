@@ -19,3 +19,6 @@ SNESEmulator.Core.Tests/PpuTests.cs text eol=lf
 testdata/**/*.sfc binary
 testdata/**/*.gz binary
 tools/dsp-oracle.cpp text eol=lf
+
+# Preserve the upstream LGPL notice verbatim, including its whitespace.
+testdata/dsp-reference/reference-license.txt -text -whitespace
