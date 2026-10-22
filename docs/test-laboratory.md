@@ -290,9 +290,8 @@ priority/creation order. CPU architectural registers commit at
 instruction boundaries; cycle rows carry the in-flight pin values. Partial
 frames remain partial and completed-field count is separate. PPU rendering is
 still whole-line host ARGB output. M3 replaces immediate DMA/stall debt with
-serializable DMA/HDMA bus ownership and phase machines; see the M3 contract. No SPC700/DSP or
-native audio samples exist. The rational oscillator counter is only the APU
-scheduling foundation. These limitations remain visible in hardware/graphics/
+serializable DMA/HDMA bus ownership and phase machines; see the M3 contract. M4 adds the own SPC700, real IPL execution and clocked MMIO; see its contract.
+S-DSP and native audio samples remain absent. These limitations remain visible in hardware/graphics/
 audio evidence reports as skipped, never passing accuracy claims.
 
 ## Evidence limitations and hardware profiles
@@ -351,3 +350,14 @@ analytical scheduling fixtures, not console frequencies. Normal NTSC/PAL
 rational clock and one-clock chunking run separately. Eight comparator
 mutations use the real verifiers. M3 constant APU-pin fixtures explicitly
 freeze the APU so their independent expected values stay valid.
+
+
+The clean M4 implementation gate passed on
+`bb1aaa9c2dc1dac7850ea2d12a71b73c9d05c079` with exit0:
+`artifacts/m4-full-validation.log`. All87 portable and5 Windows groups passed;
+all5080400 CPU semantic cases,5080400 CPU bus cases,256000 SPC semantic cases
+and256000 source-adjudicated SPC bus cases ran. Original IPL checks4/4 passed.
+The raw SPC split remains249000/7000. Structured clean reports are preserved
+under `artifacts/m4-implementation-evidence/`; counts/hashes and limits are
+recorded in [M4 baseline](baselines/m4.json). Independent parent acceptance is
+still pending.

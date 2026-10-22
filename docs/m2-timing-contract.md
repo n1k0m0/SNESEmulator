@@ -1,6 +1,7 @@
 # M2 timing contract and evidence limits
 
-Historical M2 acceptance record. The independent parent gate passed at
+Historical M2 acceptance record. [M4](m4-apu-contract.md) supersedes the
+legacy APU-only-accumulator and savestate-format descriptions below. The independent parent gate passed at
 `artifacts/root-m2-phase-validation.log`. [M3](m3-io-contract.md) supersedes
 the legacy DMA, MDR, I/O and savestate-format limitations stated below; M2
 read-latch/hold timing and generic CPU coverage remain unchanged.

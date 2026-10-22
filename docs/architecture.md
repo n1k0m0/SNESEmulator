@@ -11,7 +11,7 @@ unversionierten Manager-/IPC-Arbeiten wurden nicht kopiert.
 | `C64System` / `SystemBus` | `SnesSystem` / `SystemBus` |
 | 6510 | eigener `Cpu65816` |
 | VIC-II / C64-Framebuffer | eigener `Ppu`, 256×224-Framebuffer |
-| SID | explizite `Apu`-Schnittstelle; SPC700/DSP noch offen |
+| SID | eigene `Spc700`/`Apu`; S-DSP-Audio noch offen |
 | CIA-Joysticks | `ControllerPorts`, serielle und automatische Abfrage |
 | PRG/D64/EasyFlash | `Cartridge`, LoROM/HiROM und Battery-SRAM |
 | C64Window | `SnesWindow`, auf mehrere Frontend-Dateien aufgeteilt |
@@ -47,7 +47,7 @@ rekursive Chipspiegelung, SRAM, PPU-/APU-Ports und 5A22-I/O. `CpuIo` enthält
 ALU-Zwischenzustände, Timer-IRQ/NMI-Holds, Zählerlatches und serielle/automatische
 JOY-Abfrage. `DmaController` übernimmt den Bus mit eigenen gespeicherten Phasen:
 A/B-Read nach vier Clocks, Write nach weiteren vier, Priorität, Start-/End-Sync,
-HDMA-Tabellen und Präemption. Savestate v4 speichert diese Zwischenzustände und
+HDMA-Tabellen und Präemption. Savestate v5 speichert diese Zwischenzustände und
 bindet den Mapper zusätzlich zum ROM-Hash. Siehe [M3-Vertrag](m3-io-contract.md)
 für genaue Grenzen und Quellen. PowerOn definiert RAM-Testseeds; Reset erhält
 CPU-WRAM und SRAM, ist aber kein vollständiges Modell aller Reset-Pins der PPU.
@@ -60,10 +60,17 @@ aber Sprites werden noch nicht gerendert. VRAM-Lesepuffer, zahlreiche Leseports,
 Interlace/Overscan und dotgenaues Timing sind offen. Unsupported PPU-Funktionen
 können derzeit zu fehlenden oder falschen Bildelementen führen.
 
-`Apu` enthält nur CPU→APU- und APU→CPU-Portzustand. Sie simuliert keine laufende
-SPC700 und bestätigt keinen erfundenen IPL-Handshake. Spiele, die auf den APU-
-Bootdialog warten, bleiben daher an dieser Stelle stehen. Das ist eine reale
-Kompatibilitätsgrenze dieses Entwicklungsstands.
+`Apu` führt eine eigene vollständige `Spc700` mit64KiB RAM, Timern,
+CONTROL/TEST, DSP-Registerschnittstelle und getrennten CPU/APU-Portlatches aus.
+Die native24.576MHz-Zeitbasis koppelt sich rational an die Masterclock;
+SPC-Portreads haben eine getrennte Latch-/Holdphase. Zwischenzyklen sind
+serialisierbar. Eine eigene offene64Byte-Bootroutine führt den IPL-Uploaddialog
+als SPC-Code aus. Optionales lokales Original-IPL bleibt unverteilt und durch
+seinen Hash an Spielstände gebunden. Ein echtes65816-ROM testet Uploads bis
+1048Bytes, Seiten-/Indexwraps und ausgeführte SPC-Antworten. S-DSP-Audio ist
+weiterhin offen; es gibt keine künstliche Ersatztonquelle. Der
+[M4-Vertrag](m4-apu-contract.md) trennt256000 Semantik-/freigegebene Busfälle
+von249000 rohen Buspässen und7000 quellengestützten Zyklusadjudikationen.
 
 `DiagnosticRom` erzeugt ein originales LoROM: Native-Mode-Setup, DMA eines
 2-bpp-Tiles, CGRAM-Farben, Mode-0-Hintergrund, NMI-Handler und animiertes
@@ -77,7 +84,8 @@ im [Entwicklungsplan](development-plan.md). Dieser beschreibt künftige Arbeit;
 er ändert den oben dokumentierten Implementierungsstand nicht.
 
 Testlabor, unabhängige CPU-Prüfungen und Masterclock sind M0–M2; M3 ergänzt
-DMA/HDMA und I/O. Darauf folgen SPC700, PPU und DSP.
+DMA/HDMA und I/O. M4 implementiert SPC700 und reale APU-Uploads; es folgen PPU
+und DSP. Die unabhängige M4-Abnahme steht aus.
 PAL/NTSC, Hardwareabgleich, Produktreife und Zusatzchips folgen mit jeweils
 eigenen Nachweisen. Savestates, Frontend- und Netzwerkregressionen begleiten
 die Hardwareentwicklung von Beginn an.

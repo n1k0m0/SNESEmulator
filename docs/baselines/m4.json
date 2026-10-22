@@ -1,0 +1,166 @@
+{
+  "schema": "snes-m4-spc-apu-v1",
+  "status": "Clean implementation full gate passed; independent parent acceptance pending. Measurement record, not expected-output oracle.",
+  "implementationCommit": "bb1aaa9c2dc1dac7850ea2d12a71b73c9d05c079",
+  "implementationCommits": [
+    "607a7434eec3f260fe380dff90c1239b48889158",
+    "bb1aaa9c2dc1dac7850ea2d12a71b73c9d05c079"
+  ],
+  "command": "python tools/test-lab.py --windows --full",
+  "log": "artifacts/m4-full-validation.log",
+  "frozenLog": "artifacts/m4-implementation-evidence/full-validation.log",
+  "exitCode": 0,
+  "workingTreeStatus": "",
+  "portableGroups": 87,
+  "m4Groups": 21,
+  "windowsGroups": 5,
+  "laboratoryMutationGroups": 11,
+  "m3AdditionalNegativeTraceChecks": 3,
+  "m4NegativeComparatorMutations": 8,
+  "cpu65816Semantics": {
+    "executed": 5080400,
+    "failed": 0,
+    "files": 512
+  },
+  "cpu65816Bus": {
+    "executed": 5080400,
+    "failed": 0,
+    "files": 512,
+    "cycleRows": 26184846
+  },
+  "spc700": {
+    "executedCases": 256000,
+    "failedCases": 0,
+    "busCyclesCompared": 1182940,
+    "fixturesVerified": 256,
+    "revision": "67d15f492b2740964abd4efd1229e0ec9c342228",
+    "rawBusPassed": 249000,
+    "rawBusMismatches": 7000,
+    "sourceAdjudicatedCases": 7000,
+    "semanticPassed": 256000,
+    "semanticFailures": 0,
+    "approvedBusPassed": 256000,
+    "approvedBusFailures": 0,
+    "adjudicationRule": "spc-indirect-y-2017-v1: only17/37/57/77/97/B7/F7 order[0,1,3,4,2,5]; hardware researcher discussion https://forums.nesdev.org/viewtopic.php?t=16140"
+  },
+  "spcManifestSha256GitBlobBytes": "fcd57f5df31f80e0ea51a6d1888a314af359de52c85a385f217f597b57cf5cba",
+  "spcFixtureJsonBytes": 83786798,
+  "originalIplTests": 4,
+  "originalIplLocalPath": "testdata/local-firmware/ipl.bin",
+  "originalIplSha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+  "originalIplSource": "Anomie SPC700 Doc revision1126,2007-04-21 published bytes; local ignored input, no distribution license established",
+  "originalIplDistributed": false,
+  "ownIplSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+  "stressUpload": {
+    "bytes": 1048,
+    "blocks": [
+      16,
+      520,
+      257,
+      255
+    ],
+    "verifiedOn": [
+      "own IPL",
+      "original IPL"
+    ],
+    "cases": [
+      "indexFF->00",
+      "destinationxxFF->nextpage",
+      "multiple blocks",
+      "command-counterzeroavoidance"
+    ]
+  },
+  "syntheticTieSnapshots": {
+    "count": 20,
+    "ratio": "24crystal clocks per masterclock, solely synthetic scheduling test",
+    "events": [
+      "DMA",
+      "timerIRQ",
+      "refresh",
+      "lineend",
+      "VblankNMI"
+    ],
+    "nominalHardwareClockClaim": false
+  },
+  "normalClockProfilesTested": [
+    "NTSC945000000/44 masterHz /24576000 crystalHz",
+    "PAL21281370 masterHz /24576000 crystalHz"
+  ],
+  "savestateFormat": 5,
+  "benchmark": {
+    "host": {
+      "machine": "NILSPC1",
+      "os": "Microsoft Windows NT 10.0.26200.0",
+      "runtime": "10.0.12",
+      "processors": 24
+    },
+    "framesPerSecond": 23.001875917990493,
+    "apuEnabled": true,
+    "spcCycles": 2061671,
+    "apuFirmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+    "masterclocksPerSecond": 8220088.38930859,
+    "stepNopInstructionsPerSecond": 6047082.585006864,
+    "singleCycleNopInstructionsPerSecond": 304650.5825376114
+  },
+  "reports": {
+    "core-child": {
+      "path": "artifacts/m4-implementation-evidence/core-child.json",
+      "sha256": "677a562e72cc4a488a9286d0a6d2ae732887b8f5bfec1a156906ad9f6e0ecd39",
+      "exitCode": 0,
+      "tests": 87
+    },
+    "mutations-child": {
+      "path": "artifacts/m4-implementation-evidence/mutations-child.json",
+      "sha256": "a91f763d1e8be57c66d29137a0bf34a3b98b74cbf6b60531f853a1d9e51ead94",
+      "exitCode": 0,
+      "tests": 11
+    },
+    "conformance-child": {
+      "path": "artifacts/m4-implementation-evidence/conformance-child.json",
+      "sha256": "625a382cf0ec3bc4f9528e2be4f11aa55b7ffabfad9abe3c580f4fc7d58edb47",
+      "exitCode": 0,
+      "tests": 512
+    },
+    "bus-conformance-child": {
+      "path": "artifacts/m4-implementation-evidence/bus-conformance-child.json",
+      "sha256": "717c1897798ff5bd8b17fa6f86218e3c2300fc7c236dc175b44525769b01bd15",
+      "exitCode": 0,
+      "tests": 512
+    },
+    "spc-conformance-child": {
+      "path": "artifacts/m4-implementation-evidence/spc-conformance-child.json",
+      "sha256": "164f82fc18285f7369007c4e2b64a50e7cd7964aa5b88ae2d3958b242b2941ec",
+      "exitCode": 0,
+      "tests": 256
+    },
+    "spc-original-boot-child": {
+      "path": "artifacts/m4-implementation-evidence/spc-original-boot-child.json",
+      "sha256": "3c5a263b003f8c1c9fbe7741ba5dabef7dc7a8e1debb57245d85c45639d1e1d3",
+      "exitCode": 0,
+      "tests": 4
+    },
+    "windows-integration-child": {
+      "path": "artifacts/m4-implementation-evidence/windows-integration-child.json",
+      "sha256": "c665c6e23ff59395879e8375c8f1151376f651c68cb71cc918ab47d2eb2ac770",
+      "exitCode": 0,
+      "tests": 5
+    },
+    "m4-benchmark": {
+      "path": "artifacts/m4-implementation-evidence/m4-benchmark.json",
+      "sha256": "f7b835ba1ba6fdd9fc83423259450b74f8766f586f4c6a99e1c8282872f51f10",
+      "exitCode": 0,
+      "tests": 1
+    }
+  },
+  "evidenceClass": "Independent software vectors + source-informed adjudication + analytical/internal determinism; no new acquired console measurements",
+  "gaps": [
+    "S-DSP audio/BRR/envelopes and shared-RAM arbitration (M6)",
+    "Physical reset-release/warm-reset timer phase",
+    "CPU/SMP OR-collision windows",
+    "TnTARGET write race/glitch",
+    "Unpredictable high TEST waits/revision behavior",
+    "Original logic-analyzer capture files not acquired",
+    "Commercial-game matrix (M8)",
+    "Active APU currently below realtime; optimize with identical digital output (M9)"
+  ]
+}

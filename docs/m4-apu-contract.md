@@ -1,6 +1,9 @@
 # M4 SPC700 / S-SMP contract and evidence
 
-Own C# implementation, pending independent parent acceptance. M0–M3 were
+Own C# implementation, pending independent parent acceptance. The clean full
+gate passed on `bb1aaa9c2dc1dac7850ea2d12a71b73c9d05c079`, exit0,
+`artifacts/m4-full-validation.log`; structured evidence and all counts are in
+[the M4 baseline](baselines/m4.json). M0–M3 were
 independently accepted, most recently on `56fb6d49571875bb90f1b6b8efed49af5af2b6e7`
 by `python tools/test-lab.py --windows --full`, exit0,
 `artifacts/root-m3-validation.log`. This document distinguishes generated
@@ -237,9 +240,9 @@ No external emulator core or GPL code transplant is included.
 ## Local performance observation
 
 `dotnet run --project SNESEmulator.Lab -c Release -- benchmark-apu` runs120
-original diagnostic fields with the APU active and the own IPL. The local
-pre-freeze observation on NILSPC1 / Windows10.0.26200 / .NET10.0.12 was24.04
-fields/s,8.59 million master clocks/s, with2.061671 million committed SPC bus
+original diagnostic fields with the APU active and the own IPL. The clean implementation
+observation on NILSPC1 / Windows10.0.26200 / .NET10.0.12 was23.00
+fields/s,8.22 million master clocks/s, with2.061671 million committed SPC bus
 cycles including the initial warmup field. This workload is below nominal
 NTSC realtime on that host. It is not a commercial-game benchmark or a speed
 guarantee. The explicit clock boundaries and exception-based budget

@@ -334,6 +334,9 @@ Arbeit:
 - Emulation auf einen eigenen, kontrollierten Thread verschieben. GUI und
   Transport erhalten unveränderliche Frames/Sampleblöcke; Eingaben werden an
   definierten Hardwarezeitpunkten übernommen.
+- M4-Benchmark: aktive APU erreicht lokal nur23.00 Diagnosefelder/s; M9 muss
+  Budget-/Zyklusfortsetzung profilieren und bei identischer digitaler Ausgabe
+  auf Echtzeit bringen. Dies ist kein60fps-Kompatibilitätsnachweis.
 - Hardwaregenaue Geschwindigkeit von Renderlimit, VSync, Turbo, Netzwerklatenz
   und Audiogerät entkoppeln. Optimierungen erst nach Profiling und mit identischer
   digitaler Ausgabe auf dem Genauigkeitspfad.
