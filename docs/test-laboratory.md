@@ -526,3 +526,16 @@ Der [M8-Vertrag](m8-compatibility-contract.md) beschreibt20 unverändert gebaute
 `--accuracy-only` bewahrt den roten Genauigkeitsexit. `--verify` prüft lediglich unveränderte manuell geprüfte Unterschiede; es macht bekannte Fehler nicht zu bestandenen Genauigkeitsfällen. Negative Kontrollen lösen tatsächliche Pixel-/Kanal-/Koordinaten-/Samplefehler sowie Missing/Crash/Timeout aus. Referenzprogramme und Overlays sind vollständig gepinnt; die frei verteilbaren Fixtures sind offline hashgeprüft. Kein heutiger eigener Emulatoroutput dient als unabhängiges Sollbild. Historische rote Entwicklungsbefunde bleiben in der M8-Evidenz.
 
 M8 korrigiert den alten M2-Test, der den WAI-Fehler als Null-Idle-Verhalten erwartete, sowie M7s Live-SETINI-Auslegung. Die korrigierten Erwartungen stammen aus beiden Quellen und tatsächlich ausgeführten ROM-/Bus-/Feldbeobachtern. Format9 lehnt unvollständig migrierbare ältere Saves ab. M6s isolierte DSP-Konformität bleibt eine andere Evidenzart als Ganzkonsolen-Audio.
+
+
+M8 implementation validation is complete on clean `47f91cb`: full Windows gate
+Exit0,209 portable groups and10 Windows groups. The114 actual whole-console
+checkpoints generate228 exact native image comparisons and20 exact SRAM
+comparisons.18 audio rows remain explicitly red; verified difference contracts
+are separate from accuracy. Four82/168-field repros and eight isolated scheduler
+parameter runs are frozen with the rest of the evidence. Runtime thread values
+differ from nominal reference frequencies; the tested rounding variants did not
+change the first divergence, and ares's SMP/DSP scalar tie separation is undecided.
+See [M8 baseline](baselines/m8.json) and its7724-file/12-archive hashmanifest.
+Only documentation follows that code/data commit; independent parent acceptance
+remains pending. No current release package or new hardware certificate is implied.

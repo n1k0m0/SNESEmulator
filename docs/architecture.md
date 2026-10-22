@@ -141,3 +141,13 @@ Der Vollgate auf7cf7cc1 bestand mit182 portablen und10 Windowsgruppen. Die spät
 WAI führt fortlaufende6-Master-Idlezyklen aus. CPU-/DMA-MMIO-Effekte liegen bei gleichem Timestamp vor der betreffenden PPU-Phase; auch H0-Latches und Feldallokation folgen diesem Commit. V128 übernimmt den am V0 erfassten Display-Interlacewert. Format9 weist alte Formate1–8 wegen nicht eindeutig rekonstruierbarer WAI-/H0-Zustände ab. Neue Beobachter-Saves werden gegen ungeladene durchgehende Referenzläufe geprüft. VID3 und AUD2 bleiben unverändert.
 
 Die Produktprofile bleiben analytische separate-chip2/1/3-Ziele. Veröffentlichte Forced-Blank-Korruption, Early-read/DMA-Errata und analoge Transienten sind weiterhin nicht nachgebildet. Gemessene SMP-Frequenzen liefern zusätzliche Parameterfälle, keine neue Board-Zertifizierung. Standard32000 und das ausdrücklich erzwungene32040-Referenzprofil sind getrennt. M9 muss weiterhin Leistung und Produktbetrieb bearbeiten; publish/ bleibt PRE-M0.
+
+
+Der saubere M8-Vollgate auf `47f91cb` bestand mit 209 portablen und
+10 Windows-Gruppen. Die zusätzlich gemessenen Referenz-Threadwerte sind von
+nominalen Systemfrequenzen getrennt: bsnes kürzt den NTSC-CPU-Wert, ares rundet
+ihn und verwendet eigene ganzzahlige CPU/SMP/DSP-Scalars. Die ausgeführten
+Parametervergleiche erklären die erste Audioabweichung damit nicht. Diese
+Diagnose verändert keine Produktzeitbasis und kein erworbenes Sollbild.
+[Baseline M8](baselines/m8.json) verweist auf den unveränderten Evidenzfreeze;
+die unabhängige Abnahme bleibt ein eigener Schritt.

@@ -6,21 +6,27 @@ Der SNES-Kern wird hier selbst entwickelt; es wird kein Snes9x-, bsnes- oder
 Libretro-Kern eingebunden.
 
 **Stand: 0.1.0-dev – eigener Entwicklungskern, noch keine allgemeine
-Spielekompatibilität.** M0–M6 sind unabhängig geprüft. Die getaktete
+Spielekompatibilität.** M0–M7 sind unabhängig geprüft. Die getaktete
 Mode0–7-PPU bietet Sprites, Fenster, Farbmathematik, OPT, Hires und Mode7.
-M7 ist implementiert, die unabhängige Abnahme steht aus. Der eigene S-DSP
+M8 ist implementiert und wartet auf die unabhängige Abnahme. 20 unveränderte
+lizenzierte Testprogramme und ein externes Techdemo laufen über den eigenen
+Kern und zwei separat gebaute Referenzen. Bekannte Audioabweichungen und
+veröffentlichte Hardwarefehler bleiben ausdrücklich offen. Der eigene S-DSP
 liefert phasengetaktetes natives Stereo. Alle5.080.400 externen CPU-Semantik- und
 Busfälle bestehen. Die SPC-Suite umfasst256.000 Semantik-/freigegebene Busfälle:
 249.000 passen roh,7.000 haben eine quellengestützte indirekt-Y-Adjudikation.
 Es gibt keine eigene Konsolenmessung. Native Rohfelder haben256/512×224/239Pixel;453.726 native
 Stereo-Paare bestehen den unabhängigen digitalen DSP-Referenzvergleich.
 Siehe [Testlabor](docs/test-laboratory.md), [M4](docs/m4-apu-contract.md)
-[M5-PPU-Vertrag](docs/m5-ppu-contract.md), [M6-DSP-Vertrag](docs/m6-dsp-contract.md) und [M7-Videovertrag](docs/m7-video-contract.md).
+[M5-PPU-Vertrag](docs/m5-ppu-contract.md), [M6-DSP-Vertrag](docs/m6-dsp-contract.md), [M7-Videovertrag](docs/m7-video-contract.md), [M8-Vertrag](docs/m8-compatibility-contract.md)
+und [Titelmatrix](docs/m8-title-matrix.md).
 
 ## Starten
 
 `Start-SNESEmulator.cmd` doppelklicken. Ein vorhandener Build in `publish` wird
 direkt gestartet, andernfalls wird das Projekt mit dem .NET 10 SDK gebaut.
+Das vorhandene `publish/` ist weiterhin PRE-M0. Für den aktuellen
+Entwicklungsstand den folgenden SDK-Build verwenden; M9 erneuert das Paket.
 
 ```powershell
 dotnet build SNESEmulator.sln -c Release
@@ -34,8 +40,10 @@ Kachelmuster, tatsächlich durch den C#-Hardwarekern ausgeführt. Es benötigt
 keine externen ROM-Dateien. Links/rechts auf Controller-Port 1 ändern die
 Scrollrichtung und Geschwindigkeit. `.sfc` und `.smc` lassen sich über MEDIA, per
 Drag-and-drop oder als Programmargument öffnen. Ein 512-Byte-Copierheader wird
-erkannt und entfernt. Unterstützt werden zunächst LoROM/HiROM bis 4 MiB ohne
-Zusatzchips; andere Cartridge-Hardware wird mit einer Fehlermeldung abgewiesen.
+erkannt und entfernt. Der Kern implementiert LoROM/HiROM bis 4 MiB und ExLoROM/ExHiROM bis 8 MiB
+mit rekursiver ROM-Spiegelung und SRAM. M3 prüft diese Mappings synthetisch;
+externe M8-Programme belegen bisher nur LoROM und HiROM. Zusatzchips und
+andere Cartridge-Hardware sind nicht unterstützt.
 
 ## Bedienung wie im C64-Projekt
 
@@ -85,12 +93,14 @@ Eine separate C64-Tastaturfreigabe ist für das SNES nicht im Menü enthalten.
   abgewiesen; die CERTIFICATE-Zeile zeigt einen Dialog mit altem und neuem
   Fingerabdruck und erlaubt ausdrücklich bestätigtes Ersetzen.
 - Controllerdaten verwenden 16 Bit mit allen zwölf SNES-Tasten.
-- Video verwendet verlustfreie Deflate-Kompression vollständiger ARGB-Bilder.
+- VID3 verwendet verlustfreie Deflate-Kompression vollständiger ARGB-Bilder
+  mit nativer 256/512×224/239-Geometrie, Feldparität und rationalen Zeitdaten.
   Es gibt keine Reduktion auf die C64-Farbpalette. Unveränderte Bilder werden
   ausgelassen; langsame Clients halten nur das neueste wartende Bild.
 - Filter und Upscaling bleiben lokal. Sitzungs- und Relay-Passwörter bleiben
   nur im Arbeitsspeicher.
-- Protokoll2 überträgt natives verlustfreies Stereo-PCM mit32000Hz,
+- Der Sitzungs-Handshake ist `0x534E0003`; Audiopakete verwenden AUD2.
+  Sie übertragen natives verlustfreies Stereo-PCM mit 32000 Hz im Standardprofil,
   Sampleindex, Crystalzeit und Sequenz. Begrenzte Queues und ein getrenntes
   Geräte-Resampling halten Hardwarezeit und Präsentation auseinander.
 
@@ -133,7 +143,9 @@ unter `%APPDATA%\SNESEmulator`. Standard-ROM-Verzeichnis:
 
 Savestates enthalten den gesamten **bisher implementierten** Hardwarezustand
 und das Vorschaubild. Sie sind versioniert und an den SHA-256-Hash des geladenen
-ROMs gebunden. Zum Laden zuerst dasselbe ROM einlegen. Fehlerhafte oder fremde
+ROMs gebunden. Format 9 bewahrt vollständige Restphasen; Formate 1–8 werden
+wegen nicht eindeutig migrierbarer Timingzustände abgelehnt. Zum Laden zuerst
+dasselbe ROM einlegen. Fehlerhafte oder fremde
 Spielstände ersetzen die laufende Maschine nicht. Battery-SRAM wird beim
 Cartridgewechsel und regulären Beenden atomar gespeichert.
 
@@ -182,9 +194,13 @@ oder Nintendo-Firmware enthalten.
 ## Testlabor
 
 `python tools/test-lab.py --windows --full` prüft portable Kernregressionen,
-fünf Windows-/Netzwerkgruppen und die vollständigen, festgeschriebenen externen
+zehn Windows-/Netzwerkgruppen und die vollständigen, festgeschriebenen externen
 CPU-Semantik- und Busdaten getrennt. Ohne `--full` bleiben die nicht ausgeführten
-Daten ausdrücklich sichtbar. Details: [Testlabor](docs/test-laboratory.md).
+Daten ausdrücklich sichtbar. M8 ergänzt 27 Zustandsgruppen und feste Offline-
+Konsolenvergleiche mit unserem frei verteilbaren IPL. Der lokale Vollgate prüft
+zusätzlich das Original-IPL; dieses wird nicht verteilt. Ein grüner
+Regressionsvertrag macht bekannte rote Genauigkeitszeilen nicht zu bestandenen
+Fällen. Details: [Testlabor](docs/test-laboratory.md).
 
 Die Standard-APU startet eine eigene offene 64-Byte-Bootroutine und führt
 SPC-Programme tatsächlich aus. Originale Nintendo-IPL-Firmware wird nicht

@@ -1,0 +1,311 @@
+{
+  "schema": "snes-m8-software-hardware-evidence-v1",
+  "status": "Implementation validation complete; independent parent acceptance pending",
+  "fullGateCommit": "47f91cb5deb26282c27aa4f26803e21dc24ce4db",
+  "implementationCommits": [
+    "328eb96",
+    "092cfbc",
+    "47f91cb5deb26282c27aa4f26803e21dc24ce4db"
+  ],
+  "command": "python tools/test-lab.py --windows --full",
+  "exitCode": 0,
+  "workingTreeStatus": "",
+  "log": "artifacts/m8-full-validation-2.log",
+  "postGateChanges": "Documentation only; no core, tool, expected-output or fixture changes",
+  "counts": {
+    "schema": "m8-implementation-validation-v1",
+    "commit": "47f91cb5deb26282c27aa4f26803e21dc24ce4db",
+    "workingTreeStatus": "",
+    "command": "python tools/test-lab.py --windows --full",
+    "exitCode": 0,
+    "portableGroups": 209,
+    "core": 129,
+    "video": 35,
+    "dsp": 17,
+    "av": 1,
+    "m8State": 27,
+    "windows": 10,
+    "wholeConsoleCases": 114,
+    "nativeVideoComparisons": 228,
+    "exactImageComparisons": 228,
+    "exactGameSramComparisons": 20,
+    "knownRedAudioRows": {
+      "originalIpl": 11,
+      "ownIpl": 7
+    },
+    "negativeConsoleControls": 22,
+    "shortAudioReproductions": 4,
+    "threadRateReads": 4,
+    "threadParameterRuns": 8,
+    "threadParameterHypothesis": "First divergence unchanged in all tested variants; scalar tie separation remains undecided",
+    "ownHardwareMeasurement": false,
+    "parentAcceptance": "pending independent review",
+    "archives": 12,
+    "files": 7724
+  },
+  "nativePixelComparisons": 13074432,
+  "referenceBuildPins": {
+    "bsnes": "78474e5d39f58872dc21aca18cf9eb583b147fe7",
+    "ares": "9408cb43d4948fc3ea6e152a307a34348df3fe04"
+  },
+  "referenceLineage": "Separately built/executed, shared higan/bsnes ancestry; software agreement is not hardware proof",
+  "datasets": {
+    "m8-console-own-ipl": {
+      "cases": 43,
+      "comparisonRows": 86,
+      "nativeImagesExact": 86,
+      "sramComparisonsExact": 8,
+      "redAudioRows": [
+        {
+          "case": "game-120",
+          "reference": "bsnes",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-120",
+          "reference": "ares",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-300",
+          "reference": "bsnes",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-300",
+          "reference": "ares",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-reference-crystal-120",
+          "reference": "ares",
+          "firstPair": 42895
+        },
+        {
+          "case": "game-reference-crystal-300",
+          "reference": "bsnes",
+          "firstPair": 88915
+        },
+        {
+          "case": "game-reference-crystal-300",
+          "reference": "ares",
+          "firstPair": 42895
+        }
+      ],
+      "fixtureManifestSha256": "b4673d449ed9a66d5bf9c1eaeaa5daffffc799e4e5b083ea1d6deed7083c6308",
+      "accuracyStatus": "fail"
+    },
+    "m8-console": {
+      "cases": 71,
+      "comparisonRows": 142,
+      "nativeImagesExact": 142,
+      "sramComparisonsExact": 12,
+      "redAudioRows": [
+        {
+          "case": "game-120",
+          "reference": "bsnes",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-120",
+          "reference": "ares",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-175",
+          "reference": "bsnes",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-175",
+          "reference": "ares",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-300",
+          "reference": "bsnes",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-300",
+          "reference": "ares",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-600",
+          "reference": "bsnes",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-600",
+          "reference": "ares",
+          "firstPair": 42296
+        },
+        {
+          "case": "game-reference-crystal-120",
+          "reference": "ares",
+          "firstPair": 42338
+        },
+        {
+          "case": "game-reference-crystal-300",
+          "reference": "bsnes",
+          "firstPair": 88915
+        },
+        {
+          "case": "game-reference-crystal-300",
+          "reference": "ares",
+          "firstPair": 42338
+        }
+      ],
+      "fixtureManifestSha256": "efdf3d9e8eeddbfdec87841a8bf1d058fa600fbf777d6846b354c54be777e169",
+      "accuracyStatus": "fail"
+    }
+  },
+  "cpuSemantics": {
+    "accuracy": "Register/listed RAM semantics only; timing and cycle traces NOT accepted. Generic 65816, no SNES hardware proof.",
+    "reproduce": "dotnet run --project SNESEmulator.Lab -c Release -- cpu-full artifacts/conformance-child testdata/65816-full [opcode.mode]",
+    "manifestSha256": "609272ECB3E2516D9B2566D14B84D2C38264D84AD33270122EE48228B4BB1192",
+    "sourceCommit": "307c63f5673c8c6b861c52f71ddb89212a227480",
+    "representedCases": 5080400,
+    "upstreamCases": 5080400,
+    "busCyclesCompared": 0,
+    "executedCases": 5080400,
+    "passedCases": 5080400,
+    "failedCases": 0,
+    "coverageKind": "full",
+    "stackConvention": "Raw upstream initial S retained in evidence; before execution E=1 maps S to 0x100|(S&255), the only valid emulation stack page. P/X/Y unchanged.",
+    "opcodeModeFixturesVerified": 512
+  },
+  "cpuBus": {
+    "accuracy": "Generic 65816 bus cycles, separate from SNES hardware access timing; no original hardware proof.",
+    "reproduce": "dotnet run --project SNESEmulator.Lab -c Release -- cpu-bus-full artifacts/bus-conformance-child testdata/65816-full [opcode.mode]",
+    "manifestSha256": "609272ECB3E2516D9B2566D14B84D2C38264D84AD33270122EE48228B4BB1192",
+    "sourceCommit": "307c63f5673c8c6b861c52f71ddb89212a227480",
+    "representedCases": 5080400,
+    "upstreamCases": 5080400,
+    "busCyclesCompared": 26184846,
+    "executedCases": 5080400,
+    "passedCases": 5080400,
+    "failedCases": 0,
+    "coverageKind": "full",
+    "stackConvention": "Raw upstream initial S retained in evidence; before execution E=1 maps S to 0x100|(S&255), the only valid emulation stack page. P/X/Y unchanged.",
+    "opcodeModeFixturesVerified": 512
+  },
+  "spc": {
+    "executedCases": 256000,
+    "failedCases": 0,
+    "busCyclesCompared": 1182940,
+    "fixturesVerified": 256,
+    "revision": "67d15f492b2740964abd4efd1229e0ec9c342228",
+    "rawBusPassed": 249000,
+    "rawBusMismatches": 7000,
+    "sourceAdjudicatedCases": 7000,
+    "semanticPassed": 256000,
+    "semanticFailures": 0,
+    "approvedBusPassed": 256000,
+    "approvedBusFailures": 0,
+    "adjudicationRule": "spc-indirect-y-2017-v1: only17/37/57/77/97/B7/F7 order[0,1,3,4,2,5]; hardware researcher discussion https://forums.nesdev.org/viewtopic.php?t=16140"
+  },
+  "diagnosticAudio8Fields": {
+    "format": "signed16 stereo interleaved little-endian",
+    "sampleRate": 32000,
+    "sampleRateNumerator": 24576000,
+    "sampleRateDenominator": 768,
+    "channels": 2,
+    "pairs": 4259,
+    "firstIndex": 0,
+    "firstCrystal": 672,
+    "lastIndex": 4258,
+    "lastCrystal": 3270816,
+    "sha256": "a0ca8a2262b4c3ca022f3ae157efb10ed7c1de0555d1d239d19ed25314db8e48",
+    "droppedPairs": 0,
+    "traceRows": 4096,
+    "phasesExecuted": 136308
+  },
+  "stateFormat": 9,
+  "rejectedStateFormats": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "transport": {
+    "handshake": "0x534E0003",
+    "video": "VID3",
+    "audio": "AUD2"
+  },
+  "measuredRateParameters": 6,
+  "ownHardwareMeasurement": false,
+  "commercialTitles": "untested; none acquired",
+  "publishedHardwareGaps": "INIDISP corruption/early-read/DMA errata and analog transients remain failures or untested; no board/reset/electrical certificate",
+  "threadRateDiagnosis": {
+    "source": "artifacts/m8-thread-diagnosis",
+    "command": "python artifacts/m8-thread-diagnosis/run.py",
+    "runtimeRates": {
+      "bsnes": {
+        "reference": "bsnes",
+        "nominalMaster": 21477272.727272727,
+        "cpuThreadFrequency": 21477272,
+        "smpThreadFrequency": 2050560,
+        "dspClockUnit": "SMP ticks divided by12 crystal; DSP::main adds2, one phase"
+      },
+      "ares": {
+        "reference": "ares",
+        "nominalMaster": 21477272.727272727,
+        "cpuThreadFrequency": 21477273,
+        "smpThreadFrequency": 2050560,
+        "dspThreadFrequency": 24606720,
+        "cpuScalar": 429448004728,
+        "smpScalar": 4497977155925,
+        "dspScalar": 374831429660,
+        "second": 9223372036854775807
+      },
+      "bsnes-pal": {
+        "reference": "bsnes",
+        "nominalMaster": 21281370,
+        "cpuThreadFrequency": 21281370,
+        "smpThreadFrequency": 2050560,
+        "dspClockUnit": "SMP ticks divided by12 crystal; DSP::main adds2, one phase"
+      },
+      "ares-pal": {
+        "reference": "ares",
+        "nominalMaster": 21281370,
+        "cpuThreadFrequency": 21281370,
+        "smpThreadFrequency": 2050560,
+        "dspThreadFrequency": 24606720,
+        "cpuScalar": 433401234829,
+        "smpScalar": 4497977155925,
+        "dspScalar": 374831429660,
+        "second": 9223372036854775807
+      }
+    },
+    "parameterRuns": 8,
+    "firstDivergenceChanged": false,
+    "conclusion": "Actual thread truncation/rounding is a real domain distinction, but all executed variants retain the original first divergence. Ares independent SMP/DSP scalar separation remains undecided and is not fully reproduced by one APU ratio."
+  },
+  "frozenEvidence": {
+    "directory": "artifacts/m8-implementation-evidence",
+    "archives": 12,
+    "files": 7724,
+    "manifestSha256": "b432d20d8b8c325c83a26b7ed90197148c61de5def1f6081f19a7121f445252d",
+    "verification": {
+      "verifiedUtc": "2026-10-22T22:37:16.680269+00:00",
+      "commit": "47f91cb5deb26282c27aa4f26803e21dc24ce4db",
+      "manifestSha256": "b432d20d8b8c325c83a26b7ed90197148c61de5def1f6081f19a7121f445252d",
+      "archives": 12,
+      "files": 7724,
+      "archiveAndEveryUncompressedFileSha256": "pass"
+    }
+  },
+  "shortReproCommand": "python tools/m8-audio-probe.py --short",
+  "offlineOwnIplCommand": "python tools/m8-console-suite.py --verify --own-ipl",
+  "localOriginalIplCommand": "python tools/m8-console-suite.py --verify",
+  "accuracyCommand": "replace --verify with --accuracy-only; observed red accuracy exits1",
+  "earlierCancelledRun": "artifacts/m8-full-validation-1.cancelled.json; not a passing fullgate",
+  "M9": "Not started; realtime/UI/persistence/security/queues/distribution remain separate. publish/ is PRE-M0.",
+  "M10": "Enhancement chips and peripherals remain untested/unimplemented."
+}

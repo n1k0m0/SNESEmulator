@@ -470,3 +470,11 @@ anhand realer Fehler und Laufzeiten neu bewertet.
 Referenzquellcode dient der Analyse und dem unabhängigen Vergleich. Eine
 Übernahme von fremdem Code ist kein Bestandteil dieses Plans; der eigene
 C#-Kern und die vorhandenen Lizenzgrenzen bleiben erhalten.
+
+
+M8-Implementierungsvollgate: sauberer Commit `47f91cb`,
+`python tools/test-lab.py --windows --full` mit Exit 0, 209 portable und
+10 Windows-Gruppen. Die unabhängige Root-Abnahme steht aus. Genauigkeitsfehler
+bleiben in den gesonderten Berichten rot; [Baseline M8](baselines/m8.json) und
+[M8-Vertrag](m8-compatibility-contract.md) halten Repros und Nachweisgrenzen fest.
+M9 und M10 wurden in dieser Phase nicht begonnen.

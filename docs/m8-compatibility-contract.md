@@ -157,3 +157,38 @@ after-same-crystal-commit epochs. The original300-field probe was byte-identical
 to the fixture video, PCM and SRAM. [Repro inventory](../testdata/m8-audio-repros.json)
 contains every red row, first stereo pair/crystal, firmware, replay and cause
 status. No sample shifting or tolerance makes these findings green.
+
+
+## Final implementation validation and scheduler diagnosis
+
+The clean Windows/full gate on `47f91cb5deb26282c27aa4f26803e21dc24ce4db`
+exited 0: 209 portable groups including 27 M8 groups, plus 10 Windows groups. Both
+offline datasets executed 228 exact native image comparisons and 20 exact game SRAM
+comparisons; 18 full-audio rows remain red as listed above. The four shortened
+reproductions also exited 0 as reproduction checks, without changing accuracy
+status. The 8-field diagnostic PCM retains SHA256
+`a0ca8a2262b4c3ca022f3ae157efb10ed7c1de0555d1d239d19ed25314db8e48`.
+
+A final isolated runtime probe distinguishes nominal system frequency from actual
+reference scheduler coupling. Bsnes stores CPU 21477272/SMP 2050560 Hz; ares stores
+CPU 21477273/SMP 2050560/DSP 24606720 Hz for NTSC. Their nominal system master value
+remains 945000000/44. PAL CPU is 21281370 Hz on both. Ares CPU/SMP/DSP scalars are
+429448004728/4497977155925/374831429660: 24 DSP ticks precede 2 SMP ticks by 10
+scheduler units, despite a nominal common crystal. Existing fixture rates describe
+nominal system values; these additional effective values are separate evidence.
+
+Eight 168-field own-core parameter runs tested both IPLs with the original rational
+profile, bsnes's truncated CPU value, ares's rounded CPU value and its effective
+CPU/DSP scalar ratio. The diagnostic host first matches the ordinary Lab output
+byte for byte. All variants retain the same first audio divergence. Thus the
+rounding hypothesis does not explain this first difference in the executed tests.
+Independent SMP/DSP scalar separation is not fully reproduced by a single APU
+ratio and remains a separate undecided question. Neither standard profiles nor
+acquired fixtures changed. Sources, parameters and results are retained under
+`artifacts/m8-thread-diagnosis`, command `python artifacts/m8-thread-diagnosis/run.py`.
+
+[Baseline](baselines/m8.json) identifies the fullgate and exact remaining red rows.
+`artifacts/m8-implementation-evidence/manifest.json` freezes 7724 unchanged files
+in 12 compressed archives, including failed and cancelled historical runs. Archive
+and every uncompressed file SHA256 were reread and verified in a separate pass. The
+parent's acceptance is still pending; M9 has not started.
