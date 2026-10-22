@@ -525,7 +525,7 @@
       "menu": "file-select checkpoint175, native images match both references",
       "scene": "playground/00-01-test checkpoint300 matches both references; numbered floor is source second-layers/sl_floor.png",
       "audio": "nonzero title audio and exact own snapshot130 -> 135; initial32768-pair reference checkpoint passes; full sequence has explicitly red differences, see accuracy reports and audio repro",
-      "inputs": "Start150\u00e2\u20ac\u201c151, B210\u00e2\u20ac\u201c211 creates file/room; Right270\u00e2\u20ac\u201c289; B310\u00e2\u20ac\u201c311 and Down340\u00e2\u20ac\u201c359 in long replay",
+      "inputs": "Start150-151, B210-211 creates file/room; Right270-289; B310-311 and Down340-359 in long replay",
       "sram": "4096 bytes CPU-created, raw battery roundtrip and both reference comparisons pass with common zero battery input",
       "state": "snapshot300 -> 305 complete state and stereo tail; room source selects song blank, so this tail is intentionally silent",
       "longSegment": "600 raw fields (~10 nominal seconds); exact native image/SRAM comparison, not hours-long validation",

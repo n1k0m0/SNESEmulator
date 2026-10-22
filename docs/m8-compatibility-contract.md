@@ -26,7 +26,7 @@ and Apache sample attributions are retained beside the ROM. No commercial ROM
 was acquired. LoROM and HiROM are exercised; other mappings, enhancement chips
 and peripherals remain untested.
 
-`python tools/m8-reference-build.py` builds these two independent consoles:
+`python tools/m8-reference-build.py` builds these two separately built and executed consoles:
 
 | Reference | Commit | Actual execution path |
 |---|---|---|
@@ -42,6 +42,9 @@ CPU hooks record actual2-master-clock ticks, parity edges and MMIO. DSP hooks co
 integer DAC pairs immediately before stream submission. They do not alter clocks,
 registers, filters, return values or scheduling. Ares video is copied synchronously
 from `screen->pixels(true)` in the existing refresh hook, before presentation.
+
+The projects share higan/bsnes ancestry. Separate builds and executions do not
+establish independent implementation lineage or hardware correctness.
 
 ## Coordinate, input and audio domains
 

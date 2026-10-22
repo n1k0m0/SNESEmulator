@@ -7094,8 +7094,8 @@
     },
     {
       "path": "testdata/m8-title-matrix.json",
-      "bytes": 27747,
-      "sha256": "4a23520a2d017f8e6637f7bf102900b3555127c878d0b6f82c6a61a03c38e532"
+      "bytes": 27662,
+      "sha256": "7cb806c07964597608afdbdadbecfe05975ebc68b73da615b609752a8f232265"
     },
     {
       "path": "tools/ares-console.cpp",
@@ -7164,8 +7164,8 @@
     },
     {
       "path": "tools/m8-title-matrix.py",
-      "bytes": 5622,
-      "sha256": "31f7589b26d6f914bc51d5d9ad144b03eca745005396e3c87c8919666a98e60d"
+      "bytes": 5587,
+      "sha256": "c980e0013c8d750b16ceadc6fdbcd02cd3c80b31ee147bc1da1fbf2fd348f84d"
     },
     {
       "path": "tools/test-lab.py",
