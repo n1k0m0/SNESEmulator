@@ -170,7 +170,7 @@ static class Lab
     {
         var options=new Dictionary<string,string>();
         for(int i=0;i<args.Length;i+=2){if(i+1==args.Length || !args[i].StartsWith("--"))throw new ArgumentException("ROM options require --key value pairs");options.Add(args[i][2..],args[i+1]);}
-        foreach(string key in options.Keys)if(key is not ("frames" or "masterclocks" or "output" or "rom" or "replay" or "trace-limit" or "expect-wram" or "expect-frame" or "expect-native" or "expect-audio" or "diagnostic"))throw new ArgumentException("Unknown ROM option: "+key);
+        foreach(string key in options.Keys)if(key is not ("frames" or "masterclocks" or "output" or "rom" or "replay" or "trace-limit" or "expect-wram" or "expect-frame" or "expect-native" or "expect-audio" or "expect-geometry" or "expect-brightness" or "diagnostic"))throw new ArgumentException("Unknown ROM option: "+key);
         string Opt(string k,string fallback)=>options.GetValueOrDefault(k,fallback);
         long frames=long.Parse(Opt("frames","8")),clockLimit=long.Parse(Opt("masterclocks","100000000"));
         if(frames<1||clockLimit<1)throw new ArgumentException("Positive frame and masterclock limits required");

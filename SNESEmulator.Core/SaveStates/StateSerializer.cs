@@ -47,7 +47,7 @@ public static class StateSerializer
         using var zip = new GZipStream(file, CompressionMode.Decompress);
         using var r = new BinaryReader(zip);
         if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 8 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
-            throw new InvalidDataException("Savestate requires format7 (native S-DSP pipeline). Formats1–6 cannot be resumed; start the ROM again. The cartridge must also match.");
+            throw new InvalidDataException("Savestate requires format8 (native video fields and complete PPU/DSP pipelines). Formats1-7 cannot be resumed; start the ROM again. The cartridge must also match.");
         var profile=JsonSerializer.Deserialize<HardwareProfile>(r.ReadString())??throw new InvalidDataException("Missing hardware profile");
         bool forced=r.ReadBoolean();var mapping=(CartridgeMapping)r.ReadInt32();
         var options=JsonSerializer.Deserialize<CartridgeOptions>(r.ReadString())??throw new InvalidDataException("Missing cartridge options");
