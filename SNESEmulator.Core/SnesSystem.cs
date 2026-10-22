@@ -65,7 +65,7 @@ public sealed class SnesSystem
     {
         if(cycle.Pins=="--------"){cycleStart=Clock.Now;return;}
         if(!cycleActive){
-            if(!cycle.Read&&!writeAluDone){Bus.CpuIo.AluEdge();writeAluDone=true;}
+            if(cycle.Valid&&!cycle.Read&&!writeAluDone){Bus.CpuIo.AluEdge();writeAluDone=true;}
             int clocks=Profile.AccessClocks(cycle,(Bus.Io[13]&1)!=0);
             if(Bus.Dma.CpuBoundary(clocks,Clock.Now))AdvanceDma();
             cycleStart=Clock.Now;cycleRemaining=clocks-(cycle.Valid&&cycle.Read?4:0);cycleActive=true;
@@ -88,7 +88,7 @@ public sealed class SnesSystem
     private void AfterCycle(CpuCycle cycle)
     {
         if(cycle.Valid&&cycle.Read){FinishReadHold();return;}
-        if(cycle.Read)Bus.CpuIo.AluEdge();writeAluDone=false;
+        if(cycle.Pins!="--------"&&(cycle.Read||!cycle.Valid))Bus.CpuIo.AluEdge();writeAluDone=false;
         CyclePhaseObserved?.Invoke(new("cycle-complete",Clock.Now,cycleStart,cycle.Valid?latchClock:null,cycle));
     }
     private void FinishReadHold()

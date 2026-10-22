@@ -72,7 +72,8 @@ distinguishes CPU, DMA and HDMA phases with actual clocks.
 
 Multiply takes eight CPU ALU edges; divide sixteen. Product, quotient, shift and
 counters are saved. Reads run ALU AFTER trailing hold; writes BEFORE time
-advance, once across budgets. Internal cycles run it at completion. Busy operand
+advance, once across budgets. Internal cycles, including E-RMW invalid-write pin rows, run it at completion;
+the zero-clock terminal marker has no ALU edge. Busy operand
 writes retain the operation but initialize result registers as documented.
 Fixed arithmetic worksheets check intermediates, separately from final integer
 results. DMA alone does not advance ALU; refresh does.
@@ -145,3 +146,7 @@ positive protocol verifier. The existing11 laboratory mutations stay separate.
 No original-console capture, licensed external M3 hardware ROM execution or
 commercial-game result was acquired. SPC700/DSP/native sound remain absent;
 whole-line graphics and remaining PPU accuracy are later milestones.
+
+The pinned [modify-instruction reference](https://github.com/bsnes-emu/bsnes/blob/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/processor/wdc65816/instructions-modify.cpp)
+identifies the RMW middle cycle as idle. An additional200 every-clock snapshots
+check this phase and colliding refresh against uninterrupted final states.

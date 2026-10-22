@@ -36,6 +36,7 @@ static class IoDmaTests
         test("M3 recursive ROM mirror and mapper metadata manual overrides",()=>{
             Check(Cartridge.Mirror(0x300000,0x300000)==0x200000,"3 MiB absent address line mirrors last chip");
             Check(Cartridge.Mirror(0x3fffff,0x300000)==0x2fffff);
+            byte[] oddImage=new byte[0x300000];DiagnosticRom.Create().CopyTo(oddImage,0);oddImage[0]=0x33;oddImage[0x200000]=0x5a;var odd=new Cartridge(oddImage);var oddBus=new SystemBus{Cartridge=odd};Check(oddBus.Read(0x608000)==0x5a&&oddBus.Read(0x408000)==0x5a&&oddBus.Read(0x008000)==0x33,"actual 3 MiB CPU ROM windows must mirror chip tail, not modulo");
             foreach(int size in new[]{0x8000,0x18000,0x280000,0x300000,0x600000})for(int a=0;a<0x800000;a+=7919)Check(Cartridge.Mirror(a,size)<size);
             byte[] rom=new byte[0x600000];DiagnosticRom.Create().AsSpan(0x7fc0,64).CopyTo(rom.AsSpan(0x40ffc0));rom[0x40ffd5]=0x35;rom[0x40ffd9]=2;
             var ex=new Cartridge(rom);Check(ex.Mapping==CartridgeMapping.ExHiRom&&ex.Metadata.HeaderOffset==0x40ffc0&&ex.Pal);
@@ -216,6 +217,13 @@ static class IoDmaTests
             b.Write(0x4202,3);b.Write(0x4203,9);b.CpuIo.AluEdge();int remaining=b.CpuIo.State.Multiply;b.Write(0x4203,5);Check(b.CpuIo.State.Multiply==remaining&&b.CpuIo.State.Product==0,"busy write clears product but does not restart counter");
         });
         test("M3 CPU ALU edges read after hold write before step refresh and save",()=>{
+            var rmw=Machine(false);rmw.Cpu.PC=0;new byte[]{0xe6,0x10,0xdb}.CopyTo(rmw.Bus.Wram,0);rmw.Bus.Write(0x4202,7);rmw.Bus.Write(0x4203,11);rmw.RunUntil(25);Check(rmw.Bus.CpuIo.State.Multiply==5,"E-RMW invalid write pins are internal: ALU must wait for cycle completion30");rmw.RunUntil(30);Check(rmw.Bus.CpuIo.State.Multiply==3,"internal completion then valid-write before-step edge share clock30");rmw.RunUntil(38);Check(rmw.Bus.CpuIo.State.Multiply==3&&rmw.Bus.Wram[0x10]==1,"valid write endpoint has no extra ALU edge");
+            foreach(bool refreshRmw in new[]{false,true}){
+                var r=Machine(false);r.Cpu.PC=0;new byte[]{0xe6,0x10,0xdb}.CopyTo(r.Bus.Wram,0);r.Bus.Write(0x4202,7);r.Bus.Write(0x4203,11);if(refreshRmw)r.Clock.Schedule(26,HardwareEventKind.Refresh);
+                string p=Path.Combine(directory,"m3-rmw-start");StateSerializer.Save(r,p);var baseline=StateSerializer.Load(r.Bus.Cartridge!,p);baseline.RunUntil(120);string expected=Snapshot(baseline,directory,"m3-rmw-end");
+                for(int t=1;t<=100;t++){r.RunUntil(t);StateSerializer.Save(r,p);var copy=StateSerializer.Load(r.Bus.Cartridge!,p);copy.RunUntil(120);Check(Snapshot(copy,directory,"m3-rmw-copy")==expected,$"RMW internal/valid-write/refresh state at{t}");}
+            }
+
             var m=Machine(false);m.Cpu.PC=0;m.Cpu.PBR=0;new byte[]{0xad,0x16,0x42,0x8d,0,0x10,0xdb}.CopyTo(m.Bus.Wram,0);m.Bus.Write(0x4202,13);m.Bus.Write(0x4203,17);
             m.RunUntil(24);Check(m.Bus.CpuIo.State.Multiply==5);m.RunUntil(26);Check(m.Bus.CpuIo.State.Multiply==5,"internal result read samples before own ALU edge");int sampled=m.CapturePhase().HeldRead!.Value!.Value;
             m.RunUntil(30);Check(m.Bus.CpuIo.State.Multiply==4&&m.Cpu.A==sampled);
