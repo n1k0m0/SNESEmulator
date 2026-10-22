@@ -77,3 +77,6 @@ __pycache__/
 relay_server/*.pem
 relay_server/*.key
 relay_server/*.log
+
+# Complete upstream corpus is a local, reproducible test input.
+testdata/65816-full/

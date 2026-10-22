@@ -17,6 +17,11 @@ public sealed class Cpu65816(ICpuBus bus)
     private int Read24(int a) => Read16(a) | bus.Read((a & 0xFF0000) | ((a + 2) & 65535)) << 16;
     private void Push(byte v) { bus.Write(S, v); S--; if (E) S = (ushort)(0x100 | (S & 255)); }
     private byte Pull() { S++; if (E) S = (ushort)(0x100 | (S & 255)); return bus.Read(S); }
+    private void PushLongStack(byte v) { bus.Write(S,v); S--; }
+    private byte PullLongStack() { S++; return bus.Read(S); }
+    private void Push16LongStack(int v) { PushLongStack((byte)(v >> 8)); PushLongStack((byte)v); }
+    private ushort Pull16LongStack() { int lo=PullLongStack(); return (ushort)(lo | PullLongStack()<<8); }
+    private void FixStack() { if(E) S=(ushort)(0x100 | (S & 255)); }
     private void Push16(int v) { Push((byte)(v >> 8)); Push((byte)v); }
     private ushort Pull16() { int lo = Pull(); return (ushort)(lo | Pull() << 8); }
     private int Mask(bool narrow) => narrow ? 255 : 65535;
@@ -37,6 +42,15 @@ public sealed class Cpu65816(ICpuBus bus)
         PC = (ushort)Read16(0xFFFC); Waiting = Stopped = false; Instructions = 0;
     }
     public void Nmi() { if (!Stopped) Interrupt(E ? 0xFFFA : 0xFFEA, false); }
+    /// <summary>Instruction-boundary IRQ assertion. Even a masked IRQ wakes WAI.</summary>
+    public void Irq()
+    {
+        if (Stopped) return;
+        Waiting = false;
+        if ((P & I) == 0) Interrupt(E ? 0xFFFE : 0xFFEE, false);
+    }
+    /// <summary>Boundary arbitration; pin latching and cycle polling belong to the scheduler.</summary>
+    public void ServiceInterrupts(bool nmi, bool irq) { if (nmi) Nmi(); else if (irq) Irq(); }
     private void Interrupt(int vector, bool software)
     {
         Waiting = false;
@@ -67,11 +81,11 @@ public sealed class Cpu65816(ICpuBus bus)
         0x1F => (Fetch24() + X) & 0xFFFFFF,
         _ => throw new InvalidOperationException("Invalid ALU addressing mode")
     };
-    private int ReadValue(int address, bool narrow) => narrow ? bus.Read(address) : Read16(address);
-    private void WriteValue(int address, int value, bool narrow)
+    private int ReadValue(int address, bool narrow, bool bankWrap = false) => narrow ? bus.Read(address) : bankWrap ? Read16(address) : bus.Read(address) | bus.Read((address + 1) & 0xFFFFFF) << 8;
+    private void WriteValue(int address, int value, bool narrow, bool bankWrap = false)
     {
         bus.Write(address, (byte)value);
-        if (!narrow) bus.Write((address & 0xFF0000) | ((address + 1) & 65535), (byte)(value >> 8));
+        if (!narrow) bus.Write(bankWrap ? (address & 0xFF0000) | ((address + 1) & 65535) : (address + 1) & 0xFFFFFF, (byte)(value >> 8));
     }
     private int Immediate(bool narrow) => narrow ? Fetch() : Fetch16();
     private void Compare(int left, int right, bool narrow) { int mask = Mask(narrow); Flag(C, (left & mask) >= right); Nz(left - right, narrow); }
@@ -90,7 +104,9 @@ public sealed class Cpu65816(ICpuBus bus)
                 int digit = subtract ? ((a >> shift) & 15) - ((value >> shift) & 15) - propagation
                     : ((a >> shift) & 15) + ((value >> shift) & 15) + propagation;
                 if (subtract) { propagation = digit < 0 ? 1 : 0; if (digit < 0) digit -= 6; }
-                else { if (digit > 9) digit += 6; propagation = digit > 15 ? 1 : 0; }
+                else {
+                    if (shift == (M8 ? 4 : 12)) Flag(V, (~(a ^ value) & (a ^ (digit << shift)) & sign) != 0);
+                    if (digit > 9) digit += 6; propagation = digit > 15 ? 1 : 0; }
                 result |= (digit & 15) << shift;
             }
             Flag(C, subtract ? propagation == 0 : propagation != 0);
@@ -108,8 +124,8 @@ public sealed class Cpu65816(ICpuBus bus)
         if (low is 1 or 3 or 5 or 7 or 9 or 13 or 15 or 17 or 18 or 19 or 21 or 23 or 25 or 29 or 31 && op != 0x89)
         {
             int address = low == 9 ? -1 : Address(low);
-            if (group == 4) { WriteValue(address, A, M8); return 4; }
-            int value = address < 0 ? Immediate(M8) : ReadValue(address, M8);
+            if (group == 4) { WriteValue(address, A, M8, low is 3 or 5 or 21); return 4; }
+            int value = address < 0 ? Immediate(M8) : ReadValue(address, M8, low is 3 or 5 or 21);
             switch (group)
             {
                 case 0: SetA(A | value); break;
@@ -127,13 +143,13 @@ public sealed class Cpu65816(ICpuBus bus)
             case 0x00: Fetch(); Interrupt(E ? 0xFFFE : 0xFFE6, true); break;
             case 0x02: Fetch(); Interrupt(E ? 0xFFF4 : 0xFFE4, true); break;
             case 0x08: Push(P); break;
-            case 0x0B: Push16(D); break;
+            case 0x0B: Push16LongStack(D); FixStack(); break;
             case 0x18: P &= unchecked((byte)~C); break;
             case 0x1B: S = E ? (ushort)(0x100 | (A & 255)) : A; break;
             case 0x20: { int target = Fetch16(); Push16(PC - 1); PC = (ushort)target; break; }
-            case 0x22: { int target = Fetch24(); Push(PBR); Push16(PC - 1); PBR = (byte)(target >> 16); PC = (ushort)target; break; }
+            case 0x22: { int target = Fetch24(); PushLongStack(PBR); Push16LongStack(PC - 1); FixStack(); PBR = (byte)(target >> 16); PC = (ushort)target; break; }
             case 0x28: Status(Pull()); break;
-            case 0x2B: D = (ushort)Nz(Pull16(), false); break;
+            case 0x2B: D = (ushort)Nz(Pull16LongStack(), false); FixStack(); break;
             case 0x38: P |= C; break;
             case 0x3B: A = (ushort)Nz(S, false); break;
             case 0x40: Status(Pull()); PC = Pull16(); if (!E) PBR = Pull(); break;
@@ -146,9 +162,9 @@ public sealed class Cpu65816(ICpuBus bus)
             case 0x5B: D = (ushort)Nz(A, false); break;
             case 0x5C: { int a = Fetch24(); PC = (ushort)a; PBR = (byte)(a >> 16); break; }
             case 0x60: PC = (ushort)(Pull16() + 1); break;
-            case 0x62: { short delta = (short)Fetch16(); Push16(PC + delta); break; }
+            case 0x62: { short delta = (short)Fetch16(); Push16LongStack(PC + delta); FixStack(); break; }
             case 0x68: SetA(M8 ? Pull() : Pull16()); break;
-            case 0x6B: PC = (ushort)(Pull16() + 1); PBR = Pull(); break;
+            case 0x6B: PC = (ushort)(Pull16LongStack() + 1); PBR = PullLongStack(); FixStack(); break;
             case 0x6C: PC = (ushort)Read16(Fetch16()); break;
             case 0x78: P |= I; break;
             case 0x7A: Y = (ushort)Nz(X8 ? Pull() : Pull16(), X8); break;
@@ -164,7 +180,7 @@ public sealed class Cpu65816(ICpuBus bus)
             case 0x9B: Y = (ushort)Nz(X, X8); break;
             case 0xA8: Y = (ushort)Nz(A, X8); break;
             case 0xAA: X = (ushort)Nz(A, X8); break;
-            case 0xAB: DBR = (byte)Nz(Pull(), true); break;
+            case 0xAB: DBR = (byte)Nz(PullLongStack(), true); FixStack(); break;
             case 0xB8: P &= unchecked((byte)~V); break;
             case 0xBA: X = (ushort)Nz(S, X8); break;
             case 0xBB: X = (ushort)Nz(Y, X8); break;
@@ -172,7 +188,7 @@ public sealed class Cpu65816(ICpuBus bus)
             case 0xC8: Y = (ushort)Nz(Y + 1, X8); break;
             case 0xCA: X = (ushort)Nz(X - 1, X8); break;
             case 0xCB: Waiting = true; break;
-            case 0xD4: Push16(Read16(Direct(Fetch()))); break;
+            case 0xD4: Push16LongStack(Read16(Direct(Fetch()))); FixStack(); break;
             case 0xD8: P &= unchecked((byte)~Decimal); break;
             case 0xDA: if (X8) Push((byte)X); else Push16(X); break;
             case 0xDB: Stopped = true; break;
@@ -181,11 +197,11 @@ public sealed class Cpu65816(ICpuBus bus)
             case 0xE8: X = (ushort)Nz(X + 1, X8); break;
             case 0xEA: break;
             case 0xEB: A = (ushort)((A >> 8) | (A << 8)); Nz(A & 255, true); break;
-            case 0xF4: Push16(Fetch16()); break;
+            case 0xF4: Push16LongStack(Fetch16()); FixStack(); break;
             case 0xF8: P |= Decimal; break;
             case 0xFA: X = (ushort)Nz(X8 ? Pull() : Pull16(), X8); break;
             case 0xFB: { bool oldE = E; E = (P & C) != 0; Flag(C, oldE); Status(P); if (E) S = (ushort)(0x100 | (S & 255)); break; }
-            case 0xFC: { int target = Read16(PBR << 16 | ((Fetch16() + X) & 65535)); Push16(PC - 1); PC = (ushort)target; break; }
+            case 0xFC: { int target = Read16(PBR << 16 | ((Fetch16() + X) & 65535)); Push16LongStack(PC - 1); FixStack(); PC = (ushort)target; break; }
             case 0x10: Branch((P & N) == 0); break;
             case 0x30: Branch((P & N) != 0); break;
             case 0x50: Branch((P & V) == 0); break;
@@ -198,7 +214,7 @@ public sealed class Cpu65816(ICpuBus bus)
             {
                 byte destination = Fetch(), source = Fetch(); DBR = destination;
                 bus.Write(destination << 16 | Y, bus.Read(source << 16 | X));
-                int delta = op == 0x54 ? 1 : -1; X = (ushort)(X + delta); Y = (ushort)(Y + delta);
+                int delta = op == 0x54 ? 1 : -1; X = (ushort)((X + delta) & Mask(X8)); Y = (ushort)((Y + delta) & Mask(X8));
                 if (A-- != 0) PC -= 3; return 7;
             }
             case 0xA0: Y = (ushort)Nz(Immediate(X8), X8); break;
@@ -206,33 +222,33 @@ public sealed class Cpu65816(ICpuBus bus)
             case 0xA4: case 0xAC: case 0xB4: case 0xBC:
             {
                 int a = op switch { 0xA4 => Direct(Fetch()), 0xAC => DBR << 16 | Fetch16(), 0xB4 => DirectIndexed(Fetch(), X), _ => ((DBR << 16 | Fetch16()) + X) & 0xFFFFFF };
-                Y = (ushort)Nz(ReadValue(a, X8), X8); break;
+                Y = (ushort)Nz(ReadValue(a, X8, (op & 15) < 8), X8); break;
             }
             case 0xA6: case 0xAE: case 0xB6: case 0xBE:
             {
                 int a = op switch { 0xA6 => Direct(Fetch()), 0xAE => DBR << 16 | Fetch16(), 0xB6 => DirectIndexed(Fetch(), Y), _ => ((DBR << 16 | Fetch16()) + Y) & 0xFFFFFF };
-                X = (ushort)Nz(ReadValue(a, X8), X8); break;
+                X = (ushort)Nz(ReadValue(a, X8, (op & 15) < 8), X8); break;
             }
             case 0x84: case 0x8C: case 0x94:
-                WriteValue(op == 0x84 ? Direct(Fetch()) : op == 0x8C ? DBR << 16 | Fetch16() : DirectIndexed(Fetch(), X), Y, X8); break;
+                WriteValue(op == 0x84 ? Direct(Fetch()) : op == 0x8C ? DBR << 16 | Fetch16() : DirectIndexed(Fetch(), X), Y, X8, op != 0x8C); break;
             case 0x86: case 0x8E: case 0x96:
-                WriteValue(op == 0x86 ? Direct(Fetch()) : op == 0x8E ? DBR << 16 | Fetch16() : DirectIndexed(Fetch(), Y), X, X8); break;
+                WriteValue(op == 0x86 ? Direct(Fetch()) : op == 0x8E ? DBR << 16 | Fetch16() : DirectIndexed(Fetch(), Y), X, X8, op != 0x8E); break;
             case 0x64: case 0x74: case 0x9C: case 0x9E:
-                WriteValue(op switch { 0x64 => Direct(Fetch()), 0x74 => DirectIndexed(Fetch(), X), 0x9C => DBR << 16 | Fetch16(), _ => ((DBR << 16 | Fetch16()) + X) & 0xFFFFFF }, 0, M8); break;
+                WriteValue(op switch { 0x64 => Direct(Fetch()), 0x74 => DirectIndexed(Fetch(), X), 0x9C => DBR << 16 | Fetch16(), _ => ((DBR << 16 | Fetch16()) + X) & 0xFFFFFF }, 0, M8, op is 0x64 or 0x74); break;
             case 0xC0: case 0xE0: Compare(op == 0xC0 ? Y : X, Immediate(X8), X8); break;
             case 0xC4: case 0xCC: case 0xE4: case 0xEC:
-                Compare(op < 0xE0 ? Y : X, ReadValue((op & 8) == 0 ? Direct(Fetch()) : DBR << 16 | Fetch16(), X8), X8); break;
+                Compare(op < 0xE0 ? Y : X, ReadValue((op & 8) == 0 ? Direct(Fetch()) : DBR << 16 | Fetch16(), X8, (op & 8) == 0), X8); break;
             case 0x24: case 0x2C: case 0x34: case 0x3C: case 0x89:
             {
-                int value = op == 0x89 ? Immediate(M8) : ReadValue(op switch { 0x24 => Direct(Fetch()), 0x2C => DBR << 16 | Fetch16(), 0x34 => DirectIndexed(Fetch(), X), _ => ((DBR << 16 | Fetch16()) + X) & 0xFFFFFF }, M8);
+                int value = op == 0x89 ? Immediate(M8) : ReadValue(op switch { 0x24 => Direct(Fetch()), 0x2C => DBR << 16 | Fetch16(), 0x34 => DirectIndexed(Fetch(), X), _ => ((DBR << 16 | Fetch16()) + X) & 0xFFFFFF }, M8, op is 0x24 or 0x34);
                 Flag(Z, (A & value & Mask(M8)) == 0);
                 if (op != 0x89) { Flag(N, (value & (M8 ? 128 : 32768)) != 0); Flag(V, (value & (M8 ? 64 : 16384)) != 0); }
                 break;
             }
             case 0x04: case 0x0C: case 0x14: case 0x1C:
             {
-                int a = (op & 8) == 0 ? Direct(Fetch()) : DBR << 16 | Fetch16(), value = ReadValue(a, M8);
-                Flag(Z, (value & A & Mask(M8)) == 0); WriteValue(a, op < 0x10 ? value | A : value & ~A, M8); break;
+                int a = (op & 8) == 0 ? Direct(Fetch()) : DBR << 16 | Fetch16(), value = ReadValue(a, M8, (op & 15) < 8);
+                Flag(Z, (value & A & Mask(M8)) == 0); WriteValue(a, op < 0x10 ? value | A : value & ~A, M8, (op & 8) == 0); break;
             }
             default:
                 if ((op & 15) is 6 or 14 || op is 0x0A or 0x2A or 0x4A or 0x6A or 0x1A or 0x3A)
@@ -243,7 +259,7 @@ public sealed class Cpu65816(ICpuBus bus)
                         6 => Direct(Fetch()), 14 => DBR << 16 | Fetch16(), 22 => DirectIndexed(Fetch(), X),
                         30 => ((DBR << 16 | Fetch16()) + X) & 0xFFFFFF, _ => -1
                     };
-                    int value = accumulator ? A & Mask(M8) : ReadValue(address, M8), carry = P & C;
+                    int value = accumulator ? A & Mask(M8) : ReadValue(address, M8, (op & 15) == 6), carry = P & C;
                     int operation = accumulator && op == 0x1A ? 7 : accumulator && op == 0x3A ? 6 : op >> 5;
                     int result;
                     switch (operation)
@@ -256,7 +272,7 @@ public sealed class Cpu65816(ICpuBus bus)
                         case 7: result = value + 1; break;
                         default: throw new NotSupportedException($"Opcode {op:X2} at {instructionAddress:X6}");
                     }
-                    if (accumulator) SetA(result); else WriteValue(address, Nz(result, M8), M8);
+                    if (accumulator) SetA(result); else WriteValue(address, Nz(result, M8), M8, (op & 15) == 6);
                 }
                 else throw new NotSupportedException($"Opcode {op:X2} at {instructionAddress:X6}");
                 break;

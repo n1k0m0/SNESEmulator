@@ -1,10 +1,11 @@
-# M0 test laboratory
+# Test laboratory: M0 infrastructure and M1 CPU semantics
 
 M0 establishes measurement, not CPU or SNES accuracy. The original17 assertions
 are preserved as12 portable core regressions and5 Windows/network integrations.
 `SNESEmulator.Core.Tests` references only the core and portable testing library;
 it does not load Windows Forms, OpenTK, the frontend, audio devices or TLS.
 `SNESEmulator.Tests` retains the existing Windows frontend/transport dependency.
+M1 adds12 portable semantic regression groups (24 total portable tests).
 No sibling C64 repository is modified.
 
 ## Reproduce locally
@@ -13,18 +14,22 @@ Requires .NET10 SDK and Python3 (standard library only). Run from repository roo
 
 ```powershell
 python tools/test-lab.py --windows
-# portable core, fixtures, replay, reporting, watchdog and red accuracy inventory:
+# portable core, fixtures, replay, reporting, watchdog and explicit sample inventory:
 python tools/test-lab.py
-# strict conformance exit, currently1 because known accuracy failures:
+# sample inventory exits2 because full-suite cases are explicitly unexecuted:
 python tools/test-lab.py --inventory-only
+# all5,080,400 pinned cases; fetch once, then entirely offline:
+python tools/fetch-full-testdata.py
+python tools/test-lab.py --windows --full
 ```
 
-The full laboratory script checks laboratory contracts and baseline regression.
-Its zero exit code DOES NOT mean external conformance passes. Conformance always
-has its own JSON/JUnit reports and nonzero exit status. CI has a separate visible
-`external-conformance-inventory` job with `continue-on-error` during M0; remove
-that setting at M1 acceptance. Workflow definition is local; no remote or CI run
-was created. GUI/window interaction remains outside these automated cases.
+The standard script checks the complete laboratory contract and green sampled
+semantics while preserving512 unsampled markers. Its zero exit does not claim
+full coverage. `--full` requires all5,080,400 cases,512 verified source files and
+zero failures/skips. Missing data is non-success. The separate full CPU CI job
+fetches the pinned data and fails on missing/failed semantics; remote CI has not
+been executed because no remote is configured. GUI/window interaction remains
+outside these automated cases.
 
 Individual commands:
 
@@ -101,8 +106,8 @@ them, fills specified flat24-bit RAM and zeros unspecified RAM. It checks exact
 final registers/status and listed RAM; any unexpected write that changes another
 address is also rejected. For MVN/MVP, upstream expects a complete block move,
 while this core exposes one byte per `Step`: the adapter repeats only those
-opcodes until PC advances, with a65537-iteration ceiling. No CPU semantics were
-changed. Logical read/write traces are diagnostic only: dummy cycles, pins and
+opcodes until PC advances, with a65537-iteration ceiling. M1 corrects CPU semantics separately from the adapter conventions described below.
+Logical read/write traces are diagnostic only: dummy cycles, pins and
 hardware timing are deferred to M2. These vectors are independently generated
 software expectations, not an original-SNES hardware measurement.
 
@@ -110,6 +115,65 @@ Frozen sampled results and first differences are in`docs/baselines/m0.json`.
 No expected values or frames are derived from the current emulator and promoted
 into correctness oracles. Replay equality is explicitly an internal determinism
 check. The synthetic black pixel oracle checks the comparator, not the PPU.
+
+## M1 full semantic gate and provenance
+
+All5,080,400 vectors from all512 pinned files pass, covering every opcode in
+both modes. The acceptance result is recorded compactly in
+[baselines/m1.json](baselines/m1.json). M0's historical baseline is unchanged.
+No expected values were altered and no cases/opcode groups were excluded.
+
+`tools/fetch-full-testdata.py` downloads unchanged files at the immutable commit
+into ignored `testdata/65816-full/`; it reuses existing files offline and checks
+all hashes against reviewed `testdata/65816-full-manifest.json`. The runner
+requires that reviewed manifest, verifies complete file hashes and case counts,
+streams individual vectors, and reuses flat RAM with sparse clearing. Full reports
+store per-opcode/mode pass/fail counts and first failure evidence, instead of
+millions of passing records. Each group has a30-second deadline; `test-lab.py`
+adds a240-second process watchdog. Failure evidence includes raw and effective
+initial registers, E/M/X, expected/actual registers and first difference. A
+single full-file group can be reproduced using
+`cpu-full artifacts/one testdata/65816-full ab.e`.
+
+The upstream generator supplies arbitrary high S bytes for E=1, including
+instructions that do not access the stack, but its final values consistently
+canonicalize S to page1. These initial states cannot exist on hardware. The
+adapter explicitly maps only E-mode initial S to `0x100 | (S & 255)` before
+execution; raw inputs remain unmodified in evidence and fixtures. This is a
+corpus-to-valid-state convention, not a side effect attributed to LDA. No global
+P/X/Y normalization occurs. WDC documents page1 stack addressing in emulation
+mode and the S-high change on XCE (sections2.8 and7.10 of the
+[W65C816S datasheet](https://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf)).
+The corpus README's illustrative older example does not canonicalize S; the
+pinned actual vector files are the test inputs and their convention is reported
+explicitly here.
+
+Core fixes include width-limited block-move index updates, ADC decimal overflow
+from the intermediate high-digit sum, full24-bit data second-byte carry while
+Direct/stack operands remain in bank0, and extended emulation stack accesses
+before restoring the stack page. WDC's stack caveats explain the extended
+PHD/PLD/JSL/RTL/PEA/PEI/PER/JSR(a,x) behavior. PLB at S=$01FF is also covered by
+the independent pinned vectors (`ab e 75` reads $0200 then leaves S=$0100);
+this is software-reference evidence, not a new original-SNES hardware claim.
+The8 reduced source failures in `testdata/m1-regressions.json` retain verbatim
+initial/final values and are permanently exercised offline.
+
+The12 added portable groups cover E/M/X transitions, hidden A,8/16-bit BCD,
+Direct/indexed/long and bank boundaries, normal/extended stack wrapping, RMW,
+both block moves, BRK/COP/RTI, Reset, IRQ/NMI priority, masked IRQ waking WAI,
+and STP requiring Reset. A saved seed `0x65816` drives20,000 valid-BCD ADC/SBC
+checks against an independent integer-decimal oracle. The mutation suite now
+also changes an LDA instruction into LDX and rejects it against an independently
+specified register oracle. The original12 portable plus5 Windows regressions
+remain green.
+
+`Irq()` and `ServiceInterrupts()` provide instruction-boundary entry/arbitration.
+They do not implement interrupt-pin sampling/latches or polling-cycle timing.
+M2 must still validate exact bus/dummy-cycle address order and values, pins,
+internal cycles, clock durations, interrupt polling and DMA/raster interactions.
+M1 establishes register/memory semantics for a generic65816, with deterministic
+test initialization; power-on register randomness, original5A22 measurements and
+commercial-game compatibility remain outside this acceptance.
 
 ## Headless limits, replay and artifacts
 

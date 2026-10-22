@@ -36,6 +36,18 @@
       "seed": null,
       "success": "no hardware verification implied",
       "timeoutSeconds": 120
+    },
+    {
+      "path": "testdata/m1-regressions.json",
+      "source": "https://github.com/SingleStepTests/65816/tree/307c63f5673c8c6b861c52f71ddb89212a227480/v1",
+      "license": "MIT; see testdata/65816/upstream-LICENCE",
+      "version": "M1-v1",
+      "sha256": "a68471538101bdd9482fea5a57fa290e89c8b42fbd66edd1bff00f1f82afa9cd",
+      "profile": "generic-65816-flat-ram",
+      "start": "raw upstream state; E-mode S canonicalized to page1 explicitly in adapter",
+      "seed": null,
+      "success": "exact independently supplied final registers/status/RAM and no unexpected changed writes",
+      "timeoutSeconds": 120
     }
   ],
   "analyticalOracles": [

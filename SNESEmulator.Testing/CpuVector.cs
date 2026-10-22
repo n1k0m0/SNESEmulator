@@ -7,10 +7,14 @@ public sealed record BusAccess(long Sequence, string Direction, int Address, byt
 public sealed class TraceBus : ICpuBus
 {
     public byte[] Memory { get; } = new byte[1<<24];
+    public bool TraceEnabled { get; set; } = true;
+    private readonly HashSet<int> dirty = [];
+    public void ClearMemory() { foreach(int a in dirty) Memory[a]=0; dirty.Clear(); }
+    public void Initialize(int a, byte v) { Memory[a]=v; dirty.Add(a); }
     public List<BusAccess> Trace { get; } = [];
     public Dictionary<int, byte> BeforeWrite { get; } = [];
-    public byte Read(int address) { address &= 0xffffff; byte value=Memory[address]; Trace.Add(new(Trace.Count,"read",address,value)); return value; }
-    public void Write(int address,byte value) { address &= 0xffffff; BeforeWrite.TryAdd(address,Memory[address]); Memory[address]=value; Trace.Add(new(Trace.Count,"write",address,value)); }
+    public byte Read(int address) { address &= 0xffffff; byte value=Memory[address]; if(TraceEnabled) Trace.Add(new(Trace.Count,"read",address,value)); return value; }
+    public void Write(int address,byte value) { address &= 0xffffff; BeforeWrite.TryAdd(address,Memory[address]); Memory[address]=value; dirty.Add(address); if(TraceEnabled) Trace.Add(new(Trace.Count,"write",address,value)); }
 }
 public static class CpuVector
 {
@@ -20,12 +24,15 @@ public static class CpuVector
         int V(string key)=>state.GetProperty(key).GetInt32();
         c.A=(ushort)V("a"); c.X=(ushort)V("x"); c.Y=(ushort)V("y"); c.S=(ushort)V("s"); c.D=(ushort)V("d"); c.PC=(ushort)V("pc");
         c.P=(byte)V("p"); c.PBR=(byte)V("pbr"); c.DBR=(byte)V("dbr"); c.E=V("e")!=0; c.Waiting=c.Stopped=false;c.Instructions=0;
-        foreach(var pair in state.GetProperty("ram").EnumerateArray()) bus.Memory[pair[0].GetInt32()]=(byte)pair[1].GetInt32();
+        foreach(var pair in state.GetProperty("ram").EnumerateArray()) bus.Initialize(pair[0].GetInt32(),(byte)pair[1].GetInt32());
         bus.Trace.Clear();bus.BeforeWrite.Clear();
     }
     /// <summary>Upstream block-move vectors cover the whole instruction, while Step exposes one byte iteration.</summary>
     public static int ExecuteInstruction(Cpu65816 cpu,TraceBus bus)
     {
+        // The corpus supplies arbitrary S high bytes in E mode but expects page 1.
+        // Map this impossible external initial state explicitly; do not alter expected values.
+        if(cpu.E) cpu.S=(ushort)(0x100 | (cpu.S & 255));
         int start=cpu.PBR<<16|cpu.PC,op=bus.Memory[start],cycles=0;
         for(int iterations=0;iterations<65537;iterations++)
         {
@@ -34,6 +41,7 @@ public static class CpuVector
         }
         throw new InvalidOperationException("Block move exceeded 65537 instruction iterations");
     }
+    public static Dictionary<string,int> EffectiveInitial(Cpu65816 c) { var state=State(c);if(c.E) state["s"]=0x100|(c.S&255);return state; }
     public static Dictionary<string,int> State(Cpu65816 c)=>new() { ["pc"]=c.PC,["s"]=c.S,["p"]=c.P,["a"]=c.A,["x"]=c.X,["y"]=c.Y,["dbr"]=c.DBR,["d"]=c.D,["pbr"]=c.PBR,["e"]=c.E?1:0 };
     public static string? FirstDifference(Cpu65816 c,TraceBus bus,JsonElement expected)
     {

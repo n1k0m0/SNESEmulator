@@ -11,53 +11,66 @@ static class Lab
     static JsonSerializerOptions Json = new() { WriteIndented=true };
     public static int Run(string[] args)
     {
-        if(args.Length==0) {Console.WriteLine("Commands: cpu [report-prefix] [fixture-directory] [case-name], rom [options], mutations [prefix], supervise <seconds> <report-prefix> <command...>, probe <pass|fail|skipped|hang|crash>. See docs/test-laboratory.md.");return 2;}
-        try { return args[0] switch { "cpu"=>Cpu(args.Skip(1).ToArray()),"rom"=>Rom(args.Skip(1).ToArray()),"mutations"=>Mutations(args.ElementAtOrDefault(1)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/mutations"),"supervise"=>Supervise(args.Skip(1).ToArray()),"unavailable"=>Unavailable(args[1]),"probe"=>Probe(args[1]),_=>throw new ArgumentException("Unknown command") }; }
+        if(args.Length==0) {Console.WriteLine("Commands: cpu [report-prefix] [fixture-directory] [case-name], cpu-full [report-prefix] [fixture-directory] [opcode.mode], rom [options], mutations [prefix], supervise <seconds> <report-prefix> <command...>, probe <pass|fail|skipped|hang|crash>. See docs/test-laboratory.md.");return 2;}
+        try { return args[0] switch { "cpu"=>Cpu(args.Skip(1).ToArray()),"cpu-full"=>Cpu(args.Skip(1).ToArray(),true),"rom"=>Rom(args.Skip(1).ToArray()),"mutations"=>Mutations(args.ElementAtOrDefault(1)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/mutations"),"supervise"=>Supervise(args.Skip(1).ToArray()),"unavailable"=>Unavailable(args[1]),"probe"=>Probe(args[1]),_=>throw new ArgumentException("Unknown command") }; }
         catch(Exception ex) {Console.Error.WriteLine(ex);var r=new TestReport("laboratory-command");r.Add(args[0],"crash",ex.ToString());r.Save("artifacts/command-crash");return 1;}
     }
-    static int Cpu(string[] args)
+    static int Cpu(string[] args,bool full=false)
     {
-        string prefix=args.ElementAtOrDefault(0)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/conformance",directory=args.ElementAtOrDefault(1)??"testdata/65816", filter=args.ElementAtOrDefault(2)??"";
-        var report=new TestReport("65816-sampled-conformance");
+        string prefix=args.ElementAtOrDefault(0)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/conformance",directory=args.ElementAtOrDefault(1)??(full?"testdata/65816-full":"testdata/65816"), filter=args.ElementAtOrDefault(2)??"";
+        var report=new TestReport(full?"65816-full-conformance":"65816-sampled-conformance");
         report.Metadata["accuracy"]="Register/listed RAM semantics only; timing and cycle traces NOT accepted. Generic 65816, no SNES hardware proof.";
-        report.Metadata["reproduce"]=$"dotnet run --project SNESEmulator.Lab -c Release -- cpu {prefix} {directory} [case-name]";
-        string manifestPath=Path.Combine(directory,"../manifest.json");
+        report.Metadata["reproduce"]=$"dotnet run --project SNESEmulator.Lab -c Release -- {(full ? "cpu-full" : "cpu")} {prefix} {directory} {(full ? "[opcode.mode]" : "[case-name]")}";
+        string manifestPath=Path.Combine(directory,full?"manifest.json":"../manifest.json");
         if(!File.Exists(manifestPath)) { report.Add("manifest","skipped","Missing pinned manifest: "+manifestPath);report.Save(prefix);return report.ExitCode; }
         byte[] manifestBytes=File.ReadAllBytes(manifestPath);using var manifest=JsonDocument.Parse(manifestBytes);
+        if(full && (!File.Exists("testdata/65816-full-manifest.json") || !SHA256.HashData(manifestBytes).SequenceEqual(SHA256.HashData(File.ReadAllBytes("testdata/65816-full-manifest.json"))))) {
+            report.Add("full-manifest-integrity","fail","Full manifest differs from reviewed immutable source hashes");report.Save(prefix);return report.ExitCode;
+        }
         report.Metadata["manifestSha256"]=Convert.ToHexString(SHA256.HashData(manifestBytes));
         report.Metadata["sourceCommit"]=manifest.RootElement.GetProperty("commit").GetString();
         report.Metadata["representedCases"]=manifest.RootElement.GetProperty("representedCases").GetInt32();report.Metadata["upstreamCases"]=manifest.RootElement.GetProperty("upstreamCases").GetInt32();
         var files=manifest.RootElement.GetProperty("files").EnumerateArray().ToArray();
-        var bus=new TraceBus();var cpu=new Cpu65816(bus);int executed=0;var coverage=new List<string>();
+        var bus=new TraceBus { TraceEnabled=!full };var cpu=new Cpu65816(bus);int executed=0,totalPassed=0,totalFailed=0;var coverage=new List<string>();
         for(int op=0;op<256;op++) foreach(string mode in new[]{"e","n"})
         {
             string key=$"{op:x2}.{mode}";
+            if(full && filter!="" && filter!=key) continue;
             var matches=files.Where(f=>f.GetProperty("opcode").GetString()==$"{op:x2}" && f.GetProperty("mode").GetString()==mode).ToArray();
             if(matches.Length!=1){report.Add(key,"skipped","Missing or ambiguous manifest entry");continue;}
             var entry=matches[0];string path=Path.Combine(directory,key+".json");
             if(!File.Exists(path)){report.Add(key,"skipped","Pinned fixture missing: "+path);continue;}
-            byte[] bytes=File.ReadAllBytes(path);
-            if(!Convert.ToHexString(SHA256.HashData(bytes)).Equals(entry.GetProperty("sha256").GetString(),StringComparison.OrdinalIgnoreCase)){report.Add(key,"fail","Fixture SHA-256 mismatch: "+path);continue;}
-            using var doc=JsonDocument.Parse(bytes);int count=doc.RootElement.GetArrayLength();
-            if(count!=entry.GetProperty("cases").GetInt32()){report.Add(key,"fail","Manifest case count mismatch");continue;}
+            using var hashStream=File.OpenRead(path);
+            if(!Convert.ToHexString(SHA256.HashData(hashStream)).Equals(entry.GetProperty("sha256").GetString(),StringComparison.OrdinalIgnoreCase)){report.Add(key,"fail","Fixture SHA-256 mismatch: "+path);continue;}
+            var groupWatch=Stopwatch.StartNew();
+            int count=0,passed=0,failed=0,crashed=0;object? firstFailure=null;
+            string? firstDiff=null;
+            using var vectorStream=File.OpenRead(path);
+            var vectors=JsonSerializer.DeserializeAsyncEnumerable<JsonElement>(vectorStream).GetAsyncEnumerator();
+            IEnumerable<JsonElement> ReadVectors() { try { while(vectors.MoveNextAsync().AsTask().GetAwaiter().GetResult()) yield return vectors.Current; } finally { vectors.DisposeAsync().AsTask().GetAwaiter().GetResult(); } }
             coverage.Add(key);
-            foreach(var vector in doc.RootElement.EnumerateArray())
+            foreach(var vector in ReadVectors())
             {
+                if(groupWatch.Elapsed.TotalSeconds>30) { failed++; report.Add(key+"/watchdog","timeout","Opcode/mode group exceeded 30 seconds");break; }
+                count++;
                 string name=vector.GetProperty("name").GetString()!;
-                if(filter!="" && filter!=name)continue;
-                Array.Clear(bus.Memory);CpuVector.Load(cpu,bus,vector.GetProperty("initial"));var watch=Stopwatch.StartNew();
+                if(!full && filter!="" && filter!=name)continue;
+                bus.ClearMemory();CpuVector.Load(cpu,bus,vector.GetProperty("initial"));var effectiveInitial=CpuVector.EffectiveInitial(cpu);var watch=Stopwatch.StartNew();
                 try
                 {
                     int approximateCycles=CpuVector.ExecuteInstruction(cpu,bus);executed++;
                     string? diff=CpuVector.FirstDifference(cpu,bus,vector.GetProperty("final"));
-                    report.Add(name,diff==null?"pass":"fail",diff,watch.Elapsed.TotalSeconds,diff==null?null:new { opcode=$"{op:X2}",mode,initial=vector.GetProperty("initial").Clone(),expected=vector.GetProperty("final").Clone(),actual=CpuVector.State(cpu),logicalBus=bus.Trace.ToArray(),approximateCycles,reproduce=$"dotnet run --project SNESEmulator.Lab -c Release -- cpu {prefix} {directory} \"{name}\"" });
+                    if(diff==null) { passed++;totalPassed++; } else { failed++;totalFailed++; firstDiff??=name+": "+diff; firstFailure??=new {name,opcode=$"{op:X2}",mode,emulation=effectiveInitial["e"]!=0,memory8=effectiveInitial["e"]!=0||(effectiveInitial["p"]&32)!=0,index8=effectiveInitial["e"]!=0||(effectiveInitial["p"]&16)!=0,effectiveInitial,initial=vector.GetProperty("initial").Clone(),expected=vector.GetProperty("final").Clone(),actual=CpuVector.State(cpu)}; }
+                    if(!full) report.Add(name,diff==null?"pass":"fail",diff,watch.Elapsed.TotalSeconds,diff==null?null:new { opcode=$"{op:X2}",mode,effectiveInitial,initial=vector.GetProperty("initial").Clone(),expected=vector.GetProperty("final").Clone(),actual=CpuVector.State(cpu),logicalBus=bus.Trace.ToArray(),approximateCycles,reproduce=$"dotnet run --project SNESEmulator.Lab -c Release -- cpu {prefix} {directory} \"{name}\"" });
                 }
-                catch(Exception ex) {report.Add(name,"crash",ex.ToString(),watch.Elapsed.TotalSeconds,new {initial=vector.GetProperty("initial").Clone()});}
+                catch(Exception ex) {failed++;crashed++;totalFailed++;firstDiff??=name+": "+ex.Message;firstFailure??=new {name,effectiveInitial,initial=vector.GetProperty("initial").Clone(),error=ex.ToString()};if(!full)report.Add(name,"crash",ex.ToString(),watch.Elapsed.TotalSeconds,new {initial=vector.GetProperty("initial").Clone()});}
             }
-            if(filter=="")report.Add(key+"/unsampled","skipped",$"{entry.GetProperty("upstreamCases").GetInt32()-count} upstream vectors not selected; sample count {count}. Full suite deferred to M1.");
+            if(count!=entry.GetProperty("cases").GetInt32()) { failed++; report.Add(key+"/count","fail",$"Expected {entry.GetProperty("cases").GetInt32()} cases, read {count}"); }
+            if(full) { report.Add(key,crashed>0?"crash":failed==0?"pass":"fail",firstDiff,groupWatch.Elapsed.TotalSeconds,evidence:new {passed,failed,crashed,firstFailure,reproduce=$"dotnet run --project SNESEmulator.Lab -c Release -- cpu-full {prefix} {directory} {key}"});Console.WriteLine($"{key}: {passed} pass / {failed} fail"); }
+            if(!full && filter=="")report.Add(key+"/unsampled","skipped",$"{entry.GetProperty("upstreamCases").GetInt32()-count} upstream vectors not selected; sample count {count}. Full suite available with cpu-full.");
         }
         if(executed==0)report.Add("selected-cases","skipped","No vectors executed, including any requested name filter");
-        report.Metadata["executedCases"]=executed;report.Metadata["opcodeModeFixturesVerified"]=coverage.Count;report.Metadata["coverage"]=coverage;
+        report.Metadata["executedCases"]=executed;report.Metadata["passedCases"]=totalPassed;report.Metadata["failedCases"]=totalFailed;report.Metadata["coverageKind"]=full?(filter==""?"full":"full-file-filter"):"sample";report.Metadata["stackConvention"]="Raw upstream initial S retained in evidence; before execution E=1 maps S to 0x100|(S&255), the only valid emulation stack page. P/X/Y unchanged.";report.Metadata["opcodeModeFixturesVerified"]=coverage.Count;report.Metadata["coverage"]=coverage;
         report.Save(prefix);return report.ExitCode;
     }
     static int Mutations(string prefix)
@@ -77,6 +90,13 @@ static class Lab
         CpuVector.Load(cpu,bus,doc.RootElement);bus.Write(0x123456,0x42);
         string? extra=CpuVector.FirstDifference(cpu,bus,doc.RootElement);
         r.Add("unexpected memory write detected",extra=="unexpected memory change 123456: expected 00, actual 42"?"pass":"fail",extra);
+        using var semantics=JsonDocument.Parse("""{"pc":32770,"s":511,"p":52,"a":66,"x":0,"y":0,"dbr":0,"d":0,"pbr":0,"e":1,"ram":[]}""");
+        foreach(bool mutate in new[]{false,true}) {
+            bus.ClearMemory();CpuVector.Load(cpu,bus,doc.RootElement);cpu.A=0;
+            bus.Initialize(0x8000,(byte)(mutate?0xA2:0xA9));bus.Initialize(0x8001,0x42);CpuVector.ExecuteInstruction(cpu,bus);
+            string? difference=CpuVector.FirstDifference(cpu,bus,semantics.RootElement);
+            r.Add(mutate?"changed instruction rejected by independent oracle":"independent immediate-load oracle",(mutate?difference=="register a: expected 42, actual 0":difference==null)?"pass":"fail",difference);
+        }
         r.Save(prefix);return r.ExitCode;
     }
     static int Unavailable(string suite)
