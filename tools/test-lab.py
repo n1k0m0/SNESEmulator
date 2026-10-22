@@ -29,6 +29,7 @@ run([sys.executable,'tools/verify-dsp-gaussian.py'])
 # M5 adds334 full-system PPU snapshots and42 graphics groups to87 prior groups.
 supervised('core',['dotnet',str(CORE)],timeout=240)
 supervised('video-conformance',['dotnet',str(CORE),'--video-only'],timeout=180)
+run([sys.executable,'tools/test-video-cli.py'])
 run([sys.executable,'tools/video-mutations.py'])
 supervised('audio-conformance',['dotnet',str(CORE),'--dsp-only'],timeout=120)
 supervised('audio-long-run',['dotnet',str(CORE),'--dsp-long'],timeout=180)
