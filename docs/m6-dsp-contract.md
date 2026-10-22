@@ -179,6 +179,8 @@ dotnet run --project SNESEmulator.Core.Tests -c Release -- --dsp-long
 python tools/test-lab.py --windows --full
 # Optional independent regeneration; requires network, git and C++ compiler:
 python tools/dsp-reference.py --rebuild
+dotnet run --project SNESEmulator.Lab -c Release -- rom --diagnostic audio --frames 8 --output artifacts/audio
+dotnet run --project SNESEmulator.Lab -c Release -- benchmark-apu
 dotnet run --project SNESEmulator.Lab -c Release -- benchmark-dsp
 ```
 
@@ -214,3 +216,15 @@ the hardware-tested accurate reference executes them on30/29. This selected
 model follows the pinned reference with dynamic phase-level register/RAM
 comparison. Physical sub-SMP electrical access slots, reset release, analog
 DAC behaviour and chip-revision differences have no new console measurement.
+
+
+Clean implementation gate: `feb978b22ed73ecef9237146bbfad760ddec3a92`, exit0,
+`artifacts/m6-full-validation.log`;208 frozen artifacts and exact hashes are
+in `artifacts/m6-implementation-evidence/`. All147 portable and8 Windows groups
+pass; source/external corpus and original IPL counts remain unchanged. On
+NILSPC1/.NET10.0.12, the comparable active PPU/APU/DSP diagnostic measures18.33
+fields/s (M5:21.62); two active BRR voices with forced-blank PPU separately
+measure19.40. Neither meets NTSC realtime; M9 must profile without removing
+accuracy. The raw CLI audio diagnostic emits4259 stereo pairs, first0/672,
+last4258/3270816, no dropped pairs; its hash is a measurement, not an oracle.
+The existing `publish/` is still pre-M0; this milestone creates no release.

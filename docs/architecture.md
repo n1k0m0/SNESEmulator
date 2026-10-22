@@ -121,3 +121,10 @@ führt65816→IPL→SPC→DSP aus. Headless-ROMs liefern zusätzlich natives Ste
 und DSP-Phasentraces. Quellen, unabhängiger digitaler Oracle und Grenzen:
 [M6-Vertrag](m6-dsp-contract.md). Audiohardware-/ROM-Hardwaremessungen fehlen
 weiterhin; veröffentlichte Forschung ersetzt keine eigene Konsolenaufnahme.
+
+
+M6 clean full gate passed on feb978b with147 portable/8 Windows groups and all
+external corpora. Comparable full PPU/APU/DSP performance is18.33 fields/s,
+versus21.62 at M5; the separate two-BRR-voice forced-blank case is19.40. Both
+remain below realtime. [M6 baseline](baselines/m6.json) records exact measurements;
+M9 must retain digital results while profiling. Independent M6 acceptance is pending.

@@ -1,4 +1,4 @@
-# Test laboratory: M0–M5 CPU, bus, I/O, SPC700 and native PPU
+# Test laboratory: M0–M6 CPU, bus, I/O, SPC700, native PPU and stereo DSP
 
 M0 establishes measurement, not CPU or SNES accuracy. The original17 assertions
 are preserved as12 portable core regressions and5 Windows/network integrations.
@@ -9,8 +9,9 @@ M1 adds12 portable semantic groups; M2 adds21 timing/continuation groups.
 M3 adds21 I/O/DMA groups (66 total through M3); M0–M3 were independently
 accepted (`artifacts/root-m3-validation.log`). M4 adds21 groups (87 total
 portable groups); independently accepted on `0b1139436727c835c4fdbf944c74e3d0067c3944`
-(`artifacts/root-m4-validation.log`). M5 adds42 PPU groups (129 total), pending
-independent parent acceptance.
+(`artifacts/root-m4-validation.log`). M5 adds42 PPU groups (129 total), independently accepted on
+`2dc8cf021ef7394f38df1db9932b443a23543b30`, full gate exit0. M6 adds17
+separately supervised DSP groups,1 AV group and3 Windows groups (8 total).
 No sibling C64 repository is modified.
 
 ## Reproduce locally
@@ -456,3 +457,14 @@ not interchangeable. Both retain all digital accuracy features. Published
 hardware research and the external digital oracle support this implementation;
 original console audio captures, rapid DAC mute/reset pin behaviour and
 revision-specific electrical measurements remain unperformed evidence.
+
+
+The clean M6 full gate passed on `feb978b22ed73ecef9237146bbfad760ddec3a92`,
+exit0, `artifacts/m6-full-validation.log`. All147 portable groups and8 Windows
+groups passed, as did the full CPU/SPC corpora and original local IPL4/4.
+Raw SPC results remain249000 pass/7000 explicit source adjudications.208
+unmodified artifacts are frozen in `artifacts/m6-implementation-evidence/`;
+all reports that record provenance have that commit and an empty working tree.
+The frozen manifest hashes the logs, native dumps, traces and structured results.
+Full counts, group durations and both distinct benchmark workloads are in
+[the M6 baseline](baselines/m6.json). Independent M6 parent acceptance is pending.

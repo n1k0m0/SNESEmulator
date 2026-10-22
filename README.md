@@ -6,14 +6,16 @@ Der SNES-Kern wird hier selbst entwickelt; es wird kein Snes9x-, bsnes- oder
 Libretro-Kern eingebunden.
 
 **Stand: 0.1.0-dev – eigener Entwicklungskern, noch keine allgemeine
-Spielekompatibilität.** M0–M4 sind unabhängig geprüft. M5 ergänzt eine getaktete
-Mode0/1-PPU mit Sprites, Fenstern, Farbmathematik und nativen RGB555-Referenzen;
-unabhängige M5-Abnahme ausstehend. Alle5.080.400 externen CPU-Semantik- und
+Spielekompatibilität.** M0–M5 sind unabhängig geprüft. Die getaktete
+Mode0/1-PPU bietet Sprites, Fenster, Farbmathematik und native RGB555-Referenzen.
+M6 ergänzt einen eigenen phasengetakteten S-DSP mit Stereo; seine unabhängige
+Abnahme steht aus. Alle5.080.400 externen CPU-Semantik- und
 Busfälle bestehen. Die SPC-Suite umfasst256.000 Semantik-/freigegebene Busfälle:
 249.000 passen roh,7.000 haben eine quellengestützte indirekt-Y-Adjudikation.
-Es gibt keine eigene Konsolenmessung. S-DSP-Audio und Modi2–7 bleiben offen.
+Es gibt keine eigene Konsolenmessung. Modi2–7 bleiben M7;453.726 native
+Stereo-Paare bestehen den unabhängigen digitalen DSP-Referenzvergleich.
 Siehe [Testlabor](docs/test-laboratory.md), [M4](docs/m4-apu-contract.md)
-und [M5-PPU-Vertrag](docs/m5-ppu-contract.md).
+[M5-PPU-Vertrag](docs/m5-ppu-contract.md) und [M6-DSP-Vertrag](docs/m6-dsp-contract.md).
 
 ## Starten
 
@@ -53,7 +55,8 @@ Zusatzchips; andere Cartridge-Hardware wird mit einer Fehlermeldung abgewiesen.
 
 Die lokale Emulation pausiert in Menüs; Clients erhalten den Menüstatus des
 Hosts. SETTINGS enthält SHARP/CRT/TV, GPU-Upscaling, Vollbild, Gamepad-Aktivierung,
-Controller-Port und eine Belegung für die acht SNES-Aktionstasten. Gamepads
+Controller-Port, Lautstärke, ein eigenes CPU→SPC→DSP-Audiodiagnose-ROM
+und eine Belegung für die acht SNES-Aktionstasten. Gamepads
 bedienen auch die Menüs: Start+Select öffnet F10, A bestätigt, B geht zurück,
 X speichert im F12-Menü. L+R+Select öffnet F12. Richtungen kommen von Steuerkreuz oder linkem Stick.
 Die Standard-Buttonnummern hängen vom Controller ab und sind anpassbar.
@@ -87,9 +90,9 @@ Eine separate C64-Tastaturfreigabe ist für das SNES nicht im Menü enthalten.
   ausgelassen; langsame Clients halten nur das neueste wartende Bild.
 - Filter und Upscaling bleiben lokal. Sitzungs- und Relay-Passwörter bleiben
   nur im Arbeitsspeicher.
-- Der übernommene Mono-PCM/ADPCM-Audiotransport ist vorhanden. Da der eigene
-  S-DSP noch fehlt, erzeugt dieser Entwicklungsstand **keinen SNES-Ton**.
-  Für SNES-Stereo muss der Audiopfad später erweitert werden.
+- Protokoll2 überträgt natives verlustfreies Stereo-PCM mit32000Hz,
+  Sampleindex, Crystalzeit und Sequenz. Begrenzte Queues und ein getrenntes
+  Geräte-Resampling halten Hardwarezeit und Präsentation auseinander.
 
 Im NETWORK-Menü Text direkt eintippen, mit Backspace bearbeiten oder mit Entf
 leeren. SERVER PORT ist momentan der gemeinsame LAN-Port für Host und Client.
@@ -106,10 +109,10 @@ Emulatoren können nicht gegenseitig als Client dienen.
 
 | Projekt / Verzeichnis | Verantwortung |
 |---|---|
-| `SNESEmulator.Core` | Plattformunabhängiger C#-Kern: CPU, Bus, Cartridge, PPU, Controller, DMA, SPC700/APU und Savestates |
+| `SNESEmulator.Core` | Plattformunabhängiger C#-Kern: CPU, Bus, Cartridge, PPU, Controller, DMA, SPC700/APU, S-DSP und Savestates |
 | `SNESEmulator/Frontend` | SharpPixels-Fenster, Pixelmenüs, Eingaben und Präsentation |
 | `SNESEmulator/Network` | TLS, Host/Client, Frame-/Input-Protokoll, Relay und E2E-Verschlüsselung |
-| `SNESEmulator/Audio` | Übernommener PCM-Ausgang für den Netzwerk-Audiopfad |
+| `SNESEmulator/Audio` | Stereo-Geräteausgabe, Lautstärke und Resampling für lokalen/Netzwerkton |
 | `SharpPixels` | Aus dem C64-Projekt übernommene OpenTK-Renderbibliothek mit GPU-Filtern |
 | `SNESEmulator.Tests` | Ausführbare Hardware- und Netzwerk-Regressionstests |
 | `relay_server` | Separater Python-TLS-Relay, einschließlich Linux-Service-Skripten |
@@ -191,3 +194,13 @@ benötigt die lokale Original-IPL-Testeingabe; ohne sie bleibt dieser Nachweis
 ausdrücklich unausgeführt. MIT-SPC-Testdaten beziehen:
 `python tools/fetch-spc700.py --full`. Herkunft und Reproduktion:
 [M4-Vertrag](docs/m4-apu-contract.md).
+
+
+M6-Vollgate auf sauberem `feb978b`:147 portable Gruppen (129 bisherige,
+17 DSP,1 AV),8 Windowsgruppen, sämtliche externen CPU/SPC-Vollvektoren und
+Original-IPL-Prüfungen bestehen. [Messdaten](docs/baselines/m6.json) bleiben
+von Korrektheitsorakeln getrennt. Die aktive PPU+APU+DSP-Diagnose erreicht lokal
+18,33 Felder/s; die gesonderte Zwei-Voice-Audiodiagnose mit Forced Blank19,40.
+Dies ist unter Echtzeit und bleibt eine M9-Optimierungsaufgabe. Der vorhandene
+`publish/`-Ordner ist noch der alte Vor-M0-Stand; für diesen Entwicklungsstand
+mit dem SDK aus den aktuellen Quellen starten. Es wurde kein Release erstellt.

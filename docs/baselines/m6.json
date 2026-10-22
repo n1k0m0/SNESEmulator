@@ -1,0 +1,957 @@
+{
+  "schema": "snes-m6-dsp-v1",
+  "status": "Clean implementation full gate passed; independent parent acceptance pending. Measurement record, not an expected-output oracle.",
+  "implementationCommit": "feb978b22ed73ecef9237146bbfad760ddec3a92",
+  "implementationCommits": [
+    "5bdf8fe51d28822e25c8fd59d9bdccb779ce8b88",
+    "feb978b22ed73ecef9237146bbfad760ddec3a92"
+  ],
+  "command": "python tools/test-lab.py --windows --full",
+  "exitCode": 0,
+  "workingTreeStatus": "",
+  "log": "artifacts/m6-full-validation.log",
+  "frozenReports": "artifacts/m6-implementation-evidence/",
+  "frozenManifest": {
+    "path": "artifacts/m6-implementation-evidence/frozen-manifest.json",
+    "bytes": 33986,
+    "sha256": "7fed6c2fe3064363e676b789d54b6ffe75e28cf33a7abc9730de151c6b417ada"
+  },
+  "frozenFiles": 208,
+  "frozenBytesExcludingManifest": 12946124,
+  "productionBuild": {
+    "command": "dotnet build SNESEmulator.sln -c Release --no-restore",
+    "warnings": 0,
+    "errors": 0,
+    "log": {
+      "path": "artifacts/m6-implementation-evidence/m6-build.log",
+      "bytes": 963,
+      "sha256": "e90e9a2643d1e2698bd7f81fffd217ffd63ccaa8f66b885c33bde11ebc642e2f"
+    }
+  },
+  "portableGroups": 147,
+  "priorCoreGroups": 129,
+  "dspGroups": 17,
+  "avLongGroups": 1,
+  "windowsGroups": 8,
+  "laboratoryMutationGroups": 11,
+  "dspNegativePhaseMutations": 4,
+  "dspNegativeDigitalMutations": 6,
+  "headlessNativeAudioNegativeMutations": 1,
+  "savestateVersion": 7,
+  "wireVersion": "0x534E0002",
+  "nativeAudio": {
+    "rate": 32000,
+    "channels": 2,
+    "crystalHz": 24576000,
+    "crystalsPerPair": 768,
+    "firstPairCrystal": 672,
+    "presentationCapacity": 8192,
+    "networkMaximumFramesPerPacket": 4096,
+    "networkCodec": "lossless signed16 little-endian stereo PCM only"
+  },
+  "cpu65816Semantics": {
+    "executedCases": 5080400,
+    "failedCases": 0,
+    "opcodeModeFixturesVerified": 512
+  },
+  "cpu65816Bus": {
+    "executedCases": 5080400,
+    "failedCases": 0,
+    "opcodeModeFixturesVerified": 512,
+    "busCyclesCompared": 26184846
+  },
+  "spc700": {
+    "executedCases": 256000,
+    "failedCases": 0,
+    "fixturesVerified": 256,
+    "busCyclesCompared": 1182940,
+    "rawBusPassed": 249000,
+    "rawBusMismatches": 7000,
+    "sourceAdjudicatedCases": 7000,
+    "approvedBusPassed": 256000,
+    "approvedBusFailures": 0,
+    "semanticFailures": 0
+  },
+  "originalIpl": {
+    "tests": 4,
+    "passed": true,
+    "sha256": "c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f",
+    "distribution": "local ignored input only"
+  },
+  "defaultOwnIplSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+  "dspIndependentEvidence": {
+    "perClockRegisterObservations": 262144,
+    "perClockRamDigests": 2048,
+    "referenceCommit": "ec8ee2bbe30451614c1d02a83f7af1c97d497d45",
+    "samplesCompared": 453726,
+    "nativePhasesExecuted": 14527424,
+    "nonzeroSamples": 387047,
+    "negativePhaseTraceMutations": 4,
+    "audioDiagnosticRomSha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0",
+    "selfAuthoredSpcSnapshotSha256": "899e894896b310a88bc2ebfc32cf5a564a3e90418be3704717cc1b98ad3ef9bc",
+    "everyCrystalContinuations": 768,
+    "everyMasterClockAudioStates": 96,
+    "fullConsoleDspObserverSnapshots": 106,
+    "negativeDigitalMutations": 6
+  },
+  "avLongEvidence": {
+    "tenSecondAvRuns": [
+      {
+        "Id": "ntsc-separate-2-1-3-unverified",
+        "masterclocks": 214772727,
+        "apuCrystal": 245759999,
+        "samples": 320000,
+        "fields": 600
+      },
+      {
+        "Id": "pal-separate-2-1-3-unverified",
+        "masterclocks": 212813700,
+        "apuCrystal": 245760000,
+        "samples": 320000,
+        "fields": 500
+      }
+    ]
+  },
+  "headlessAudioDiagnostic": {
+    "format": "signed16 stereo interleaved little-endian",
+    "sampleRate": 32000,
+    "channels": 2,
+    "pairs": 4259,
+    "firstIndex": 0,
+    "firstCrystal": 672,
+    "lastIndex": 4258,
+    "lastCrystal": 3270816,
+    "sha256": "a0ca8a2262b4c3ca022f3ae157efb10ed7c1de0555d1d239d19ed25314db8e48",
+    "droppedPairs": 0,
+    "traceRows": 4096,
+    "phasesExecuted": 136308
+  },
+  "benchmarks": {
+    "host": {
+      "machine": "NILSPC1",
+      "os": "Microsoft Windows NT 10.0.26200.0",
+      "runtime": "10.0.12",
+      "processors": 24
+    },
+    "comparisonPpuWorkload": {
+      "host": {
+        "machine": "NILSPC1",
+        "os": "Microsoft Windows NT 10.0.26200.0",
+        "runtime": "10.0.12",
+        "processors": 24
+      },
+      "framesPerSecond": 18.334622537410002,
+      "apuEnabled": true,
+      "spcCycles": 2061671,
+      "apuFirmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "masterclocksPerSecond": 6552170.717704063,
+      "stepNopInstructionsPerSecond": 3323506.831468292,
+      "singleCycleNopInstructionsPerSecond": 242053.79742469284,
+      "dspNativeSamples": 64427,
+      "twoBrrVoices": false,
+      "ppuForcedBlank": false
+    },
+    "twoBrrVoicesForcedBlankWorkload": {
+      "host": {
+        "machine": "NILSPC1",
+        "os": "Microsoft Windows NT 10.0.26200.0",
+        "runtime": "10.0.12",
+        "processors": 24
+      },
+      "framesPerSecond": 19.400788224924394,
+      "apuEnabled": true,
+      "spcCycles": 2061671,
+      "apuFirmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+      "masterclocksPerSecond": 6933182.084788332,
+      "stepNopInstructionsPerSecond": 2861860.839154835,
+      "singleCycleNopInstructionsPerSecond": 244701.53875668618,
+      "dspNativeSamples": 64427,
+      "twoBrrVoices": true,
+      "ppuForcedBlank": true
+    },
+    "priorM5ComparableFieldsPerSecond": 21.62,
+    "interpretation": "Both are below NTSC realtime. The two-voice forced-blank score is a different workload and cannot replace the active PPU comparison. M9 profiling must preserve native digital output."
+  },
+  "suiteSeconds": {
+    "core": 135.64681140000005,
+    "dsp": 12.960919100000002,
+    "avLong": 54.5186898
+  },
+  "groupDurations": {
+    "core": [
+      {
+        "name": "LoROM mapping, header, copier header",
+        "seconds": 0.0084628,
+        "status": "pass"
+      },
+      {
+        "name": "HiROM mapping and SRAM",
+        "seconds": 0.0002641,
+        "status": "pass"
+      },
+      {
+        "name": "Unsupported cartridge rejected",
+        "seconds": 0.0004471,
+        "status": "pass"
+      },
+      {
+        "name": "WRAM mirrors, multiplication, division",
+        "seconds": 0.004049,
+        "status": "pass"
+      },
+      {
+        "name": "65816 native mode and accumulator high byte",
+        "seconds": 0.0027689,
+        "status": "pass"
+      },
+      {
+        "name": "65816 ADC/SBC flags and decimal",
+        "seconds": 0.0005968,
+        "status": "pass"
+      },
+      {
+        "name": "65816 JSR/RTS stack and bank-local fetch",
+        "seconds": 0.0002461,
+        "status": "pass"
+      },
+      {
+        "name": "Controller serial and auto-read ordering",
+        "seconds": 0.1264014,
+        "status": "pass"
+      },
+      {
+        "name": "DMA alternates VRAM low/high and wraps source",
+        "seconds": 0.0052519,
+        "status": "pass"
+      },
+      {
+        "name": "Diagnostic ROM executes CPU/DMA/PPU/NMI",
+        "seconds": 0.5545693,
+        "status": "pass"
+      },
+      {
+        "name": "Diagnostic ROM responds to actual controller registers",
+        "seconds": 0.9308453,
+        "status": "pass"
+      },
+      {
+        "name": "Savestate resumes deterministically and rejects wrong ROM",
+        "seconds": 0.5647163,
+        "status": "pass"
+      },
+      {
+        "name": "M1 E/M/X transitions and hidden accumulator",
+        "seconds": 0.0003036,
+        "status": "pass"
+      },
+      {
+        "name": "M1 decimal carry overflow and borrow",
+        "seconds": 0.0019774,
+        "status": "pass"
+      },
+      {
+        "name": "M1 emulation stack page wrap and native full stack",
+        "seconds": 0.0002453,
+        "status": "pass"
+      },
+      {
+        "name": "M1 Direct Page indexed wrap and long pointer page crossing",
+        "seconds": 0.0002693,
+        "status": "pass"
+      },
+      {
+        "name": "M1 RMW memory width and flags",
+        "seconds": 9.14e-05,
+        "status": "pass"
+      },
+      {
+        "name": "M1 MVN MVP index width and per-byte continuation",
+        "seconds": 0.0001667,
+        "status": "pass"
+      },
+      {
+        "name": "M1 reset WAI masked IRQ unmasked IRQ NMI priority STP",
+        "seconds": 0.0001878,
+        "status": "pass"
+      },
+      {
+        "name": "M1 BRK COP and RTI register semantics",
+        "seconds": 0.0003035,
+        "status": "pass"
+      },
+      {
+        "name": "M1 24-bit long boundary absolute carry and bank-zero Direct wrapping",
+        "seconds": 0.0001951,
+        "status": "pass"
+      },
+      {
+        "name": "M1 emulation extended PHD PLD cross stack page",
+        "seconds": 0.000284,
+        "status": "pass"
+      },
+      {
+        "name": "M1 seeded valid BCD arithmetic independent decimal oracle",
+        "seconds": 0.010435,
+        "status": "pass"
+      },
+      {
+        "name": "M1 permanently reduced upstream failure regressions",
+        "seconds": 0.0056839,
+        "status": "pass"
+      },
+      {
+        "name": "M2 presentation pacing uses actual rational field duration",
+        "seconds": 0.0004748,
+        "status": "pass"
+      },
+      {
+        "name": "M2 mapped access speeds are separate from 65816 cycle counts",
+        "seconds": 0.0002022,
+        "status": "pass"
+      },
+      {
+        "name": "M2 NTSC PAL fields short long lines dots and refresh phase",
+        "seconds": 0.0022856,
+        "status": "pass"
+      },
+      {
+        "name": "M2 independent rational APU oscillator one hour per profile has zero integer drift",
+        "seconds": 3.8884735,
+        "status": "pass"
+      },
+      {
+        "name": "M2 stable event ordering before CPU access at exact boundary",
+        "seconds": 0.0009093,
+        "status": "pass"
+      },
+      {
+        "name": "M2 refresh stalls CPU effects at endpoint and within a cycle",
+        "seconds": 0.0012052,
+        "status": "pass"
+      },
+      {
+        "name": "M2 distinct read latch and completion phases for all access speeds",
+        "seconds": 0.0031871,
+        "status": "pass"
+      },
+      {
+        "name": "M2 MMIO changes between read latch and completion cannot change captured data",
+        "seconds": 0.0015422,
+        "status": "pass"
+      },
+      {
+        "name": "M2 MMIO read side effects and latched value survive every trailing hold clock",
+        "seconds": 0.2219905,
+        "status": "pass"
+      },
+      {
+        "name": "M2 refresh at read hold and completion delays completion without another read",
+        "seconds": 0.0008431,
+        "status": "pass"
+      },
+      {
+        "name": "M2 IRQ NMI edges at read latch and completion preserve last-cycle polling",
+        "seconds": 0.0024469,
+        "status": "pass"
+      },
+      {
+        "name": "M2 read hold savestate format rejects both earlier versions",
+        "seconds": 0.0135021,
+        "status": "pass"
+      },
+      {
+        "name": "M2 exact clock chunking single clocks blocks and frames same state",
+        "seconds": 0.0969522,
+        "status": "pass"
+      },
+      {
+        "name": "M2 savestate at every master clock around instruction refresh and field boundaries",
+        "seconds": 6.9647656,
+        "status": "pass"
+      },
+      {
+        "name": "M2 restartable cycles preserve side effects and every-cycle continuation",
+        "seconds": 0.0281043,
+        "status": "pass"
+      },
+      {
+        "name": "M2 interrupt polling CLI SEI delayed mask NMI priority and WAI wake",
+        "seconds": 0.0035764,
+        "status": "pass"
+      },
+      {
+        "name": "M2 RTI IRQ polling uses restored I independently of delayed width pins",
+        "seconds": 0.0010865,
+        "status": "pass"
+      },
+      {
+        "name": "M2 WAI STP suspend CPU clocks while scheduler and APU continue",
+        "seconds": 0.0010114,
+        "status": "pass"
+      },
+      {
+        "name": "M2 reset IRQ NMI entry continuation survives every cycle",
+        "seconds": 0.0096951,
+        "status": "pass"
+      },
+      {
+        "name": "M2 timed cycle comparator rejects cycle address value direction and pin mutations",
+        "seconds": 0.0011174,
+        "status": "pass"
+      },
+      {
+        "name": "M2 every opcode incremental execution matches external bus vector",
+        "seconds": 0.108659,
+        "status": "pass"
+      },
+      {
+        "name": "M3 recursive ROM mirror and mapper metadata manual overrides",
+        "seconds": 0.0382747,
+        "status": "pass"
+      },
+      {
+        "name": "M3 SRAM bank mirrors warm reset and deterministic power seed",
+        "seconds": 0.0007261,
+        "status": "pass"
+      },
+      {
+        "name": "M3 CPU MDR internal IO exemptions register masks and side effects",
+        "seconds": 0.0005589,
+        "status": "pass"
+      },
+      {
+        "name": "M3 all DMA modes forward reverse protocol and exact read hold edges",
+        "seconds": 0.0025213,
+        "status": "pass"
+      },
+      {
+        "name": "M3 original CPU ROM all DMA modes directions and critical raster starts",
+        "seconds": 0.4176004,
+        "status": "pass"
+      },
+      {
+        "name": "M3 DMA fixed decrement bank wrap zero means 65536 and channel priority",
+        "seconds": 0.0241687,
+        "status": "pass"
+      },
+      {
+        "name": "M3 precise DMA forbidden A ranges and WRAM2180 conflict",
+        "seconds": 0.0032154,
+        "status": "pass"
+      },
+      {
+        "name": "M3 DMA clock budgets chunking save every phase and refresh collision",
+        "seconds": 32.1539401,
+        "status": "pass"
+      },
+      {
+        "name": "M3 DMA public phase observer saves committed 2180 read and write",
+        "seconds": 4.5632719,
+        "status": "pass"
+      },
+      {
+        "name": "M3 HDMA all modes direct indirect repeat and two pass ordering",
+        "seconds": 0.0115507,
+        "status": "pass"
+      },
+      {
+        "name": "M3 HDMA no repeat skips lines table dummy and indirect terminal low byte",
+        "seconds": 0.0025333,
+        "status": "pass"
+      },
+      {
+        "name": "M3 HDMA preempts DMA at byte edge cancels shared channel",
+        "seconds": 0.0005206,
+        "status": "pass"
+      },
+      {
+        "name": "M3 HDMA every clock state and observer resume during descriptors pointers transfers",
+        "seconds": 8.3933105,
+        "status": "pass"
+      },
+      {
+        "name": "M3 ALU partial multiplication division zero and busy writes",
+        "seconds": 0.0007462,
+        "status": "pass"
+      },
+      {
+        "name": "M3 CPU ALU edges read after hold write before step refresh and save",
+        "seconds": 12.8395189,
+        "status": "pass"
+      },
+      {
+        "name": "M3 H V HV IRQ holds readclear enable disable and line spill",
+        "seconds": 1.256661,
+        "status": "pass"
+      },
+      {
+        "name": "M3 NMI delayed enable edge four clock read hold and field reset",
+        "seconds": 0.0097319,
+        "status": "pass"
+      },
+      {
+        "name": "M3 H V counter latches high bit toggles status reset and PIO falling",
+        "seconds": 0.0013043,
+        "status": "pass"
+      },
+      {
+        "name": "M3 serial four data lines live strobe falling latch and signature",
+        "seconds": 0.0004917,
+        "status": "pass"
+      },
+      {
+        "name": "M3 automatic JOY exact start busy shifts all four results and replay",
+        "seconds": 0.4525137,
+        "status": "pass"
+      },
+      {
+        "name": "M3 IRQ NMI DMA event collisions state chunks and meaningful mutations",
+        "seconds": 0.2103259,
+        "status": "pass"
+      },
+      {
+        "name": "M4 complete opcode sample both direct and resumable state bus",
+        "seconds": 0.0706295,
+        "status": "pass"
+      },
+      {
+        "name": "M4 IPL underlay ports directional clears auxiliary RAM and writeonly",
+        "seconds": 0.0007441,
+        "status": "pass"
+      },
+      {
+        "name": "M4 DSP address read mirror high-address write suppress writable output and ENDX interface",
+        "seconds": 0.0002522,
+        "status": "pass"
+      },
+      {
+        "name": "M4 source adjudicated indirect Y fixed electrical worksheet",
+        "seconds": 0.0005912,
+        "status": "pass"
+      },
+      {
+        "name": "M4 permanent immutable SPC seed regressions",
+        "seconds": 0.0005746,
+        "status": "pass"
+      },
+      {
+        "name": "M4 TEST independent internal external wait selectors literal timing table",
+        "seconds": 0.0006259,
+        "status": "pass"
+      },
+      {
+        "name": "M4 timers fixed boundaries target0 readclear overflow all enable edges",
+        "seconds": 0.0099061,
+        "status": "pass"
+      },
+      {
+        "name": "M4 timer scaler free runs disabled target wrap TEST gating P restriction",
+        "seconds": 0.0008211,
+        "status": "pass"
+      },
+      {
+        "name": "M4 RAM read latch endpoint CPUport half latch hold and dummy MMIO",
+        "seconds": 0.0006355,
+        "status": "pass"
+      },
+      {
+        "name": "M4 every crystal continuation against untouched continuous reference",
+        "seconds": 0.0452681,
+        "status": "pass"
+      },
+      {
+        "name": "M4 committed phase observer snapshot never repeats readclear or port hold",
+        "seconds": 0.0027917,
+        "status": "pass"
+      },
+      {
+        "name": "M4 original SNES ROM real own IPL upload RAM program port pingpong",
+        "seconds": 0.0480863,
+        "status": "pass"
+      },
+      {
+        "name": "M4 own IPL CPU multiblock upload index and page wraps command zero avoidance",
+        "seconds": 0.3176717,
+        "status": "pass"
+      },
+      {
+        "name": "M4 every master clock savestate active CPU SPC ports matches continuous",
+        "seconds": 10.1604521,
+        "status": "pass"
+      },
+      {
+        "name": "M4 APU observers exactly before on after typed refresh and line endpoints",
+        "seconds": 0.3118347,
+        "status": "pass"
+      },
+      {
+        "name": "M4 targeted APU observer snapshots across DMA IRQ Vblank NMI typed events",
+        "seconds": 11.8311667,
+        "status": "pass"
+      },
+      {
+        "name": "M4 public APU observer system saves retain future due events CPU DMA raster",
+        "seconds": 1.302932,
+        "status": "pass"
+      },
+      {
+        "name": "M4 reset sleep stop firmware identity and ratios NTSC PAL chunks",
+        "seconds": 0.1699768,
+        "status": "pass"
+      },
+      {
+        "name": "M4 own IPL reentry restores stack clears dirty page and advertises through code",
+        "seconds": 0.0012892,
+        "status": "pass"
+      },
+      {
+        "name": "M4 savestate v5 rejects formats1 through4 and foreign IPL identity",
+        "seconds": 0.0291042,
+        "status": "pass"
+      },
+      {
+        "name": "M4 negative comparator mutations and hardware adjudication cannot hide errors",
+        "seconds": 0.0103908,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM VRAM prefetch old buffer increment remap and wrapped address",
+        "seconds": 0.2456194,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM OAM low word latch high mirror and CGRAM shared flip",
+        "seconds": 0.0177938,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM PPU MDR exact unreadable masks multiplication and shared PPU2",
+        "seconds": 0.0164784,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM shared horizontal vertical and separate Mode7 latches",
+        "seconds": 0.0159685,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM Mode0 palettes native RGB555 before brightness",
+        "seconds": 0.051363,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM Mode1 four plane decode and BG3 priority override",
+        "seconds": 0.1058073,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM 16x16 subtiles carry and whole tile flips",
+        "seconds": 0.2009138,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM map quadrants and 8x8 16x16 scroll wrapping",
+        "seconds": 0.199716,
+        "status": "pass"
+      },
+      {
+        "name": "M5 fixed mathematical color operations worksheet saturation half and lanes",
+        "seconds": 0.0011368,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM fixed color add subtract half and transparent subscreen",
+        "seconds": 0.2458185,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM two windows OR AND XOR XNOR inversion main sub masks",
+        "seconds": 0.1945529,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM color window clips before math and suppresses halve",
+        "seconds": 0.0478828,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM Mosaic horizontal and vertical block worksheet",
+        "seconds": 0.0506298,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM all OBJ size pairs geometry and native palette",
+        "seconds": 0.8498181,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM OBJ OAM order overrides priority and priority rotation",
+        "seconds": 0.0956792,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM OBJ range time overflow offscreen and X256 exception",
+        "seconds": 0.2896329,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM OBJ flip name table and Y wrap",
+        "seconds": 0.3999571,
+        "status": "pass"
+      },
+      {
+        "name": "M5 active display VRAM suppression increments buffer and blanking access",
+        "seconds": 0.0411464,
+        "status": "pass"
+      },
+      {
+        "name": "M5 raster exact map fetch timing and irreversible output",
+        "seconds": 0.0411039,
+        "status": "pass"
+      },
+      {
+        "name": "M5 native comparator first difference carries pixel line and bus evidence",
+        "seconds": 0.0009747,
+        "status": "pass"
+      },
+      {
+        "name": "M5 real CPU midpixel fixed color and brightness exact master clocks",
+        "seconds": 0.0962883,
+        "status": "pass"
+      },
+      {
+        "name": "M5 every master clock CPU color pipeline and OBJ fetch against untouched run",
+        "seconds": 12.6258466,
+        "status": "pass"
+      },
+      {
+        "name": "M5 public fetch pixel and APU observers save only committed phases",
+        "seconds": 0.4464224,
+        "status": "pass"
+      },
+      {
+        "name": "M5 independent native verifier rejects fresh palette fetch priority and clock mutations",
+        "seconds": 0.2536878,
+        "status": "pass"
+      },
+      {
+        "name": "M5 every clock real DMA HDMA raster IRQ and active APU full state trace continuation",
+        "seconds": 16.0456917,
+        "status": "pass"
+      },
+      {
+        "name": "M5 full native golden frame independent constant RGB555 worksheet and mutations",
+        "seconds": 0.0996096,
+        "status": "pass"
+      },
+      {
+        "name": "M5 sprite descriptor and OBSEL latch at individual fetch entry with plane snapshot",
+        "seconds": 0.0840061,
+        "status": "pass"
+      },
+      {
+        "name": "M5 Mode0 literal BG OBJ priority stack worksheet",
+        "seconds": 0.5911072,
+        "status": "pass"
+      },
+      {
+        "name": "M5 OBJ low palettes exclude math high palettes include fixed color",
+        "seconds": 0.196689,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU CGRAM subscreen write H57 is observed by shared output H58",
+        "seconds": 0.051013,
+        "status": "pass"
+      },
+      {
+        "name": "M5 Mosaic enable edge size update line counter and horizontal phase state",
+        "seconds": 0.7145701,
+        "status": "pass"
+      },
+      {
+        "name": "M5 active OAM redirect preserves CPU low word parity and high byte commits",
+        "seconds": 0.1983271,
+        "status": "pass"
+      },
+      {
+        "name": "M5 external Zlib VRAM midscanline ROM independent white pixel oracle",
+        "seconds": 1.6114892,
+        "status": "pass"
+      },
+      {
+        "name": "M5 last visible line suppresses OBJ pattern fetch time overflow",
+        "seconds": 0.2339202,
+        "status": "pass"
+      },
+      {
+        "name": "M5 published OAM odd priority three-read example literal63 through70",
+        "seconds": 0.0286857,
+        "status": "pass"
+      },
+      {
+        "name": "M5 digital brightness rounding worksheet and explicit frame geometry",
+        "seconds": 0.0008672,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM inverted windows empty range and independent subscreen mask worksheet",
+        "seconds": 0.3138418,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM color window math prevent inside outside always worksheet",
+        "seconds": 0.1961187,
+        "status": "pass"
+      },
+      {
+        "name": "M5 PPU state in format7 rejects earlier formats and invalid pipeline",
+        "seconds": 0.0338029,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM Mode1 all four planes and 8x8 bit mirror worksheet",
+        "seconds": 0.2484153,
+        "status": "pass"
+      },
+      {
+        "name": "M5 CPU ROM VRAM address FFFF wrap and Hblank still locked",
+        "seconds": 0.0469347,
+        "status": "pass"
+      },
+      {
+        "name": "M5 BG coarse scroll fetch deadline and horizontal fine scroll H0 latch",
+        "seconds": 0.1474604,
+        "status": "pass"
+      }
+    ],
+    "dsp": [
+      {
+        "name": "M6 immutable independent LGPL DSP raw stereo RAM and register corpus",
+        "seconds": 1.316678,
+        "status": "pass"
+      },
+      {
+        "name": "M6 BRR independent literal signed rounding invalid shifts filters saturation and wrap",
+        "seconds": 0.0012183,
+        "status": "pass"
+      },
+      {
+        "name": "M6 Gaussian independent coefficient worksheet three-term wrap and even truncation",
+        "seconds": 0.000186,
+        "status": "pass"
+      },
+      {
+        "name": "M6 source literal ADSR GAIN release and unsigned hidden bent gain",
+        "seconds": 0.0011572,
+        "status": "pass"
+      },
+      {
+        "name": "M6 independent full rate periods offsets and noise literal sequence",
+        "seconds": 0.0049821,
+        "status": "pass"
+      },
+      {
+        "name": "M6 split left right echo write gating and overlapping shared ARAM",
+        "seconds": 0.0002772,
+        "status": "pass"
+      },
+      {
+        "name": "M6 literal FIR wrap before eighth tap feedback and signed mix intermediates",
+        "seconds": 0.0021184,
+        "status": "pass"
+      },
+      {
+        "name": "M6 published phase RAM worksheet voice operations and negative trace mutations",
+        "seconds": 0.003443,
+        "status": "pass"
+      },
+      {
+        "name": "M6 first sample native timestamp fixed crystal despite TEST sleep and stop",
+        "seconds": 0.0006259,
+        "status": "pass"
+      },
+      {
+        "name": "M6 actual original CPU IPL SPC BRR stereo diagnostic and native output",
+        "seconds": 0.5031352,
+        "status": "pass"
+      },
+      {
+        "name": "M6 self-authored standard SPC snapshot matches independent native stereo",
+        "seconds": 0.0044594,
+        "status": "pass"
+      },
+      {
+        "name": "M6 every crystal DSP SPC register and echo collision continuation against uninterrupted",
+        "seconds": 0.1731444,
+        "status": "pass"
+      },
+      {
+        "name": "M6 committed DSP observer snapshots include same-clock SPC port effects",
+        "seconds": 0.0049318,
+        "status": "pass"
+      },
+      {
+        "name": "M6 full console every master clock audio savestate against uninterrupted reference",
+        "seconds": 4.0692871,
+        "status": "pass"
+      },
+      {
+        "name": "M6 public DSP observer full console continuation DMA IRQ PPU typed event ties",
+        "seconds": 6.8561612,
+        "status": "pass"
+      },
+      {
+        "name": "M6 bounded presentation queue separated from savestate and hardware",
+        "seconds": 0.0182806,
+        "status": "pass"
+      },
+      {
+        "name": "M6 native stereo comparator rejects channel value timing length mutations",
+        "seconds": 0.0008333,
+        "status": "pass"
+      }
+    ],
+    "avLong": [
+      {
+        "Name": "M6 native rational NTSC PAL continuous audio video pause reset and bounded long run",
+        "Status": "pass",
+        "Detail": null,
+        "Seconds": 54.5186898,
+        "Evidence": null
+      }
+    ]
+  },
+  "independentSourcePins": [
+    {
+      "path": "testdata/dsp-reference/manifest.json",
+      "bytes": 22333,
+      "sha256": "cdb12d1bedfa27d99c17bed5956aed7499bc37ff875c41820eefa22be48c5a22"
+    },
+    {
+      "path": "testdata/dsp-sources.json",
+      "bytes": 944,
+      "sha256": "54ec996bfba629413a7af69e80be8823c2f591e09d1cb4bad078216ff46bd20f"
+    }
+  ],
+  "m4RomByteIdentity": {
+    "comparisonSourceCommit": "2dc8cf021ef7394f38df1db9932b443a23543b30",
+    "shortSha256": "60384889500eb3037ed4912cacbc7cdb370ce89431ea37021bac35283b76723f",
+    "stressSha256": "93ca50b7e9805db099a77cd9136deb9b40e4f8a983636c2165d7d6835b1c9e05",
+    "result": "Both byte-identical to separately compiled prior generator; permanent literals in M6 tests."
+  },
+  "evidenceLimits": [
+    "No own console captures or revision-specific electrical measurements.",
+    "453726 pairs and final71 RAM/register states are externally compared;14527424 counts executed phases, not independently verified electrical RAM slots.",
+    "262144 register observations and2048 full ARAM digests are individually compared at clock boundaries; separate literal RAM phase worksheets and mutations cover order/address/value/direction.",
+    "Soft reset follows the selected research reference; external reset-pin behaviour and rapid DAC mute pulses remain unverified.",
+    "Ten-second NTSC/PAL AV runs are executed; one-hour M2 rational clock checks remain separate analytical evidence.",
+    "Laboratory SPC container is deliberately limited, not a universal music player/exact hidden-state restoration.",
+    "No general commercial-game compatibility claim; graphics modes2–7 and variable geometry remain M7.",
+    "publish/ is the old pre-M0 distribution; no release was created. M9 must refresh distribution and performance."
+  ],
+  "developmentAttempts": {
+    "folder": "artifacts/m6-development-attempts/",
+    "notes": "An early128/129 core run exposed the old M4 read-only ENVX expectation, corrected from research. Initial full-gate launch stopped at intentionally stale changed-source hashes; a subsequent precommit launch was interrupted on parent instruction to validate only committed clean code. These are not console hardware failures or acceptance passes."
+  }
+}

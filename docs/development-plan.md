@@ -272,7 +272,9 @@ abgenommen: `python tools/test-lab.py --windows --full`, Exit0,
 M6 implementiert den eigenen phasengetakteten DSP und Stereo bis zum Gerät und
 TLS/Relay. Vertrag, Quellenkonflikte und digitale Evidenzgrenzen:
 [m6-dsp-contract.md](m6-dsp-contract.md). Unabhängige Abnahme steht aus;
-M7 wurde noch nicht begonnen. Der vollständige Gate läuft zusätzlich zu den
+M7 wurde noch nicht begonnen. Der vollständige Gate bestand auf sauberem
+`feb978b` mit Exit0 (147 portable und8 Windowsgruppen);
+[Messdaten](baselines/m6.json). Er läuft zusätzlich zu den
 unveränderten129 M0–M5-Gruppen in getrennt beaufsichtigten DSP-/AV-Suiten.
 
 Arbeit:
@@ -356,7 +358,9 @@ Arbeit:
 - Emulation auf einen eigenen, kontrollierten Thread verschieben. GUI und
   Transport erhalten unveränderliche Frames/Sampleblöcke; Eingaben werden an
   definierten Hardwarezeitpunkten übernommen.
-- M5-Benchmark: aktive APU und getaktete PPU erreichen lokal21.62 Diagnosefelder/s; M9 muss
+- M5-Benchmark: aktive APU und getaktete PPU erreichen lokal21.62 Diagnosefelder/s;
+  nach M6 inklusive DSP18.33. Der separate Zwei-Voice/Forced-Blank-Test misst19.40
+  und ist kein direkter Vergleich. M9 muss
   Budget-/Zyklusfortsetzung profilieren und bei identischer digitaler Ausgabe
   auf Echtzeit bringen. Dies ist kein60fps-Kompatibilitätsnachweis.
 - Hardwaregenaue Geschwindigkeit von Renderlimit, VSync, Turbo, Netzwerklatenz
