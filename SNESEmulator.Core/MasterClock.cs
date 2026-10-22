@@ -15,6 +15,7 @@ public sealed class MasterClock(HardwareProfile profile)
     public bool Field {get;private set;}
     public long Fields {get;private set;}
     public bool Interlace {get;set;}
+    public Func<bool>? InterlaceInput {get;set;}
     public long ApuTicks {get;private set;}
     public long ApuRemainder {get;private set;}
     public long StallUntil {get;private set;}
@@ -109,7 +110,8 @@ public sealed class MasterClock(HardwareProfile profile)
         get
         {
             long remaining=events.Single(e=>e.Kind==HardwareEventKind.LineEnd).Clock-Now;
-            for(int line=V+1;line<Profile.FieldLines(Field,Interlace);line++)remaining+=Profile.LineClocks(line,Field,Interlace);
+            bool predicted=V<128?(InterlaceInput?.Invoke()??Interlace):Interlace;
+            for(int line=V+1;line<Profile.FieldLines(Field,predicted);line++)remaining+=Profile.LineClocks(line,Field,predicted);
             return remaining;
         }
     }

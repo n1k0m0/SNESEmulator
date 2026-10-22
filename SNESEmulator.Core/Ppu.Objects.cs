@@ -11,6 +11,7 @@ public sealed class ObjFetch
 }
 public sealed partial class Ppu
 {
+    private bool ObjectInterlace=>(Registers[0x33]&2)!=0;
     private static readonly (int W,int H)[] SmallObjects=[(8,8),(8,8),(8,8),(16,16),(16,16),(32,32),(16,32),(16,32)];
     private static readonly (int W,int H)[] LargeObjects=[(16,16),(32,32),(64,64),(32,32),(64,64),(64,64),(32,64),(32,32)];
     public static (int Width,int Height) ObjectSize(int pair,bool large)=>large?LargeObjects[pair&7]:SmallObjects[pair&7];
@@ -26,7 +27,7 @@ public sealed partial class Ppu
         int index=(firstObject+number)&127;var s=Object(index);
         int signedX=s.X>=256?s.X-512:s.X;
         bool horizontal=s.X==256||signedX<256&&signedX+s.W>0;
-        if(!horizontal||((Scanline-s.Y)&255)>=s.H)return;
+        if(!horizontal||((Scanline-s.Y)&255)>=(ObjectInterlace?s.H/2:s.H))return;
         internalOamAddress=index;
         if(selectedCount<32)selectedObjects[selectedCount]=index;
         selectedCount++;if(selectedCount>32)RangeOver=true;
@@ -62,6 +63,7 @@ public sealed partial class Ppu
                 internalOamAddress=512+index/4;
                 if(ForcedBlank||Scanline>=((Registers[0x33]&4)!=0?239:224)){objectNextH=h+8;return;}
                 var s=Object(index);int row=(Scanline-s.Y)&255;
+                if(ObjectInterlace)row=row*2+(Clock?.Field==true?1:0);
                 if((s.Flags&128)!=0)row=(row&~(s.W-1))|((s.W-1)-(row&(s.W-1)));
                 int origin=(Registers[1]&7)*16384+((s.Flags&1)!=0?(((Registers[1]>>3)&3)+1)*8192:0);
                 objectDescriptor=new(){X=s.X,Row=row,Tile=s.Tile,Flags=s.Flags,Width=s.W,Origin=origin};objectColumn=0;

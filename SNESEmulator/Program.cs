@@ -18,13 +18,13 @@ internal static class Program
                 var machine=new SnesSystem(); machine.Insert(new Cartridge(File.ReadAllBytes(args[1]),args[1]));
                 int frames=int.Parse(args[2]); if(frames is <1 or >100000) throw new ArgumentOutOfRangeException(nameof(frames));
                 for(int i=0;i<frames;i++) machine.RunFrame();
-                if(args.Length>=4) WritePpm(args[3],machine.Bus.Ppu.Pixels);
+                if(args.Length>=4) WritePpm(args[3],machine.Bus.Ppu.CompletedFrame??machine.Bus.Ppu.Frame);
                 if(args.Length>=5) File.WriteAllText(args[4],$"Frames={machine.Frames}\nInstructions={machine.Cpu.Instructions}\nPC={machine.Cpu.PBR:X2}:{machine.Cpu.PC:X4}\n");
                 return 0;
             }
             if(args.Length>=2 && args[0]=="--ui-smoke")
             {
-                using var preview=new SnesWindow();
+                using var preview=new SnesWindow(args.Length>=4?args[3]:null);
                 int count=0; string output=args[1];
                 preview.RenderFrame+=_=>
                 {
@@ -70,10 +70,10 @@ internal static class Program
             return 1;
         }
     }
-    private static void WritePpm(string path,uint[] pixels)
+    private static void WritePpm(string path,PpuFrame field)
     {
         using var output=File.Create(path);
-        output.Write(Encoding.ASCII.GetBytes($"P6\n{Ppu.Width} {Ppu.Height}\n255\n"));
-        foreach(uint p in pixels) output.Write([(byte)(p>>16),(byte)(p>>8),(byte)p]);
+        output.Write(Encoding.ASCII.GetBytes($"P6\n{field.Geometry.Width} {field.Geometry.Height}\n255\n"));
+        foreach(uint p in field.Argb.Span) output.Write([(byte)(p>>16),(byte)(p>>8),(byte)p]);
     }
 }

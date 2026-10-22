@@ -221,6 +221,7 @@ namespace SNESEmulator.Network
         /// Gets or sets decoded pixels in ARGB32 format.
         /// </summary>
         public uint[] Pixels { get; set; }
+        public SNESEmulator.Core.PpuGeometry Geometry { get; set; }
     }
 
     /// <summary>
@@ -238,7 +239,7 @@ namespace SNESEmulator.Network
         /// <summary>
         /// Current wire protocol version accepted by host and client.
         /// </summary>
-        public const int Version = 0x534E0002;
+        public const int Version = 0x534E0003;
         /// <summary>
         /// Default TCP port shown in the network menu.
         /// </summary>
@@ -549,7 +550,7 @@ namespace SNESEmulator.Network
         /// <returns>Four bytes per pixel, or an empty array for invalid input.</returns>
         public static byte[] CreatePackedVideoFrame(uint[] pixels, int width, int height)
         {
-            if (width < 1 || width > 512 || height < 1 || height > 478 || pixels.Length < width * height)
+            if (width is not (256 or 512) || height is not (224 or 239) || pixels==null || pixels.Length != width * height)
                 return EmptyPayload;
             byte[] bytes = new byte[width * height * 4];
             Buffer.BlockCopy(pixels, 0, bytes, 0, bytes.Length);
@@ -558,12 +559,16 @@ namespace SNESEmulator.Network
         public static bool PackedVideoFramesEqual(byte[] a, byte[] b) => a != null && b != null && a.AsSpan().SequenceEqual(b);
         public static byte[] CreateVideoFramePayload(uint[] pixels, int width, int height, long frameId)
             => CreateBestVideoFramePayload(CreatePackedVideoFrame(pixels, width, height), null, width, height, frameId, 0, out _);
-        public static byte[] CreateBestVideoFramePayload(byte[] pixels, byte[] previous, int width, int height, long frameId, long previousFrameId, out bool usedDelta)
+        public static byte[] CreateBestVideoFramePayload(byte[] pixels, byte[] previous, int width, int height, long frameId, long previousFrameId, out bool usedDelta, SNESEmulator.Core.PpuGeometry geometry = null)
         {
             usedDelta = false;
             using var output = new MemoryStream();
             using var writer = new BinaryWriter(output);
-            writer.Write(width); writer.Write(height); writer.Write(frameId); writer.Write(pixels.Length);
+            geometry ??= new(width,height,width,false,Overscan:height==239);
+            if(!ValidVideoGeometry(geometry)||geometry.Width!=width||geometry.Height!=height||pixels==null||pixels.Length!=width*height*4||frameId<0)throw new InvalidDataException("Invalid raw video field.");
+            writer.Write(0x56494433);writer.Write(width);writer.Write(height);writer.Write(geometry.Stride);
+            writer.Write(8|(geometry.Field?1:0)|(geometry.Interlace?2:0)|(geometry.Overscan?4:0)|(geometry.TimingInterlace?16:0));writer.Write(pixels.Length);
+            writer.Write(frameId);writer.Write(geometry.FieldIndex);writer.Write(geometry.StartClock);writer.Write(geometry.EndClock);writer.Write(geometry.MasterHzNumerator);writer.Write(geometry.MasterHzDenominator);writer.Write(geometry.ApuHzNumerator);writer.Write(geometry.ApuHzDenominator);
             writer.Flush();
             using (var deflate = new DeflateStream(output, CompressionLevel.Fastest, true)) deflate.Write(pixels);
             return output.ToArray();
@@ -577,12 +582,14 @@ namespace SNESEmulator.Network
             => ReadVideoFramePayload(payload, ref reference, ref id, null);
         public static SnesNetVideoFrame ReadVideoFramePayload(byte[] payload, ref byte[] reference, ref long id, uint[] target)
         {
-            if (payload == null || payload.Length < 20) return null;
+            if (payload == null || payload.Length < 89 || payload.Length > 1024*1024) return null;
             using var input = new MemoryStream(payload);
             using var reader = new BinaryReader(input);
-            int width = reader.ReadInt32(), height = reader.ReadInt32();
-            long frameId = reader.ReadInt64(); int size = reader.ReadInt32();
-            if (width < 1 || width > 512 || height < 1 || height > 478 || size != width * height * 4) return null;
+            if(reader.ReadInt32()!=0x56494433)return null;
+            int width=reader.ReadInt32(),height=reader.ReadInt32(),stride=reader.ReadInt32(),flags=reader.ReadInt32(),size=reader.ReadInt32();
+            long frameId=reader.ReadInt64(),field=reader.ReadInt64(),start=reader.ReadInt64(),end=reader.ReadInt64();
+            var geometry=new SNESEmulator.Core.PpuGeometry(width,height,stride,(flags&1)!=0,(flags&2)!=0,(flags&4)!=0,field,start,end,reader.ReadInt64(),reader.ReadInt64(),reader.ReadInt64(),reader.ReadInt64(),(flags&16)!=0);
+            if((flags&~31)!=0||(flags&8)==0||!ValidVideoGeometry(geometry)||frameId<0||size!=width*height*4)return null;
             byte[] bytes = new byte[size];
             using var deflate = new DeflateStream(input, CompressionMode.Decompress);
             try { deflate.ReadExactly(bytes); if (deflate.ReadByte() != -1) return null; }
@@ -591,9 +598,11 @@ namespace SNESEmulator.Network
             uint[] pixels = target != null && target.Length == width * height ? target : new uint[width * height];
             Buffer.BlockCopy(bytes, 0, pixels, 0, size);
             reference = bytes; id = frameId;
-            return new SnesNetVideoFrame { Width = width, Height = height, FrameId = frameId, Pixels = pixels };
+            return new SnesNetVideoFrame { Width = width, Height = height, FrameId = frameId, Pixels = pixels, Geometry=geometry };
         }
 
+        private static bool ValidVideoGeometry(SNESEmulator.Core.PpuGeometry g)
+        {try{g.Validate();return true;}catch(InvalidDataException){return false;}}
         public const int MaxAudioFrames = 4096;
         // Protocol2 audio is always lossless native stereo PCM. No implicit ADPCM.
         public static byte[] CreateAudioChunkPayload(byte[] buffer, int count, int sampleRate, long firstSample, long crystal, uint sequence)

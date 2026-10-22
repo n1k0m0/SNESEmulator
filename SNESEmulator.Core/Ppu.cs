@@ -8,10 +8,12 @@ public sealed partial class Ppu
     public byte[] Cgram {get;}=new byte[512];
     public byte[] Oam {get;}=new byte[544];
     public byte[] Registers {get;}=new byte[64];
-    public uint[] Pixels {get;}=new uint[Width*Height];
+    public uint[] Pixels {get;private set;}=new uint[Width*Height];
     // Native digital RGB555 before display brightness, plus the independent DAC control.
-    public ushort[] NativePixels {get;}=new ushort[Width*Height];
-    public byte[] Brightness {get;}=new byte[Width*Height];
+    public ushort[] NativePixels {get;private set;}=new ushort[Width*Height];
+    public byte[] Brightness {get;private set;}=new byte[Width*Height];
+    public PpuGeometry FrameGeometry {get;private set;}=new(Width,Height,Width,false);
+    public PpuFrame? CompletedFrame {get;private set;}
     public ushort[] Scroll {get;}=new ushort[8];
     public ushort VramAddress {get;set;}
     public ushort CgramAddress {get;set;}
@@ -47,12 +49,15 @@ public sealed partial class Ppu
         Array.Clear(NativePixels);Array.Clear(Brightness);Array.Fill(Pixels,0xff000000u);
         VramAddress=CgramAddress=OamAddress=vramBuffer=oamReload=fixedColor=0;
         ScrollLatch=oamLatch=cgramLatch=scrollFineLatch=mode7Latch=Ppu1Mdr=Ppu2Mdr=0;
+        FrameGeometry=new(Width,Height,Width,false,MasterHzNumerator:Clock?.Profile.MasterHzNumerator??945000000,MasterHzDenominator:Clock?.Profile.MasterHzDenominator??44,ApuHzNumerator:Clock?.Profile.ApuHzNumerator??24576000,ApuHzDenominator:Clock?.Profile.ApuHzDenominator??1);Pixels=new uint[Width*Height];Array.Fill(Pixels,0xff000000u);NativePixels=new ushort[Width*Height];Brightness=new byte[Width*Height];CompletedFrame=null;
         Scanline=0;RangeOver=TimeOver=false;Registers[0]=128;ResetPipeline();
     }
     public void StartLine(int line)
     {
         Scanline=line;
-        if(line==0){RangeOver=TimeOver=false;mosaicStart=1;}
+        if(line==0){RangeOver=TimeOver=false;mosaicStart=1;BeginField();}
+        // The counter's interlace input has its own mid-field sampling deadline.
+        if(line==128&&Clock!=null){Clock.Interlace=(Registers[0x33]&1)!=0;FrameGeometry=FrameGeometry with{TimingInterlace=Clock.Interlace};}
         if(line==((Registers[0x33]&4)!=0?240:225)&&!ForcedBlank)OamAddress=oamReload;
         BeginPipelineLine();
     }
@@ -103,6 +108,7 @@ public sealed partial class Ppu
                 if((value&64)!=0)fixedColor=(ushort)((fixedColor&~992)|((value&31)<<5));
                 if((value&128)!=0)fixedColor=(ushort)((fixedColor&~31744)|((value&31)<<10));
                 break;
+            case 0x33:if(Clock!=null)Clock.VblankLine=(value&4)!=0?240:225;break;
         }
     }
     private void WriteMode7(int i,byte value){mode7[i]=(ushort)(value<<8|mode7Latch);mode7Latch=value;}
@@ -141,7 +147,11 @@ public sealed partial class Ppu
         int r=(digital&31)*255/31,g=((digital>>5)&31)*255/31,b=((digital>>10)&31)*255/31;
         return 0xff000000u|(uint)(r<<16|g<<8|b);
     }
-    public PpuFrame Frame=>new(new(Width,Height,Width,Clock?.Field??false),NativePixels,Brightness,Pixels);
+    public PpuFrame Frame=>new(FrameGeometry,NativePixels,Brightness,Pixels);
 }
-public sealed record PpuGeometry(int Width,int Height,int Stride,bool Field);
+// A raw field contains only the rows emitted in this field. No host weave is in hardware state.
+public sealed record PpuGeometry(int Width,int Height,int Stride,bool Field,bool Interlace=false,bool Overscan=false,long FieldIndex=0,long StartClock=0,long EndClock=0,long MasterHzNumerator=945000000,long MasterHzDenominator=44,long ApuHzNumerator=24576000,long ApuHzDenominator=1,bool TimingInterlace=false)
+{
+    public void Validate(){if(Width is not (256 or 512)||Height is not (224 or 239)||Stride!=Width||Overscan!=(Height==239)||FieldIndex<0||StartClock<0||EndClock<StartClock||MasterHzNumerator is <=0 or >1000000000||MasterHzDenominator is <=0 or >1000000||ApuHzNumerator is <=0 or >1000000000||ApuHzDenominator is <=0 or >1000000)throw new InvalidDataException("Invalid raw video field geometry");}
+}
 public sealed record PpuFrame(PpuGeometry Geometry,ReadOnlyMemory<ushort> Native,ReadOnlyMemory<byte> Brightness,ReadOnlyMemory<uint> Argb);

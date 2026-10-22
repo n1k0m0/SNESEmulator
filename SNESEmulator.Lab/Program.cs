@@ -17,14 +17,14 @@ static class Lab
     }
     static int Benchmark(bool apu=false,bool audio=false)
     {
-        var report=new TestReport(audio?"M6-two-active-BRR-voices-forced-blank-PPU-performance":apu?"M4-active-APU-local-performance-observation":"M2-local-performance-observation");report.Metadata["host"]=new{machine=Environment.MachineName,os=Environment.OSVersion.ToString(),runtime=Environment.Version.ToString(),processors=Environment.ProcessorCount};
+        var report=new TestReport(audio?"M7-two-active-BRR-voices-forced-blank-PPU-performance":apu?"M7-active-PPU-APU-DSP-diagnostic-performance":"M2-local-performance-observation");report.Metadata["host"]=new{machine=Environment.MachineName,os=Environment.OSVersion.ToString(),runtime=Environment.Version.ToString(),processors=Environment.ProcessorCount};
         var machine=new SnesSystem();machine.Insert(new Cartridge(audio?AudioDiagnosticRom.Create():DiagnosticRom.Create()));machine.RunFrame();var watch=Stopwatch.StartNew();
         for(int n=0;n<120;n++)machine.RunFrame();watch.Stop();report.Metadata["framesPerSecond"]=120/watch.Elapsed.TotalSeconds;report.Metadata["apuEnabled"]=!machine.Bus.Apu.Isolated;report.Metadata["spcCycles"]=machine.Bus.Apu.Cycles;report.Metadata["apuFirmwareSha256"]=machine.Bus.Apu.FirmwareHash;report.Metadata["masterclocksPerSecond"]=(machine.Clock.Now-357368)/watch.Elapsed.TotalSeconds;
         var bus=new TraceBus{TraceEnabled=false};Array.Fill(bus.Memory,(byte)0xea);var cpu=new Cpu65816(bus){PC=0x8000,P=0x34};
         watch.Restart();for(int n=0;n<100000;n++)cpu.Step();watch.Stop();report.Metadata["stepNopInstructionsPerSecond"]=100000/watch.Elapsed.TotalSeconds;
         watch.Restart();for(int n=0;n<100000;n++)while(cpu.AdvanceCycle()){}watch.Stop();report.Metadata["singleCycleNopInstructionsPerSecond"]=100000/watch.Elapsed.TotalSeconds;
         report.Metadata["dspNativeSamples"]=machine.Bus.Apu.Dsp.SampleCount;report.Metadata["twoBrrVoices"]=audio;report.Metadata["ppuForcedBlank"]=(machine.Bus.Ppu.Registers[0]&128)!=0;
-        report.Add("benchmark executed","pass","Performance observation only; no minimum performance or hardware-accuracy assertion");report.Save(audio?"artifacts/m6-benchmark":apu?"artifacts/m4-benchmark":"artifacts/m2-benchmark");Console.WriteLine(JsonSerializer.Serialize(report.Metadata,Json));return 0;
+        report.Add("benchmark executed","pass","Performance observation only; no minimum performance or hardware-accuracy assertion");report.Save(audio?"artifacts/m7-benchmark-audio":apu?"artifacts/m7-benchmark-full":"artifacts/m2-benchmark");Console.WriteLine(JsonSerializer.Serialize(report.Metadata,Json));return 0;
     }
     static int Cpu(string[] args,bool full=false,bool timed=false)
     {
@@ -216,11 +216,12 @@ static class Lab
         report.Metadata["audio"]=new{format="signed16 stereo interleaved little-endian",sampleRate=32000,channels=2,pairs=audioCount,firstIndex=firstAudio?.Index,firstCrystal=firstAudio?.Crystal,lastIndex=lastAudio?.Index,lastCrystal=lastAudio?.Crystal,sha256=Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(prefix+".stereo-pcm16le.bin"))),droppedPairs=machine.Bus.Apu.Dsp.DroppedPresentationSamples,traceRows=dspRows,phasesExecuted=machine.Bus.Apu.Crystal/24};
         clocks=machine.Clock.Now;machine.CyclePhaseObserved=null;machine.Bus.Dma.Observed=null;machine.Clock.EventObserved=null;
         File.WriteAllBytes(prefix+".wram.bin",machine.Bus.Wram);
-        using(var output=new BinaryWriter(File.Create(prefix+".argb32le.bin")))foreach(uint pixel in machine.Bus.Ppu.Pixels)output.Write(pixel);
-        using(var native=new BinaryWriter(File.Create(prefix+".rgb555le.bin")))foreach(ushort pixel in machine.Bus.Ppu.NativePixels)native.Write(pixel);
-        File.WriteAllBytes(prefix+".brightness.bin",machine.Bus.Ppu.Brightness);
+        var video=machine.Bus.Ppu.CompletedFrame??machine.Bus.Ppu.Frame;
+        using(var output=new BinaryWriter(File.Create(prefix+".argb32le.bin")))foreach(uint pixel in video.Argb.Span)output.Write(pixel);
+        using(var native=new BinaryWriter(File.Create(prefix+".rgb555le.bin")))foreach(ushort pixel in video.Native.Span)native.Write(pixel);
+        File.WriteAllBytes(prefix+".brightness.bin",video.Brightness.ToArray());
         report.Metadata["nativeFrameSha256"]=Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(prefix+".rgb555le.bin")));
-        report.Metadata["frameGeometry"]=machine.Bus.Ppu.Frame.Geometry;
+        report.Metadata["frameGeometry"]=video.Geometry;
         report.Metadata["cpuState"]=CpuVector.State(machine.Cpu);report.Metadata["completedFrames"]=machine.Frames;report.Metadata["masterclocks"]=clocks;report.Metadata["instructionsAttempted"]=instructions;
         report.Metadata["traceLimit"]=traceLimit;report.Metadata["busEvents"]=busEvents;report.Metadata["traceTruncated"]=busEvents>traceLimit||instructions>traceLimit;
         report.Metadata["stopReason"]=machine.Frames>=frames?"frame-limit":"masterclock-limit";
@@ -237,14 +238,25 @@ static class Lab
         if(options.TryGetValue("expect-frame",out string? framePath))
         {
             byte[] bytes=File.ReadAllBytes(framePath);if(bytes.Length%4!=0)throw new InvalidDataException("ARGB32LE reference requires whole pixels");uint[] expected=new uint[bytes.Length/4];for(int i=0;i<expected.Length;i++)expected[i]=System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(bytes.AsSpan(i*4));
-            string? diff=CpuVector.FirstPixelDifference(machine.Bus.Ppu.Pixels,expected,Ppu.Width);report.Metadata["frameOracleSha256"]=Convert.ToHexString(SHA256.HashData(bytes));report.Add("frame oracle",diff==null?"pass":"fail",diff);
+            string? diff=CpuVector.FirstPixelDifference(video.Argb.ToArray(),expected,video.Geometry.Stride);report.Metadata["frameOracleSha256"]=Convert.ToHexString(SHA256.HashData(bytes));report.Add("frame oracle",diff==null?"pass":"fail",diff);
         }
         if(options.TryGetValue("expect-native",out string? nativePath))
         {
             byte[] bytes=File.ReadAllBytes(nativePath);if(bytes.Length%2!=0)throw new InvalidDataException("RGB555LE reference requires whole pixels");
             ushort[] expected=new ushort[bytes.Length/2];for(int i=0;i<expected.Length;i++)expected[i]=System.Buffers.Binary.BinaryPrimitives.ReadUInt16LittleEndian(bytes.AsSpan(i*2));
-            string? diff=NativeFrameOracle.FirstDifference(machine.Bus.Ppu.NativePixels,expected,Ppu.Width,registerTrace.Prepend("PPU registers: "+Convert.ToHexString(machine.Bus.Ppu.Registers)));
+            string? diff=NativeFrameOracle.FirstDifference(video.Native.Span,expected,video.Geometry.Stride,registerTrace.Prepend("PPU registers: "+Convert.ToHexString(machine.Bus.Ppu.Registers)));
             report.Metadata["nativeOracleSha256"]=Convert.ToHexString(SHA256.HashData(bytes));report.Add("native pixel oracle",diff==null?"pass":"fail",diff);
+        }
+        if(options.TryGetValue("expect-geometry",out string? geometryPath))
+        {
+            var expected=JsonSerializer.Deserialize<PpuGeometry>(File.ReadAllText(geometryPath))??throw new InvalidDataException("Missing raw field oracle geometry");expected.Validate();
+            report.Add("raw field geometry oracle",expected==video.Geometry?"pass":"fail",expected==video.Geometry?null:$"field geometry expected {expected}, actual {video.Geometry}");
+        }
+        if(options.TryGetValue("expect-brightness",out string? brightnessPath))
+        {
+            byte[] expected=File.ReadAllBytes(brightnessPath);var actual=video.Brightness.Span;string? diff=expected.Length!=actual.Length?$"brightness count expected{expected.Length}, actual{actual.Length}":null;
+            if(diff==null)for(int i=0;i<actual.Length;i++)if(actual[i]!=expected[i]){diff=$"brightness pixel({i%video.Geometry.Stride},{i/video.Geometry.Stride}) expected{expected[i]}, actual{actual[i]}";break;}
+            report.Add("brightness oracle",diff==null?"pass":"fail",diff);
         }
         if(options.TryGetValue("expect-audio",out string? audioPath)){
             byte[] actual=File.ReadAllBytes(prefix+".stereo-pcm16le.bin"),expected=File.ReadAllBytes(audioPath);string? difference=null;

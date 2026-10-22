@@ -33,15 +33,17 @@ public sealed class SnesSystem
             long denominator=checked(Profile.ApuHzNumerator*Profile.MasterHzDenominator);
             return Math.Min(Bus.Ppu.NextBoundary,(long)((numerator+denominator-1)/denominator));
         };
-        Clock.PeripheralAdvanced=()=>{Bus.Ppu.Synchronize();Bus.Apu.RunUntil(Clock.ApuTicks);};
+        Clock.PeripheralAdvanced=SynchronizeDevices;
         Clock.RefreshStarted=()=>{for(int i=1;i<=5;i++)Clock.Schedule(Clock.Now+i*8,HardwareEventKind.Device,1,-6);};
+        Clock.InterlaceInput=()=>(Bus.Ppu.Registers[0x33]&1)!=0;
         Bus.Ppu.Clock=Clock;
         Bus.CpuIo.Clock=Clock;Bus.DeferCpuMdr=true;
         Clock.DeviceEvent=e=>{if((e.Payload&255)==7)Bus.Dma.RequestHdma(e.Payload==7);else Bus.CpuIo.Event(e.Payload);};
         Clock.LineStarted=line=>{Bus.Ppu.StartLine(line);ScheduleIoLine();};
-        Clock.FieldStarted=()=>{Bus.CpuIo.NewField();Bus.Ppu.Scanline=0;};
+        Clock.FieldStarted=()=>{Bus.Ppu.CompleteField();Bus.CpuIo.NewField();Bus.Ppu.Scanline=0;};
         Clock.VblankStarted=()=>Bus.BeginVblank();
     }
+    private void SynchronizeDevices(){Bus.Ppu.Synchronize(false);Bus.Apu.RunUntil(Clock.ApuTicks);Bus.Ppu.PublishNotifications();}
     private void ScheduleIoLine()
     {
         Bus.CpuIo.ScheduleIrq(false);
@@ -137,10 +139,10 @@ public sealed class SnesSystem
     {
         if(masterClock<Clock.Now)throw new ArgumentOutOfRangeException(nameof(masterClock));target=masterClock;
         // A snapshot from an APU phase may precede a same-timestamp typed event.
-        Clock.AdvanceTo(Clock.Now);Bus.Ppu.Synchronize();Bus.Apu.RunUntil(Clock.ApuTicks);SyncInterrupts();
+        Clock.AdvanceTo(Clock.Now);SynchronizeDevices();SyncInterrupts();
         while(Clock.Now<target)
         {
-            Bus.Ppu.Scanline=Clock.V;Clock.Interlace=(Bus.Ppu.Registers[0x33]&1)!=0;Clock.VblankLine=(Bus.Ppu.Registers[0x33]&4)!=0?240:225;
+            Bus.Ppu.Scanline=Clock.V;
             if(Cpu.AtInstructionBoundary)
             {
                 SyncInterrupts();

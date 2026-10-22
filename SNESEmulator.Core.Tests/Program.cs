@@ -13,9 +13,10 @@ void Test(string name,Action test)
     try { test(); passed++; report.Add(name,"pass",seconds:watch.Elapsed.TotalSeconds); Console.WriteLine("PASS "+name); }
     catch(Exception e) { failed++; report.Add(name,"fail",e.ToString(),watch.Elapsed.TotalSeconds); Console.WriteLine("FAIL "+name+": "+e); }
 }
+if(args.Contains("--video-only")){VideoTests.Run((name,body)=>{if(args.Length<3||name.Contains(args[2],StringComparison.OrdinalIgnoreCase))Test(name,body);},testRoot);report.Metadata["M7"]=VideoTests.Evidence;report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m7-targeted");return failed==0?0:1;}
 if(args.Contains("--dsp-long")){DspTests.Run(Test,testRoot,true);report.Metadata["M6Long"]=DspTests.Evidence;report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m6-long");return failed==0?0:1;}
 if(args.Contains("--dsp-only")){DspTests.Run(Test,testRoot);report.Metadata["M6"]=DspTests.Evidence;report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m6-targeted");return failed==0?0:1;}
-if(args.Contains("--ppu-only")){PpuTests.Run(Test,testRoot);report.Metadata["M5"]=PpuTests.Evidence;report.Save("artifacts/m5-targeted");return failed==0?0:1;}
+if(args.Contains("--ppu-only")){PpuTests.Run(Test,testRoot);report.Metadata["M5"]=PpuTests.Evidence;report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m5-targeted");return failed==0?0:1;}
 SnesSystem Diagnostic() { var m=new SnesSystem(); m.Insert(new Cartridge(DiagnosticRom.Create())); return m; }
 Test("LoROM mapping, header, copier header",()=>
 {

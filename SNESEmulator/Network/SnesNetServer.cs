@@ -349,7 +349,8 @@ namespace SNESEmulator.Network
         /// <param name="pixels">ARGB32 pixels from the completed host framebuffer.</param>
         /// <param name="width">Frame width.</param>
         /// <param name="height">Frame height.</param>
-        public void BroadcastVideoFrame(uint[] pixels, int width, int height)
+        public void BroadcastVideoFrame(SNESEmulator.Core.PpuFrame field)=>BroadcastVideoFrame(field.Argb.ToArray(),field.Geometry.Width,field.Geometry.Height,field.Geometry);
+        public void BroadcastVideoFrame(uint[] pixels, int width, int height, SNESEmulator.Core.PpuGeometry geometry = null)
         {
             if (!IsRunning || pixels == null)
             {
@@ -370,7 +371,7 @@ namespace SNESEmulator.Network
 
             // Pack the host frame once, then let each client choose full/delta encoding
             // against its own last transmitted reference frame at send time.
-            var frame = new PendingVideoFrame(packedPixels, width, height, Interlocked.Increment(ref _frameId));
+            var frame = new PendingVideoFrame(packedPixels, width, height, Interlocked.Increment(ref _frameId),geometry);
             for (int index = 0; index < clients.Count; index++)
             {
                 clients[index].EnqueueVideo(frame);
@@ -1225,9 +1226,9 @@ namespace SNESEmulator.Network
             /// <param name="width">Frame width.</param>
             /// <param name="height">Frame height.</param>
             /// <param name="frameId">Host completed frame id.</param>
-            public PendingVideoFrame(byte[] packedPixels, int width, int height, long frameId)
+            public PendingVideoFrame(byte[] packedPixels, int width, int height, long frameId, SNESEmulator.Core.PpuGeometry geometry)
             {
-                PackedPixels = packedPixels;
+                Geometry=geometry;PackedPixels = packedPixels;
                 Width = width;
                 Height = height;
                 FrameId = frameId;
@@ -1237,6 +1238,7 @@ namespace SNESEmulator.Network
             /// Gets the packed full-color SNES ARGB frame.
             /// </summary>
             public byte[] PackedPixels { get; private set; }
+            public SNESEmulator.Core.PpuGeometry Geometry {get;}
 
             /// <summary>
             /// Gets the frame width.
@@ -1718,14 +1720,6 @@ namespace SNESEmulator.Network
             /// <returns>Protocol message ready to write, or null when encoding fails.</returns>
             private SnesNetMessage CreateVideoMessage(PendingVideoFrame video)
             {
-                if (SnesNetProtocol.PackedVideoFramesEqual(video.PackedPixels, _lastSentVideoPixels))
-                {
-                    // No visual byte changed since the last frame this client received.
-                    // TCP/TLS is reliable, so the client can keep presenting its current
-                    // image and we can spend zero bandwidth for this completed Snes frame.
-                    return null;
-                }
-
                 bool forceKeyFrame = _lastSentVideoPixels == null || _deltaFramesSinceKeyFrame >= MaxDeltaFramesBeforeKeyFrame;
                 byte[] previous = forceKeyFrame ? null : _lastSentVideoPixels;
                 long previousFrameId = forceKeyFrame ? 0 : _lastSentVideoFrameId;
@@ -1737,7 +1731,7 @@ namespace SNESEmulator.Network
                     video.Height,
                     video.FrameId,
                     previousFrameId,
-                    out usedDelta);
+                    out usedDelta,video.Geometry);
                 if (payload == null || payload.Length == 0)
                 {
                     return null;

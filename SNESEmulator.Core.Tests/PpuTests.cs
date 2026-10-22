@@ -334,10 +334,10 @@ static class PpuTests
                 var r=Background();r.Palette(1,12);r.Write(0x2125,32);r.Write(0x2126,2);r.Write(0x2127,3);r.Write(0x2130,f.Control);r.Write(0x2131,1);r.Write(0x2132,37);var m=Boot(r);Line(m);Pixels(m,f.Expected);
             }
         });
-        test("M5 PPU state in format7 rejects earlier formats and invalid pipeline",()=>{
+        test("M5 PPU state in format8 rejects earlier formats and invalid pipeline",()=>{
             var m=Boot(Background());string path=Path.Combine(directory,"m5-v6");StateSerializer.Save(m,path);byte[] raw;
             using(var file=File.OpenRead(path))using(var zip=new System.IO.Compression.GZipStream(file,System.IO.Compression.CompressionMode.Decompress))using(var stream=new MemoryStream()){zip.CopyTo(stream);raw=stream.ToArray();}
-            for(int version=1;version<=6;version++){
+            for(int version=1;version<=7;version++){
                 var changed=raw.ToArray();BitConverter.GetBytes(version).CopyTo(changed,8);using(var file=File.Create(path+"old"))using(var zip=new System.IO.Compression.GZipStream(file,System.IO.Compression.CompressionLevel.Fastest))zip.Write(changed);
                 bool rejected=false;try{StateSerializer.Load(m.Bus.Cartridge!,path+"old");}catch(InvalidDataException){rejected=true;}Check(rejected,$"format{version}");
             }

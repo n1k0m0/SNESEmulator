@@ -23,14 +23,16 @@
         "refreshPhase": "first line538, then free-running divider aligned to global clock2 mod8 near H536",
         "epoch": "H0 V0 field0 AFTER deterministic convenience reset; not physical reset-release measurement",
         "apuNominalOscillatorHz": 24576000,
-        "apuCoupling": "independent rational integer accumulator; no SPC700/DSP execution",
+        "apuCoupling": "independent rational integer accumulator; own SPC700 and24-crystal-step S-DSP,32kHz native stereo; no host-timer hardware pacing",
         "readPhases": {
           "latchAfterActiveMasterclocks": "accessClocks - 4",
           "trailingHoldActiveMasterclocks": 4,
           "writeLatch": "cycle completion",
           "source": "https://github.com/bsnes-emu/bsnes/blob/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/cpu/memory.cpp",
           "evidence": "reference-informed analytical model; no acquired hardware trace"
-        }
+        },
+        "video": "own modes0-7 with scheduled BG/OBJ/half-pixel pipeline; raw fields256/512 by224/239, parity and display/timing interlace flags separate",
+        "interlaceInput": "analytical V128 H0 sample, selected pinned software convention; exact physical deadline unverified"
       },
       "hardwareEvidence": null,
       "currentReportedVersionIds": {
@@ -68,14 +70,16 @@
         "refreshPhase": "first line538, then free-running divider aligned to global clock2 mod8 near H536",
         "epoch": "H0 V0 field0 AFTER deterministic convenience reset; not physical reset-release measurement",
         "apuNominalOscillatorHz": 24576000,
-        "apuCoupling": "independent rational integer accumulator; no SPC700/DSP execution",
+        "apuCoupling": "independent rational integer accumulator; own SPC700 and24-crystal-step S-DSP,32kHz native stereo; no host-timer hardware pacing",
         "readPhases": {
           "latchAfterActiveMasterclocks": "accessClocks - 4",
           "trailingHoldActiveMasterclocks": 4,
           "writeLatch": "cycle completion",
           "source": "https://github.com/bsnes-emu/bsnes/blob/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/cpu/memory.cpp",
           "evidence": "reference-informed analytical model; no acquired hardware trace"
-        }
+        },
+        "video": "own modes0-7 with scheduled BG/OBJ/half-pixel pipeline; raw fields256/512 by224/239, parity and display/timing interlace flags separate",
+        "interlaceInput": "analytical V128 H0 sample, selected pinned software convention; exact physical deadline unverified"
       },
       "hardwareEvidence": null,
       "currentReportedVersionIds": {
@@ -113,11 +117,10 @@
   ],
   "limitations": [
     "No physical reset-release alignment, warm-reset or power-on measurement; deterministic test initialization only",
-    "PAL/NTSC selection follows cartridge metadata; profiles remain unverified hardware targets",
-    "Whole-line renderer and host ARGB32 output remain M5/M7 work",
-    "Legacy DMA is immediate with subsequent serialized stall debt; full DMA/HDMA, I/O latency and edge interactions are M3",
-    "APU oscillator is nominal; individual crystal tolerance and SPC700/DSP behavior are not implemented",
-    "Precise MDR behavior remains M3, including internal CPU reads4000-43FF that preserve MDR in the inspected reference"
+    "PAL/NTSC profiles remain unverified separate-CPU/two-PPU targets; no new silicon revision behaviours invented",
+    "Absolute PPU origin, Mode7 internal VRAM subslots, first hires half-pixel and undocumented SETINI/forced-blank glitches remain physical-evidence questions",
+    "APU oscillator is nominal; individual crystal tolerance and analogue DAC behavior are not measured",
+    "M3 per-bus DMA/HDMA/I-O and M4/M6 SPC700/DSP are implemented; published software/reference evidence does not replace original-console captures"
   ],
   "openQuestions": [
     "Acquire named NTSC and PAL motherboard/revision evidence and measurements for the separate-CPU/two-PPU target.",

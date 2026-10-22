@@ -15,8 +15,8 @@ void Test(string name,Action test)
 }
 Test("Network video retains all 32768 SNES colors",()=>
 {
-    uint[] pixels=Enumerable.Range(0,32768).Select(i=>0xFF000000u|(uint)(((i&31)*255/31)<<16|(((i>>5)&31)*255/31)<<8|((i>>10)&31)*255/31)).ToArray();
-    byte[] data=SnesNetProtocol.CreateVideoFramePayload(pixels,256,128,99);
+    uint[] pixels=Enumerable.Range(0,256*224).Select(i=>0xFF000000u|(uint)(((i&31)*255/31)<<16|(((i>>5)&31)*255/31)<<8|((i>>10)&31)*255/31)).ToArray();
+    byte[] data=SnesNetProtocol.CreateVideoFramePayload(pixels,256,224,99);
     var decoded=SnesNetProtocol.ReadVideoFramePayload(data);
     Check(decoded!=null && decoded.FrameId==99 && decoded.Pixels.SequenceEqual(pixels));
     Check(SnesNetProtocol.ReadVideoFramePayload([0,0,0])==null);
@@ -28,6 +28,37 @@ Test("Network controller includes every SNES button",()=>
         ushort value=(ushort)~(1<<i);
         Check(SnesNetProtocol.ReadInputStatePayload(SnesNetProtocol.CreateInputStatePayload(value))==value);
     }
+});
+Test("M7 VID3 lossless full ARGB dynamic raw-field geometry bounds and reused-buffer changes",()=>
+{
+    byte[] reference=null!;long id=0;uint[] target=null!;
+    foreach(var g in new[]{new PpuGeometry(512,239,512,true,true,true,15,1234,426806),new PpuGeometry(256,224,256,false,false,false,0,0,357368)})
+    {
+        uint[] pixels=Enumerable.Range(0,g.Width*g.Height).Select(i=>unchecked((uint)i*0x01987f31u)).ToArray();
+        byte[] packet=SnesNetProtocol.CreateBestVideoFramePayload(SnesNetProtocol.CreatePackedVideoFrame(pixels,g.Width,g.Height),reference,g.Width,g.Height,1,0,out bool delta,g);
+        var frame=SnesNetProtocol.ReadVideoFramePayload(packet,ref reference,ref id,target);Check(frame!=null&&frame.Geometry==g&&frame.Pixels.SequenceEqual(pixels)&&!delta,"exact alpha/R/G/B raw-field packet");target=frame!.Pixels;
+        foreach(int offset in new[]{0,4,8,12,16,20}){byte[] bad=packet.ToArray();bad[offset]^=0x80;Check(SnesNetProtocol.ReadVideoFramePayload(bad)==null,$"VID3header{offset}");}
+        Check(SnesNetProtocol.ReadVideoFramePayload(packet.AsSpan(0,87).ToArray())==null,"truncated metadata");
+        byte[] badTime=packet.ToArray();BitConverter.GetBytes(-1L).CopyTo(badTime,48);Check(SnesNetProtocol.ReadVideoFramePayload(badTime)==null,"negative native timestamp");
+    }
+});
+void VideoMatrix(SnesNetServer host,params SnesNetClient[] clients)
+{
+    for(int change=0;change<6;change++)
+    {
+        int width=change is 1 or 2 or 3?512:256,height=change is 2 or 3?239:224;
+        var geometry=new PpuGeometry(width,height,width,(change&1)!=0,change is 2 or 3,height==239,change<4?change:0,change<4?change*400000L:0,change<4?(change+1)*400000L:357368,change is 2 or 3?21281370:945000000,change is 2 or 3?1:44);
+        uint[] pixels=Enumerable.Range(0,width*height).Select(i=>unchecked((uint)(i*17011+change*112233))).ToArray();
+        using var received=new CountdownEvent(clients.Length);var handlers=new List<Action<SnesNetVideoFrame>>();
+        foreach(var client in clients){Action<SnesNetVideoFrame> handler=f=>{if(f.Geometry==geometry&&f.Pixels.SequenceEqual(pixels))received.Signal();};handlers.Add(handler);client.FrameReceived+=handler;}
+        host.BroadcastVideoFrame(new PpuFrame(geometry,new ushort[pixels.Length],new byte[pixels.Length],pixels));Check(received.Wait(3000),$"geometry transition{change}");
+        for(int i=0;i<clients.Length;i++)clients[i].FrameReceived-=handlers[i];
+    }
+}
+Test("M7 TLS two clients retain hires interlace overscan and reset timestamps",()=>
+{
+    using var host=new SnesNetServer(256,224);using var a=new SnesNetClient{PlayAudio=false};using var b=new SnesNetClient{PlayAudio=false};host.Start(0,"video");
+    Check(a.Connect("localhost",host.Port,"video",SnesNetClientRole.Player,"a",out _));Check(b.Connect("localhost",host.Port,"video",SnesNetClientRole.Observer,"b",out _));VideoMatrix(host,a,b);
 });
 Test("M6 lossless stereo packet bounds metadata and malformed payload rejection",()=>
 {
@@ -110,10 +141,11 @@ Test("Python relay TLS + end-to-end session + full controller input",()=>
         {
             try {using var probe=new System.Net.Sockets.TcpClient();probe.Connect("127.0.0.1",port);return true;} catch{return false;}
         },5000),"Relay failed to start");
-        using var host=new SnesNetServer(256,224);using var client=new SnesNetClient();
+        using var host=new SnesNetServer(256,224);using var client=new SnesNetClient{PlayAudio=false};using var second=new SnesNetClient{PlayAudio=false};
         host.StartRelay("localhost",port,"test-session","","secret");
         Check(client.ConnectRelay("localhost",port,"test-session","","secret",SnesNetClientRole.Player,"relay-player",out string status),status);
-        Check(SpinWait.SpinUntil(()=>host.GetClientSnapshots().Count==1,3000));
+        Check(second.ConnectRelay("localhost",port,"test-session","","secret",SnesNetClientRole.Observer,"relay-second",out _));
+        Check(SpinWait.SpinUntil(()=>host.GetClientSnapshots().Count==2,3000));
         host.SetClientPermission(host.GetClientSnapshots()[0].ClientId,SnesNetJoystickPermission.Port1);
         Check(SpinWait.SpinUntil(()=>client.Permission==SnesNetJoystickPermission.Port1,3000));
         ushort buttons=(ushort)(65535 ^ (ushort)(SnesButtons.X|SnesButtons.R));client.SendJoystickState(buttons,true);
@@ -124,6 +156,7 @@ Test("Python relay TLS + end-to-end session + full controller input",()=>
         using var audioReceived=new ManualResetEventSlim();byte[] pcm=[0x34,0x12,0xcc,0xed,0,0x80,0xff,0x7f];
         client.AudioReceived+=b=>{if(b.Pcm.SequenceEqual(pcm)&&b.FirstSample==0&&b.Crystal==672&&b.SampleRate==32000)audioReceived.Set();};
         host.BroadcastAudio(pcm,pcm.Length,0,672);Check(audioReceived.Wait(3000),"Relay lossless native stereo missing");
+        VideoMatrix(host,client,second);
     }
     finally { if(!process.HasExited) {process.Kill(true);process.WaitForExit();} }
 });

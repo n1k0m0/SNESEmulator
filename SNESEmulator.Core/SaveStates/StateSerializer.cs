@@ -17,7 +17,7 @@ public static class StateSerializer
         using (var zip = new GZipStream(file, CompressionLevel.Fastest))
         using (var w = new BinaryWriter(zip))
         {
-            w.Write("SNESSAV"); w.Write(7); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));w.Write(machine.ProfileForced);w.Write((int)cart.Mapping);w.Write(JsonSerializer.Serialize(cart.Options));
+            w.Write("SNESSAV"); w.Write(8); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));w.Write(machine.ProfileForced);w.Write((int)cart.Mapping);w.Write(JsonSerializer.Serialize(cart.Options));
             var c = machine.Cpu; var b = machine.Bus; var p = b.Ppu;
             w.Write(c.A); w.Write(c.X); w.Write(c.Y); w.Write(c.S); w.Write(c.D); w.Write(c.PC);
             w.Write(c.P); w.Write(c.PBR); w.Write(c.DBR); w.Write(c.E); w.Write(c.Waiting); w.Write(c.Stopped); w.Write(c.Instructions);
@@ -27,6 +27,7 @@ public static class StateSerializer
             w.Write(p.Vram); w.Write(p.Cgram); w.Write(p.Oam); w.Write(p.Registers);
             w.Write(p.VramAddress); w.Write(p.CgramAddress); w.Write(p.OamAddress); w.Write(p.ScrollLatch); w.Write(p.Scanline);
             foreach (ushort value in p.Scroll) w.Write(value);
+            w.Write(JsonSerializer.Serialize(p.FrameGeometry));w.Write(p.Pixels.Length);
             foreach (uint pixel in p.Pixels) w.Write(pixel);
             foreach(ushort pixel in p.NativePixels)w.Write(pixel);w.Write(p.Brightness);w.Write(JsonSerializer.Serialize(p.CapturePipeline()));
             w.Write(JsonSerializer.Serialize(b.Apu.Capture()));
@@ -45,7 +46,7 @@ public static class StateSerializer
         using var file = File.OpenRead(path);
         using var zip = new GZipStream(file, CompressionMode.Decompress);
         using var r = new BinaryReader(zip);
-        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 7 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
+        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 8 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
             throw new InvalidDataException("Savestate requires format7 (native S-DSP pipeline). Formats1–6 cannot be resumed; start the ROM again. The cartridge must also match.");
         var profile=JsonSerializer.Deserialize<HardwareProfile>(r.ReadString())??throw new InvalidDataException("Missing hardware profile");
         bool forced=r.ReadBoolean();var mapping=(CartridgeMapping)r.ReadInt32();
@@ -63,6 +64,8 @@ public static class StateSerializer
         Read(r, p.Vram); Read(r, p.Cgram); Read(r, p.Oam); Read(r, p.Registers);
         p.VramAddress = r.ReadUInt16(); p.CgramAddress = r.ReadUInt16(); p.OamAddress = r.ReadUInt16(); p.ScrollLatch = r.ReadByte(); p.Scanline = r.ReadInt32();
         for (int i = 0; i < p.Scroll.Length; i++) p.Scroll[i] = r.ReadUInt16();
+        p.RestoreGeometry(JsonSerializer.Deserialize<PpuGeometry>(r.ReadString())??throw new InvalidDataException("Missing video geometry"));
+        if(r.ReadInt32()!=p.Pixels.Length)throw new InvalidDataException("Invalid video array length");
         for (int i = 0; i < p.Pixels.Length; i++) p.Pixels[i] = r.ReadUInt32();
         for(int i=0;i<p.NativePixels.Length;i++)p.NativePixels[i]=r.ReadUInt16();Read(r,p.Brightness);p.RestorePipeline(JsonSerializer.Deserialize<PpuPipelineState>(r.ReadString())??throw new InvalidDataException("Missing PPU pipeline"));
         b.Apu.Restore(JsonSerializer.Deserialize<ApuState>(r.ReadString())??throw new InvalidDataException("Missing APU state"));

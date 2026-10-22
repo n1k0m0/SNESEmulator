@@ -22,3 +22,5 @@ tools/dsp-oracle.cpp text eol=lf
 
 # Preserve the upstream LGPL notice verbatim, including its whitespace.
 testdata/dsp-reference/reference-license.txt -text -whitespace
+
+SNESEmulator.Core.Tests/VideoTests.cs text eol=lf

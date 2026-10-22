@@ -14,7 +14,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private enum Menu { None, Main, Settings, Network, Media, Saves, Reset, Delete, Controller }
     private SnesSystem machine = new();
     private readonly EmulatorSettings settings = EmulatorSettings.Load();
-    private readonly SnesNetServer server = new(Ppu.Width, Ppu.Height);
+    private readonly SnesNetServer server;
     private readonly SnesNetClient client = new();
     private readonly ConcurrentQueue<Action> pending = new();
     private PcmAudioOutput? localAudio;
@@ -31,7 +31,8 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private uint[]? remotePixels;
     private string? previewPath;
     private uint[]? savePreview;
-    private int remoteWidth = Ppu.Width, remoteHeight = Ppu.Height;
+    private int previewWidth,previewHeight;
+    private int remoteWidth,remoteHeight;
     private readonly string? startupRom;
     private static readonly Dictionary<char, byte[]> Font = CreateOverlayFont();
     private static readonly (Key key, SnesButtons button)[] KeyboardMap =
@@ -42,6 +43,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     ];
     public SnesWindow(string? rom = null) : base(512, 288, "SNESEmulator - C# core")
     {
+        server=new(machine.Bus.Ppu.FrameGeometry.Width,machine.Bus.Ppu.FrameGeometry.Height);
         startupRom = rom; ClientSize = new Vector2i(1024, 576); UpdateFrequency = 60;
         server.StatusChanged += s => pending.Enqueue(() => status = s);
         client.StatusChanged += s => pending.Enqueue(() => status = s);
@@ -86,7 +88,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
                 while (accumulator >= machine.Profile.ClockSeconds(machine.Clock.ClocksUntilFieldEnd) && !fault)
                 {
                     long before = machine.Clock.Now;
-                    Try(() => { machine.RunFrame(); PresentAudio(); server.BroadcastVideoFrame(machine.Bus.Ppu.Pixels, Ppu.Width, Ppu.Height); }, true);
+                    Try(() => { machine.RunFrame(); PresentAudio(); server.BroadcastVideoFrame(machine.Bus.Ppu.CompletedFrame??machine.Bus.Ppu.Frame); }, true);
                     accumulator -= machine.Profile.ClockSeconds(machine.Clock.Now-before);
                 }
             }
@@ -99,7 +101,8 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private void DrawScreen(bool remote)
     {
         ClearScreen();
-        uint[] pixels = machine.Bus.Ppu.Pixels; int width = Ppu.Width, height = Ppu.Height;
+        var field=machine.Bus.Ppu.CompletedFrame??machine.Bus.Ppu.Frame;
+        uint[] pixels = field.Argb.ToArray(); int width = field.Geometry.Width, height = field.Geometry.Height;
         if (remote) lock (client) { if (remotePixels != null) { pixels = remotePixels; width = remoteWidth; height = remoteHeight; } }
         if (remote || machine.Bus.Cartridge != null)
             DrawArgbPixelsGpuPresented(pixels,width,height,0,0,width,height,85,12,342,256,
@@ -112,7 +115,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             Text(34,126,"F10  SETTINGS / NETWORK / MEDIA / RESET",1);
             Text(34,144,"F12  SAVE AND LOAD    F11 FULLSCREEN",1);
             Text(34,162,"F6   RUN ORIGINAL DIAGNOSTIC ROM",1);
-            Text(34,196,"CORE: CPU / SPC700 / DMA / HDMA / PPU0-1",1);
+            Text(34,196,"CORE: CPU / SPC700 / DMA / HDMA / PPU0-7",1);
             Text(34,214,"SPRITES / COLOR MATH / NATIVE STEREO DSP",1,255,220,140);
         }
         Text(8,276,Clip(status,82),1,192,210,225);
@@ -170,10 +173,10 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             if(previewPath!=path)
             {
                 previewPath=path; savePreview=null;
-                try { savePreview=StateSerializer.Load(cart,path).Bus.Ppu.Pixels; }
+                try { var saved=StateSerializer.Load(cart,path).Bus.Ppu;var image=saved.CompletedFrame??saved.Frame;savePreview=image.Argb.ToArray();previewWidth=image.Geometry.Width;previewHeight=image.Geometry.Height; }
                 catch(Exception e) when(e is IOException or InvalidDataException or ArgumentException) { status="PREVIEW UNAVAILABLE: "+e.Message; }
             }
-            if(savePreview!=null) { DrawArgbPixelsCroppedStretched(savePreview,256,224,0,0,256,224,330,112,128,112); Text(330,98,"PREVIEW",1,108,214,182); }
+            if(savePreview!=null) { DrawArgbPixelsCroppedStretched(savePreview,previewWidth,previewHeight,0,0,previewWidth,previewHeight,330,112,128,96); Text(330,98,"PREVIEW",1,108,214,182); }
         }
         if(rows.Length>10)
         {

@@ -1,0 +1,134 @@
+{
+  "schema": "m7-native-video-v1",
+  "license": "Original ROM generators/tests Apache-2.0; no copyrighted ROM/firmware or reference implementation embedded",
+  "evidence": "Published primary research plus independent software comparison; no console measurement. Literal input-derived expected values; no generated emulator-output golden.",
+  "comparisonCommit": "78474e5d39f58872dc21aca18cf9eb583b147fe7",
+  "sources": [
+    {
+      "role": "Anomie backgrounds primary research",
+      "url": "https://wiki.superfamicom.org/backgrounds",
+      "sha256": "c205c0dc4e3f2b824230385fee4dc25e0deb8505a318165e9ebcf70839ef11cf",
+      "bytes": 24455,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Anomie register primary research",
+      "url": "https://wiki.superfamicom.org/registers",
+      "sha256": "bbd0ddfe2dcefb205f5460b7ae5aba9933683069efbfc62ef3e5ac0abb3a466b",
+      "bytes": 106831,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Anomie rendering primary research",
+      "url": "https://wiki.superfamicom.org/rendering-the-screen",
+      "sha256": "9a50712c550026c8a0b7b3f8457b45c41eccbe5b19b0dea791e45d84447a7026",
+      "bytes": 11819,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Anomie timing primary research",
+      "url": "https://wiki.superfamicom.org/timing",
+      "sha256": "e493de39a8d54fb4253d3ae5a173095e5ebd8d1eb74b603d0cbe0cc41423360e",
+      "bytes": 28235,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Independent software comparison; not transplanted code",
+      "url": "https://raw.githubusercontent.com/bsnes-emu/bsnes/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/ppu/main.cpp",
+      "sha256": "4330498eb628755fbeed9e6bf434ef40ae9b6f346c319858615bfe402cb61bb0",
+      "bytes": 6184,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Independent software comparison; not transplanted code",
+      "url": "https://raw.githubusercontent.com/bsnes-emu/bsnes/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/ppu/background.cpp",
+      "sha256": "04993c2ac4c26836a2fecad0d75af7428d9859a9247dbf9572b9f99063ddd2f0",
+      "bytes": 6881,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Independent software comparison; not transplanted code",
+      "url": "https://raw.githubusercontent.com/bsnes-emu/bsnes/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/ppu/background.hpp",
+      "sha256": "a8d65e8fa8d1ebd8d942ece3523a73bded075c9d345e63ee84230b32cfae244b",
+      "bytes": 1777,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Independent software comparison; not transplanted code",
+      "url": "https://raw.githubusercontent.com/bsnes-emu/bsnes/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/ppu/mode7.cpp",
+      "sha256": "e5c40b8470c48d253ae0ae14fe7f82c8dc8c84958610e6663a086e857e218ffb",
+      "bytes": 2076,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Independent software comparison; not transplanted code",
+      "url": "https://raw.githubusercontent.com/bsnes-emu/bsnes/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/ppu/screen.cpp",
+      "sha256": "54e5b47a632aafe46a04540e34d2128d1983ce4630b0260f271dd3c44a3ffffb",
+      "bytes": 6503,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Independent software comparison; not transplanted code",
+      "url": "https://raw.githubusercontent.com/bsnes-emu/bsnes/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/ppu/object.cpp",
+      "sha256": "8fe8aeef9c2d307ac4173694b5a0ecf5c5d798f96b631e315e32e2a8fbae8fae",
+      "bytes": 5597,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Independent software comparison; not transplanted code",
+      "url": "https://raw.githubusercontent.com/bsnes-emu/bsnes/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/ppu/mosaic.cpp",
+      "sha256": "9a538783e533e73dd0b6218503fb072005ecbeb6a6a0ffc1486289ca80ff00ec",
+      "bytes": 581,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Independent software comparison; not transplanted code",
+      "url": "https://raw.githubusercontent.com/bsnes-emu/bsnes/78474e5d39f58872dc21aca18cf9eb583b147fe7/bsnes/sfc/ppu/counter/counter-inline.hpp",
+      "sha256": "92c5db5133f315b773da2900caf2e12cf19bc671db0175ac15617116c24cfe83",
+      "bytes": 2813,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    },
+    {
+      "role": "Published hardware captures: known forced-blank/INIDISP physical effects NOT covered by current digital model",
+      "url": "https://undisbeliever.net/snesdev/registers/inidisp.html",
+      "sha256": "b7360f98071fbc38b8f2a3da286252a074cb9f0949d0630e14064de6a0abdbc0",
+      "bytes": 35927,
+      "accessed": "2026-10-22",
+      "redistributed": false
+    }
+  ],
+  "files": [
+    {
+      "path": "SNESEmulator.Core.Tests/VideoTests.cs",
+      "sha256": "f6cd4cfaa701293cc847b99d0333349c3940325c490b26c646f541822cac2659",
+      "bytes": 28311
+    },
+    {
+      "path": "SNESEmulator.Core/PpuDiagnosticRom.cs",
+      "sha256": "a4ddbef10396684987969af14a38b5908bf558c96bf3dfd27b1436f78fbfe72c",
+      "bytes": 2181
+    },
+    {
+      "path": "tools/video-mutations.py",
+      "sha256": "59021d126a5e819339356ba2aed6d0fb8f0f81357cac3f38ff975576834243e6",
+      "bytes": 2970
+    },
+    {
+      "path": "testdata/hardware-profiles.json",
+      "sha256": "7b3039034318ff9b93652842bb65de16370b0ea34def8bc125e74b67418e5105",
+      "bytes": 6672
+    }
+  ]
+}
