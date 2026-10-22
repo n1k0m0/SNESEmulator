@@ -39,5 +39,5 @@ testdata/m8-console/*LICENSE* -text -whitespace
 testdata/m8-console/bsnes-GPLv3.txt -text -whitespace
 testdata/m8-console-own-ipl/*LICENSE* -text -whitespace
 testdata/m8-console-own-ipl/bsnes-GPLv3.txt -text -whitespace
-testdata/m8-game/*.md -text
+testdata/m8-game/*.md -text -whitespace
 testdata/m8-game/*LICENSE -text -whitespace
