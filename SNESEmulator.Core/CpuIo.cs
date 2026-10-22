@@ -123,14 +123,13 @@ public sealed class CpuIo(SystemBus bus)
         if(kind==1){AluEdge();return;}
         if(kind==2){if(bus.NmiFlag&&(bus.Io[0]&128)!=0)State.NmiOutput=true;return;}
         if(kind==4) {
-            if((payload>>8)!=State.IrqGeneration||(bus.Io[0]&0x30)==0)return;
+            if((payload>>8)!=State.IrqGeneration||(bus.Io[0]&0x30)==0||!IrqCounterTapValid())return;
             RaiseIrq();return;
         }
         if(kind==8) {
             if((payload>>8)!=State.IrqGeneration)return;
-            int delayedV=Clock!.V;
-            if(Clock.H<10)delayedV=delayedV>0?delayedV-1:Clock.Profile.FieldLines(!Clock.Field,Clock.Interlace)-1;
-            bool level=(bus.Io[0]&0x30)==0x20&&delayedV==(bus.Io[9]|(bus.Io[10]&1)<<8);
+            int delayedV=Clock!.CounterBefore(10).V;
+            bool level=(bus.Io[0]&0x30)==0x20&&delayedV==(bus.Io[9]|(bus.Io[10]&1)<<8)&&IrqCounterTapValid();
             if(level&&!State.ComparatorHigh)RaiseIrq();
             State.ComparatorHigh=level;return;
         }
@@ -148,6 +147,11 @@ public sealed class CpuIo(SystemBus bus)
             else for(int i=0;i<4;i++)State.Joy[i]=(ushort)(State.Joy[i]<<1|((i&1)==0?State.AutoPort1:State.AutoPort2)>>(i/2)&1);
         }
         if(State.AutoCounter<33)Clock!.Schedule(Clock.Now+128,HardwareEventKind.Device,6,-3);
+    }
+    private bool IrqCounterTapValid()
+    {
+        var tap=Clock!.CounterBefore(6);
+        return tap.H!=0||tap.V!=0;
     }
     private void RaiseIrq()
     {

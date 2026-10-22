@@ -233,6 +233,16 @@ static class IoDmaTests
             }
         });
         test("M3 H V HV IRQ holds readclear enable disable and line spill",()=>{
+            foreach(var profile in new[]{HardwareProfile.Ntsc,HardwareProfile.PalProfile})foreach(bool interlace in new[]{false,true})foreach(bool field in new[]{false,true})foreach(bool suppressed in new[]{false,true}){
+                var boundary=new SnesSystem(profile);boundary.Insert(new Cartridge(DiagnosticRom.Create()));boundary.Cpu.Stopped=true;boundary.Bus.Ppu.Registers[0x33]=(byte)(interlace?1:0);boundary.RunUntil(1);
+                long first=profile.FieldMasterClocks(false,interlace);long fieldStart=field?first:0;int lastLine=profile.FieldLines(field,interlace)-1;int length=profile.LineClocks(lastLine,field,interlace);
+                if(field)boundary.RunUntil(first+1);
+                int timer=(length-4)/4-1-(suppressed?0:1); // raw comparator at last/penultimate dot.
+                boundary.Bus.Write(0x4207,(byte)timer);boundary.Bus.Write(0x4208,(byte)(timer>>8));boundary.Bus.Write(0x4209,(byte)lastLine);boundary.Bus.Write(0x420a,(byte)(lastLine>>8));boundary.Bus.Write(0x4200,0x30);
+                long end=fieldStart+profile.FieldMasterClocks(field,interlace);boundary.RunUntil(end-1);Check(boundary.Clock.Capture().Events.Any(e=>e.Kind==HardwareEventKind.Device&&(e.Payload&255)==4&&e.Clock==end+(suppressed?6:2)),"delayed comparator event must actually be pending across field end");boundary.RunUntil(end+(suppressed?6:2));var tap=boundary.Clock.CounterBefore(6);
+                Check(boundary.Bus.CpuIo.State.IrqFlag==!suppressed,$"historical counter6 last-dot IRQ {profile.Pal} interlace{interlace} field{field} length{length}");Check(suppressed?tap.H==0&&tap.V==0:tap.H!=0||tap.V!=0);
+            }
+            var shortLine=Machine();shortLine.RunUntil(HardwareProfile.Ntsc.FieldMasterClocks(false,false)+1);shortLine.Bus.Write(0x4207,0x52);shortLine.Bus.Write(0x4208,1);shortLine.Bus.Write(0x4209,240);shortLine.Bus.Write(0x420a,0);shortLine.Bus.Write(0x4200,0x30);long shortStart=HardwareProfile.Ntsc.FieldMasterClocks(false,false)+240L*1364;shortLine.RunUntil(shortStart+1366);Check(shortLine.Bus.CpuIo.State.IrqFlag&&shortLine.Clock.CounterBefore(6).V==241,"H6 after 1360-clock short line is not field H0/V0 and must allow IRQ");
             foreach(int early in new[]{0,1,5,9}){
                 var e=Machine();e.RunUntil(early);e.Bus.Write(0x4209,0);e.Bus.Write(0x420a,0);e.Bus.Write(0x4200,0x20);e.RunUntil(10);Check(e.Bus.CpuIo.State.IrqFlag,$"V-only early enable H{early} preserves delayed H10 edge");
                 var previous=Machine();previous.RunUntil(2*1364+early);previous.Bus.Write(0x4209,1);previous.Bus.Write(0x420a,0);previous.Bus.Write(0x4200,0x20);previous.RunUntil(2*1364+10);Check(previous.Bus.CpuIo.State.IrqFlag==(early<9),$"previous V compare at H{early}");

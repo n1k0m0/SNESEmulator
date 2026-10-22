@@ -91,6 +91,10 @@ Generic old-I/RTI/WAI/arbitration tests remain separate.
 SLHV/WRIO falling counter latches, low/high H/V reads, counter-latched status and
 status toggle reset are implemented. Full PPU MDR sharing/errata remain M5/M7.
 Timer writes in the comparison reference are themselves marked unverified.
+Historical counter taps cross the selected profile's real short/long lines and
+interlaced field lengths. The IRQ inhibit tests counter6 H0/V0, not a fixed
+current-H condition; normal/short1360/long1368 NTSC/PAL field transitions have
+explicit last-dot suppression and adjacent allowed-dot cases.
 23-bit IRQ tokens remain live at most one line plus ten clocks; hardware writes
 cannot reuse a live token across rollover.
 

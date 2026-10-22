@@ -37,6 +37,19 @@ public sealed class MasterClock(HardwareProfile profile)
             int h=H;if(h>=1292)h-=Math.Min(2,h-1292);if(H>=1310)h-=Math.Min(2,H-1310);return h/4;
         }
     }
+    /// <summary>Analytical historical counter taps used by the 5A22 IRQ unit.
+    /// Crosses the actual short/long lines and interlaced field lengths; the
+    /// convenience epoch extends the selected profile backwards deterministically.</summary>
+    public (int H,int V,bool Field) CounterBefore(int clocks)
+    {
+        if(clocks<0)throw new ArgumentOutOfRangeException(nameof(clocks));
+        int h=H-clocks,v=V;bool field=Field;
+        while(h<0){
+            v--;if(v<0){field=!field;v=Profile.FieldLines(field,Interlace)-1;}
+            h+=Profile.LineClocks(v,field,Interlace);
+        }
+        return(h,v,field);
+    }
     public void Reset()
     {Profile.Validate();Now=H=V=0;Field=false;Fields=ApuTicks=ApuRemainder=StallUntil=sequence=0;Interlace=false;VblankLine=225;events.Clear();ScheduleLine();}
     public void Schedule(long at,HardwareEventKind kind,int payload=0,int priority=0)
