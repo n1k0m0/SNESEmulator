@@ -21,5 +21,5 @@ public sealed class SnesNetAudioContinuity
         }
         started=true;previousSequence=block.Sequence;nextSample=block.FirstSample+block.Frames;nextCrystal=block.Crystal+block.Frames*768L;return true;
     }
-    public void Reset(){started=false;Discontinuities=RejectedPackets=0;}
+    public void Reset(bool clearCounters=true){started=false;if(clearCounters)Discontinuities=RejectedPackets=0;}
 }

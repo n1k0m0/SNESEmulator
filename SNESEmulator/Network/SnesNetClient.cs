@@ -54,13 +54,38 @@ namespace SNESEmulator.Network
         private Stream _stream;
         private CancellationTokenSource _shutdown;
         private Task _receiveTask;
-        private PcmAudioOutput _audioOutput;
+        private Task _sendTask;
+        private readonly Queue<SnesNetMessage> outgoing=new();
+        private SnesNetMessage latestInput;
+        private readonly AutoResetEvent sendReady=new(false);
+        private uint inputGeneration;
+        private bool inputArmed;
+        private NetworkTimeline timeline;
+        private volatile bool hasAudioTimeline;
+        private NetworkPlayout playout;
+
+        public event Action<NetworkTimeline> TimelineChanged;
+        public event Action SessionStarted;
+        private double? AudioPlayhead(){var t=timeline;var crystal=_audioOutput?.PlayedCrystal;return t!=null&&crystal.HasValue?crystal.Value*t.ApuDenominator/t.ApuNumerator:null;}
+        public NetworkPlayout Playout=>playout;
+        public NetworkTimeline TimelineIdentity=>Volatile.Read(ref timeline);
+        public uint InputGeneration=>Volatile.Read(ref inputGeneration);
+        public int PendingSend {get{lock(_sendLock)return outgoing.Count+(latestInput==null?0:1);}}
+        private readonly object cleanupGate=new();
+        private Task deferredCleanup=Task.CompletedTask;
+        private int disposed;
+        public Task CleanupCompletion {get{lock(cleanupGate)return deferredCleanup;}}
+        public bool TasksDrained=>CleanupCompletion.IsCompleted&&(_receiveTask?.IsCompleted??true)&&(_sendTask?.IsCompleted??true);
+        public void RequireNeutral(){lock(_sendLock){inputArmed=false;latestInput=null;_lastSentJoystickState=0xffff;SendMessage(new SnesNetMessage{Sequence=inputGeneration,Type=SnesNetMessageType.InputState,Payload=SnesNetProtocol.CreateInputStatePayload(0xffff)});}}
+
+        private NetworkAudioOutput _audioOutput;
         private readonly SnesNetAudioContinuity audioContinuity=new();
         public event Action<SnesNetAudioChunk> AudioReceived;
         public long AudioDiscontinuities=>audioContinuity.Discontinuities;
         public long RejectedAudioPackets=>audioContinuity.RejectedPackets;
         public float AudioVolume {get;set;}=1;
         public bool PlayAudio {get;set;}=true;
+        public bool AudioDeviceAvailable=>_audioOutput!=null;
         /// <summary>
         /// Last joystick state sent to the server, used to suppress unchanged packets.
         /// </summary>
@@ -136,6 +161,7 @@ namespace SNESEmulator.Network
         /// Gets the latest status text shown in the network overlay.
         /// </summary>
         public string StatusText { get; private set; } = "DISCONNECTED";
+        public string SecurityStatus {get;private set;}="";
 
         /// <summary>
         /// Gets the short SHA-256 fingerprint prefix of the connected/pinned server certificate.
@@ -212,7 +238,9 @@ namespace SNESEmulator.Network
         {
             // Always start from a clean transport state. Reusing a half-closed stream can
             // otherwise leak old audio output or receive loops into the next connection.
+            ObjectDisposedException.ThrowIf(Volatile.Read(ref disposed)!=0,this);
             Disconnect();
+            SessionStarted?.Invoke();
             Interlocked.Exchange(ref _bytesSent, 0);
             Interlocked.Exchange(ref _bytesReceived, 0);
             status = string.Empty;
@@ -222,7 +250,7 @@ namespace SNESEmulator.Network
                 _relayFingerprint = "UNKNOWN";
                 _relaySessionFingerprint = "UNKNOWN";
                 _tcpClient = new TcpClient();
-                _tcpClient.NoDelay = true;
+                _tcpClient.NoDelay = true;_tcpClient.ReceiveTimeout=8000;_tcpClient.SendTimeout=2000;_tcpClient.SendBufferSize=16384;
                 Task connectTask = _tcpClient.ConnectAsync(host, port);
                 if (!connectTask.Wait(3000))
                 {
@@ -233,7 +261,7 @@ namespace SNESEmulator.Network
                 }
 
                 string tlsStatus;
-                _stream = SnesNetTls.AuthenticateClient(_tcpClient, host, port, out tlsStatus);
+                _stream = SnesNetTls.AuthenticateClient(_tcpClient, host, port, out tlsStatus);SecurityStatus=tlsStatus;
                 if (!string.IsNullOrWhiteSpace(tlsStatus))
                 {
                     StatusText = tlsStatus;
@@ -259,7 +287,7 @@ namespace SNESEmulator.Network
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                status = "CONNECT FAILED";
+                status = "CONNECT FAILED: "+ex.Message;
                 Disconnect();
                 return false;
             }
@@ -279,7 +307,9 @@ namespace SNESEmulator.Network
         /// <returns>True when the relay and host handshake completed.</returns>
         public bool ConnectRelay(string relayHost, int relayPort, string connectionId, string relayPassword, string password, SnesNetClientRole role, string name, out string status)
         {
+            ObjectDisposedException.ThrowIf(Volatile.Read(ref disposed)!=0,this);
             Disconnect();
+            SessionStarted?.Invoke();
             Interlocked.Exchange(ref _bytesSent, 0);
             Interlocked.Exchange(ref _bytesReceived, 0);
             status = string.Empty;
@@ -301,6 +331,7 @@ namespace SNESEmulator.Network
                     return false;
                 }
 
+                SecurityStatus=status;
                 _serverCertificateFingerprint = "RELAY " + _relayFingerprint + " E2E " + _relaySessionFingerprint;
                 return FinishConnect(password, role, name, out status);
             }
@@ -388,15 +419,16 @@ namespace SNESEmulator.Network
                 Role = acceptedRole;
                 Permission = permission;
                 KeyboardEnabled = keyboardEnabled;
-                StatusText = string.IsNullOrWhiteSpace(welcomeStatus) ? "CONNECTED" : welcomeStatus;
+                StatusText = (string.IsNullOrWhiteSpace(welcomeStatus) ? "CONNECTED" : welcomeStatus)+"; "+SecurityStatus;
                 _connected = true;
                 ApplyStreamTimeouts(_stream, Timeout.Infinite);
+                if(_stream.CanTimeout)_stream.WriteTimeout=2000;
 
                 try
                 {
                     // Remote clients play host audio locally. If audio initialization fails,
                     // the session can still remain useful as a silent viewer/player.
-                    if(PlayAudio)_audioOutput = new PcmAudioOutput(AudioSampleRate);
+                    if(PlayAudio)_audioOutput = new NetworkAudioOutput();
                 }
                 catch
                 {
@@ -406,7 +438,11 @@ namespace SNESEmulator.Network
                 // Receiving is backgrounded so the UI/render thread can continue drawing
                 // the last decoded frame and collecting joystick input.
                 _shutdown = new CancellationTokenSource();
-                _receiveTask = Task.Run(() => ReceiveLoop(_shutdown.Token));
+                var token=_shutdown.Token;
+                playout=new NetworkPlayout(()=>_audioOutput?.Clear(),AudioPlayhead,needsAudio:()=>_audioOutput!=null&&hasAudioTimeline&&timeline is {Paused:false,Turbo:false,Muted:false});
+                playout.Failed+=error=>{StatusText="NETWORK PLAYOUT FAILED: "+error;RaiseStatus(StatusText);};
+                _sendTask=Task.Run(()=>SendLoop(token));
+                _receiveTask = Task.Run(() => ReceiveLoop(token));
                 status = StatusText;
                 RaiseStatus(status);
                 return true;
@@ -416,7 +452,7 @@ namespace SNESEmulator.Network
                 Debug.WriteLine(ex);
                 status = TransportMode == SnesNetTransportMode.Relay && IsTimeoutException(ex)
                     ? "RELAY HOST TIMEOUT"
-                    : (TransportMode == SnesNetTransportMode.Relay ? "RELAY HOST FAILED" : "CONNECT FAILED");
+                    : (TransportMode == SnesNetTransportMode.Relay ? "RELAY HOST FAILED: " : "CONNECT FAILED: ")+ex.Message;
                 Disconnect();
                 return false;
             }
@@ -463,33 +499,23 @@ namespace SNESEmulator.Network
         /// <summary>
         /// Disconnects from the remote session.
         /// </summary>
+        private readonly object disconnectGate=new();
         public void Disconnect()
+        {
+            if(playout?.IsCurrent==true){lock(cleanupGate){if(deferredCleanup.IsCompleted)deferredCleanup=Task.Run(()=>{lock(disconnectGate)DisconnectCore();if(Volatile.Read(ref disposed)!=0)sendReady.Dispose();});}return;}
+            CleanupCompletion.GetAwaiter().GetResult();
+            lock(disconnectGate)DisconnectCore();
+        }
+        private void DisconnectCore()
         {
             CancellationTokenSource shutdown = _shutdown;
             Task receiveTask = _receiveTask;
             _shutdown = null;
+            try{_tcpClient?.Close();}catch{}
             if (shutdown != null)
             {
                 // Signal the receive loop before closing the socket; either path may win.
                 shutdown.Cancel();
-            }
-
-            try
-            {
-                if (_stream != null)
-                {
-                    // Best-effort graceful leave. Socket close below is still the real
-                    // guarantee if the peer is gone or the write fails.
-                    AddBytesSent(SnesNetProtocol.WriteMessage(_stream, new SnesNetMessage
-                    {
-                        Type = SnesNetMessageType.Disconnect,
-                        Timestamp = DateTime.UtcNow.Ticks,
-                        Payload = SnesNetProtocol.CreateTextPayload("LEAVE")
-                    }));
-                }
-            }
-            catch
-            {
             }
 
             try
@@ -520,13 +546,16 @@ namespace SNESEmulator.Network
                 {
                     // Avoid deadlocking when Disconnect is called from inside ReceiveLoop
                     // after a server-initiated disconnect message.
-                    receiveTask.Wait(250);
+                    receiveTask.GetAwaiter().GetResult();
                 }
             }
             catch
             {
             }
 
+            if(_sendTask!=null&&Task.CurrentId!=_sendTask.Id)_sendTask.GetAwaiter().GetResult();
+            playout?.Dispose();playout=null;
+            lock(_sendLock){outgoing.Clear();latestInput=null;inputGeneration=0;inputArmed=false;timeline=null;}
             if (_audioOutput != null)
             {
                 _audioOutput.Dispose();
@@ -538,7 +567,7 @@ namespace SNESEmulator.Network
                 shutdown.Dispose();
             }
 
-            _receiveTask = null;
+            _receiveTask = null;_sendTask=null;
             _stream = null;
             _tcpClient = null;
             _connected = false;
@@ -569,21 +598,19 @@ namespace SNESEmulator.Network
         /// <param name="force">True to send even when the state did not change.</param>
         public void SendJoystickState(ushort activeLowJoystickState, bool force)
         {
+            if(!_connected)return;
             activeLowJoystickState |= 0x000F;
-            if (!force && activeLowJoystickState == _lastSentJoystickState)
+            lock(_sendLock)
             {
-                // Joystick polling happens every frame; suppress unchanged packets unless
-                // the caller requests a periodic refresh.
-                return;
+                bool release=activeLowJoystickState==0xffff&&!inputArmed;
+                if(activeLowJoystickState==0xffff)inputArmed=true;
+                if(!inputArmed||Permission==SnesNetJoystickPermission.Observer)activeLowJoystickState=0xffff;
+                if(!force&&!release&&activeLowJoystickState==_lastSentJoystickState)return;
+                _lastSentJoystickState=activeLowJoystickState;
+                var message=new SnesNetMessage{Sequence=inputGeneration,Type=SnesNetMessageType.InputState,Payload=SnesNetProtocol.CreateInputStatePayload(activeLowJoystickState)};
+                if(release){if(outgoing.Count>=32)throw new IOException("Client control queue full");outgoing.Enqueue(message);SignalSend();}
+                else SendMessage(message);
             }
-
-            _lastSentJoystickState = activeLowJoystickState;
-            SendMessage(new SnesNetMessage
-            {
-                Type = SnesNetMessageType.InputState,
-                Timestamp = DateTime.UtcNow.Ticks,
-                Payload = SnesNetProtocol.CreateInputStatePayload(activeLowJoystickState)
-            });
         }
 
         /// <summary>
@@ -644,7 +671,8 @@ namespace SNESEmulator.Network
 
         public void Dispose()
         {
-            Disconnect();
+            if(Interlocked.Exchange(ref disposed,1)!=0){if(playout?.IsCurrent!=true)CleanupCompletion.GetAwaiter().GetResult();return;}
+            bool deferred=playout?.IsCurrent==true;Disconnect();if(!deferred)sendReady.Dispose();
         }
 
         /// <summary>
@@ -670,13 +698,13 @@ namespace SNESEmulator.Network
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                StatusText="NETWORK RECEIVE FAILED: "+ex.Message;Debug.WriteLine(ex);
             }
             finally
             {
                 // The window notices IsConnected == false on its next update and returns
                 // to local emulation cleanup.
-                StatusText = "DISCONNECTED";
+                if(StatusText.StartsWith("PERMISSION")||StatusText.Contains("CONNECTED"))StatusText = "SERVER DISCONNECTED";
                 _connected = false;
                 RaiseHostOverlayStatus(string.Empty);
                 RaiseStatus(StatusText);
@@ -691,27 +719,44 @@ namespace SNESEmulator.Network
         {
             switch (message.Type)
             {
+                case SnesNetMessageType.Timeline:
+                    var updated=NetworkTimeline.Decode(message.Payload);
+                    if(timeline!=null&&updated.StreamEpoch<=timeline.StreamEpoch)throw new InvalidDataException("Stale timeline");
+                    bool inputBoundary=timeline==null||updated.InputEpoch!=timeline.InputEpoch;
+                    playout.Reset(()=>{timeline=updated;hasAudioTimeline=false;TimelineChanged?.Invoke(updated);audioContinuity.Reset(false);_videoReferencePixels=null;_videoDecodePixels=null;});
+                    if(inputBoundary)RequireNeutral();break;
                 case SnesNetMessageType.VideoFrame:
-                    SnesNetVideoFrame frame = SnesNetProtocol.ReadVideoFramePayload(message.Payload, ref _videoReferencePixels, ref _videoReferenceFrameId, _videoDecodePixels);
+                    if(timeline==null||!timeline.Unwrap(message.Payload,out var videoBytes))break;
+                    SnesNetVideoFrame frame = SnesNetProtocol.ReadVideoFramePayload(videoBytes, ref _videoReferencePixels, ref _videoReferenceFrameId, null);
+                    if(frame==null)throw new InvalidDataException("Malformed VID3");
+                    if(frame.Geometry.MasterHzNumerator!=timeline.MasterNumerator||frame.Geometry.MasterHzDenominator!=timeline.MasterDenominator||frame.Geometry.ApuHzNumerator!=timeline.ApuNumerator||frame.Geometry.ApuHzDenominator!=timeline.ApuDenominator)throw new InvalidDataException("VID3 timeline rate mismatch");
                     if (frame != null)
                     {
+                        frame.Timeline=timeline;
                         _videoDecodePixels = frame.Pixels;
                         // The window owns frame storage because it must synchronize with
                         // the render thread and apply the user's local video filter.
                         Action<SnesNetVideoFrame> handler = FrameReceived;
                         if (handler != null)
                         {
-                            handler(frame);
+                            var identity=timeline;playout.Enqueue(identity.VideoSeconds(frame.Geometry.EndClock),false,()=>{if(timeline==identity)handler(frame);});
                         }
                     }
 
                     break;
                 case SnesNetMessageType.AudioChunk:
-                    if (SnesNetProtocol.ReadAudioChunkPayload(message.Payload, out var block) && audioContinuity.Accept(block,out bool flush))
+                    if(timeline==null||timeline.Paused||timeline.Turbo||timeline.Muted||!timeline.Unwrap(message.Payload,out var audioBytes))break;
+                    if((Int128)timeline.ApuNumerator!=24576000*(Int128)timeline.ApuDenominator)throw new InvalidDataException("AUD2 on unsupported source rate");
+                    if(!SnesNetProtocol.ReadAudioChunkPayload(audioBytes,out var block))throw new InvalidDataException("Malformed AUD2");
+                    if (audioContinuity.Accept(block,out bool flush))
                     {
-                        if(flush)_audioOutput?.Clear();
-                        if(_audioOutput!=null){_audioOutput.Volume=AudioVolume;_audioOutput.Write(block.Pcm,block.Pcm.Length);}
-                        AudioReceived?.Invoke(block);
+                        hasAudioTimeline=true;
+                        if(flush)playout.Reset();
+                        var identity=timeline;playout.Enqueue(identity.AudioSeconds(block.Crystal),true,()=>{
+                            if(timeline!=identity)return;
+                            if(_audioOutput!=null){_audioOutput.Volume=AudioVolume;_audioOutput.Write(block.Pcm,block.Crystal);}
+                            AudioReceived?.Invoke(block);
+                        });
                     }
 
                     break;
@@ -730,9 +775,11 @@ namespace SNESEmulator.Network
                     // Permission is authoritative from the host. The local F10 joystick
                     // item is displayed read-only while connected.
                     SnesNetProtocol.ReadPermissionPayload(message.Payload, out SnesNetJoystickPermission permission, out bool keyboardEnabled);
+                    lock(_sendLock){inputGeneration=message.Sequence;inputArmed=false;latestInput=null;_lastSentJoystickState=0xffff;}
                     Permission = permission;
                     KeyboardEnabled = keyboardEnabled;
                     StatusText = "PERMISSION " + FormatPermission(Permission) + " KEYBOARD " + (KeyboardEnabled ? "ON" : "OFF");
+                    if(SecurityStatus.Contains("RECOVERED"))StatusText+="; "+SecurityStatus;
                     RaiseStatus(StatusText);
                     break;
                 case SnesNetMessageType.HostOverlayStatus:
@@ -741,6 +788,7 @@ namespace SNESEmulator.Network
                     RaiseHostOverlayStatus(SnesNetProtocol.ReadTextPayload(message.Payload));
                     break;
                 case SnesNetMessageType.Ping:
+                    if(message.Payload.Length!=0)throw new InvalidDataException("Invalid ping");
                     // Preserve the host timestamp to make the round-trip calculation exact
                     // on the host side.
                     SendMessage(new SnesNetMessage
@@ -751,6 +799,7 @@ namespace SNESEmulator.Network
                     });
                     break;
                 case SnesNetMessageType.Pong:
+                    if(message.Payload.Length!=0)throw new InvalidDataException("Invalid pong");
                     UpdateLatency(message.Timestamp);
                     break;
                 case SnesNetMessageType.Disconnect:
@@ -758,8 +807,9 @@ namespace SNESEmulator.Network
                     RaiseStatus(StatusText);
                     // Disconnect performs the full cleanup and sends a best-effort leave;
                     // that is harmless even when the server initiated the close.
-                    Disconnect();
+                    _connected=false;_stream?.Dispose();
                     break;
+                default:throw new InvalidDataException("Unexpected server message");
             }
         }
 
@@ -767,28 +817,31 @@ namespace SNESEmulator.Network
         /// Sends one client-to-server message in a thread-safe way.
         /// </summary>
         /// <param name="message">Message to send.</param>
+        private void SignalSend(){try{sendReady.Set();}catch(ObjectDisposedException){}}
         private void SendMessage(SnesNetMessage message)
         {
-            if (_stream == null || message == null)
+            if(!_connected||message==null)return;
+            lock(_sendLock)
             {
-                return;
+                if(message.Type==SnesNetMessageType.InputState)latestInput=message;
+                else if(outgoing.Count>=32){_connected=false;StatusText="CLIENT CONTROL OVERFLOW";_stream?.Dispose();RaiseStatus(StatusText);return;}
+                else outgoing.Enqueue(message);
             }
-
+            SignalSend();
+        }
+        private void SendLoop(CancellationToken token)
+        {
             try
             {
-                lock (_sendLock)
+                while(!token.IsCancellationRequested&&_connected)
                 {
-                    // Input events and ping responses can originate from different
-                    // threads. Serialize writes so protocol frames never interleave.
-                    AddBytesSent(SnesNetProtocol.WriteMessage(_stream, message));
+                    SnesNetMessage next;
+                    lock(_sendLock){next=outgoing.Count>0?outgoing.Dequeue():latestInput;if(next==latestInput)latestInput=null;}
+                    if(next==null){sendReady.WaitOne(10);continue;}
+                    AddBytesSent(SnesNetProtocol.WriteMessage(_stream,next));
                 }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-                // Any write failure means the TCP stream is no longer usable.
-                Disconnect();
-            }
+            catch(Exception e){StatusText="NETWORK SEND FAILED: "+e.Message;_connected=false;_stream?.Dispose();RaiseStatus(StatusText);}
         }
 
         /// <summary>

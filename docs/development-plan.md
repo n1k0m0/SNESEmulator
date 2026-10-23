@@ -501,3 +501,10 @@ wurden gegen CRC/Länge/SHA256 und alle Diskoriginale erneut geprüft. Unabhäng
 M9c-Rootabnahme auf `cfe4ed2` bestanden (239 portable/10 Windows-Gruppen,
 beide nativen Probearten, 122368 Pixel/5 Checks und unveränderte Stereo-SHA). Das schließt weder M9a-Dauerleistung noch Netzwerk,
 Distribution/Manager, mehrstündigen Soak oder M9/Release insgesamt ab.
+
+M9d implementiert den versionierten LAN/TLS-/Relaybetrieb mit neutralem Rechtewechsel,
+begrenzten Queues/Ressourcen, drainbarem Shutdown, Trust-Recovery und gemessener
+Software-A/V-Zeitachse; [Netzwerkvertrag](m9-network-contract.md). Unabhängige
+M9d-Abnahme steht aus. Neue Gruppen werden zusätzlich ausgewiesen; die bisherigen
+239 portablen und10 Windows-Gruppen sowie externe Vollkorpora bleiben erhalten.
+M9a-Dauerleistung, Distribution/Manager/CI, mehrstündiger Soak und M10 bleiben offen.

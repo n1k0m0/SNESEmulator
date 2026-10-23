@@ -48,7 +48,7 @@ namespace SNESEmulator.Network
     public sealed class SnesRelayServerListener : IDisposable
     {
         private const int RelayHandshakeTimeoutMilliseconds = 8000;
-        private readonly BlockingCollection<SnesRelayAcceptedClient> _acceptedClients = new BlockingCollection<SnesRelayAcceptedClient>();
+        private readonly BlockingCollection<SnesRelayAcceptedClient> _acceptedClients = new BlockingCollection<SnesRelayAcceptedClient>(16);
         private readonly List<Task> _handshakeTasks = new List<Task>();
         private readonly object _syncRoot = new object();
         private bool _disposed;
@@ -74,6 +74,7 @@ namespace SNESEmulator.Network
         /// Gets the pinned TLS fingerprint of the relay server.
         /// </summary>
         public string RelayFingerprint { get; private set; } = "UNKNOWN";
+        public string SecurityStatus=>_connection?.SecurityStatus??"";
 
         /// <summary>
         /// Gets whether the relay server connection is active.
@@ -130,7 +131,7 @@ namespace SNESEmulator.Network
         {
             try
             {
-                return _acceptedClients.Take(cancellationToken);
+                return _acceptedClients.TryTake(out var accepted,100,cancellationToken)?accepted:null;
             }
             catch
             {
@@ -174,7 +175,7 @@ namespace SNESEmulator.Network
                 {
                     try
                     {
-                        _handshakeTasks[index].Wait(25);
+                        _handshakeTasks[index].GetAwaiter().GetResult();
                     }
                     catch
                     {
@@ -205,6 +206,7 @@ namespace SNESEmulator.Network
         private void HandleChannelOpened(SnesRelayRawStream rawStream)
         {
             CancellationToken token = _shutdown != null ? _shutdown.Token : CancellationToken.None;
+            lock(_syncRoot){_handshakeTasks.RemoveAll(t=>t.IsCompleted);if(_handshakeTasks.Count>=4){rawStream.Dispose();return;}}
             Task task = Task.Run(() =>
             {
                 try
@@ -226,7 +228,7 @@ namespace SNESEmulator.Network
                         fingerprint);
                     if (!_acceptedClients.IsAddingCompleted && !token.IsCancellationRequested)
                     {
-                        _acceptedClients.Add(accepted, token);
+                        if(!_acceptedClients.TryAdd(accepted))accepted.Dispose();
                     }
                     else
                     {
@@ -238,7 +240,7 @@ namespace SNESEmulator.Network
                     Debug.WriteLine(ex);
                     rawStream.Dispose();
                 }
-            }, token);
+            });
 
             lock (_syncRoot)
             {
@@ -353,7 +355,7 @@ namespace SNESEmulator.Network
                     encryptedStream.WriteTimeout = RelayHandshakeTimeoutMilliseconds;
                 }
 
-                status = "RELAY CONNECTED";
+                status = "RELAY CONNECTED; "+connection.SecurityStatus;
                 return new SnesRelayOwnedStream(encryptedStream, connection);
             }
             catch (IOException ex)
@@ -439,6 +441,10 @@ namespace SNESEmulator.Network
         private Task _receiveTask;
         private CancellationTokenSource _shutdown;
         private int _clientChannelId;
+        private volatile bool transportAlive;
+        private readonly object closeGate=new();
+        private readonly List<Task> closeTasks=new();
+        public string LastError {get;private set;}="";
 
         public SnesRelayConnection(bool serverSide)
         {
@@ -448,10 +454,11 @@ namespace SNESEmulator.Network
         public event Action<SnesRelayRawStream> ChannelOpened;
 
         public string RelayFingerprint { get; private set; } = "UNKNOWN";
+        public string SecurityStatus {get;private set;}="";
 
         public bool IsConnected
         {
-            get { return _tcpClient != null && _tcpClient.Connected && _stream != null; }
+            get { return transportAlive&&_tcpClient != null && _tcpClient.Connected && _stream != null; }
         }
 
         public bool Connect(string host, int port, SnesRelayRole role, string connectionId, string relayPassword, out string status)
@@ -470,7 +477,7 @@ namespace SNESEmulator.Network
                 }
 
                 string tlsStatus;
-                _stream = SnesNetTls.AuthenticateClient(_tcpClient, host, port, out tlsStatus);
+                _stream = SnesNetTls.AuthenticateClient(_tcpClient, host, port, out tlsStatus);SecurityStatus=tlsStatus;
                 ApplyStreamTimeouts(_stream, RelayControlHandshakeTimeoutMilliseconds);
                 RelayFingerprint = SnesNetTls.GetTrustedServerShortFingerprint(host, port);
                 SendFrame(SnesRelayFrameType.Register, 0, CreateRegisterPayload(role, connectionId, relayPassword));
@@ -505,9 +512,10 @@ namespace SNESEmulator.Network
                     _channels[_clientChannelId] = new SnesRelayRawStream(this, _clientChannelId);
                 }
 
-                _shutdown = new CancellationTokenSource();
+                _shutdown = new CancellationTokenSource();transportAlive=true;
                 ApplyStreamTimeouts(_stream, Timeout.Infinite);
-                ApplySocketTimeouts(_tcpClient, Timeout.Infinite);
+                if(_stream.CanTimeout)_stream.WriteTimeout=2000;
+                ApplySocketTimeouts(_tcpClient, Timeout.Infinite);_tcpClient.SendTimeout=2000;
                 _receiveTask = Task.Run(() => ReceiveLoop(_shutdown.Token));
                 status = string.IsNullOrWhiteSpace(relayStatus) ? "RELAY CONNECTED" : relayStatus;
                 return true;
@@ -556,15 +564,19 @@ namespace SNESEmulator.Network
 
         public void CloseChannel(int channelId)
         {
-            SendFrame(SnesRelayFrameType.ChannelClose, channelId, Array.Empty<byte>());
-            if (_channels.TryRemove(channelId, out SnesRelayRawStream stream))
+            if(_channels.TryRemove(channelId,out var stream))stream.MarkRemoteClosed();
+            if(!transportAlive)return;
+            lock(closeGate)
             {
-                stream.MarkRemoteClosed();
+                closeTasks.RemoveAll(t=>t.IsCompleted);
+                if(closeTasks.Count>=16){transportAlive=false;LastError="Relay close control budget exceeded";_tcpClient?.Close();return;}
+                closeTasks.Add(Task.Run(()=>{try{SendFrame(SnesRelayFrameType.ChannelClose,channelId,[]);}catch(Exception e){LastError=e.Message;transportAlive=false;_tcpClient?.Close();}}));
             }
         }
 
         public void Dispose()
         {
+            transportAlive=false;try{_tcpClient?.Close();}catch{}
             CancellationTokenSource shutdown = _shutdown;
             _shutdown = null;
             if (shutdown != null)
@@ -601,17 +613,18 @@ namespace SNESEmulator.Network
             {
             }
 
-            if (_receiveTask != null)
+            if (_receiveTask != null && Task.CurrentId!=_receiveTask.Id)
             {
                 try
                 {
-                    _receiveTask.Wait(250);
+                    _receiveTask.GetAwaiter().GetResult();
                 }
                 catch
                 {
                 }
             }
 
+            Task[] closes;lock(closeGate)closes=closeTasks.ToArray();Task.WhenAll(closes).GetAwaiter().GetResult();lock(closeGate)closeTasks.Clear();
             if (shutdown != null)
             {
                 shutdown.Dispose();
@@ -661,6 +674,7 @@ namespace SNESEmulator.Network
             }
             finally
             {
+                transportAlive=false;try{_tcpClient?.Close();}catch{}
                 foreach (KeyValuePair<int, SnesRelayRawStream> pair in _channels)
                 {
                     pair.Value.MarkRemoteClosed();
@@ -675,6 +689,7 @@ namespace SNESEmulator.Network
                 return;
             }
 
+            if(_channels.Count>=16)throw new InvalidDataException("Relay channel budget exceeded");
             var stream = new SnesRelayRawStream(this, channelId);
             if (_channels.TryAdd(channelId, stream))
             {
@@ -729,7 +744,7 @@ namespace SNESEmulator.Network
 
             int channelId = ReadInt32(header, 8);
             int payloadLength = ReadInt32(header, 12);
-            if (payloadLength < 0 || payloadLength > MaxPayloadLength)
+            if (payloadLength < 0 || payloadLength > 1024*1024+64 || header[5]<1||header[5]>8||(header[6]!=0||header[7]!=0))
             {
                 throw new InvalidDataException("Invalid relay payload length.");
             }
@@ -768,6 +783,7 @@ namespace SNESEmulator.Network
             {
                 int channelId = reader.ReadInt32();
                 status = ReadString(reader);
+                if(stream.Position!=stream.Length||channelId<0)throw new InvalidDataException("Invalid relay registration");
                 return channelId;
             }
         }
@@ -777,7 +793,7 @@ namespace SNESEmulator.Network
             using (var stream = new MemoryStream(payload ?? Array.Empty<byte>()))
             using (var reader = new BinaryReader(stream, Encoding.UTF8))
             {
-                return ReadString(reader);
+                string text=ReadString(reader);if(stream.Position!=stream.Length)throw new InvalidDataException("Trailing relay text");return text;
             }
         }
 
@@ -863,7 +879,8 @@ namespace SNESEmulator.Network
                 throw new InvalidDataException("Invalid relay string length.");
             }
 
-            return Encoding.UTF8.GetString(reader.ReadBytes(length));
+            byte[] bytes=reader.ReadBytes(length);if(bytes.Length!=length)throw new EndOfStreamException("Truncated relay string");
+            return new UTF8Encoding(false,true).GetString(bytes);
         }
 
         private static void WriteUInt16(byte[] buffer, int offset, ushort value)
@@ -910,6 +927,8 @@ namespace SNESEmulator.Network
     {
         private readonly SnesRelayConnection _connection;
         private readonly object _syncRoot = new object();
+        private int incomingBytes;
+        public int BufferedBytes {get{lock(_syncRoot)return incomingBytes;}}
         private readonly Queue<byte[]> _incoming = new Queue<byte[]>();
         private byte[] _currentReadBuffer;
         private int _currentReadOffset;
@@ -1013,7 +1032,7 @@ namespace SNESEmulator.Network
                     _currentReadOffset += chunk;
                     offset += chunk;
                     count -= chunk;
-                    copied += chunk;
+                    copied += chunk;incomingBytes-=chunk;
                     if (_currentReadOffset >= _currentReadBuffer.Length)
                     {
                         _currentReadBuffer = null;
@@ -1063,7 +1082,8 @@ namespace SNESEmulator.Network
                     return;
                 }
 
-                _incoming.Enqueue(data);
+                if(data.Length>1024*1024+64||incomingBytes+data.Length>2*1024*1024||_incoming.Count>=128)throw new InvalidDataException("Relay channel receive budget exceeded");
+                incomingBytes+=data.Length;_incoming.Enqueue(data);
                 Monitor.PulseAll(_syncRoot);
             }
         }
@@ -1238,7 +1258,7 @@ namespace SNESEmulator.Network
         private const int RecordHeaderLength = 4;
         private const int NonceLength = 12;
         private const int TagLength = 16;
-        private const int MaxPlaintextLength = 16 * 1024 * 1024;
+        private const int MaxPlaintextLength = 1024 * 1024;
         private static readonly byte[] HandshakeMagic = Encoding.ASCII.GetBytes("SnesE2E1");
         private readonly Stream _inner;
         private readonly byte[] _key;

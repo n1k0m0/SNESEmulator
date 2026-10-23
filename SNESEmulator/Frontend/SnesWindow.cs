@@ -43,12 +43,12 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private string hostMenu = "", password = "", relayPassword = "";
     private List<string> entries = [];
     private string? deletePath;
-    private uint[]? remotePixels;
+    private readonly EpochPublication<SnesNetVideoFrame> remoteVideo=new();
     private string? previewPath;
     private uint[]? savePreview;
     private bool previewBusy;
     private int previewWidth,previewHeight;
-    private int remoteWidth,remoteHeight;
+
     private readonly string? startupRom;
     private static readonly Dictionary<char, byte[]> Font = CreateOverlayFont();
     private static readonly (Key key, SnesButtons button)[] KeyboardMap =
@@ -71,11 +71,11 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         server.StatusChanged += pending.SetStatus;
         client.StatusChanged += pending.SetStatus;
         client.HostOverlayStatusChanged += s => Interlocked.Exchange(ref nextHostMenu,s);
+        client.SessionStarted += remoteVideo.Clear;
+        client.TimelineChanged += remoteVideo.Update;
         client.FrameReceived += f =>
         {
-            // The decoder reuses its buffer: publish an owned copy to the UI thread.
-            var pixels = f.Pixels.ToArray();
-            lock (client) { remotePixels = pixels; remoteWidth = f.Width; remoteHeight = f.Height; }
+            remoteVideo.Publish(f.Timeline,f);
         };
     }
     public override void OnUserInitialize()
@@ -127,7 +127,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         // GPU API consumes synchronously; retain one UI copy per completed field.
         if(field!=null&&!ReferenceEquals(drawnField,field)){drawnField=field;drawnPixels=field.Argb.ToArray();}
         uint[] pixels=field!=null?drawnPixels:[];int width=field?.Geometry.Width??256,height=field?.Geometry.Height??224;
-        if (remote) lock (client) { if (remotePixels != null) { pixels = remotePixels; width = remoteWidth; height = remoteHeight; } }
+        if(remote){var frame=remoteVideo.Read(client.TimelineIdentity);pixels=frame?.Pixels??[];width=frame?.Width??256;height=frame?.Height??224;}
         if (pixels.Length>0)
             DrawArgbPixelsGpuPresented(pixels,width,height,0,0,width,height,85,12,342,256,
                 (SharpPixelsGpuFilterMode)settings.Filter,(SharpPixelsGpuUpscaleMode)settings.Upscale,

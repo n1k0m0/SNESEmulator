@@ -81,7 +81,8 @@ namespace SNESEmulator.Network
         /// <summary>
         /// Client-to-server keyboard matrix key press or release.
         /// </summary>
-        KeyboardInput = 13
+        KeyboardInput = 13,
+        Timeline = 14
     }
 
     /// <summary>
@@ -222,6 +223,7 @@ namespace SNESEmulator.Network
         /// </summary>
         public uint[] Pixels { get; set; }
         public SNESEmulator.Core.PpuGeometry Geometry { get; set; }
+        public NetworkTimeline Timeline {get;set;}
     }
 
     /// <summary>
@@ -239,7 +241,7 @@ namespace SNESEmulator.Network
         /// <summary>
         /// Current wire protocol version accepted by host and client.
         /// </summary>
-        public const int Version = 0x534E0003;
+        public const int Version = 0x534E0004;
         /// <summary>
         /// Default TCP port shown in the network menu.
         /// </summary>
@@ -335,6 +337,8 @@ namespace SNESEmulator.Network
                 throw new InvalidDataException("Invalid SnesNet payload length.");
             }
 
+            ushort kind=ReadUInt16(header,4);
+            if(kind<1||kind>14||ReadUInt16(header,6)!=0||payloadLength>(kind==5?1024*1024+16:kind==6?16440:65536))throw new InvalidDataException("Invalid SnesNet frame type, flags or budget");
             byte[] payload = payloadLength == 0 ? EmptyPayload : new byte[payloadLength];
             if (payloadLength > 0 && !ReadExact(stream, payload, 0, payloadLength))
             {
@@ -392,6 +396,8 @@ namespace SNESEmulator.Network
                 name = ReadString(reader);
                 password = ReadString(reader);
                 role = (SnesNetClientRole)reader.ReadByte();
+                if(!Enum.IsDefined(role))throw new InvalidDataException("Invalid client role");
+                End(reader);
             }
         }
 
@@ -449,8 +455,10 @@ namespace SNESEmulator.Network
                 audioSampleRate = reader.ReadInt32();
                 role = (SnesNetClientRole)reader.ReadByte();
                 permission = (SnesNetJoystickPermission)reader.ReadByte();
-                keyboardEnabled = reader.ReadBoolean();
+                keyboardEnabled = ReadBoolean(reader);
                 status = ReadString(reader);
+                if(clientId<=0||width is not(256 or 512)||height is not(224 or 239)||audioSampleRate!=32000||!Enum.IsDefined(role)||!Enum.IsDefined(permission))throw new InvalidDataException("Invalid welcome");
+                End(reader);
             }
         }
 
@@ -479,7 +487,7 @@ namespace SNESEmulator.Network
             using (var stream = new MemoryStream(payload ?? EmptyPayload))
             using (var reader = new BinaryReader(stream, Encoding.UTF8))
             {
-                return ReadString(reader);
+                string value=ReadString(reader);End(reader);return value;
             }
         }
 
@@ -527,7 +535,7 @@ namespace SNESEmulator.Network
         {
             key = default(Key);
             pressed = false;
-            if (payload == null || payload.Length < 5)
+            if (payload == null || payload.Length != 5 || payload[4]>1)
             {
                 return false;
             }
@@ -536,8 +544,8 @@ namespace SNESEmulator.Network
             using (var reader = new BinaryReader(stream, Encoding.UTF8))
             {
                 key = (Key)reader.ReadInt32();
-                pressed = reader.ReadBoolean();
-                return true;
+                pressed = ReadBoolean(reader);
+                return Enum.IsDefined(key);
             }
         }
 
@@ -669,6 +677,7 @@ namespace SNESEmulator.Network
             using (var reader = new BinaryReader(stream, Encoding.UTF8))
             {
                 int count = reader.ReadInt32();
+                if(count<0||count>16)throw new InvalidDataException("Invalid client count");
                 for (int index = 0; index < count; index++)
                 {
                     clients.Add(new SnesNetClientSnapshot
@@ -679,14 +688,16 @@ namespace SNESEmulator.Network
                         RemoteEndpoint = ReadString(reader),
                         Role = (SnesNetClientRole)reader.ReadByte(),
                         Permission = (SnesNetJoystickPermission)reader.ReadByte(),
-                        KeyboardEnabled = reader.ReadBoolean(),
+                        KeyboardEnabled = ReadBoolean(reader),
                         JoystickState = reader.ReadUInt16(),
                         LatencyMilliseconds = reader.ReadInt32(),
-                        Connected = reader.ReadBoolean()
+                        Connected = ReadBoolean(reader)
                     });
                 }
+                End(reader);
             }
 
+            if(clients.Any(c=>c.ClientId<=0||!Enum.IsDefined(c.Role)||!Enum.IsDefined(c.Permission)))throw new InvalidDataException("Invalid client list");
             return clients;
         }
 
@@ -709,6 +720,7 @@ namespace SNESEmulator.Network
         /// <param name="keyboardEnabled">Decoded keyboard permission.</param>
         public static void ReadPermissionPayload(byte[] payload, out SnesNetJoystickPermission permission, out bool keyboardEnabled)
         {
+            if(payload==null||payload.Length!=2||payload[0]>3||payload[1]>1)throw new InvalidDataException("Invalid permission");
             permission = payload != null && payload.Length > 0
                 ? (SnesNetJoystickPermission)payload[0]
                 : SnesNetJoystickPermission.Observer;
@@ -760,6 +772,8 @@ namespace SNESEmulator.Network
         /// <param name="reader">Payload reader.</param>
         /// <returns>Decoded string.</returns>
         /// <exception cref="InvalidDataException">Thrown when the encoded string length is invalid.</exception>
+        private static bool ReadBoolean(BinaryReader reader){byte value=reader.ReadByte();if(value>1)throw new InvalidDataException("Invalid boolean");return value!=0;}
+        private static void End(BinaryReader reader){if(reader.BaseStream.Position!=reader.BaseStream.Length)throw new InvalidDataException("Trailing SnesNet bytes");}
         private static string ReadString(BinaryReader reader)
         {
             int length = reader.ReadInt32();
@@ -769,7 +783,8 @@ namespace SNESEmulator.Network
             }
 
             byte[] bytes = reader.ReadBytes(length);
-            return Encoding.UTF8.GetString(bytes);
+            if(bytes.Length!=length)throw new EndOfStreamException("Truncated SnesNet string");
+            return new UTF8Encoding(false,true).GetString(bytes);
         }
 
         /// <summary>

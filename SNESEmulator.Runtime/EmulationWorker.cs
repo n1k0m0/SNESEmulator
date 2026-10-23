@@ -7,7 +7,7 @@ namespace SNESEmulator.Runtime;
 
 public sealed record WorkerStatus(long Epoch,long Field,long MasterClock,string Title,string CartridgeHash,
     bool Paused,bool Turbo,string? Fault,int PendingCommands,int PendingOutput,long DroppedPresentation,long AppliedInputSequence,
-    long ApuHzNumerator,long ApuHzDenominator,double PacingLateSeconds=0)
+    long ApuHzNumerator,long ApuHzDenominator,double PacingLateSeconds=0,long HardwareGeneration=0,long InputEpoch=0)
 {
     public bool AudioSupported=>(Int128)ApuHzNumerator==24576000*(Int128)ApuHzDenominator;
 }
@@ -32,7 +32,7 @@ public sealed class EmulationWorker : IDisposable
     private SnesSystem machine;
     private bool paused=true,turbo,disposed,exited;
     private string? fault;
-    private long epoch=1,dropped,sequence,appliedSequence;
+    private long epoch=1,dropped,sequence,appliedSequence,hardwareGeneration,inputEpoch;
     private long deadline;
     private FieldInput input;
     private FieldOutput? latest;
@@ -69,7 +69,7 @@ public sealed class EmulationWorker : IDisposable
     // Live input is a latest-value mailbox, atomically sampled immediately before
     // the next RunFrame (including a loaded partial field). Replay uses StepAsync.
     public Task SetModeAsync(bool pause,bool fast,CancellationToken cancellation=default)=>Enqueue(()=>{
-        if(paused!=pause||turbo!=fast){paused=pause;turbo=fast;Discontinuity(true);}return true;
+        if(paused!=pause||turbo!=fast){bool inputBoundary=paused!=pause;paused=pause;turbo=fast;Discontinuity(true,inputBoundary);}return true;
     },cancellation);
     public Task InsertAsync(byte[] rom,byte[]? sram=null,string source="",CancellationToken cancellation=default)
     {
@@ -113,10 +113,10 @@ public sealed class EmulationWorker : IDisposable
         return Emulate(value,++appliedSequence);
     },cancellation);
     public bool TryDequeue(out FieldOutput? output){lock(gate){if(outputs.TryDequeue(out var found)){output=found;return true;}output=null;return false;}}
-    private void Discontinuity(bool keepFrame=false)
+    private void Discontinuity(bool keepFrame=false,bool inputBoundary=true)
     {
-        epoch++;machine.Bus.Apu.Dsp.ClearPresentation();
-        lock(gate){outputs.Clear();input=default;sequence++;}
+        epoch++;if(!keepFrame)hardwareGeneration++;if(inputBoundary)inputEpoch++;machine.Bus.Apu.Dsp.ClearPresentation();
+        lock(gate){outputs.Clear();if(inputBoundary){input=default;sequence++;}}
         if(!keepFrame)Volatile.Write(ref latest,null);pacer.Rebase(clock.Timestamp);
         PublishStatus();
     }
@@ -134,7 +134,7 @@ public sealed class EmulationWorker : IDisposable
     }
     private void PublishStatus()
     {
-        lock(gate)Volatile.Write(ref status,new(epoch,machine.Frames,machine.Clock.Now,machine.Bus.Cartridge?.Title??"",machine.Bus.Cartridge?.Hash??"",paused,turbo,fault,commands.Count,outputs.Count,dropped,appliedSequence,machine.Profile.ApuHzNumerator,machine.Profile.ApuHzDenominator,paused?0:(clock.Timestamp-deadline)/(double)clock.Frequency));
+        lock(gate)Volatile.Write(ref status,new(epoch,machine.Frames,machine.Clock.Now,machine.Bus.Cartridge?.Title??"",machine.Bus.Cartridge?.Hash??"",paused,turbo,fault,commands.Count,outputs.Count,dropped,appliedSequence,machine.Profile.ApuHzNumerator,machine.Profile.ApuHzDenominator,paused?0:(clock.Timestamp-deadline)/(double)clock.Frequency,hardwareGeneration,inputEpoch));
     }
     private void Run()
     {

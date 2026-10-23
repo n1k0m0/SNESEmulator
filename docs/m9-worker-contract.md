@@ -43,9 +43,11 @@ machine retains its deadline debt and executes every hardware tick; it never
 skips CPU/PPU/DSP work to catch up. The UI shows lateness over250ms, derived each
 draw so it clears when caught up. `UI FPS` explicitly names the window rate.
 
-Mode transitions (pause/resume/turbo), reset, load and cartridge replacement
-start new host epochs, rebase host pacing, neutralize the host input mailbox
-and clear queued presentation/audio history. Pause/turbo retain the last owned
+Pause/resume, reset, load and cartridge replacement start new host epochs,
+rebase host pacing and neutralize the host input mailbox. M9d additionally gives
+hardware/input discontinuities explicit identities; pure turbo retains held input
+while changing its pacing/presentation epoch. All these boundaries
+clear queued presentation/audio history. Pause/turbo retain the last owned
 image for overlays; reset/load/ROM replacement invalidate old images. Epochs
 and host queues are not hardware savestate fields. Load/Capture therefore
 preserves even held controller hardware bytes exactly until the next defined
@@ -68,10 +70,9 @@ then learns one raw control, and Delete clears a binding. Focus/device/config/
 port transitions require neutral before new actions. Background input cannot
 open menus or capture controls. Menu-era held buttons stay suppressed until
 released. Keyboard/gamepad local input is neutral in menus/background; remote
-client sends neutral immediately. The existing server permission/disconnect transport path is retained and its
-prior integration cases still run. M9b does not comprehensively validate that
-path: the known revoke/regrant held-input gap remains open for the later
-network package.
+client sends neutral immediately. The prior integration cases still run. M9d closes the revoke/regrant held-input
+gap with generation-tagged input and a fresh neutral-release boundary; see
+[the network contract](m9-network-contract.md), pending independent root review.
 
 ## Video/audio handoff and limits
 

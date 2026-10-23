@@ -44,7 +44,11 @@ from typing import Dict, Optional
 MAGIC = 0x52534E53  # "SNSR" in little-endian bytes
 VERSION = 1
 HEADER = struct.Struct("<IBBHIi")
-MAX_PAYLOAD = 16 * 1024 * 1024
+MAX_PAYLOAD = 1024 * 1024 + 64
+MAX_CONNECTIONS = 64
+MAX_SESSIONS = 16
+MAX_CLIENTS_PER_SESSION = 16
+active_connections = 0
 
 # Relay frame types. Register/RegisterOk are the relay handshake; channel frames
 # are opaque transport frames after a client has been paired with a host.
@@ -62,6 +66,8 @@ ROLE_CLIENT = 2
 
 RELAY_PASSWORD_FAILURE_LIMIT = 3
 RELAY_PASSWORD_BLOCK_SECONDS = 30 * 60
+AUTH_ENTRY_BUDGET = 1024
+AUTH_ENTRY_TTL_SECONDS = 30 * 60
 
 
 @dataclass
@@ -98,6 +104,7 @@ class RelayAuthFailure:
     """In-memory relay-password failure state for one remote IP address."""
 
     failures: int = 0
+    last_failure: float = 0.0
     blocked_until: float = 0.0
 
 
@@ -136,12 +143,16 @@ def parse_register(payload: bytes) -> tuple[int, int, str, str]:
     if len(payload) < 5:
         raise ValueError("short register payload")
     version, role = struct.unpack_from("<iB", payload, 0)
+    if role not in (ROLE_SERVER, ROLE_CLIENT):
+        raise ValueError("invalid relay role")
     connection_id, offset = read_string(payload, 5)
     password = ""
     if offset < len(payload):
         password, offset = read_string(payload, offset)
     if offset != len(payload):
         raise ValueError("trailing register payload")
+    if len(connection_id) > 128 or len(password) > 128:
+        raise ValueError("relay text budget exceeded")
     return version, role, normalize_connection_id(connection_id), password
 
 
@@ -210,7 +221,7 @@ async def read_frame(reader: asyncio.StreamReader) -> Optional[RelayFrame]:
         return None
 
     magic, version, frame_type, _flags, channel_id, payload_length = HEADER.unpack(header)
-    if magic != MAGIC or version != VERSION:
+    if magic != MAGIC or version != VERSION or _flags != 0 or frame_type not in range(1, 9):
         raise ValueError("invalid relay frame header")
     if payload_length < 0 or payload_length > MAX_PAYLOAD:
         raise ValueError("invalid relay payload length")
@@ -229,7 +240,7 @@ async def send_frame(writer: asyncio.StreamWriter, frame_type: int, channel_id: 
     writer.write(HEADER.pack(MAGIC, VERSION, frame_type, 0, channel_id, len(payload)))
     if payload:
         writer.write(payload)
-    await writer.drain()
+    await asyncio.wait_for(writer.drain(), 2.0)
 
 
 async def close_writer(writer: asyncio.StreamWriter) -> None:
@@ -237,9 +248,9 @@ async def close_writer(writer: asyncio.StreamWriter) -> None:
 
     try:
         writer.close()
-        await writer.wait_closed()
+        await asyncio.wait_for(writer.wait_closed(), 2.0)
     except Exception:
-        pass
+        writer.transport.abort()
 
 
 async def reject(writer: asyncio.StreamWriter, reason: str) -> None:
@@ -251,11 +262,18 @@ async def reject(writer: asyncio.StreamWriter, reason: str) -> None:
         await close_writer(writer)
 
 
+def prune_auth_entries(now: float) -> None:
+    for address, state in list(relay_auth_failures.items()):
+        if now - state.last_failure >= AUTH_ENTRY_TTL_SECONDS and state.blocked_until <= now:
+            relay_auth_failures.pop(address, None)
+
+
 async def get_relay_auth_block_seconds(remote_address: str) -> int:
     """Return remaining block time for a remote IP, or zero when it may try again."""
 
     now = time.monotonic()
     async with relay_auth_lock:
+        prune_auth_entries(now)
         state = relay_auth_failures.get(remote_address)
         if state is None or state.blocked_until <= 0:
             return 0
@@ -270,13 +288,18 @@ async def record_bad_relay_password(remote_address: str, endpoint: str, role: in
 
     now = time.monotonic()
     async with relay_auth_lock:
+        prune_auth_entries(now)
         state = relay_auth_failures.get(remote_address)
         if state is None or (state.blocked_until > 0 and state.blocked_until <= now):
-            state = RelayAuthFailure()
+            if state is None and len(relay_auth_failures) >= AUTH_ENTRY_BUDGET:
+                logger.warning("relay auth entry budget exhausted; unknown address rejected")
+                return True
+            state = RelayAuthFailure(last_failure=now)
             relay_auth_failures[remote_address] = state
         if state.blocked_until > now:
             return True
 
+        state.last_failure = now
         state.failures += 1
         if state.failures >= RELAY_PASSWORD_FAILURE_LIMIT:
             state.blocked_until = now + RELAY_PASSWORD_BLOCK_SECONDS
@@ -309,7 +332,25 @@ async def clear_relay_auth_failures(remote_address: str) -> None:
         relay_auth_failures.pop(remote_address, None)
 
 
-async def handle_connection(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, relay_password: str) -> None:
+async def handle_connection(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, relay_password: str, context: ssl.SSLContext) -> None:
+    global active_connections
+    if active_connections >= MAX_CONNECTIONS:
+        logger.warning("preTLS connection budget exceeded")
+        await close_writer(writer)
+        return
+    active_connections += 1
+    logger.info("TLS admitted active=%s", active_connections)
+    try:
+        await writer.start_tls(context, ssl_handshake_timeout=8.0)
+        await handle_connection_owned(reader, writer, relay_password)
+    except (ConnectionError, OSError, asyncio.TimeoutError):
+        await close_writer(writer)
+    finally:
+        active_connections -= 1
+        logger.info("TLS closed active=%s", active_connections)
+
+
+async def handle_connection_owned(reader: asyncio.StreamReader, writer: asyncio.StreamWriter, relay_password: str) -> None:
     """Handle a newly accepted TLS connection until it becomes host or client."""
 
     endpoint = peer_name(writer)
@@ -327,7 +368,7 @@ async def handle_connection(reader: asyncio.StreamReader, writer: asyncio.Stream
                 await close_writer(writer)
                 return
 
-        frame = await read_frame(reader)
+        frame = await asyncio.wait_for(read_frame(reader), 8.0)
         if frame is None or frame.frame_type != REGISTER:
             await reject(writer, "BAD RELAY HELLO")
             return
@@ -370,6 +411,9 @@ async def handle_server(
     # The connection id is the rendezvous key. Allowing two hosts to own the
     # same id would make client routing ambiguous, so the second host is rejected.
     async with sessions_lock:
+        if len(sessions) >= MAX_SESSIONS:
+            await reject(writer, "SESSION BUDGET EXCEEDED")
+            return
         if connection_id in sessions:
             await reject(writer, "CONNECTION ID IN USE")
             return
@@ -426,6 +470,9 @@ async def handle_client(
         session = sessions.get(connection_id)
         if session is None:
             await reject(writer, "NO SERVER FOR ID")
+            return
+        if len(session.clients) >= MAX_CLIENTS_PER_SESSION:
+            await reject(writer, "CLIENT BUDGET EXCEEDED")
             return
         # Channel ids are host-local. They let one server connection multiplex
         # arbitrarily many client streams through the same relay registration.
@@ -565,8 +612,8 @@ async def main() -> None:
     context.load_cert_chain(certfile=os.fspath(cert_path), keyfile=os.fspath(key_path))
 
     relay_password = args.password or ""
-    handler = lambda reader, writer: handle_connection(reader, writer, relay_password)
-    server = await asyncio.start_server(handler, args.host, args.port, ssl=context)
+    handler = lambda reader, writer: handle_connection(reader, writer, relay_password, context)
+    server = await asyncio.start_server(handler, args.host, args.port, limit=64 * 1024)
     logger.info(
         "listening on %s:%s tls cert=%s relay_password=%s",
         args.host,

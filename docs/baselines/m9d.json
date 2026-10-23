@@ -1,0 +1,25 @@
+{
+  "milestone": "M9d",
+  "status": "Implementation prepared; final clean-commit gate and independent root acceptance pending. M9/release incomplete.",
+  "implementationCommit": null,
+  "wireVersion": "0x534e0004",
+  "stateFormat": 9,
+  "codecPayloads": "VID3/AUD2 unchanged within explicit epoch envelope",
+  "previousPortable": 239,
+  "newPortableNetwork": 14,
+  "newPortableRelayContract": 3,
+  "expectedPortableTotal": 256,
+  "previousWindows": 10,
+  "newSocketTlsRelayDriverGroups": 13,
+  "expectedWindowsTotal": 23,
+  "rootAcceptance": "pending",
+  "knownLimits": [
+    "18 M8 whole-console audio rows remain red",
+    "7000 raw SPC indirect-Y bus mismatches retain source adjudication",
+    "M9a sustained NTSC38/62 below1x; PAL sustained unexecuted",
+    "Software/driver A/V publication boundary, no physical DAC/display latency measurement",
+    "Linear remote3:2 presentation resampler differs from local WDL; native samples unchanged",
+    "No physical SNES/gamepad/OS focus/cleanVM/hours-long soak claim",
+    "Distribution/Manager/CI and M10 remain open; publish is PRE-M0"
+  ]
+}

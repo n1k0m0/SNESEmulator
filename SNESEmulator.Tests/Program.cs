@@ -2,16 +2,33 @@ using SNESEmulator.Network;
 using SNESEmulator.Core;
 using SNESEmulator.SaveStates;
 
+if(args.Length==7&&args[0]=="--network-persist-worker")
+{
+    Environment.SetEnvironmentVariable("SNESEMULATOR_DATA_DIR",args[1]);
+    File.WriteAllText(args[5]+".ready","ready");
+    if(!SpinWait.SpinUntil(()=>File.Exists(args[4]),5000))return 2;
+    SnesNetTls.ReplaceTrustedServerCertificate(args[2],1991,args[3]);
+    File.WriteAllText(args[5]+".pin-done","ready");
+    if(!SpinWait.SpinUntil(()=>File.Exists(args[4]+".cert"),5000))return 3;
+    File.WriteAllText(args[5],SnesNetTls.GetServerCertificateFingerprint());return 0;
+}
 string testRoot=Path.Combine(Path.GetTempPath(),"SNESEmulator-tests-"+Guid.NewGuid().ToString("N"));
 Environment.SetEnvironmentVariable("SNESEMULATOR_DATA_DIR",testRoot);
 Directory.CreateDirectory(testRoot);
-var report = new SNESEmulator.Testing.TestReport("windows-integration");
+var report = new SNESEmulator.Testing.TestReport(args.Contains("--network-only")?"network-windows-conformance":"windows-integration");
 int passed=0,failed=0;
 void Check(bool value,string message="Assertion failed") { if(!value) throw new Exception(message); }
 void Test(string name,Action test)
 {
-    try { test(); passed++; report.Add(name,"pass"); Console.WriteLine("PASS "+name); }
-    catch(Exception e) { failed++; report.Add(name,"fail",e.ToString()); Console.WriteLine("FAIL "+name+": "+e); }
+    var timer=System.Diagnostics.Stopwatch.StartNew();
+    try { test(); passed++; report.Add(name,"pass",seconds:timer.Elapsed.TotalSeconds); Console.WriteLine("PASS "+name); }
+    catch(Exception e) { failed++; report.Add(name,"fail",e.ToString(),timer.Elapsed.TotalSeconds); Console.WriteLine("FAIL "+name+": "+e); }
+}
+if(args.Contains("--network-only"))
+{
+    report.Metadata["dataDirectory"]=testRoot;
+    NetworkTests.Run((name,body)=>{var filter=args.FirstOrDefault(a=>a.StartsWith("--filter="))?[9..];if(filter==null||name.Contains(filter,StringComparison.OrdinalIgnoreCase))Test(name,body);},testRoot);report.Metadata["limits"]="Own real localhost TLS/Relay sockets; software driver boundaries; no physical input/DAC/console or external relay";
+    report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9d-network-windows");return failed==0?0:1;
 }
 Test("Network video retains all 32768 SNES colors",()=>
 {
@@ -51,6 +68,7 @@ void VideoMatrix(SnesNetServer host,params SnesNetClient[] clients)
         uint[] pixels=Enumerable.Range(0,width*height).Select(i=>unchecked((uint)(i*17011+change*112233))).ToArray();
         using var received=new CountdownEvent(clients.Length);var handlers=new List<Action<SnesNetVideoFrame>>();
         foreach(var client in clients){Action<SnesNetVideoFrame> handler=f=>{if(f.Geometry==geometry&&f.Pixels.SequenceEqual(pixels))received.Signal();};handlers.Add(handler);client.FrameReceived+=handler;}
+        host.UpdateTimeline(change,geometry.MasterHzNumerator,geometry.MasterHzDenominator,geometry.ApuHzNumerator,geometry.ApuHzDenominator,false,false,false);
         host.BroadcastVideoFrame(new PpuFrame(geometry,new ushort[pixels.Length],new byte[pixels.Length],pixels));Check(received.Wait(3000),$"geometry transition{change}");
         for(int i=0;i<clients.Length;i++)clients[i].FrameReceived-=handlers[i];
     }
@@ -103,6 +121,7 @@ Test("TLS host/client, permission, input, video, disconnect",()=>
     Check(server.GetAggregatedJoystickState(SnesNetJoystickPermission.Port2)==65535);
     server.SetClientPermission(id,SnesNetJoystickPermission.Port2);
     Check(SpinWait.SpinUntil(()=>client.Permission==SnesNetJoystickPermission.Port2,3000));
+    client.SendJoystickState(65535,true);
     client.SendJoystickState((ushort)(65535 ^ (ushort)(SnesButtons.A|SnesButtons.L)),true);
     Check(SpinWait.SpinUntil(()=>server.GetAggregatedJoystickState(SnesNetJoystickPermission.Port2)==(ushort)(65535 ^ (ushort)(SnesButtons.A|SnesButtons.L)),3000));
     Check(server.GetAggregatedJoystickState(SnesNetJoystickPermission.Port1)==65535);
@@ -148,7 +167,7 @@ Test("Python relay TLS + end-to-end session + full controller input",()=>
         Check(SpinWait.SpinUntil(()=>host.GetClientSnapshots().Count==2,3000));
         host.SetClientPermission(host.GetClientSnapshots()[0].ClientId,SnesNetJoystickPermission.Port1);
         Check(SpinWait.SpinUntil(()=>client.Permission==SnesNetJoystickPermission.Port1,3000));
-        ushort buttons=(ushort)(65535 ^ (ushort)(SnesButtons.X|SnesButtons.R));client.SendJoystickState(buttons,true);
+        ushort buttons=(ushort)(65535 ^ (ushort)(SnesButtons.X|SnesButtons.R));client.SendJoystickState(65535,true);client.SendJoystickState(buttons,true);
         Check(SpinWait.SpinUntil(()=>host.GetAggregatedJoystickState(SnesNetJoystickPermission.Port1)==buttons,3000));
         using var received=new ManualResetEventSlim();client.FrameReceived+=f=>{if(f.Pixels[0]==0xFFABCDEF) received.Set();};
         host.BroadcastVideoFrame(Enumerable.Repeat(0xFFABCDEFu,256*224).ToArray(),256,224);

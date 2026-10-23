@@ -20,7 +20,8 @@ internal sealed class HostPresentation : IDisposable
     {
         pump=Task.Run(async()=>{
             PcmAudioOutput? audio=null;bool attempted=false;
-            var handoff=new PresentationHandoff(server.BroadcastVideoFrame,output=>{
+            var network=new IsolatedNetworkPresentation(status=>server.UpdateHostStatus(status),(field,read)=>server.BroadcastOutput(field,read),message);
+            var handoff=new PresentationHandoff(_=>{},output=>{
                 if(!attempted){attempted=true;try{audio=new PcmAudioOutput(32000);}catch(Exception e){message("AUDIO DEVICE UNAVAILABLE: "+e.Message);}}
                 if(audio!=null)audio.Volume=Volume;
                 var samples=output.Audio;
@@ -30,7 +31,7 @@ internal sealed class HostPresentation : IDisposable
                     for(int i=0;i<count;i++){var sample=samples.Span[offset+i];BinaryPrimitives.WriteInt16LittleEndian(pcm.AsSpan(i*4),sample.Left);BinaryPrimitives.WriteInt16LittleEndian(pcm.AsSpan(i*4+2),sample.Right);}
                     if(output.Epoch!=worker.Status.Epoch){audio?.Clear();break;}
                     // A network encoder failure cannot stop the local device.
-                    try{server.BroadcastAudio(pcm,pcm.Length,samples.Span[offset].Index,samples.Span[offset].Crystal);}catch(Exception e){message("NETWORK AUDIO FAILED: "+e.Message);}
+
                     if(audio!=null)try{audio.Write(pcm,pcm.Length);}catch(Exception e){audio.Dispose();audio=null;message("LOCAL AUDIO MUTED: "+e.Message);}
                 }
             },()=>audio?.Clear(),message);
@@ -38,12 +39,14 @@ internal sealed class HostPresentation : IDisposable
             {
                 while(!stop.IsCancellationRequested)
                 {
+                    network.Update(worker.Status);
                     handoff.UpdateEpoch(worker.Status.Epoch);
                     if(!worker.TryDequeue(out var output)){await Task.Delay(3,stop.Token);continue;}
                     if(output!.Epoch!=previousEpoch||previousEnd>=0&&previousEnd!=output.Video.Geometry.StartClock)Interlocked.Increment(ref discontinuities);
                     previousEpoch=output.Epoch;previousEnd=output.Video.Geometry.EndClock;
                     Interlocked.Increment(ref frames);Interlocked.Add(ref samplePairs,output.Audio.Length);
                     if(output.CatchingUp)Interlocked.Increment(ref mutedCatchupFields);
+                    network.Present(output!,()=>worker.Status);
                     handoff.Present(output!,worker.Status.Epoch);
                     Volatile.Write(ref bufferedBytes,audio?.BufferedBytes??0);Interlocked.Exchange(ref deviceOverflows,audio?.Overflows??0);
                 }

@@ -170,3 +170,11 @@ nur bei unveränderter Epoche. Format9/VID3/AUD2 bleiben erhalten. Der volle Gat
 auf `ed62a20` besteht; M9c wurde unabhängig auf `cfe4ed2` abgenommen. Siehe
 [Persistenzvertrag](m9-persistence-contract.md) und [Baseline](baselines/m9c.json).
 M9a-Dauerleistung, Netzwerk, aktuelle Distribution und M9/Release bleiben offen.
+
+M9d ergänzt Protokoll4 mit unveränderten VID3/AUD2-Codecbytes in expliziten
+Konsolen-/Streamepochen, atomaren Rechte-/Neutralgrenzen, begrenzten Transport-
+und Handshake-Ressourcen, drainbaren Tasks und atomarer Pin-/Zertifikatspersistenz.
+A/V wird an einer ausdrücklich begrenzten Software-/Drivergrenze gemessen;
+physischer DAC und Displaytransport bleiben ungemessen. Hardware-/Inputgenerationen
+sind Worker-Metadaten außerhalb von Format9. Siehe [Netzwerkvertrag](m9-network-contract.md).
+Unabhängige M9d-Abnahme, Distribution und M9/Release bleiben offen.

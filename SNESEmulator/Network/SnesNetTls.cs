@@ -51,6 +51,10 @@ namespace SNESEmulator.Network
         private static readonly object CertificateSyncRoot = new object();
         private static readonly object TrustSyncRoot = new object();
         private static X509Certificate2 _serverCertificate;
+        private static string certificatePath;
+        private static bool recoveredTrust;
+        public static string TrustStatus {get;private set;}="";
+        public static string ServerCertificateStatus {get;private set;}="";
 
         /// <summary>
         /// Authenticates an accepted server-side socket as TLS before SnesNet framing begins.
@@ -149,6 +153,7 @@ namespace SNESEmulator.Network
             string trustKey = BuildTrustKey(host, port);
             lock (TrustSyncRoot)
             {
+                using var transaction=AcquireTransaction(GetTrustedCertificatesPath());
                 NetworkTrustFile trustFile = LoadTrustFile();
                 if (trustFile.PinnedCertificates.TryGetValue(trustKey, out string fingerprint))
                 {
@@ -177,7 +182,7 @@ namespace SNESEmulator.Network
         /// <param name="fingerprint">New full SHA-256 certificate fingerprint to pin.</param>
         public static void ReplaceTrustedServerCertificate(string host, int port, string fingerprint)
         {
-            if (string.IsNullOrWhiteSpace(fingerprint))
+            if (fingerprint==null||fingerprint.Length!=64||!fingerprint.All(Uri.IsHexDigit))
             {
                 throw new ArgumentException("A certificate fingerprint is required.", nameof(fingerprint));
             }
@@ -185,6 +190,7 @@ namespace SNESEmulator.Network
             string trustKey = BuildTrustKey(host, port);
             lock (TrustSyncRoot)
             {
+                using var transaction=AcquireTransaction(GetTrustedCertificatesPath());
                 NetworkTrustFile trustFile = LoadTrustFile();
                 trustFile.PinnedCertificates[trustKey] = fingerprint.Trim().ToUpperInvariant();
                 SaveTrustFile(trustFile);
@@ -199,39 +205,24 @@ namespace SNESEmulator.Network
         {
             lock (CertificateSyncRoot)
             {
-                if (_serverCertificate != null && _serverCertificate.HasPrivateKey)
+                string path=GetServerCertificatePath();
+                using var transaction=AcquireTransaction(path);
+                if(_serverCertificate!=null&&certificatePath==path)return _serverCertificate;
+                bool Valid(byte[] data){try{using var c=X509CertificateLoader.LoadPkcs12(data,(string)null,X509KeyStorageFlags.EphemeralKeySet);return c.HasPrivateKey;}catch(CryptographicException){return false;}}
+                byte[] bytes;
+                if(File.Exists(path)||File.Exists(path+".bak"))
                 {
-                    return _serverCertificate;
+                    bytes=AtomicFile.Read(path,65536,Valid,out bool recovery);
+                    ServerCertificateStatus=recovery?"TLS CERTIFICATE RECOVERED FROM BACKUP":"TLS CERTIFICATE VALID";
                 }
-
-                string path = GetServerCertificatePath();
-                try
+                else
                 {
-                    if (File.Exists(path))
-                    {
-                        var certificate = X509CertificateLoader.LoadPkcs12(
-                            File.ReadAllBytes(path),
-                            (string)null,
-                            X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.Exportable,
-                            null);
-                        if (certificate.HasPrivateKey && certificate.NotAfter > DateTime.UtcNow.AddDays(7))
-                        {
-                            _serverCertificate = certificate;
-                            return _serverCertificate;
-                        }
-
-                        certificate.Dispose();
-                    }
+                    using var created=CreateServerCertificate();bytes=created.Export(X509ContentType.Pfx);ServerCertificateStatus="TLS CERTIFICATE CREATED";
+                    AtomicFile.Write(path,stream=>stream.Write(bytes),candidate=>Valid(AtomicFile.ReadBytes(candidate,65536)));
                 }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                }
-
-                _serverCertificate = CreateServerCertificate();
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
-                File.WriteAllBytes(path, _serverCertificate.Export(X509ContentType.Pfx));
-                return _serverCertificate;
+                _serverCertificate?.Dispose();
+                _serverCertificate=X509CertificateLoader.LoadPkcs12(bytes,(string)null,X509KeyStorageFlags.UserKeySet|X509KeyStorageFlags.Exportable);
+                certificatePath=path;return _serverCertificate;
             }
         }
 
@@ -300,12 +291,13 @@ namespace SNESEmulator.Network
             string trustKey = BuildTrustKey(host, port);
             lock (TrustSyncRoot)
             {
+                using var transaction=AcquireTransaction(GetTrustedCertificatesPath());
                 NetworkTrustFile trustFile = LoadTrustFile();
                 if (trustFile.PinnedCertificates.TryGetValue(trustKey, out string pinnedFingerprint))
                 {
                     if (string.Equals(pinnedFingerprint, fingerprint, StringComparison.OrdinalIgnoreCase))
                     {
-                        status = "TLS PIN OK " + FormatShortFingerprint(fingerprint);
+                        status = (recoveredTrust?"TLS TRUST RECOVERED; ":"")+"TLS PIN OK " + FormatShortFingerprint(fingerprint);
                         return true;
                     }
 
@@ -314,6 +306,7 @@ namespace SNESEmulator.Network
                     return false;
                 }
 
+                if(recoveredTrust){pinChange=new SnesNetTlsPinChange(host,port,"UNKNOWN AFTER TRUST RECOVERY",fingerprint);status="TLS TRUST RECOVERY: UNKNOWN ENDPOINT REQUIRES REVIEW";return false;}
                 trustFile.PinnedCertificates[trustKey] = fingerprint;
                 SaveTrustFile(trustFile);
                 status = "TLS PINNED " + FormatShortFingerprint(fingerprint);
@@ -368,38 +361,34 @@ namespace SNESEmulator.Network
         /// <returns>Trust file with a non-null pin dictionary.</returns>
         private static NetworkTrustFile LoadTrustFile()
         {
-            string path = GetTrustedCertificatesPath();
+            string path=GetTrustedCertificatesPath();recoveredTrust=false;
+            if(!File.Exists(path)&&!File.Exists(path+".bak"))return new NetworkTrustFile();
+            var bytes=AtomicFile.Read(path,65536,ValidTrust,out recoveredTrust);
+            TrustStatus=recoveredTrust?"TLS TRUST RECOVERED FROM BACKUP":"TLS TRUST VALID";
+            var file=JsonSerializer.Deserialize<NetworkTrustFile>(bytes,new JsonSerializerOptions{MaxDepth=8});file.PinnedCertificates=new(file.PinnedCertificates,StringComparer.OrdinalIgnoreCase);return file;
+        }
+        private static FileStream AcquireTransaction(string path)
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            var timer=Stopwatch.StartNew();
+            while(true){try{return new FileStream(path+".transaction.lock",FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None);}
+                catch(IOException)when(timer.ElapsedMilliseconds<3000){System.Threading.Thread.Sleep(10);}}
+        }
+        private static bool ValidTrust(byte[] bytes)
+        {
             try
             {
-                if (File.Exists(path))
-                {
-                    string json = File.ReadAllText(path);
-                    NetworkTrustFile trustFile = JsonSerializer.Deserialize<NetworkTrustFile>(json);
-                    if (trustFile != null)
-                    {
-                        trustFile.EnsureInitialized();
-                        return trustFile;
-                    }
-                }
+                var value=JsonSerializer.Deserialize<NetworkTrustFile>(bytes,new JsonSerializerOptions{MaxDepth=8});
+                return value!=null&&value.Version==1&&value.PinnedCertificates!=null&&value.PinnedCertificates.Count<=256&&value.PinnedCertificates.Keys.Distinct(StringComparer.OrdinalIgnoreCase).Count()==value.PinnedCertificates.Count&&
+                    value.PinnedCertificates.All(p=>p.Key.Length is >0 and <=512&&p.Value!=null&&p.Value.Length==64&&p.Value.All(Uri.IsHexDigit));
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-            }
-
-            return new NetworkTrustFile();
+            catch(JsonException){return false;}
         }
-
-        /// <summary>
-        /// Saves the trust-on-first-use certificate pin file.
-        /// </summary>
-        /// <param name="trustFile">Trust file to persist.</param>
         private static void SaveTrustFile(NetworkTrustFile trustFile)
         {
-            string path = GetTrustedCertificatesPath();
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            File.WriteAllText(path, JsonSerializer.Serialize(trustFile, options));
+            byte[] bytes=JsonSerializer.SerializeToUtf8Bytes(trustFile,new JsonSerializerOptions{WriteIndented=true});
+            if(bytes.Length>65536||!ValidTrust(bytes))throw new InvalidDataException("TLS trust budget/format exceeded");
+            AtomicFile.Write(GetTrustedCertificatesPath(),stream=>stream.Write(bytes),candidate=>ValidTrust(AtomicFile.ReadBytes(candidate,65536)));
         }
 
         /// <summary>

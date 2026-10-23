@@ -15,6 +15,8 @@ public sealed class UiMailbox(int capacity=16) : IDisposable
     {
         await slots.WaitAsync(cancellation).ConfigureAwait(false);completions.Enqueue(action);
     }
+    public Task PostOutcomeAsync(Action action,Func<string> visibleStatus,CancellationToken cancellation=default)
+        =>PostAsync(()=>{action();SetStatus(visibleStatus());},cancellation);
     public void Drain()
     {
         for(int i=0;i<capacity;i++){if(!completions.TryDequeue(out var action))break;slots.Release();action();}

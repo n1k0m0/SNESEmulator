@@ -7,6 +7,7 @@ public sealed partial class SnesWindow
 {
     private SnesNetTlsPinChange? pinChange;
     private bool retryHost;
+    private string hostFingerprint="UNKNOWN";
     private string[] NetworkRows()
     {
         var clients=server.GetClientSnapshots();
@@ -28,12 +29,12 @@ public sealed partial class SnesWindow
             "RELAY PORT       "+settings.RelayPort,
             "CONNECTION ID    "+settings.ConnectionId,
             "RELAY PASSWORD   "+(relayPassword.Length==0?"NONE":new string('*',relayPassword.Length)),
-            "CERTIFICATE      "+(pinChange==null?client.ServerCertificateFingerprint:"CHANGED - ENTER TO REVIEW")
+            "CERTIFICATE      "+(pinChange==null?(settings.Relay?(server.IsRunning?server.RelayFingerprint:client.RelayFingerprint):(server.IsRunning?hostFingerprint:client.ServerCertificateFingerprint))+(client.SecurityStatus.Contains("RECOVERED")?" RECOVERED":""):"CHANGED - ENTER TO REVIEW")
         ];
     }
     private void ActivateNetwork(int direction)
     {
-        if(busy) { status="NETWORK CONNECTION IN PROGRESS"; return; }
+        if(busy) { status="NETWORK OPERATION IN PROGRESS"; return; }
         var clients=server.GetClientSnapshots();
         var chosen=clients.Count>0?clients[Math.Clamp(selectedClient,0,clients.Count-1)]:null;
         switch(selection)
@@ -41,7 +42,7 @@ public sealed partial class SnesWindow
             case 0: if(!server.IsRunning && !client.IsConnected) settings.Relay=!settings.Relay; break;
             case 1: settings.Port=Math.Clamp(settings.Port+direction,1,65535); break;
             case 3:
-                if(server.IsRunning) server.Stop();
+                if(server.IsRunning) BeginNetworkAction("STOPPING SERVER...",server.Stop,()=>status="SERVER STOPPED");
                 else if(!client.IsConnected) BeginConnection(true);
                 break;
             case 4: if(clients.Count>0) selectedClient=(selectedClient+direction+clients.Count)%clients.Count; break;
@@ -49,7 +50,7 @@ public sealed partial class SnesWindow
             case 6: if(chosen!=null) server.KickClient(chosen.ClientId); break;
             case 9: if(!client.IsConnected) settings.Observer=!settings.Observer; break;
             case 10:
-                if(client.IsConnected) { client.Disconnect(); lock(client) remotePixels=null; hostMenu=""; }
+                if(client.IsConnected) BeginNetworkAction("DISCONNECTING...",client.Disconnect,()=>{remoteVideo.Clear();hostMenu="";status="DISCONNECTED";});
                 else if(!server.IsRunning) BeginConnection(false);
                 break;
             case 12: settings.RelayPort=Math.Clamp(settings.RelayPort+direction,1,65535); break;
@@ -61,7 +62,7 @@ public sealed partial class SnesWindow
                         $"Certificate for {p.Host}:{p.Port} changed.\n\nOld SHA-256:\n{p.OldFingerprint}\n\nNew SHA-256:\n{p.NewFingerprint}\n\nTrust the new certificate and reconnect?",
                         "SNESEmulator - TLS certificate changed",System.Windows.Forms.MessageBoxButtons.YesNo,System.Windows.Forms.MessageBoxIcon.Warning);
                     if(answer==System.Windows.Forms.DialogResult.Yes)
-                    { SnesNetTls.ReplaceTrustedServerCertificate(p.Host,p.Port,p.NewFingerprint); pinChange=null; BeginConnection(retryHost); }
+                    { bool retry=retryHost;BeginNetworkAction("SAVING CONFIRMED CERTIFICATE...",()=>SnesNetTls.ReplaceTrustedServerCertificate(p.Host,p.Port,p.NewFingerprint),()=>{pinChange=null;BeginConnection(retry);}); }
                 }
                 break;
         }
@@ -102,8 +103,19 @@ public sealed partial class SnesWindow
         }
         SaveSettings(); return true;
     }
+    private void PostNetworkOutcome(Action completion)
+    {
+        if(closing)return;
+        _=pending.PostOutcomeAsync(completion,()=>status,lifetime.Token).ContinueWith(task=>{_=task.Exception;},TaskContinuationOptions.OnlyOnFaulted);
+    }
+    private void BeginNetworkAction(string text,Action action,Action completed)
+    {
+        busy=true;status=text;
+        networkTask=Task.Run(()=>{try{action();PostNetworkOutcome(()=>{busy=false;completed();});}catch(Exception e){PostNetworkOutcome(()=>{busy=false;status=e.Message;});}});
+    }
     private void BeginConnection(bool host)
     {
+        if(!host)remoteVideo.Clear();
         busy=true; status="CONNECTING...";
         // Capture UI settings; network I/O must never block the OpenTK thread.
         bool relay=settings.Relay,observer=settings.Observer;
@@ -114,20 +126,20 @@ public sealed partial class SnesWindow
         {
             try
             {
-                string result="SERVER STARTED";
+                string result="SERVER STARTED",fingerprint="UNKNOWN";
                 if(host)
-                { if(relay) server.StartRelay(relayAddress,relayPort,id,relaySecret,secret); else server.Start(port,secret); }
+                { if(relay) server.StartRelay(relayAddress,relayPort,id,relaySecret,secret); else server.Start(port,secret);fingerprint=relay?server.RelayFingerprint:SnesNetTls.GetServerCertificateShortFingerprint();if((relay?server.RelaySecurityStatus:SnesNetTls.ServerCertificateStatus).Contains("RECOVERED")){fingerprint+=" RECOVERED";result+="; TLS RECOVERED FROM BACKUP";} }
                 else
                 {
                     var role=observer?SnesNetClientRole.Observer:SnesNetClientRole.Player;
                     if(relay) client.ConnectRelay(relayAddress,relayPort,id,relaySecret,secret,role,name,out result);
                     else client.Connect(address,port,secret,role,name,out result);
                 }
-                Post(()=>{ status=result; busy=false; });
+                PostNetworkOutcome(()=>{ if(host)hostFingerprint=fingerprint;status=result; busy=false; });
             }
             catch(SnesNetTlsException e) when(e.PinChange!=null)
-            { Post(()=>{ pinChange=e.PinChange; retryHost=host; status="TLS CERTIFICATE CHANGED - REVIEW CERTIFICATE ROW"; busy=false; }); }
-            catch(Exception e) { Post(()=>{ status=e.Message; busy=false; }); }
+            { PostNetworkOutcome(()=>{ pinChange=e.PinChange; retryHost=host; status="TLS CERTIFICATE CHANGED - REVIEW CERTIFICATE ROW"; busy=false; }); }
+            catch(Exception e) { PostNetworkOutcome(()=>{ status=e.Message; busy=false; }); }
         });
     }
 }

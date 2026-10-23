@@ -6,7 +6,7 @@ if(args.Length==2&&args[0]=="--persistence-lock")return AtomicFile.Locked(args[1
 string testRoot=Path.Combine(Path.GetTempPath(),"SNESEmulator-tests-"+Guid.NewGuid().ToString("N"));
 Environment.SetEnvironmentVariable("SNESEMULATOR_DATA_DIR",testRoot);
 Directory.CreateDirectory(testRoot);
-var report = new SNESEmulator.Testing.TestReport("core-regression");
+var report = new SNESEmulator.Testing.TestReport(args.Contains("--network-only")?"network-conformance":"core-regression");
 int passed=0,failed=0;
 void Check(bool value,string message="Assertion failed") { if(!value) throw new Exception(message); }
 void Test(string name,Action test)
@@ -15,6 +15,7 @@ void Test(string name,Action test)
     try { test(); passed++; report.Add(name,"pass",seconds:watch.Elapsed.TotalSeconds); Console.WriteLine("PASS "+name); }
     catch(Exception e) { failed++; report.Add(name,"fail",e.ToString(),watch.Elapsed.TotalSeconds); Console.WriteLine("FAIL "+name+": "+e); }
 }
+if(args.Contains("--network-only")){NetworkTimelineTests.Run(Test);report.Metadata["limits"]="Deterministic injected clock/driver playhead; actual Socket TLS/Relay tests are separate Windows groups";report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9d-network-portable");return failed==0?0:1;}
 if(args.Contains("--persistence-only")){PersistenceTests.Run(Test,testRoot);report.Metadata["limits"]="Isolated real OS files, injected exceptions/cancellation and owned process; no physical power-cut guarantee";report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9c-persistence");return failed==0?0:1;}
 if(args.Contains("--runtime-only")){RuntimeTests.Run(Test,testRoot);report.Metadata["limits"]="Synthetic gamepad/clock/fault tests; no physical gamepad, console or hours-long soak";report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9b-runtime");return failed==0?0:1;}
 if(args.Contains("--video-only")){VideoTests.Run((name,body)=>{if(args.Length<3||name.Contains(args[2],StringComparison.OrdinalIgnoreCase))Test(name,body);},testRoot);report.Metadata["M7"]=VideoTests.Evidence;report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m7-targeted");return failed==0?0:1;}
