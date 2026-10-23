@@ -10,6 +10,9 @@ public sealed class EmulatorSettings
     public bool Fullscreen { get; set; }
     public bool Gamepad { get; set; } = true;
     public int ControllerPort { get; set; } = 1;
+    public int GamepadDevice {get;set;}=-1;
+    // Null denotes the pre-M9 button-only settings schema; migration is lossless.
+    public Dictionary<string,string>? GamepadControls {get;set;}
     public string MediaDirectory { get; set; } = UserDataPaths.GetMediaDirectory();
     public string Host { get; set; } = "localhost";
     public int Port { get; set; } = 1991;

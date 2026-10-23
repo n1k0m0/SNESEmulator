@@ -56,6 +56,9 @@ public sealed class PcmAudioOutput : IDisposable
     private readonly StereoPcmPresentation presentation;
     private readonly WaveOutEvent wave;
     public float Volume {get=>presentation.Volume;set=>presentation.Volume=value;}
+    public int BufferedBytes=>presentation.BufferedBytes;
+    public int Capacity=>presentation.Capacity;
+    public long Overflows=>presentation.Overflows;
     public PcmAudioOutput(int sampleRate)
     {
         presentation=new(sampleRate);wave=new WaveOutEvent{DesiredLatency=100,NumberOfBuffers=2};

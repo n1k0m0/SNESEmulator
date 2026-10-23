@@ -478,3 +478,8 @@ M8-Implementierungsvollgate: sauberer Commit `47f91cb`,
 bleiben in den gesonderten Berichten rot; [Baseline M8](baselines/m8.json) und
 [M8-Vertrag](m8-compatibility-contract.md) halten Repros und Nachweisgrenzen fest.
 M9a ist unvollständig: Das volle Genauigkeitsgate auf `2dbeb5f` besteht; das Dauerleistungsziel scheitert in 38/62 NTSC-Fenstern. Worker/UI folgt gemäß Root-Sequenzierung; vor M9-/Releaseabnahme müssen NTSC/PAL-Dauerleistung und die übrigen M9-Produktphasen abgeschlossen werden.
+
+M9b implementiert den kontrollierten Worker, feldgebundene Eingaben und getrennte
+Video-/Audio�bergabe; [Vertrag und Nachweisgrenzen](m9-worker-contract.md).
+NTSC/PAL-Dauerleistung, mehrst�ndiger A/V-/Threading-Soak und die weiteren
+Produkt-/Distributionsphasen bleiben vor M9-/Releasefreigabe offen.

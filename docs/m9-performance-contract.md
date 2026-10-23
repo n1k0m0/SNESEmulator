@@ -2,6 +2,17 @@
 
 Status: **M9a incomplete. The sustained realtime gate is red.**
 
+Independent parent regression on `3cb3949b7ca0171a6f3ad36dd027818e84257308`
+passed `python tools/test-lab.py --windows --full`:209 portable and10 Windows
+groups, all5080400 CPU semantic/bus cases,256000 SPC approved cases (7000 raw
+differences retained),14 exact M9 console comparisons and all suspension/clock
+proofs. Additional literal native-video and audio checks passed. Frozen evidence:
+`artifacts/root-m9a-evidence/acceptance.json`, manifest SHA256
+`e8c8435a3a475d29c9e03795d21b8f9bd71e015da36e1b23219c5f6f59ce4ad3`.
+This independently accepts the accuracy regression only. The38/62 failed NTSC
+duration windows, unexecuted PAL duration and hours-long A/V soak remain open.
+Worker/UI work is the next sequenced package, not a performance acceptance.
+
 Scope: preserve the complete own CPU/SPC/PPU/DSP accuracy path while reaching
 real time on NILSPC1 (AMD Ryzen9 9900X,12 cores/24 logical processors, Windows
 10.0.26200, .NET10.0.12 x64). UI threading, input/menu parity, networking,

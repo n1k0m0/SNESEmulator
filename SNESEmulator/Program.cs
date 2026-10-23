@@ -11,6 +11,7 @@ internal static class Program
     {
         try
         {
+            if(args.Length>=2&&args[0]=="--ui-runtime-smoke"){RuntimeSmoke.Run(args[1],args.Length>=3&&args[2]!="-"?args[2]:null,args.Length>=4?double.Parse(args[3],System.Globalization.CultureInfo.InvariantCulture):8);return 0;}
             if(args.Length>=2 && args[0]=="--write-diagnostic-rom")
             { File.WriteAllBytes(args[1],DiagnosticRom.Create()); return 0; }
             if(args.Length>=3 && args[0]=="--headless")
@@ -25,7 +26,7 @@ internal static class Program
             if(args.Length>=2 && args[0]=="--ui-smoke")
             {
                 using var preview=new SnesWindow(args.Length>=4?args[3]:null);
-                int count=0; string output=args[1];
+                int count=0;bool savesTriggered=false; string output=args[1];
                 preview.RenderFrame+=_=>
                 {
                     count++;
@@ -41,12 +42,16 @@ internal static class Program
                             case "saves": Key(OpenTK.Input.Key.F6); break;
                         }
                     }
-                    if(count==15 && args.Length>=3 && args[2]=="saves")
+                    if(count>1800)throw new TimeoutException("Native preview did not reach a completed worker field");
+                    if(count>=15 && !savesTriggered && args.Length>=3 && args[2]=="saves"&&!preview.MediaOperationPending&&preview.RuntimeStatus.Field>0)
                     {
+                        savesTriggered=true;
                         preview.OnUserKeyDown(new SharpPixels.KeyEventArgs(OpenTK.Input.Key.F12,0));
                         preview.OnUserKeyDown(new SharpPixels.KeyEventArgs(OpenTK.Input.Key.S,0));
                     }
-                    if(count!=30) return;
+                    if(count<30||preview.MediaOperationPending) return;
+                    if(args.Length>=3&&args[2] is "demo" or "saves"&&!preview.HasPresentedImage)return;
+                    if(args.Length>=3&&args[2]=="saves"&&!savesTriggered)return;
                     using var screenshot=new System.Drawing.Bitmap(preview.ClientSize.X,preview.ClientSize.Y);
                     var bits=screenshot.LockBits(new System.Drawing.Rectangle(0,0,screenshot.Width,screenshot.Height),
                         System.Drawing.Imaging.ImageLockMode.WriteOnly,System.Drawing.Imaging.PixelFormat.Format32bppArgb);

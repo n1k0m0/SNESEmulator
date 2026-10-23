@@ -13,6 +13,7 @@ void Test(string name,Action test)
     try { test(); passed++; report.Add(name,"pass",seconds:watch.Elapsed.TotalSeconds); Console.WriteLine("PASS "+name); }
     catch(Exception e) { failed++; report.Add(name,"fail",e.ToString(),watch.Elapsed.TotalSeconds); Console.WriteLine("FAIL "+name+": "+e); }
 }
+if(args.Contains("--runtime-only")){RuntimeTests.Run(Test,testRoot);report.Metadata["limits"]="Synthetic gamepad/clock/fault tests; no physical gamepad, console or hours-long soak";report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9b-runtime");return failed==0?0:1;}
 if(args.Contains("--video-only")){VideoTests.Run((name,body)=>{if(args.Length<3||name.Contains(args[2],StringComparison.OrdinalIgnoreCase))Test(name,body);},testRoot);report.Metadata["M7"]=VideoTests.Evidence;report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m7-targeted");return failed==0?0:1;}
 if(args.Contains("--compatibility-only")){CompatibilityTests.Run((name,body)=>{if(args.Length<3||name.Contains(args[2],StringComparison.OrdinalIgnoreCase))Test(name,body);},testRoot);report.Metadata["M8"]=CompatibilityTests.Evidence;report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m8-state");return failed==0?0:1;}
 if(args.Contains("--dsp-long")){DspTests.Run(Test,testRoot,true);report.Metadata["M6Long"]=DspTests.Evidence;report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m6-long");return failed==0?0:1;}

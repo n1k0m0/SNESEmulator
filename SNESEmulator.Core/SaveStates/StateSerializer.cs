@@ -13,9 +13,28 @@ public static class StateSerializer
         var cart = machine.Bus.Cartridge ?? throw new InvalidOperationException("Load a cartridge first.");
         Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
         string temporary = path + ".tmp";
-        using (var file = File.Create(temporary))
-        using (var zip = new GZipStream(file, CompressionLevel.Fastest))
-        using (var w = new BinaryWriter(zip))
+        using (var file = File.Create(temporary)) Write(machine,file);
+        File.Move(temporary, path, true);
+    }
+    // The host captures uncompressed hardware bytes on its owner thread, then
+    // compresses/writes those owned bytes outside the emulation loop.
+    public static byte[] Capture(SnesSystem machine)
+    {
+        using var stream=new MemoryStream();Write(machine,stream,false);return stream.ToArray();
+    }
+    public static void SaveCaptured(byte[] bytes,string path)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
+        string temporary=path+".tmp";
+        using(var file=File.Create(temporary))
+        using(var zip=new GZipStream(file,CompressionLevel.Fastest))zip.Write(bytes);
+        File.Move(temporary,path,true);
+    }
+    private static void Write(SnesSystem machine,Stream destination,bool compress=true)
+    {
+        var cart=machine.Bus.Cartridge??throw new InvalidOperationException("Load a cartridge first.");
+        using var zip=compress?new GZipStream(destination,CompressionLevel.Fastest,true):null;
+        using (var w = new BinaryWriter(zip??destination,System.Text.Encoding.UTF8,true))
         {
             w.Write("SNESSAV"); w.Write(9); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));w.Write(machine.ProfileForced);w.Write((int)cart.Mapping);w.Write(JsonSerializer.Serialize(cart.Options));
             var c = machine.Cpu; var b = machine.Bus; var p = b.Ppu;
@@ -39,12 +58,15 @@ public static class StateSerializer
             w.Write(JsonSerializer.Serialize(b.CpuIo.State));w.Write(JsonSerializer.Serialize(b.Dma.State));
             w.Write(JsonSerializer.Serialize(c.CaptureContinuation()));w.Write(JsonSerializer.Serialize(c.CaptureInterrupts()));
         }
-        File.Move(temporary, path, true);
     }
     public static SnesSystem Load(Cartridge cartridge, string path)
     {
         using var file = File.OpenRead(path);
-        using var zip = new GZipStream(file, CompressionMode.Decompress);
+        return Load(cartridge,file);
+    }
+    public static SnesSystem Load(Cartridge cartridge,Stream source)
+    {
+        using var zip = new GZipStream(source, CompressionMode.Decompress,true);
         using var r = new BinaryReader(zip);
         if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 9 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
             throw new InvalidDataException("Savestate requires format9 (continuous WAI phase, pending PPU bus endpoints and field-start display latches). Formats1-8 lack an unambiguous corrected timing state; start the ROM again. The cartridge must also match.");

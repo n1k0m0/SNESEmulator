@@ -556,3 +556,15 @@ output cases. The extra realtime gate fails:37000 NTSC game fields average
 PAL sustained did not run after that assertion. This is an open performance
 failure; see [the contract](m9-performance-contract.md) and frozen partial
 [baseline](baselines/m9a.json). No failed report or expected value was replaced.
+
+## M9b portable host/runtime and actual native app
+
+`Core.Tests --runtime-only` runs the separate deterministic worker/input/clock/
+mailbox/presentation regression. `test-lab.py --windows` also invokes the native
+`tools/test-ui-runtime.py` probe in a fresh isolated output directory. Its app
+key callbacks are synthetic; actual GL windows and state I/O are exercised.
+`--seconds60` adds periodic real app masterclock/wall/lateness/queue/audio rows.
+The initial development run caught up initial JIT debt with five device buffer
+overflows; raw findings are retained. Catchup audio is now explicitly muted
+above100ms without skipping hardware. Full contracts and open physical OS-focus/
+gamepad, sustained NTSC/PAL and hours-long soak gates: [M9b](m9-worker-contract.md).

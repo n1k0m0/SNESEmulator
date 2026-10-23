@@ -25,6 +25,7 @@ run([sys.executable,'tools/own-ipl.py'])
 run([sys.executable,'tools/verify-ppu-testdata.py'])
 run([sys.executable,'tools/verify-video-testdata.py'])
 run([sys.executable,'tools/verify-m8-testdata.py'])
+supervised('runtime-conformance',['dotnet',str(CORE),'--runtime-only'],timeout=180)
 # M9 frozen preoptimization state/trace regression, separate from accuracy oracles.
 run([sys.executable,'tools/test-performance.py'])
 run([sys.executable,'tools/dsp-reference.py','--verify'])
@@ -101,5 +102,6 @@ supervised('spc-original-boot',['dotnet',str(LAB),'spc-boot-original','artifacts
 if args.full:assert original_expected==0, 'Original IPL execution unperformed: supply local64-byte firmware with SNESEMULATOR_IPL'
 if args.windows:
  run(['dotnet','build','SNESEmulator.Tests','-c','Release','--nologo'])
+ run([sys.executable,'tools/test-ui-runtime.py','--output','artifacts/m9b-ui-gate-'+__import__('datetime').datetime.now().strftime('%Y%m%d-%H%M%S')])
  supervised('windows-integration',['dotnet',str(ROOT/'SNESEmulator.Tests/bin/Release/net10.0-windows/SNESEmulator.Tests.dll')])
 print('Laboratory checks passed. '+('Full M1 CPU semantics verified.' if args.full else '2048 sampled semantics pass; 5,078,352 upstream cases remain explicitly unsampled.')+' Generic 65816 bus cycles verified separately; SNES profiles are analytical targets, not original-hardware measurements.')

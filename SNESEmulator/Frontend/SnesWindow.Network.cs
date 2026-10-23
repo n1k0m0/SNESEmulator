@@ -110,7 +110,7 @@ public sealed partial class SnesWindow
         string address=settings.Host,relayAddress=settings.RelayHost,id=settings.ConnectionId,name=settings.PlayerName;
         string secret=password,relaySecret=relayPassword;
         int port=settings.Port,relayPort=settings.RelayPort;
-        _=Task.Run(()=>
+        networkTask=Task.Run(()=>
         {
             try
             {
@@ -123,11 +123,11 @@ public sealed partial class SnesWindow
                     if(relay) client.ConnectRelay(relayAddress,relayPort,id,relaySecret,secret,role,name,out result);
                     else client.Connect(address,port,secret,role,name,out result);
                 }
-                pending.Enqueue(()=>{ status=result; busy=false; });
+                Post(()=>{ status=result; busy=false; });
             }
             catch(SnesNetTlsException e) when(e.PinChange!=null)
-            { pending.Enqueue(()=>{ pinChange=e.PinChange; retryHost=host; status="TLS CERTIFICATE CHANGED - REVIEW CERTIFICATE ROW"; busy=false; }); }
-            catch(Exception e) { pending.Enqueue(()=>{ status=e.Message; busy=false; }); }
+            { Post(()=>{ pinChange=e.PinChange; retryHost=host; status="TLS CERTIFICATE CHANGED - REVIEW CERTIFICATE ROW"; busy=false; }); }
+            catch(Exception e) { Post(()=>{ status=e.Message; busy=false; }); }
         });
     }
 }

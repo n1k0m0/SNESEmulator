@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../SNESEmulator.Core/SNESEmulator.Core.csproj" />
+    <ProjectReference Include="../SNESEmulator.Runtime/SNESEmulator.Runtime.csproj" />
     <ProjectReference Include="../SharpPixels/SharpPixels.csproj" />
     <PackageReference Include="NAudio" Version="2.3.0" />
   </ItemGroup>

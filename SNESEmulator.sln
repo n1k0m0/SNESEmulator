@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNESEmulator.Core.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNESEmulator.Lab", "SNESEmulator.Lab\SNESEmulator.Lab.csproj", "{3E950CE1-8925-4CA9-8475-C89D55E8194E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNESEmulator.Runtime", "SNESEmulator.Runtime\SNESEmulator.Runtime.csproj", "{21A9B685-FB63-48CF-B703-EE054E50815A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,18 @@ Global
 		{3E950CE1-8925-4CA9-8475-C89D55E8194E}.Release|x64.Build.0 = Release|Any CPU
 		{3E950CE1-8925-4CA9-8475-C89D55E8194E}.Release|x86.ActiveCfg = Release|Any CPU
 		{3E950CE1-8925-4CA9-8475-C89D55E8194E}.Release|x86.Build.0 = Release|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Debug|x64.Build.0 = Debug|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Debug|x86.Build.0 = Debug|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Release|x64.ActiveCfg = Release|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Release|x64.Build.0 = Release|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Release|x86.ActiveCfg = Release|Any CPU
+		{21A9B685-FB63-48CF-B703-EE054E50815A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
