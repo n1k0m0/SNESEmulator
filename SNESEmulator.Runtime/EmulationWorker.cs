@@ -55,12 +55,12 @@ public sealed class EmulationWorker : IDisposable
         lock(gate){if(disposed||stopping.IsCancellationRequested)return Task.FromException<T>(new ObjectDisposedException(nameof(EmulationWorker)));
             if(exited)return Task.FromException<T>(new InvalidOperationException("Emulation owner stopped; restart the application. "+fault));
             if(commands.Count>=CommandCapacity)return Task.FromException<T>(new InvalidOperationException("Emulation command queue is full; retry after pending operation."));
-            commands.Enqueue(command);}
-        changed.Set();return command.Completion.Task;
+            commands.Enqueue(command);changed.Set();}
+        return command.Completion.Task;
     }
     public void SubmitInput(FieldInput value)
     {
-        lock(gate){if(disposed)return;input=value;sequence++;}changed.Set();
+        lock(gate){if(disposed)return;input=value;sequence++;changed.Set();}
     }
     // Live input is a latest-value mailbox, atomically sampled immediately before
     // the next RunFrame (including a loaded partial field). Replay uses StepAsync.
