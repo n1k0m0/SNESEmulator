@@ -1,6 +1,6 @@
 {
   "schema": "m9g-interaction-baseline-v1",
-  "status": "Implementation and targeted final native checks complete; independent final Root full Windows acceptance pending",
+  "status": "Independent Root full gate on8daf478 failed the40ms software A/V check; label followup corrected/visually checked; overall M9 and release remain incomplete",
   "releaseAccepted": false,
   "implementationCommit": "2ab409d551962799551157e16a80344d86681185",
   "priorAcceptedCommit": "0f8aadcd602a3f72472096df63e2158654987952",
@@ -114,12 +114,246 @@
     "First delta-freeze rejected because selected active output log changed after readback. Final active log and rejected archive excluded; corrected freeze and all originals read again after freezer exit."
   ],
   "open": [
-    "Independent Root full Windows gate on final source and final image review",
+    "Root49.942ms software A/V failure and two isolated30s readiness failures transfer unresolved to the performance/A/V phase; no overall Root gate pass",
     "M9a sustained performance:38/62 NTSC windows red; PAL and hours soak unperformed",
     "18 M8 full-audio rows red;7000 raw SPC bus mismatches remain source-adjudicated",
     "Warm PPU VRAM/CGRAM/OAM retention requires separate hardware/source audit; no speculative change here",
     "Linux observed settings busy/ENOENT findings unresolved",
     "Base-console accuracy audit, then M10 DSP1, SuperFX, SA1 and remaining chips/peripherals",
     "No physical pad, real OS-focus, DAC, own-console, clean VM or remote CI proof; no release acceptance"
-  ]
+  ],
+  "independentRootAttempt": {
+    "commit": "8daf478468a7fc08404b0c4bd8e101259b417754",
+    "exit": 1,
+    "portablePassed": 285,
+    "windowsPassed": 31,
+    "windowsTotal": 32,
+    "interactionStages": 151,
+    "cumulativeSoftwareAvMaximumSeconds": 0.049942021527777714,
+    "coldSeconds": 2.4943818,
+    "measurementSeconds": 5.0049301,
+    "video": 294,
+    "audio": 301,
+    "driverVideo": 294,
+    "cumulativeDrops": 22,
+    "fault": null,
+    "coldOrSteadyMaximumLocation": "unknown in this original run",
+    "originalsReadOnlyReferences": [
+      "artifacts/root-m9g-validation.log",
+      "artifacts/root-m9g-full-process.json",
+      "artifacts/root-m9g-failed-full-reports"
+    ],
+    "collectedIntoOwnEvidence": false,
+    "overallPass": false
+  },
+  "followup": {
+    "contract": "docs/m9g-followup.md",
+    "sourceCommit": "a6c6c917e9d35d0278ebad0d7174d25d6422a9a2",
+    "labelCommit": "4a35520",
+    "observationCommits": [
+      "52fbbcc",
+      "a6c6c91"
+    ],
+    "labelNativeStages": 151,
+    "labelReviewedByRoot": true,
+    "portableNetworkGroupsUnderWindows": 15,
+    "portableReportCommit": "52fbbcca77ab15b3c396948c18f721875cdeba3b",
+    "newLinuxRun": false,
+    "isolatedNativeReadinessFailures": 2,
+    "isolatedReadinessBudgetSeconds": 30,
+    "newOrderedNativeNetworkGroups": 13,
+    "selectionOrMetricPolicyChanged": false,
+    "avThresholdChanged": false,
+    "rootAvFailureResolved": false,
+    "observations": {
+      "native02": {
+        "commit": "52fbbcca77ab15b3c396948c18f721875cdeba3b",
+        "workingTree": "",
+        "tests": [
+          {
+            "Name": "M9d actual LAN source-timed stereo and nonzero driver-synchronized video presentation",
+            "Status": "fail",
+            "Detail": "System.Exception: bounded stable unmuted driver readiness\r\n   at NetworkTests.Check(Boolean value, String reason) in C:\\Users\\nilsk\\Desktop\\SNESEmulator\\SNESEmulator.Tests\\NetworkTests.cs:line 14\r\n   at NetworkTests.<>c__DisplayClass9_0.<Run>b__8() in C:\\Users\\nilsk\\Desktop\\SNESEmulator\\SNESEmulator.Tests\\NetworkTests.cs:line 168\r\n   at Program.<>c__DisplayClass0_0.<<Main>$>g__Test|3(String name, Action test) in C:\\Users\\nilsk\\Desktop\\SNESEmulator\\SNESEmulator.Tests\\Program.cs:line 24"
+          }
+        ],
+        "rows": 1757,
+        "driverRows": 0,
+        "phaseReached": "cold-readiness",
+        "phaseMaxima": {
+          "cold": {
+            "SamplePlayhead": null,
+            "CommitPlayhead": null,
+            "CompletedPlayhead": null
+          },
+          "measurement": {
+            "SamplePlayhead": null,
+            "CommitPlayhead": null,
+            "CompletedPlayhead": null
+          }
+        },
+        "cumulativeMaximum": 0,
+        "worstSelection": null,
+        "maximumSampleToCommitSeconds": null,
+        "maximumCallbackSeconds": null,
+        "originalObservation": "C:\\Users\\nilsk\\AppData\\Local\\Temp\\SNESEmulator-tests-8dc555d8a3da45cb9f384359b8982d6e\\actual-driver-av-observations.json",
+        "copiedObservation": "C:\\Users\\nilsk\\Desktop\\SNESEmulator\\artifacts\\m9g-followup-observations\\native02.json",
+        "sha256": "b4a757974b33fe3fac622909a9deed2f8286e9cc8111dc2eb69ea862134f365f"
+      },
+      "native13": {
+        "commit": "a6c6c917e9d35d0278ebad0d7174d25d6422a9a2",
+        "workingTree": "",
+        "tests": [
+          {
+            "Name": "M9d actual TLS fragmented input revoke regrant and stale generation",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d actual two TLS clients observer held-state portchange focusneutral kick",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d TLS certificate replacement recovery unknown endpoint and corrupt trust fail closed",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d crossprocess trust readmodifywrite and certificate create identity",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d strict malformed strings enums booleans counts and real TLS oversize frames",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d session timeline rejects delayed output and preserves input across media-only epochs",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d registration versus stop atomic ownership and callback disconnect completion",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d actual WinMM provider source map initial prefill underrun refill and flush",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d actual LAN source-timed stereo and nonzero driver-synchronized video presentation",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d actual local TLS relay two clients v4 epochs stereo malformed budgets and kick",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d actual slow TLS server bounded nonblocking client input and concurrent shutdown",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d reconnect clears old owned picture for a paused new host with reused epochs",
+            "Status": "pass",
+            "Detail": null
+          },
+          {
+            "Name": "M9d actual TLS handshake and slowcontrol resource budgets and shutdown",
+            "Status": "pass",
+            "Detail": null
+          }
+        ],
+        "rows": 414,
+        "driverRows": 321,
+        "phaseReached": "measurement",
+        "phaseMaxima": {
+          "cold": {
+            "SamplePlayhead": 0.01665947470238094,
+            "CommitPlayhead": 0.01665947470238094,
+            "CompletedPlayhead": 0.01665947470238094
+          },
+          "measurement": {
+            "SamplePlayhead": 0.007943828472222414,
+            "CommitPlayhead": 0.007881328472223004,
+            "CompletedPlayhead": 0.0077782493055549295
+          }
+        },
+        "cumulativeMaximum": 0.01665947470238094,
+        "worstSelection": {
+          "Sequence": 94,
+          "Generation": 6,
+          "Source": 1.996711619047619,
+          "Arrival": 2380310.737471,
+          "Due": 2380310.7798526273,
+          "SampleAt": 2380310.7996975,
+          "CommitAt": 2380310.7996982,
+          "CompletedAt": 2380310.7998992,
+          "SamplePlayhead": 2.01337109375,
+          "CommitPlayhead": 2.01337109375,
+          "CompletedPlayhead": 2.01337109375,
+          "Delivered": true,
+          "GenerationValid": true,
+          "SchedulingError": 0.019844872877001762
+        },
+        "maximumSampleToCommitSeconds": 1.00000761449337e-05,
+        "maximumCallbackSeconds": 0.0010234001092612743,
+        "originalObservation": "C:\\Users\\nilsk\\AppData\\Local\\Temp\\SNESEmulator-tests-5411450eec064a62947bb13392b7a6aa\\actual-driver-av-observations.json",
+        "copiedObservation": "C:\\Users\\nilsk\\Desktop\\SNESEmulator\\artifacts\\m9g-followup-observations\\native13.json",
+        "sha256": "49e2ef62f742b365e9de2e3ec1424fd0621687d90889d2798bf7047c79a6a829"
+      }
+    },
+    "freeze": {
+      "schema": "m9g-followup-evidence-v1",
+      "sourceCommit": "a6c6c917e9d35d0278ebad0d7174d25d6422a9a2",
+      "filesSha256": "016835c8bde8dbf8cb2202361d689626400a91a11a37ee5f171691ac4421aca8",
+      "archiveSha256": "97f871414be8553ef2b3b17f9f40f43965ca18eb8850d3c31ab21fdaa0766077",
+      "newObjects": 51,
+      "archiveBytes": 954385,
+      "originals": 1249,
+      "originalBytes": 475639200,
+      "priors": [
+        {
+          "path": "../m9f-frozen-evidence",
+          "archiveSha256": "85f0ed26847c02b1c74ddd4d461db7fabc5713bb6d751e00d5d6ec6d3871c0d6",
+          "filesSha256": "805017741a7fdb5510adaebc6ca26eba71865d3f09cff57cd8756864166e7a55"
+        },
+        {
+          "path": "../m9g-frozen-evidence",
+          "archiveSha256": "a21cefbfbf37ea4672ad76fd133f9e3e4fa23c1186c9716f9ec5e40deb7dbe33",
+          "filesSha256": "90ecc2a74adb77dd61ce44aedfd584b52d6425a0db5c11cbf3badb5370f67e0d"
+        }
+      ],
+      "incrementalSourcePrerequisite": "2ab409d551962799551157e16a80344d86681185; exact prerequisite bundle is reused from M9g",
+      "scope": "Label correction and opt-in observations; selection/metric policy and thresholds unchanged; Root failed gate remains failed",
+      "limits": [
+        "No Root originals/helpers, original local game/firmware, SDKs or old corpora copied",
+        "15 portable network groups under Windows; no new Linux run; historical Linux59 on7effa47 remains separate",
+        "Two isolated readiness failures and one new13-group pass do not explain Root49.942ms",
+        "Actual binaries captured after final native process; no pre-start inventory claimed",
+        "Early development observation binaries not all retained; final source/history, raw reports and actual final binaries retained"
+      ],
+      "seconds": 2.0780000002123415,
+      "acceptanceSha256": "c3091e191af8b76f34290d47695e85aa030510a1776e166b7d383ed51881fff1",
+      "postCloseVerification": {
+        "sourceCommit": "a6c6c917e9d35d0278ebad0d7174d25d6422a9a2",
+        "acceptanceSha256": "c3091e191af8b76f34290d47695e85aa030510a1776e166b7d383ed51881fff1",
+        "filesSha256": "016835c8bde8dbf8cb2202361d689626400a91a11a37ee5f171691ac4421aca8",
+        "archiveSha256": "97f871414be8553ef2b3b17f9f40f43965ca18eb8850d3c31ab21fdaa0766077",
+        "afterFreezerProcessJoined": true,
+        "allSelectedObjectsDecompressedAndChecked": 561,
+        "allOriginalsReread": 1249,
+        "activeLogsExcluded": true,
+        "seconds": 3.625
+      },
+      "postCloseVerificationSha256": "214588a2a8cac645651389403510c42b08f58763640fc8e9b12e6193694023cc"
+    },
+    "sessions": "Own test sessions joined and private build servers shut down; no SNES products remain. Two unrelated global dotnet processes were preserved, not stopped.",
+    "processClassification": "artifacts/m9g-followup-process-classification.json"
+  }
 }

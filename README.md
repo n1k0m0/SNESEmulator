@@ -10,8 +10,9 @@ Spielekompatibilität.** M0–M8 sowie M9b Worker/UI und M9c Persistenz sind una
 Mode0–7-PPU bietet Sprites, Fenster, Farbmathematik, OPT, Hires und Mode7.
 M9d Netzwerk und M9e Manager sind unabhängig abgenommen (`2a5ae39`/`2534dba`).
 M9f Distribution/CI ist unabhängig auf `0f8aadc` abgenommen. M9g erweitert
-konfigurierbare Eingaben, Anzeige und Resetbedienung; seine unabhängige finale
-Abnahme steht aus ([Nachweise](docs/baselines/m9g.json)). M9a-Dauerleistung
+konfigurierbare Eingaben, Anzeige und Resetbedienung; der unabhängige
+Root-Vollgate ist wegen eines Software-A/V-Abstands rot. Die getrennte
+Beschriftungskorrektur ist geprüft ([Nachweise](docs/m9g-followup.md)). M9a-Dauerleistung
 und M9/Release bleiben offen. 20 unveränderte
 lizenzierte Testprogramme und ein externes Techdemo laufen über den eigenen
 Kern und zwei separat gebaute Referenzen. Bekannte Audioabweichungen und

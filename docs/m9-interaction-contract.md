@@ -1,6 +1,7 @@
 # M9g interaction parity contract
 
-Status: implementation complete on2ab409d; final independent Root acceptance pending.
+Status: implementation on2ab409d; label followup4a35520 corrected.
+Independent Root gate on8daf478 failed the software A/V bound; no overall pass.
 Whole-M9 and release remain incomplete.
 Baseline: M9f independently accepted on0f8aadc; this phase changes host input,
 settings and presentation, not hardware timing, State9, VID3, AUD2 or Protocol4.
@@ -72,7 +73,8 @@ test: unknown bool/string/object values are disabled and preserved exactly by
 actual offline Apply, including lexical JSON number1.2300. Final clean checks
 passed Manager12 portable, all32 native Windows groups,151 interaction stages,
 runtime and all four persistence modes;1194 identities matched before/after.
-The full final independent Windows gate remains Root work.
+The subsequent independent Root gate on8daf478 failed the software A/V bound;
+the followup below keeps that failure open.
 
 Actual Ubuntu WSL/private SDK10.0.402 passed59 targeted portable groups plus a
 second Distribution9 run on7effa47. This is not a repeated full Linux hardware
@@ -88,7 +90,7 @@ selection excludes active logs and the rejected archive. Root helpers, SDKs,
 original local ROM/IPL bytes and the user game snapshot are excluded. Exact
 commits, hashes, raw reports, retained failures and limits are in
 [the M9g baseline](baselines/m9g.json). C64, the user game/shortcut and publish
-remain unchanged. Independent Root acceptance is a later step.
+remain unchanged. Independent overall acceptance was not achieved.
 Known7000 source-adjudicated SPC raw mismatches,18 full-audio comparison rows,
 38/62 failed NTSC sustained windows, unperformed PAL and hours soak remain open.
 M10 follows the later performance and base-accuracy phases.
@@ -118,3 +120,7 @@ The version boundary prevents older full snapshots from resetting new bindings.
 New client/old server response rejection and old client/new server request
 rejection both run over real named pipes; no command is forwarded after a bad
 Hello. New portable totals are prior276 plus8 interaction plus1 IPC boundary.
+
+## Independent Root result and bounded followup
+
+The Root full gate on8daf478 passed285 portable/31 of32 Windows groups and151 interaction stages, then failed cumulative software A/V distance49.942ms against unchanged40ms. The separate label correction is visually accepted; opt-in diagnostics and one new13-group pass do not explain or fix that original failure. Two isolated30s readiness failures also remain open. [Followup details and next A/V scope](m9g-followup.md); no further product or Linux run was made after the final ordered13-group observation.
