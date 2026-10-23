@@ -87,7 +87,7 @@ UTF8 JSON has a32-bit little-endian positive length prefix,2MiB maximum, depth16
 150000 nodes,122368 array elements,64 object members,65536-character strings and
 no duplicate/unmapped envelope members. UTF8 is strict. Requests require a32-hex
 requestId, command length1..64 and object/array payload. Hello/version is mandatory;
-Hello and each response are correlated by requestId and version. Unknown commands
+Hello and each response are correlated by requestId and version, including the second-instance activation client. Hello capability payloads are bounded and validated; Manager activation advertises only Activate, while the emulator advertises its actual commands. Unknown commands
 return UNSUPPORTED, version mismatch PROTOCOL_MISMATCH, missing Hello
 HELLO_REQUIRED. Malformed framing closes only its connection. Other stable codes
 include REVISION_CONFLICT, STALE_EPOCH, NETWORK_CLIENT_LOCKED, BUSY, INVALID_DATA,

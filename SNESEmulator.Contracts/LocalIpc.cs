@@ -72,14 +72,10 @@ public sealed class IpcClient(InstanceInfo instance)
         var hello = Request.Create("Hello");
         await Framing.WriteAsync(pipe, hello, token);
         var answer = await Framing.ReadAsync<Response>(pipe, token);
-        if (answer.Version != 1 || answer.RequestId != hello.RequestId)
-            throw new InvalidDataException("Hello correlation mismatch");
-        if (!answer.Success)
-            throw new IOException(answer.Code + ": " + answer.Message);
+        _ = Framing.ValidateHello(answer, hello);
         await Framing.WriteAsync(pipe, request, token);
         var result = await Framing.ReadAsync<Response>(pipe, token);
-        if (result.RequestId != request.RequestId || result.Version != 1)
-            throw new InvalidDataException("Response correlation mismatch");
+        Framing.ValidateResponse(result, request);
         return result;
     }
 }
@@ -90,11 +86,15 @@ public sealed class IpcServer : IAsyncDisposable
     private readonly CancellationTokenSource stop = new();
     private readonly Task[] loops;
     private readonly string? discovery;
+    private readonly string[] capabilities;
     public string PipeName { get; }
 
-    public IpcServer(Func<Request, CancellationToken, Task<Response>> handler, string? pipeName = null, bool publish = true)
+    public IpcServer(Func<Request, CancellationToken, Task<Response>> handler, string? pipeName = null, bool publish = true, string[]? capabilities = null)
     {
         this.handler = handler;
+        this.capabilities = (capabilities ?? ["Status", "Settings", "ApplySettings", "LoadRom", "LoadState", "SaveState", "Reset", "Mode", "States", "StatePreview", "DeleteState", "RecoverState", "Close"]).ToArray();
+        if (this.capabilities.Length > 32 || this.capabilities.Any(c => string.IsNullOrWhiteSpace(c) || c.Length > 64 || c.Any(char.IsControl)) || this.capabilities.Distinct(StringComparer.Ordinal).Count() != this.capabilities.Length)
+            throw new ArgumentException("Invalid capabilities");
         PipeName = pipeName ?? "SNESEmulator." + Environment.ProcessId + "." + Guid.NewGuid().ToString("N");
         if (publish)
         {
@@ -136,7 +136,7 @@ public sealed class IpcServer : IAsyncDisposable
                     else if (r.Command == "Hello")
                     {
                         hello = true;
-                        response = Response.Ok(r, new { Version = 1, Capabilities = new[] { "Status", "Settings", "ApplySettings", "LoadRom", "LoadState", "SaveState", "Reset", "Mode", "States", "StatePreview", "DeleteState", "RecoverState" }, MaximumBytes = Framing.MaximumBytes });
+                        response = Response.Ok(r, new HelloInfo(1, capabilities, Framing.MaximumBytes));
                     }
                     else
                     {

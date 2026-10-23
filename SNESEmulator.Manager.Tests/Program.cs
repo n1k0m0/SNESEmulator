@@ -172,6 +172,7 @@ if (!args.Contains("--windows"))
         using var oversized = new MemoryStream(new byte[] { 255, 255, 255, 127 });
         await Throws<InvalidDataException>(async () => _ = await Framing.ReadAsync<Request>(oversized, default));
     });
+    await HelloTests.Run(Test, Check);
     await Test("M9e canonical copierheader library notes favorites missing and relink", async () =>
     {
         string folder = Path.Combine(root, "roms");

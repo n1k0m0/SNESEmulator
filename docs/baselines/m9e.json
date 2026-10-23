@@ -1,10 +1,18 @@
 {
-  "schema":"m9e-manager-baseline-v1",
-  "status":"implementation awaiting clean full gate and independent Root acceptance",
-  "priorPortable":256,
-  "priorWindows":23,
-  "newPortable":10,
-  "newWindows":7,
-  "contract":"docs/m9-manager-contract.md",
-  "releaseAccepted":false
+  "schema": "m9e-manager-baseline-v1",
+  "status": "implementation awaiting clean full gate and independent Root acceptance",
+  "priorPortable": 256,
+  "priorWindows": 23,
+  "newPortable": 11,
+  "newWindows": 7,
+  "contract": "docs/m9-manager-contract.md",
+  "releaseAccepted": false,
+  "firstFullGate": {
+    "commit": "6ea6e41ba3090aca5cf8206ec984e1858a0078d0",
+    "exit": 0,
+    "portable": 266,
+    "windows": 30,
+    "retained": "artifacts/m9e-development/fullgate1",
+    "reason": "Final protocol audit added shared Hello/response validation to Manager activation; final clean gate must repeat"
+  }
 }

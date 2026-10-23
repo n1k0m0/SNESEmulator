@@ -16,6 +16,7 @@ public sealed record Response(int Version, string RequestId, bool Success, strin
 }
 
 public sealed record InstanceInfo(int ProcessId, long StartTicks, string PipeName, int Version, string Executable);
+public sealed record HelloInfo(int Version, string[] Capabilities, int MaximumBytes);
 public sealed record StatusInfo(int ProcessId, long Epoch, long Field, string Title, string CartridgeHash, string RomPath, bool Paused, bool Turbo, bool MenuOpen, string Network, long SettingsRevision, string? Fault);
 public sealed record SettingsInfo(long Revision, JsonElement Settings, Dictionary<string, string> Effects);
 public sealed record ApplySettings(long ExpectedRevision, JsonElement Settings);
@@ -81,6 +82,32 @@ public static class Framing
         await stream.WriteAsync(prefix, token);
         await stream.WriteAsync(bytes, token);
         await stream.FlushAsync(token);
+    }
+
+    public static void ValidateResponse(Response response, Request request)
+    {
+        if (response == null || response.Version != 1 || response.RequestId != request.RequestId)
+            throw new InvalidDataException("Response version/requestId mismatch");
+    }
+
+    public static HelloInfo ValidateHello(Response response, Request hello)
+    {
+        ValidateResponse(response, hello);
+        if (!response.Success)
+            throw new IOException(response.Code + ": " + response.Message);
+        HelloInfo info;
+        try
+        {
+            info = response.Data.Deserialize<HelloInfo>(Options) ?? throw new InvalidDataException("Missing Hello capabilities");
+        }
+        catch (JsonException error)
+        {
+            throw new InvalidDataException("Invalid Hello capabilities", error);
+        }
+
+        if (info.Version != 1 || info.MaximumBytes != MaximumBytes || info.Capabilities == null || info.Capabilities.Length > 32 || info.Capabilities.Any(c => string.IsNullOrWhiteSpace(c) || c.Length > 64 || c.Any(char.IsControl)) || info.Capabilities.Distinct(StringComparer.Ordinal).Count() != info.Capabilities.Length)
+            throw new InvalidDataException("Unsupported or malformed Hello capabilities");
+        return info;
     }
 
     public static void Validate(Request r)
