@@ -13,8 +13,12 @@ internal static class RuntimeSmoke
     {
         Directory.CreateDirectory(output);
         using var window=new SnesWindow(rom);
+        // This probe injects application keys, not desktop input. Native fullscreen
+        // transitions can drop OS focus between keys in one callback. Keep this
+        // synthetic input stream focused; InteractionSmoke tests focus loss itself.
+        window.ProbeInput(true,null,new HashSet<string>(),new HashSet<string>());
         var timer=Stopwatch.StartNew();var rows=new List<object>();int step=0;double since=0,paceStart=0,nextSample=0;long master=0,field=0;bool loaded=false,deletedOnce=false;long epochBeforeLoad=0;
-        void Check(bool ok,string why){if(!ok)throw new InvalidOperationException("UI runtime smoke: "+why);}
+        void Check(bool ok,string why){if(!ok){File.WriteAllText(Path.Combine(output,"failure.json"),JsonSerializer.Serialize(new{Why=why,Step=step,Selection=window.ProbeSelection,Metrics=window.RuntimeMetrics,Rows=rows}));throw new InvalidOperationException("UI runtime smoke: "+why);}}
         void Press(Key key)=>window.ProbeKey(key);
         void Row(string name)=>rows.Add(new{Name=name,WallSeconds=timer.Elapsed.TotalSeconds,Metrics=window.RuntimeMetrics});
         void Next(){step++;since=timer.Elapsed.TotalSeconds;}
@@ -69,7 +73,7 @@ internal static class RuntimeSmoke
         // Parse every byte and validate the complete format9 after close.
         var cartridge=new SNESEmulator.Core.Cartridge(rom==null?DiagnosticRom.Create():File.ReadAllBytes(rom));
         foreach(string state in Directory.GetFiles(UserDataPaths.GetSaveDirectory(),"*.snessav",SearchOption.AllDirectories))_ = SNESEmulator.SaveStates.StateSerializer.Load(cartridge,state);
-        File.WriteAllText(Path.Combine(output,"result.json"),JsonSerializer.Serialize(new{Success=true,Rows=rows,Limits=new[]{"Synthetic app key callbacks; physical gamepad untested","No hours-long A/V soak","Short app pacing sample does not close M9a sustained gate","No hardware console evidence"}},new JsonSerializerOptions{WriteIndented=true}));
+        File.WriteAllText(Path.Combine(output,"result.json"),JsonSerializer.Serialize(new{Success=true,Rows=rows,Limits=new[]{"Synthetic app key callbacks with synthetic focus; physical input and desktop focus untested here","No hours-long A/V soak","Short app pacing sample does not close M9a sustained gate","No hardware console evidence"}},new JsonSerializerOptions{WriteIndented=true}));
     }
     internal static void Screenshot(SnesWindow window,string path)
     {

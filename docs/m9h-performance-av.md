@@ -168,3 +168,18 @@ PAL enthält wenige nichtnull Stereo-Samples. Amplituden werden ehrlich gezählt
 nicht als gehörtes oder physisch verifiziertes Audio ausgegeben.
 
 Der Dauertest beginnt erst auf dem geprüften sauberen Implementierungsstand.
+
+## Fehler im älteren Runtime-Smoke
+
+Der vollständige Lauf auf c470d7c bestand die Core-, CPU-, Bus- und SPC-Korpora,
+brach jedoch beim ersten nativen Runtime-Smoke mit `mapping menu path` ab.
+Dieser Gesamtlauf bleibt fehlgeschlagen; die folgenden Windows-Gruppen wurden
+dabei noch nicht erreicht. Der Smoke sendete F11 und unmittelbar danach weitere
+synthetische Tasten, während HandleKey den tatsächlichen Desktopfokus prüfte.
+Ein Fokuswechsel ist bei einem nativen Fullscreenwechsel möglich; der damalige
+Fokus wurde nicht gespeichert, deshalb ist dies kein bewiesener historischer
+Ursachenbefund. Der Test pinnt nun ausdrücklich seinen synthetischen Fokus und
+neutrale Eingaben, wie bereits InteractionSmoke. Echte Fokusverlustlogik wird
+weiter separat dort geprüft; die Produktlogik bleibt unverändert. Fehlerberichte
+enthalten künftig Menü, Selection und Runtime. Nur die noch fehlenden nativen
+Stufen werden hierfür erneut ausgeführt, keine unveränderten CPU-Vollkorpora.
