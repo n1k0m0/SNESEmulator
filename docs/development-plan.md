@@ -480,6 +480,10 @@ bleiben in den gesonderten Berichten rot; [Baseline M8](baselines/m8.json) und
 M9a ist unvollständig: Das volle Genauigkeitsgate auf `2dbeb5f` besteht; das Dauerleistungsziel scheitert in 38/62 NTSC-Fenstern. Worker/UI folgt gemäß Root-Sequenzierung; vor M9-/Releaseabnahme müssen NTSC/PAL-Dauerleistung und die übrigen M9-Produktphasen abgeschlossen werden.
 
 M9b implementiert den kontrollierten Worker, feldgebundene Eingaben und getrennte
-Video-/Audio�bergabe; [Vertrag und Nachweisgrenzen](m9-worker-contract.md).
-NTSC/PAL-Dauerleistung, mehrst�ndiger A/V-/Threading-Soak und die weiteren
-Produkt-/Distributionsphasen bleiben vor M9-/Releasefreigabe offen.
+Video-/Audioübergabe; [Vertrag und Nachweisgrenzen](m9-worker-contract.md).
+Saubere Implementierung43c566d: voller Windows-Gate Exit0,209 bisherige portable,
+16 getrennte Runtime- und10 Windows-Gruppen plus nativer App-Probe.
+[Drei60-s-App-Messungen und unveränderte Grenzen](m9-worker-contract.md) sowie
+[Baseline](baselines/m9b.json) trennen Implementierungsnachweis und noch offene
+unabhängige Produktabnahme. NTSC/PAL-Dauerleistung, mehrstündiger A/V-/Threading-
+Soak und die weiteren Produkt-/Distributionsphasen bleiben vor M9-/Releasefreigabe offen.
