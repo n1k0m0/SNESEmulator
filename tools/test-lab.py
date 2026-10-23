@@ -20,6 +20,8 @@ if args.inventory_only:
  sys.exit(subprocess.run(['dotnet',str(LAB),'supervise','240','artifacts/conformance','dotnet',str(LAB),*(['cpu-full','artifacts/conformance-child','testdata/65816-full'] if args.full else ['cpu'])],cwd=ROOT).returncode)
 run(['dotnet','build','SNESEmulator.Core.Tests','-c','Release','--nologo'])
 run(['dotnet','build','SNESEmulator.Manager.Tests','-c','Release','--nologo'])
+run(['dotnet','build','SNESEmulator.Distribution.Tests','-c','Release','--nologo'])
+supervised('distribution-conformance',['dotnet',str(ROOT/'SNESEmulator.Distribution.Tests/bin/Release/net10.0/SNESEmulator.Distribution.Tests.dll')],timeout=180)
 supervised('manager-conformance',['dotnet',str(ROOT/'SNESEmulator.Manager.Tests/bin/Release/net10.0/SNESEmulator.Manager.Tests.dll')],timeout=180)
 run([sys.executable,'tools/fetch-testdata.py','--verify'])
 run([sys.executable,'tools/fetch-spc700.py','--verify',*(['--full'] if args.full else [])])
@@ -36,7 +38,9 @@ run([sys.executable,'tools/test-performance.py'])
 run([sys.executable,'tools/dsp-reference.py','--verify'])
 run([sys.executable,'tools/verify-dsp-gaussian.py'])
 # M5 adds334 full-system PPU snapshots and42 graphics groups to87 prior groups.
-supervised('core',['dotnet',str(CORE)],timeout=240)
+# Core includes hundreds of full JSON/deflate snapshot continuations. Linux zlib
+# and hosted VM costs differ; this functional watchdog is not a realtime budget.
+supervised('core',['dotnet',str(CORE)],timeout=240 if sys.platform=='win32' else 600)
 supervised('video-conformance',['dotnet',str(CORE),'--video-only'],timeout=180)
 run([sys.executable,'tools/test-video-cli.py'])
 run([sys.executable,'tools/video-mutations.py'])

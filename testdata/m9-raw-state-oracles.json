@@ -1,0 +1,225 @@
+{
+  "schema": "m9-raw-state-oracles-v1",
+  "provenance": "Derived solely by decompressing immutable preoptimization baseline/baseline-traced/baseline-devices archive states whose compressed hashes match the unchanged pre-M9 regression contract. No current product output contributes expected values.",
+  "sourceArchive": "artifacts/m9a-implementation-evidence/m9a-history.zip",
+  "sourceArchiveSha256": "475ac577f9b37f5145a8d244dba2d6f2d6179c5da5867bc42098c6071b13dccf",
+  "sourceCoreCommit": "10164c78e24124dfc613764cffd859409aeed1f8",
+  "statesByCompressedSha256": {
+    "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd": {
+      "archiveEntry": "baseline-traced/audio-ntsc-traced.field0.state",
+      "compressedBytes": 19453,
+      "rawBytes": 1550477,
+      "rawSha256": "76ba4155fb015fdc96b6809b66eaf851c0a86cebbe023862f6812ad5fe099be4"
+    },
+    "945e716496f7e5539928de25ea3737469b5ea4dd1f00c5a7a2f506278dec89d0": {
+      "archiveEntry": "baseline/audio-ntsc-untraced.field129.state",
+      "compressedBytes": 19549,
+      "rawBytes": 1550680,
+      "rawSha256": "6006b93bbb7be190e8e60a6cc8bfed07dc0b1c04a9092c285eb69b78194fbd84"
+    },
+    "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725": {
+      "archiveEntry": "baseline-traced/audio-ntsc-traced.field9.state",
+      "compressedBytes": 19443,
+      "rawBytes": 1550514,
+      "rawSha256": "e4c18d681595c7c25871d27f94f6bf211ede19d5eae06a003cb67138da83100c"
+    },
+    "99649671110d72942bb3290322e994fbd254a769ea08a3c0f04fd5eec8c0e5a3": {
+      "archiveEntry": "baseline/audio-ntsc-untraced.state",
+      "compressedBytes": 19666,
+      "rawBytes": 1550497,
+      "rawSha256": "e1b7efc30d5e9ddb44fb357c35b494a3123be9a7e3966bfca8b7de0f252675fc"
+    },
+    "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e": {
+      "archiveEntry": "baseline-traced/diagnostic-ntsc-traced.field0.state",
+      "compressedBytes": 41732,
+      "rawBytes": 1651201,
+      "rawSha256": "373ede9c7d02c84f244d7a0639a261ece32e80938380d1e578a7b735094a3ab7"
+    },
+    "a33b57a85e2788c0210030674247f77cc408031265e2eadac6411586fca7cf82": {
+      "archiveEntry": "baseline/diagnostic-ntsc-untraced.field129.state",
+      "compressedBytes": 49259,
+      "rawBytes": 1651498,
+      "rawSha256": "4e71ac8cb07405ee4a94fd4b09d22701e9aac9dee13208bc11b846b73deeb685"
+    },
+    "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc": {
+      "archiveEntry": "baseline-traced/diagnostic-ntsc-traced.field9.state",
+      "compressedBytes": 49620,
+      "rawBytes": 1651564,
+      "rawSha256": "dded61d615d648f9fb8ccdd03dc85ebcd672f46d7eb6faff62a8bd906fa83760"
+    },
+    "963be3c6d93d78b31f88339776f65d8f766fc7f6915dd3fe340b25a6ab88d780": {
+      "archiveEntry": "baseline/diagnostic-ntsc-untraced.state",
+      "compressedBytes": 50394,
+      "rawBytes": 1651434,
+      "rawSha256": "657bf22e93e2c3ff4f697d0dba5979bc1da04482a02550f13ccc6e75675788ab"
+    },
+    "f9bd5ae1b3b024e97ee858fdb5f63ead3ec0f9373ccfdc0ecc02b70863071e6b": {
+      "archiveEntry": "baseline-traced/game-ntsc-traced.field0.state",
+      "compressedBytes": 19297,
+      "rawBytes": 1554861,
+      "rawSha256": "01121916e5e3974fac61fb939c81acb3c4dc7a12935e51d859427724caf3458b"
+    },
+    "74a32360ebcfd7f4fc7fccbc311141add74da97dbe85f3215912b8c1843ffed4": {
+      "archiveEntry": "baseline-traced/game-ntsc-traced.field329.state",
+      "compressedBytes": 145838,
+      "rawBytes": 1713748,
+      "rawSha256": "2aee1bf4e2d042d2a0941ef180c02b916021c0791c7a23188a6ededcbfecd5f2"
+    },
+    "c2fa789c162c346d4c2580bfc05922bfb76ecbe77b2928b5a0c07d96ccac1227": {
+      "archiveEntry": "baseline-traced/game-ntsc-traced.field9.state",
+      "compressedBytes": 28689,
+      "rawBytes": 1556986,
+      "rawSha256": "f2ffccf9d690e894615f27f8bae187f85a0b77b933a2ef96f52d6db5a681843b"
+    },
+    "eca8b2fe64f64f86901b90324f835469727663b60ef5e77526c689b2b40c90be": {
+      "archiveEntry": "baseline-traced/game-ntsc-traced.state",
+      "compressedBytes": 146039,
+      "rawBytes": 1713851,
+      "rawSha256": "1a6a55069d6fb73e38efb7368da8ec1037d3bc461bdcee6d1b00b72c3af6a55f"
+    },
+    "16eab4f61ca632b613fa998565e3692592fbeacfdd37f552906fd0182ac721cc": {
+      "archiveEntry": "baseline-traced/game-pal-traced.field0.state",
+      "compressedBytes": 19297,
+      "rawBytes": 1554899,
+      "rawSha256": "b2307282ad121a6825aa1558b685ed15d556eb2c09b584dd5f958517a3563c6f"
+    },
+    "5c9168356ba209c80a1b8efa3e222a5fc84d473be8bc5407abf0d4d45ef26a4d": {
+      "archiveEntry": "baseline-traced/game-pal-traced.field329.state",
+      "compressedBytes": 145106,
+      "rawBytes": 1713697,
+      "rawSha256": "cae57a3963bb694900f9c93b654942b836c5957be824f9a834917acef9f603b5"
+    },
+    "762e01d15a862696ada5cdd19fcb965ac60bd101b512fd0a2efb49e218404e4f": {
+      "archiveEntry": "baseline-traced/game-pal-traced.field9.state",
+      "compressedBytes": 29403,
+      "rawBytes": 1556615,
+      "rawSha256": "54b1eee4d461f7b776d3fcfcb78dfa296715cbd44425973a81f11b527f1304cd"
+    },
+    "31bb450adbd07c77abe46c97a2653292bc439900024ad9a1c577880129a82ec1": {
+      "archiveEntry": "baseline-traced/game-pal-traced.state",
+      "compressedBytes": 145835,
+      "rawBytes": 1713862,
+      "rawSha256": "0e4b370e367bdfe6b632af921736b07124b7f480b78a5dd1d811e3bc342ae948"
+    },
+    "a6952d68e53767dc5e5b0d1064828167af82505f133ee1c86cea7450cfdc0b53": {
+      "archiveEntry": "baseline-traced/geometry-ntsc-traced.field0.state",
+      "compressedBytes": 33444,
+      "rawBytes": 2938068,
+      "rawSha256": "209aa1cbfb00448d9d11feddbd3aae3a553390984133a6a77a0a0f3e2571e903"
+    },
+    "2b25d695f45752754b3b412522017287799e473253dcf7e646e3d2e15a1af2f8": {
+      "archiveEntry": "baseline/geometry-ntsc-untraced.field129.state",
+      "compressedBytes": 33540,
+      "rawBytes": 2938101,
+      "rawSha256": "748220540217ce04bd1870c928cf4c6566e44fc19b25f925f276955907d1811c"
+    },
+    "4751c827b576bf1fc9c1ccc2264124a035d2343d17e448e379e7f899dcc4707d": {
+      "archiveEntry": "baseline-traced/geometry-ntsc-traced.field9.state",
+      "compressedBytes": 33550,
+      "rawBytes": 2938215,
+      "rawSha256": "8b127bd0fb0bb1172a3dc431d54c906a13052a0a7e611d99f6a785490c77a14f"
+    },
+    "56d12ad52b42578a4681ea0a872255f9f6ceb193ec81286d8e9ae1415386ad18": {
+      "archiveEntry": "baseline/geometry-ntsc-untraced.state",
+      "compressedBytes": 33518,
+      "rawBytes": 2937904,
+      "rawSha256": "098d729a46d0ad2d450c9ad73d9e73c91747aae08ac6e56aa2679acc2ac2409d"
+    },
+    "740b3bdbdf5aa3ccd9a185b7c99e7240e15ea1a5b3e4f6d3571533034cde2689": {
+      "archiveEntry": "baseline-traced/geometry-pal-traced.field0.state",
+      "compressedBytes": 33440,
+      "rawBytes": 2938106,
+      "rawSha256": "c2dbdbfef6a41e5babef271df024377d70a875133cd581e2a2a5fe3c23c8a523"
+    },
+    "dfbc285060be56b317ff0b744394d4ba3f546dbbf78e18bc87ae76aa7b3bbf98": {
+      "archiveEntry": "baseline/geometry-pal-untraced.field129.state",
+      "compressedBytes": 33519,
+      "rawBytes": 2938086,
+      "rawSha256": "0c64bcb9df1b3b866f5f0eb275cd5271e4ab8b0277de7f4d4dddffb1be4e072c"
+    },
+    "157785fb5b912d74523e60308b34dbd35399a2190c14859ee7fc5c551669e956": {
+      "archiveEntry": "baseline-traced/geometry-pal-traced.field9.state",
+      "compressedBytes": 33518,
+      "rawBytes": 2938106,
+      "rawSha256": "e9b9238a0c47a31e410f6b993a8638f12c3ea71f3fabe34c8d72a31da8eaccd6"
+    },
+    "9b77dac11f34b3151b0bcd6437eb918b3278df8bf29065360308d46c0a7e459a": {
+      "archiveEntry": "baseline/geometry-pal-untraced.state",
+      "compressedBytes": 33573,
+      "rawBytes": 2937938,
+      "rawSha256": "ce4f2a5a4467479bf1045299ccdb6de84130c2c659eab8e622d0d275227d9ba5"
+    },
+    "5f6cb64d8020fad866d56c430963e5bd417cf7e231882e049723049f0af49125": {
+      "archiveEntry": "baseline-devices/audio-ntsc-devices.field13.state",
+      "compressedBytes": 19506,
+      "rawBytes": 1550592,
+      "rawSha256": "9336eefbe2e7810d80874012788abf4422555ec461d55c89bc906ec1ffc10d04"
+    },
+    "b8cef407b6d81e263a76a1bab174def506e0b00be012f29ac4b62f2c1c79755b": {
+      "archiveEntry": "baseline-devices/audio-ntsc-devices.state",
+      "compressedBytes": 19647,
+      "rawBytes": 1550403,
+      "rawSha256": "1e686836aa22d73f1199c97c188a965882d2747ca1346b7eee15a8cc58e64415"
+    },
+    "f00d49227ecb619d84248c861920c4b4067f361518ec4f7699f795b2e2c4dbe8": {
+      "archiveEntry": "baseline-devices/diagnostic-ntsc-devices.field13.state",
+      "compressedBytes": 48776,
+      "rawBytes": 1651213,
+      "rawSha256": "e1ced01397c1fd5f3306c152df89882d23bdc199b715f5772d3d97fa098f2f6f"
+    },
+    "d33538e2f5b0b71c6e9816bdc720a2124a48259bf816cfe0bb2df9b3156c7a61": {
+      "archiveEntry": "baseline-devices/diagnostic-ntsc-devices.state",
+      "compressedBytes": 49082,
+      "rawBytes": 1651301,
+      "rawSha256": "d4b1dabf283dd7eb4abb41b9d909aced4f8cd94e1701db47eb0aed6db36cd7ec"
+    },
+    "b97419d3ecaaf27ec29a95bde5b010ee7d942d87d79bd4f6ed12486da8baedbf": {
+      "archiveEntry": "baseline-traced/audio-ntsc-traced.field25.state",
+      "compressedBytes": 19498,
+      "rawBytes": 1550574,
+      "rawSha256": "fde3489bdce1fa5c60044a24286787ad5af029459585a569a06120b92b042e25"
+    },
+    "ed2a9454de1b8f08e098ef10d5111d6f27a518d15aeba8eedd9c4ed7a50584ce": {
+      "archiveEntry": "baseline-traced/audio-ntsc-traced.state",
+      "compressedBytes": 19618,
+      "rawBytes": 1550369,
+      "rawSha256": "da2a8d2554393a4ca827d5fcce15bc1ea67016e5740e177f07dbb2597ce56dbb"
+    },
+    "98e6f3bb17202faeba35a0411111a79438852178fe1246737b0f0ec944d686df": {
+      "archiveEntry": "baseline-traced/diagnostic-ntsc-traced.field25.state",
+      "compressedBytes": 49490,
+      "rawBytes": 1651269,
+      "rawSha256": "a13b5d0671fde56687a9e6b7af676a81e6c7736c9b4d87ba28b46a36b165bfd1"
+    },
+    "66ebf79bfd62f557f3141b20c3a200eed8603f5feb1cbf1fac6c24a5c8e0127c": {
+      "archiveEntry": "baseline-traced/diagnostic-ntsc-traced.state",
+      "compressedBytes": 50717,
+      "rawBytes": 1651349,
+      "rawSha256": "58f86dbc2c0c7224e61e55d761eb425757eb8d296bdce93669e780665be87599"
+    },
+    "0c3761c436669815d03f711dda77f15c056bb2999d06fd32c61b567c70ca2583": {
+      "archiveEntry": "baseline-traced/geometry-ntsc-traced.field25.state",
+      "compressedBytes": 33545,
+      "rawBytes": 2938123,
+      "rawSha256": "a3ea786e130412788d6b33c47b18d8ddeef4ee341ad85304cf2deb26d07dc038"
+    },
+    "399770960834ba37ddd36737e57831895397bd7c2fc6410c18b491a9dcfc7dcf": {
+      "archiveEntry": "baseline-traced/geometry-ntsc-traced.state",
+      "compressedBytes": 33575,
+      "rawBytes": 2937928,
+      "rawSha256": "f17f3c220a1c5d74d4502186f18a876bba54586e99fa1609410b14487b16661f"
+    },
+    "c5e62f6923dcf64c162073ee108ce2998abb0c92db80d2f6446b340516a2e77f": {
+      "archiveEntry": "baseline-traced/geometry-pal-traced.field25.state",
+      "compressedBytes": 33484,
+      "rawBytes": 2938028,
+      "rawSha256": "120fb1002ae32b701eb67831c96053ebbab8515f704831be1f6a5f9cd53c1c7e"
+    },
+    "1e5eb6af3509de87c1dc687864992b312823b707d50cce19d113588306e5fc5d": {
+      "archiveEntry": "baseline-traced/geometry-pal-traced.state",
+      "compressedBytes": 33527,
+      "rawBytes": 2937886,
+      "rawSha256": "2f4cb6d62575db7081700f49492a02ba5162870df57105db0f075b7e6975d233"
+    }
+  }
+}

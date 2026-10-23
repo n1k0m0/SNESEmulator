@@ -34,6 +34,7 @@ public sealed partial class SnesWindow
     }
 
     internal string? ManagerPipe => managerIpc?.PipeName;
+    internal bool ManagerClosePending => managerCloseAfter != 0;
 
     private IpcServer? managerIpc;
     private bool managerPaused;

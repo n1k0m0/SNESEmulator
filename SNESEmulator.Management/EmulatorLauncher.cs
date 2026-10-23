@@ -18,14 +18,14 @@ public static class EmulatorLauncher
             WorkingDirectory = Path.GetDirectoryName(Path.GetFullPath(executable))!
         };
         using var p = Process.Start(start) ?? throw new IOException("Could not start emulator");
-        long ticks = p.StartTime.ToUniversalTime().Ticks;
+        long ticks = Discovery.StartIdentity(p);
         var until = Stopwatch.StartNew();
         while (until.Elapsed < TimeSpan.FromSeconds(20))
         {
             token.ThrowIfCancellationRequested();
             if (p.HasExited)
                 throw new IOException("Emulator exited before IPC readiness");
-            var instance = Discovery.List().SingleOrDefault(x => x.ProcessId == p.Id && x.StartTicks == ticks);
+            var instance = Discovery.List().SingleOrDefault(x => x.ProcessId == p.Id && x.StartTicks == ticks && x.StartIdentityKind == Discovery.StartIdentityKind);
             if (instance != null)
             {
                 var response = await new IpcClient(instance).SendAsync(Request.Create("Status"), token);

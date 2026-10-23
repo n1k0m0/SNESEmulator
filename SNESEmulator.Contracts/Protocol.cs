@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 
 namespace SNESEmulator.Contracts;
+
 public sealed record Request(int Version, string RequestId, string Command, JsonElement Payload)
 {
     public static Request Create(string command, object? payload = null) => new(1, Guid.NewGuid().ToString("N"), command, JsonSerializer.SerializeToElement(payload ?? new { }));
@@ -15,7 +16,7 @@ public sealed record Response(int Version, string RequestId, bool Success, strin
     public T Value<T>() => Data.Deserialize<T>() ?? throw new InvalidDataException("Missing response value");
 }
 
-public sealed record InstanceInfo(int ProcessId, long StartTicks, string PipeName, int Version, string Executable);
+public sealed record InstanceInfo(int ProcessId, long StartTicks, string PipeName, int Version, string Executable, string StartIdentityKind = "utc-ticks");
 public sealed record HelloInfo(int Version, string[] Capabilities, int MaximumBytes);
 public sealed record StatusInfo(int ProcessId, long Epoch, long Field, string Title, string CartridgeHash, string RomPath, bool Paused, bool Turbo, bool MenuOpen, string Network, long SettingsRevision, string? Fault);
 public sealed record SettingsInfo(long Revision, JsonElement Settings, Dictionary<string, string> Effects, string? PersistenceNotice = null);

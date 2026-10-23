@@ -1,50 +1,99 @@
-name: Local test laboratory definition
-on: [push, pull_request, workflow_dispatch]
+name: SNES laboratory and package definition
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      native_windows:
+        description: Run actual windows on an explicitly configured interactive self-hosted runner
+        type: boolean
+        default: false
 jobs:
-  portable-core:
-    runs-on: ubuntu-latest
+  portable:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.402'
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.12'
       - run: python tools/test-lab.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: portable-core-reports
-          path: artifacts/
-  external-cpu-semantics:
-    runs-on: ubuntu-latest
+          name: portable-${{ matrix.os }}
+          path: |
+            artifacts/*.json
+            artifacts/*.junit.xml
+            artifacts/m9-performance/result.json
+            artifacts/m9-performance/commands.log
+  external-cpu-and-spc:
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.402'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
       - run: python tools/fetch-full-testdata.py
-      - run: python tools/test-lab.py --inventory-only --full
-      - run: dotnet run --project SNESEmulator.Lab -c Release -- cpu-bus-full artifacts/bus-conformance testdata/65816-full
+      - run: python tools/fetch-spc700.py --full
+      - run: dotnet build SNESEmulator.Lab -c Release
+      - run: dotnet SNESEmulator.Lab/bin/Release/net10.0/SNESEmulator.Lab.dll cpu-full artifacts/ci-cpu testdata/65816-full
+      - run: dotnet SNESEmulator.Lab/bin/Release/net10.0/SNESEmulator.Lab.dll cpu-bus-full artifacts/ci-bus testdata/65816-full
+      - run: dotnet SNESEmulator.Lab/bin/Release/net10.0/SNESEmulator.Lab.dll spc-full artifacts/ci-spc testdata/spc700-full
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: external-cpu-semantics
-          path: artifacts/
-  windows-integration:
-    runs-on: windows-latest
+          name: external-opcode-reports
+          path: artifacts/ci-*
+  windows-package:
+    runs-on: windows-2025
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.402'
+      - shell: powershell
+        run: ./scripts/publish-win-x64.ps1 -OutputDirectory artifacts/ci-package
+      - shell: powershell
+        run: |
+          ./artifacts/ci-package/Updater/SNESEmulator.Updater.exe verify artifacts/ci-package
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./artifacts/ci-package/SNESEmulator.exe --write-diagnostic-rom artifacts/ci-diagnostic.sfc
+          ./artifacts/ci-package/SNESEmulator.exe --headless artifacts/ci-diagnostic.sfc 8 artifacts/ci-image.ppm
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: snes-win-x64-preview-unreleased
+          path: artifacts/ci-package/
+  native-windows:
+    if: github.event_name == 'workflow_dispatch' && inputs.native_windows
+    runs-on: [self-hosted, Windows, X64, snes-interactive]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.402'
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: '3.12'
       - run: python tools/test-lab.py --windows
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: windows-integration-reports
-          path: artifacts/
+          name: actual-native-windows-reports
+          path: |
+            artifacts/*.json
+            artifacts/*.junit.xml
+            artifacts/m9b-ui-gate-*/result.json
+            artifacts/m9c-ui-gate-*/processes.json
+# This repository has no configured remote. These jobs have not executed remotely.
+# Hosted Windows agents do not provide a verified interactive OpenGL/audio device.
+# Native tests require the opt-in self-hosted runner; absence is unexecuted, never pass.

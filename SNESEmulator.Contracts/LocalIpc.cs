@@ -4,16 +4,30 @@ using System.IO.Pipes;
 using System.Text.Json;
 
 namespace SNESEmulator.Contracts;
+
 public static class Discovery
 {
     public static string DirectoryPath => Path.Combine(Environment.GetEnvironmentVariable("SNESEMULATOR_IPC_DIR") ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SNESEmulator", "ipc"), "instances");
+
+    // Windows exposes a stable creation FILETIME. Linux StartTime is reconstructed
+    // against a per-process wall-clock estimate; use procfs start ticks exactly.
+    public static string StartIdentityKind => OperatingSystem.IsLinux() ? "linux-proc-startticks" : "utc-ticks";
+    public static long StartIdentity(Process process)
+    {
+        if (!OperatingSystem.IsLinux()) return process.StartTime.ToUniversalTime().Ticks;
+        string stat = File.ReadAllText($"/proc/{process.Id}/stat");
+        int end = stat.LastIndexOf(')');
+        if (end < 0) throw new InvalidDataException("Invalid process stat");
+        string[] fields = stat[(end + 2)..].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return long.Parse(fields[19], System.Globalization.CultureInfo.InvariantCulture);
+    }
 
     public static bool IsAlive(InstanceInfo info)
     {
         try
         {
             using var p = Process.GetProcessById(info.ProcessId);
-            return !p.HasExited && p.StartTime.ToUniversalTime().Ticks == info.StartTicks && info.Version == 1 && info.PipeName != null && info.PipeName.StartsWith("SNESEmulator." + info.ProcessId + ".", StringComparison.Ordinal) && info.PipeName.Length < 128;
+            return info.StartIdentityKind == StartIdentityKind && !p.HasExited && StartIdentity(p) == info.StartTicks && info.Version == 1 && info.PipeName != null && info.PipeName.StartsWith("SNESEmulator." + info.ProcessId + ".", StringComparison.Ordinal) && info.PipeName.Length < 128;
         }
         catch
         {
@@ -36,7 +50,7 @@ public static class Discovery
     public static IReadOnlyList<InstanceInfo> List()
     {
         if (!Directory.Exists(DirectoryPath))
-            return[];
+            return [];
         var list = new List<InstanceInfo>();
         foreach (string path in Directory.EnumerateFiles(DirectoryPath, "*.json").Take(256))
         {
@@ -49,7 +63,7 @@ public static class Discovery
                 if (info != null && IsAlive(info))
                     list.Add(info);
             }
-            catch (Exception e)when (e is IOException or JsonException or UnauthorizedAccessException)
+            catch (Exception e) when (e is IOException or JsonException or UnauthorizedAccessException)
             {
             }
         }
@@ -101,7 +115,7 @@ public sealed class IpcServer : IAsyncDisposable
             Directory.CreateDirectory(Discovery.DirectoryPath);
             discovery = Path.Combine(Discovery.DirectoryPath, Environment.ProcessId + ".json");
             using var p = Process.GetCurrentProcess();
-            var info = new InstanceInfo(Environment.ProcessId, p.StartTime.ToUniversalTime().Ticks, PipeName, 1, Environment.ProcessPath ?? "");
+            var info = new InstanceInfo(Environment.ProcessId, Discovery.StartIdentity(p), PipeName, 1, Environment.ProcessPath ?? "", Discovery.StartIdentityKind);
             string tmp = discovery + "." + Guid.NewGuid().ToString("N") + ".tmp";
             File.WriteAllBytes(tmp, JsonSerializer.SerializeToUtf8Bytes(info));
             File.Move(tmp, discovery, true);
@@ -112,11 +126,13 @@ public sealed class IpcServer : IAsyncDisposable
 
     private async Task Loop()
     {
+        // Keep each of the four listener references alive between clients. On Unix
+        // disposing the last SharedServer unlinks its socket and resets queued peers.
+        using var pipe = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 4, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
         while (!stop.IsCancellationRequested)
         {
             try
             {
-                using var pipe = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 4, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
                 await pipe.WaitForConnectionAsync(stop.Token);
                 using var life = CancellationTokenSource.CreateLinkedTokenSource(stop.Token);
                 life.CancelAfter(TimeSpan.FromSeconds(30));
@@ -179,7 +195,7 @@ public sealed class IpcServer : IAsyncDisposable
                             {
                                 await probe;
                             }
-                            catch (Exception e)when (e is OperationCanceledException or IOException)
+                            catch (Exception e) when (e is OperationCanceledException or IOException)
                             {
                             }
                         }
@@ -190,8 +206,12 @@ public sealed class IpcServer : IAsyncDisposable
                         break;
                 }
             }
-            catch (Exception e)when (e is IOException or OperationCanceledException or InvalidDataException or JsonException or DecoderFallbackException or UnauthorizedAccessException)
+            catch (Exception e) when (e is IOException or OperationCanceledException or InvalidDataException or JsonException or DecoderFallbackException or UnauthorizedAccessException)
             {
+            }
+            finally
+            {
+                try { pipe.Disconnect(); } catch (Exception e) when (e is IOException or InvalidOperationException) { }
             }
         }
     }

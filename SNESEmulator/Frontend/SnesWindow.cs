@@ -86,6 +86,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         Directory.CreateDirectory(UserDataPaths.GetMediaDirectory());
         if (startupRom != null) Try(() => LoadRom(startupRom));
         StartManagerIpc();
+        CheckPreviousUpdateFailure();
     }
     public override void OnUserUpdate(double time)
     {
@@ -171,7 +172,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     }
     private string[] Rows() => menu switch
     {
-        Menu.Main => ["SETTINGS", "NETWORK", "MEDIA    " + (worker.Status.Title.Length==0?"NO MEDIA":worker.Status.Title), "RESET", "MANAGER"],
+        Menu.Main => ["SETTINGS", "NETWORK", "MEDIA    " + (worker.Status.Title.Length==0?"NO MEDIA":worker.Status.Title), "RESET", "MANAGER", preparedUpdate == null ? "CHECK FOR UPDATES" : "INSTALL PREPARED UPDATE"],
         Menu.Settings => [$"VIDEO FILTER    {new[]{"SHARP","CRT","TV"}[settings.Filter]}",
             $"VIDEO UPSCALE   {((SharpPixelsGpuUpscaleMode)settings.Upscale).ToString().ToUpperInvariant()}",
             $"FULLSCREEN      {settings.Fullscreen}", $"GAMEPAD         {settings.Gamepad}",
@@ -251,7 +252,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     {
         switch (menu)
         {
-            case Menu.Main: if(selection==4){LaunchManager();Open(Menu.None);}else Open(new[]{Menu.Settings,Menu.Network,Menu.Media,Menu.Reset}[selection]); break;
+            case Menu.Main: if(selection==5){ActivateUpdate();}else if(selection==4){LaunchManager();Open(Menu.None);}else Open(new[]{Menu.Settings,Menu.Network,Menu.Media,Menu.Reset}[selection]); break;
             case Menu.Settings:
                 switch(selection)
                 {
@@ -368,6 +369,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         if(unreportedMediaError!=null)errors.Add(unreportedMediaError);
         Finish(()=>previewTask.GetAwaiter().GetResult());
         Finish(()=>networkTask.GetAwaiter().GetResult());
+        Finish(()=>updateTask.GetAwaiter().GetResult());
         Finish(()=>autosave.Pending.GetAwaiter().GetResult());
         Finish(()=>settingsPersistence.Pending.GetAwaiter().GetResult());
         Finish(()=>worker.SetModeAsync(true,false).GetAwaiter().GetResult());

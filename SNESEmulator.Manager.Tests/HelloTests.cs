@@ -49,7 +49,7 @@ internal static class HelloTests
             {
                 using var current = Process.GetCurrentProcess();
                 string name = "SNESEmulator." + Environment.ProcessId + "." + Guid.NewGuid().ToString("N");
-                var instance = new InstanceInfo(Environment.ProcessId, current.StartTime.ToUniversalTime().Ticks, name, 1, Environment.ProcessPath ?? "");
+                var instance = new InstanceInfo(Environment.ProcessId, Discovery.StartIdentity(current), name, 1, Environment.ProcessPath ?? "", Discovery.StartIdentityKind);
                 using var stop = new CancellationTokenSource(5000);
                 using var fake = new NamedPipeServerStream(name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
                 var server = Task.Run(async () =>

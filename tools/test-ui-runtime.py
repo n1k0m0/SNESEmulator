@@ -2,14 +2,14 @@
 """Real OpenTK native windows with isolated data; synthetic app callbacks, no gamepad claim."""
 import argparse, hashlib, json, os, pathlib, subprocess
 ROOT=pathlib.Path(__file__).resolve().parents[1]
-p=argparse.ArgumentParser();p.add_argument('--output',default='artifacts/m9b-ui');p.add_argument('--rom');p.add_argument('--seconds',type=int,default=8);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--output',default='artifacts/m9b-ui');p.add_argument('--rom');p.add_argument('--seconds',type=int,default=8);p.add_argument('--exe');a=p.parse_args()
 out=(ROOT/a.output).resolve();out.mkdir(parents=True,exist_ok=True)
 data=out/'data';data.mkdir(exist_ok=True)
 assert not list(data.rglob('*.snessav')),'Use a fresh output directory; previous evidence is never overwritten'
 env=os.environ.copy();env['SNESEMULATOR_DATA_DIR']=str(data);env.pop('SNESEMULATOR_IPL',None)
 media=data/'media';media.mkdir(exist_ok=True)
 (data/'settings.json').write_text(json.dumps({'MediaDirectory':str(media),'Gamepad':True}))
-exe=ROOT/'SNESEmulator/bin/Release/net10.0-windows/SNESEmulator.exe'
+exe=pathlib.Path(a.exe).resolve() if a.exe else ROOT/'SNESEmulator/bin/Release/net10.0-windows/SNESEmulator.exe'
 command=[str(exe),'--ui-runtime-smoke',str(out),str((ROOT/a.rom).resolve()) if a.rom else '-',str(a.seconds)]
 run=subprocess.run(command,cwd=ROOT,env=env,capture_output=True,text=True,timeout=a.seconds+120)
 (out/'process.log').write_text(run.stdout+'\n'+run.stderr)

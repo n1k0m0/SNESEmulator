@@ -27,7 +27,9 @@ internal static class WindowsTests
         }
 
         string repo = Directory.GetCurrentDirectory();
-        string exe = Path.Combine(repo, "SNESEmulator/bin/Release/net10.0-windows/SNESEmulator.exe"), manager = Path.Combine(repo, "SNESEmulatorManager/bin/Release/net10.0-windows/SNESEmulatorManager.exe");
+        string? package = Environment.GetEnvironmentVariable("SNESEMULATOR_TEST_PACKAGE");
+        string exe = package == null ? Path.Combine(repo, "SNESEmulator/bin/Release/net10.0-windows/SNESEmulator.exe") : Path.Combine(package, "SNESEmulator.exe");
+        string manager = package == null ? Path.Combine(repo, "SNESEmulatorManager/bin/Release/net10.0-windows/SNESEmulatorManager.exe") : Path.Combine(package, "Manager/SNESEmulatorManager.exe");
         var directories = new[]
         {
             "SNESEmulator",
@@ -37,7 +39,7 @@ internal static class WindowsTests
             "SNESEmulator.Runtime",
             "SNESEmulator.Core"
         };
-        Dictionary<string, string> Identities() => directories.SelectMany(d => Directory.EnumerateFiles(Path.Combine(repo, d, "bin", "Release"), "*", SearchOption.AllDirectories)).Where(p => p.EndsWith(".dll") || p.EndsWith(".exe") || p.EndsWith(".deps.json") || p.EndsWith(".runtimeconfig.json")).ToDictionary(p => Path.GetRelativePath(repo, p), p => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(p))));
+        Dictionary<string, string> Identities() => (package == null ? directories.SelectMany(d => Directory.EnumerateFiles(Path.Combine(repo, d, "bin", "Release"), "*", SearchOption.AllDirectories)) : Directory.EnumerateFiles(package, "*", SearchOption.AllDirectories)).Where(p => p.EndsWith(".dll") || p.EndsWith(".exe") || p.EndsWith(".deps.json") || p.EndsWith(".runtimeconfig.json")).ToDictionary(p => Path.GetRelativePath(repo, p), p => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(p))));
         var before = Identities();
         File.WriteAllText(Path.Combine(root, "native-before.json"), JsonSerializer.Serialize(before));
         async Task Wait(Func<bool> condition, string message, int seconds = 30)
@@ -72,6 +74,7 @@ internal static class WindowsTests
                 RedirectStandardError = true,
                 WorkingDirectory = repo
             };
+            if (package != null) { start.Environment["PATH"] = Environment.GetFolderPath(Environment.SpecialFolder.System); start.Environment["DOTNET_ROOT"] = Path.Combine(root, "no-sdk"); start.Environment["DOTNET_MULTILEVEL_LOOKUP"] = "0"; }
             start.Environment["SNESEMULATOR_DATA_DIR"] = dataRoot;
             start.Environment["SNESEMULATOR_IPC_DIR"] = dataRoot;
             start.Environment["SNESEMULATOR_MANAGER_TEST_ID"] = Path.GetFileName(dataRoot);
@@ -83,6 +86,8 @@ internal static class WindowsTests
             children.Add(p);
             var exited = p.WaitForExitAsync();
             logs.Add(exited.ContinueWith(_ => File.WriteAllText(Path.Combine(root, name + ".identity-after.json"), JsonSerializer.Serialize(Identities()))));
+            int launchedPid = p.Id; long launchedStart = p.StartTime.ToUniversalTime().Ticks;
+            logs.Add(exited.ContinueWith(_ => File.WriteAllText(Path.Combine(root, name + ".exit.json"), JsonSerializer.Serialize(new { Pid = launchedPid, StartTicks = launchedStart, ExitCode = p.ExitCode, ExitUtc = p.ExitTime.ToUniversalTime(), RecordedUtc = DateTimeOffset.UtcNow }))));
             logs.Add(p.StandardOutput.ReadToEndAsync().ContinueWith(t => File.WriteAllText(Path.Combine(root, name + ".stdout.log"), t.Result)));
             logs.Add(p.StandardError.ReadToEndAsync().ContinueWith(t => File.WriteAllText(Path.Combine(root, name + ".stderr.log"), t.Result)));
             return p;
@@ -90,6 +95,12 @@ internal static class WindowsTests
 
         async Task<Response> Send(InstanceInfo info, string command, object? payload = null)
         {
+            if (!Discovery.IsAlive(info))
+            {
+                string observed;
+                try { using var process = Process.GetProcessById(info.ProcessId); observed = $"Exited={process.HasExited} observedStart={Discovery.StartIdentity(process)} kind={Discovery.StartIdentityKind}"; } catch (Exception e) { observed = e.ToString(); }
+                throw new IOException($"Before {command}: selected={JsonSerializer.Serialize(info)} observed={observed}");
+            }
             return await new IpcClient(info).SendAsync(Request.Create(command, payload));
         }
 
@@ -323,7 +334,7 @@ internal static class WindowsTests
                         {
                             await request;
                         }
-                        catch (Exception e)when (e is IOException or OperationCanceledException)
+                        catch (Exception e) when (e is IOException or OperationCanceledException)
                         {
                         }
                     }
@@ -347,23 +358,24 @@ internal static class WindowsTests
         }
         finally
         {
-            var cleanupErrors=new List<Exception>();
-            foreach(string dir in new[]{aDir,bDir,Path.Combine(root,"manager-single")})
+            var cleanupErrors = new List<Exception>();
+            foreach (string dir in new[] { aDir, bDir, Path.Combine(root, "manager-single") })
             {
-                try{Directory.CreateDirectory(dir);string tmp=Path.Combine(dir,"cleanup-close.tmp");File.WriteAllText(tmp,"close");File.Move(tmp,Path.Combine(dir,"close"),true);}catch(Exception error){cleanupErrors.Add(error);}
+                try { Directory.CreateDirectory(dir); string tmp = Path.Combine(dir, "cleanup-close.tmp"); File.WriteAllText(tmp, "close"); File.Move(tmp, Path.Combine(dir, "close"), true); } catch (Exception error) { cleanupErrors.Add(error); }
             }
             // Include only the emulator launched through this isolated test's Manager.
-            foreach(var info in Discovery.List().Where(i=>string.Equals(i.Executable,exe,StringComparison.OrdinalIgnoreCase)&&!children.Any(p=>p.Id==i.ProcessId)))
+            foreach (var info in Discovery.List().Where(i => string.Equals(i.Executable, exe, StringComparison.OrdinalIgnoreCase) && !children.Any(p => p.Id == i.ProcessId)))
             {
-                try{var launched=Process.GetProcessById(info.ProcessId);if(launched.StartTime.ToUniversalTime().Ticks!=info.StartTicks){launched.Dispose();continue;}children.Add(launched);await Send(info,"Close");}catch(Exception error){cleanupErrors.Add(error);}
+                try { var launched = Process.GetProcessById(info.ProcessId); if (launched.StartTime.ToUniversalTime().Ticks != info.StartTicks) { launched.Dispose(); continue; } children.Add(launched); await Send(info, "Close"); } catch (Exception error) { cleanupErrors.Add(error); }
             }
-            foreach(var process in children)
+            foreach (var process in children)
             {
-                try{if(!process.HasExited){try{await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(25));}catch(TimeoutException){cleanupErrors.Add(new TimeoutException("Owned process did not join:"+process.Id));process.Kill(true);await process.WaitForExitAsync();}}}catch(Exception error){cleanupErrors.Add(error);}finally{process.Dispose();}
+                try { if (!process.HasExited) { try { await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(25)); } catch (TimeoutException) { cleanupErrors.Add(new TimeoutException("Owned process did not join:" + process.Id)); process.Kill(true); await process.WaitForExitAsync(); } } } catch (Exception error) { cleanupErrors.Add(error); } finally { }
             }
-            try{await Task.WhenAll(logs);}catch(Exception error){cleanupErrors.Add(error);}
-            try{var after=Identities();File.WriteAllText(Path.Combine(root,"native-after.json"),JsonSerializer.Serialize(after));if(before.Count!=after.Count||before.Any(p=>after.GetValueOrDefault(p.Key)!=p.Value))cleanupErrors.Add(new Exception("Native binary/configuration identities changed"));}catch(Exception error){cleanupErrors.Add(error);}
-            if(cleanupErrors.Count>0)await test("M9e owned cleanup and identities",()=>Task.FromException(new AggregateException(cleanupErrors)));
+            try { await Task.WhenAll(logs); } catch (Exception error) { cleanupErrors.Add(error); }
+            foreach (var process in children) process.Dispose();
+            try { var after = Identities(); File.WriteAllText(Path.Combine(root, "native-after.json"), JsonSerializer.Serialize(after)); if (before.Count != after.Count || before.Any(p => after.GetValueOrDefault(p.Key) != p.Value)) cleanupErrors.Add(new Exception("Native binary/configuration identities changed")); } catch (Exception error) { cleanupErrors.Add(error); }
+            if (cleanupErrors.Count > 0) await test("M9e owned cleanup and identities", () => Task.FromException(new AggregateException(cleanupErrors)));
         }
     }
 }

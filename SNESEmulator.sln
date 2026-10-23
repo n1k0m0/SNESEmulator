@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNESEmulatorManager", "SNES
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNESEmulator.Manager.Tests", "SNESEmulator.Manager.Tests\SNESEmulator.Manager.Tests.csproj", "{E173FE23-5087-42AA-B183-C9B0835E8F85}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNESEmulator.Updater", "SNESEmulator.Updater\SNESEmulator.Updater.csproj", "{CEBB04B3-3FF8-43DB-9B41-642031357BD3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SNESEmulator.Distribution.Tests", "SNESEmulator.Distribution.Tests\SNESEmulator.Distribution.Tests.csproj", "{26203C75-3C37-420F-BB93-EE83A42B30D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +185,30 @@ Global
 		{E173FE23-5087-42AA-B183-C9B0835E8F85}.Release|x64.Build.0 = Release|Any CPU
 		{E173FE23-5087-42AA-B183-C9B0835E8F85}.Release|x86.ActiveCfg = Release|Any CPU
 		{E173FE23-5087-42AA-B183-C9B0835E8F85}.Release|x86.Build.0 = Release|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Debug|x64.Build.0 = Debug|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Debug|x86.Build.0 = Debug|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Release|x64.ActiveCfg = Release|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Release|x64.Build.0 = Release|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Release|x86.ActiveCfg = Release|Any CPU
+		{CEBB04B3-3FF8-43DB-9B41-642031357BD3}.Release|x86.Build.0 = Release|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Debug|x64.Build.0 = Debug|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Debug|x86.Build.0 = Debug|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Release|x64.ActiveCfg = Release|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Release|x64.Build.0 = Release|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Release|x86.ActiveCfg = Release|Any CPU
+		{26203C75-3C37-420F-BB93-EE83A42B30D1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

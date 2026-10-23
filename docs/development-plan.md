@@ -543,3 +543,5 @@ OS-focus or clean-VM claim is added.
 
 
 M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. Independent Root acceptance passed on `2534dba` (267 portable/31 Windows groups); implementation `a397fca` and frozen evidence remain separately identified. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.
+
+M9f implementiert selbständige Windowspakete beider Apps, Paketmanifest/Notices/Locks, einen explizit konfigurierten Updatepfad, isolierte Inno-Install/Repair/Uninstall-Prüfungen sowie echte Linux-Portabilitätsprüfung. [Distributionsvertrag](m9-distribution-contract.md). Finale Implementierungsgates und unabhängige Abnahme stehen noch aus; M9/Release bleiben unvollständig.

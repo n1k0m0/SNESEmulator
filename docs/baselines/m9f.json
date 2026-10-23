@@ -1,0 +1,50 @@
+{
+  "schema": "m9f-distribution-baseline-v1",
+  "status": "implementation validation in progress; independent Root acceptance pending",
+  "releaseAccepted": false,
+  "priorPortable": 267,
+  "priorWindows": 31,
+  "newPortable": 8,
+  "contract": "docs/m9-distribution-contract.md",
+  "pins": { "sdk": "10.0.402", "runtime": "10.0.13", "rid": "win-x64", "globalSdkInstalled": false },
+  "linuxDiscoveryFix": {
+    "evidence": "artifacts/m9f-linux-discovery-debug.log",
+    "measuredTickDeltaExample": -17329,
+    "fix": "Explicit Linux procfs start token and Windows UTC kind; four persistent listener streams avoid unlinking the shared Unix socket between queued clients",
+    "primarySource": "https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.IO.Pipes/src/System/IO/Pipes/NamedPipeServerStream.Unix.cs"
+  },
+  "rawStateOracle": {
+    "states": 36,
+    "path": "testdata/m9-raw-state-oracles.json",
+    "archiveSha256": "475ac577f9b37f5145a8d244dba2d6f2d6179c5da5867bc42098c6071b13dccf",
+    "expectedInput": "Only historical baseline/baseline-traced/baseline-devices entries whose compressed hashes match all unchanged pre-M9 expected values. No current output contributes expected values."
+  },
+  "linuxCoreWatchdog": {
+    "priorSeconds": 240,
+    "newSeconds": 600,
+    "calibration": "artifacts/m9f-linux-core-calibration.log",
+    "calibrationExit": 0,
+    "groups": 129,
+    "wallSeconds": 270.21,
+    "userSeconds": 129.14,
+    "systemSeconds": 10.56,
+    "windowsSecondsUnchanged": 240,
+    "realtimeThresholdsUnchanged": true
+  },
+  "developmentLimits": [
+    "Package01 missing RID locks; package02 unsupported WindowsPowerShell5 GetRelativePath. Original failures retained; separate precomputed Windows locks and compatible relative path calculation replace these attempts.",
+    "Initial CMD harness quoting and Inno /D argument joining failed. Corrected explicit argument handling is tested by actual published processes and the isolated installer.",
+    "One early Linux settings-writer group failed without the old assertion retaining child stderr. Later assertion retains both exits/errors; no invented causal fix.",
+    "Package07 Manager first run5/8: first pre-F10 alive guard failed and two later groups followed. Empty stderr and successful closed.json do not prove native close versus identity failure. Unchanged package repeat8/8; final diagnostics record selected/current identity, actual exit/time and apphook close cause. Original cause remains unknown.",
+    "Early intermediate source drafts were not all snapshotted. Available original logs, published binaries/manifests and final source remain; no exact intermediate-source reproduction claim."
+  ],
+  "openLimits": [
+    "No remote CI execution or configured remote",
+    "No fresh Windows VM execution; local SDK-discovery-hidden selfcontained probes only",
+    "No physical SNES/input/DAC verification",
+    "M9a38/62 NTSC sustained windows red; PAL sustained unperformed",
+    "Multi-hour soak pending",
+    "18 M8 full-audio differences and7000 source-adjudicated raw SPC mismatches remain",
+    "M10 families pending"
+  ]
+}

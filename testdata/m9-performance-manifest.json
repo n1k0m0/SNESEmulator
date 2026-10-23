@@ -10,6 +10,8 @@
     "testdata/m9-performance-replay.json": "c5e7e91e565ee6feaf3a3bf377d8a068f60581e737f72dbb8ae35b140309bde6",
     "testdata/m9-performance-baseline.json": "11c9c7a2b6ae55cfaa102c291fb7e76a02ead3e90e00cf08efa1ef582f622377",
     "testdata/m9-spc-suspension-reference.jsonl.gz": "837e898f015a401db0be290794d7938b507a5eb0c95d4b9248d301f54bc3ff84",
-    "tools/test-performance.py": "548828b9d8f43de8149cb03874326810fa00fddf2e99082fbba44f01553066aa"
-  }
+    "tools/test-performance.py": "bcfd8b328385d10aa7161fa033a38eb3f78e66239f23bfe897bd4bf9196e0f55",
+    "testdata/m9-raw-state-oracles.json": "3d9eefd1396da5212c53c1abe50f85a87d9bc820876b61b525011373e11eb2a8"
+  },
+  "comparisonAdapterChange": "M9f adds independent raw-state hashes derived only from accepted immutable preoptimization archive; Windows compressed goldens and hardware output oracles unchanged."
 }

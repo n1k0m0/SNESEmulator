@@ -7169,8 +7169,8 @@
     },
     {
       "path": "tools/test-lab.py",
-      "bytes": 12077,
-      "sha256": "ce50af6bd60081c5ee2d5e9fded7df9beb71828ea3e321052c288ab4de0c46e2"
+      "bytes": 12519,
+      "sha256": "a5218c211e16a0f8aac5a66da429573d65803cf8a539d624ecb7c16cf057b875"
     },
     {
       "path": "tools/verify-m8-testdata.py",

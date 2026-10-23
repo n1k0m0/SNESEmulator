@@ -17,7 +17,7 @@
     <ProjectReference Include="../SharpPixels/SharpPixels.csproj" />
     <PackageReference Include="NAudio" Version="2.3.0" />
   </ItemGroup>
-  <Target Name="CopyManagerForDevelopment" AfterTargets="Build">
+  <Target Name="CopyManagerForDevelopment" AfterTargets="Build" Condition="'$(SkipManagerDevelopmentCopy)' != 'true'">
     <ItemGroup><ManagerFiles Include="../SNESEmulatorManager/bin/$(Configuration)/net10.0-windows/**/*" /></ItemGroup>
     <Copy SourceFiles="@(ManagerFiles)" DestinationFiles="@(ManagerFiles->'$(OutDir)Manager/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>

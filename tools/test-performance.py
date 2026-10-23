@@ -17,6 +17,12 @@ provenance={'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT
 manifest=json.loads((ROOT/'testdata/m9-performance-manifest.json').read_text())
 for f,h in manifest['files'].items():assert sha(ROOT/f)==h,('Immutable M9 regression/source identity',f)
 contract=json.loads((ROOT/inputs[0]).read_text());reference=ROOT/inputs[1]
+raw_oracles=json.loads((ROOT/'testdata/m9-raw-state-oracles.json').read_text())['statesByCompressedSha256']
+def compare_state(expected_hash,path):
+ raw=gzip.decompress(path.read_bytes());oracle=raw_oracles[expected_hash]
+ assert len(raw)==oracle['rawBytes'] and hashlib.sha256(raw).hexdigest()==oracle['rawSha256'],('Immutable pre-M9 raw state mismatch',path)
+ if sys.platform=='win32':assert sha(path)==expected_hash,('Windows compressed state mismatch',path)
+
 run(['dotnet',LAB,'suspend-proof',OUT/'suspend',reference])
 run(['dotnet',LAB,'frame-proof',OUT/'horizons'])
 comparisons=[]
@@ -26,7 +32,14 @@ for fields,mode in [(120,'untraced'),(16,'traced'),(4,'devices')]:
   expected=e['expected'];name=expected['name'];directory=OUT/mode
   run(['dotnet',LAB,'performance',directory,fields,name,mode])
   result=json.loads((directory/(name+'-'+mode+'.json')).read_text())
-  for k,v in expected.items():assert result[k]==v,(name,mode,k,result[k],v)
+  for k,v in expected.items():
+   if k=='stateSha256':compare_state(v,directory/(name+'-'+mode+'.state'))
+   elif k=='checkpoints':
+    assert len(result[k])==len(v)
+    for actual,prior in zip(result[k],v):
+     assert actual['field']==prior['field'] and actual['clock']==prior['clock']
+     compare_state(prior['stateSha256'],directory/(name+'-'+mode+'.field'+str(prior['field'])+'.state'))
+   else:assert result[k]==v,(name,mode,k,result[k],v)
   assert result['activeApu'] and result['presentationDrops']==0
   if args.realtime and mode=='untraced':assert result['realtimeRatio']>=1,(name,result['realtimeRatio'])
   comparisons.append({'name':name,'mode':mode,'exact':True,'realtimeRatio':result['realtimeRatio']})
@@ -50,5 +63,5 @@ if args.sustained:
    windows.append({'firstField':window[0]['field'],'fields':len(window),'realtimeRatio':ratio,'allocatedBytes':sum(f['allocatedBytes'] for f in window)})
    if args.realtime:assert ratio>=1,(name,start,ratio)
   comparisons.append({'name':name,'mode':'sustained-untraced','emulatedSeconds':d['emulatedSeconds'],'realtimeRatio':d['realtimeRatio'],'managedStart':d['managedStart'],'managedMax':d['managedMax'],'managedEnd':d['managedEnd'],'gcCollections':d['gcCollections'],'windows':windows})
-(OUT/'result.json').write_text(json.dumps({'exactWholeConsoleCases':len(contract['entries']),'suspendCases':18952,'horizonCases':128,'checks':comparisons,'accuracy':'Regression against pre-M9 own core; all independent M0-M8 oracles stay separate','seconds':time.time()},indent=2)+'\n')
+(OUT/'result.json').write_text(json.dumps({'exactWholeConsoleCases':len(contract['entries']),'suspendCases':18952,'horizonCases':128,'checks':comparisons,'compressionComparison':'Windows compressed bytes AND pinned prior raw states; Linux pinned prior raw states only (platform zlib differs)', 'accuracy':'Regression against pre-M9 own core; all independent M0-M8 oracles stay separate','seconds':time.time()},indent=2)+'\n')
 print('M9 performance/state/observer gates PASS')

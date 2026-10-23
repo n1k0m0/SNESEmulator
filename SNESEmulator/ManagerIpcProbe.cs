@@ -11,6 +11,7 @@ internal static class ManagerIpcProbe
         using var window = new SnesWindow(rom);
         var time = Stopwatch.StartNew();
         bool ready = false;
+        string closeReason="window-close-event";
         window.RenderFrame += _ =>
         {
             if (!ready && window.ManagerPipe != null && !window.MediaOperationPending)
@@ -53,9 +54,12 @@ internal static class ManagerIpcProbe
             }
 
             if (File.Exists(Path.Combine(directory, "close")) || time.Elapsed.TotalSeconds > 180)
+            {
+                closeReason=File.Exists(Path.Combine(directory,"close"))?"test-close-file":"test-lifetime180s";
                 window.Close();
+            }
         };
         window.Run();
-        File.WriteAllText(Path.Combine(directory, "closed.json"), JsonSerializer.Serialize(new { Success = true, SyntheticAppHooks = true }));
+        File.WriteAllText(Path.Combine(directory, "closed.json"), JsonSerializer.Serialize(new { Success = true, SyntheticAppHooks = true, CloseReason=window.ManagerClosePending?"acknowledged-IPC-Close":closeReason, Seconds=time.Elapsed.TotalSeconds, EndUtc=DateTimeOffset.UtcNow }));
     }
 }

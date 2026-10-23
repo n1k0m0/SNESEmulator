@@ -276,6 +276,7 @@ if (!args.Contains("--windows"))
             Check(results.Length == 12 && results.Select(x => x.Value<JsonElement>().GetProperty("Index").GetInt32()).Order().SequenceEqual(Enumerable.Range(0, 12)) && results.All(x => x.Success));
             Check((await new IpcClient(info).SendAsync(Request.Create("Unknown"))).Code == "UNSUPPORTED");
             Check(!Discovery.IsAlive(info with { StartTicks = info.StartTicks + 1 }));
+            Check(!Discovery.IsAlive(info with { StartIdentityKind = "foreign-identity-kind" }));
             await child.StandardInput.WriteLineAsync();
             await child.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(10));
             Check(child.ExitCode == 0 && !Discovery.IsAlive(info));
@@ -419,7 +420,8 @@ if (!args.Contains("--windows"))
         await first.StandardInput.WriteLineAsync();
         await second.StandardInput.WriteLineAsync();
         await Task.WhenAll(first.WaitForExitAsync(), second.WaitForExitAsync()).WaitAsync(TimeSpan.FromSeconds(20));
-        Check(first.ExitCode == 0 && second.ExitCode == 0 && new[] { 20, 70 }.Contains(EmulatorSettings.Load(path).AudioVolume) && File.Exists(path + ".bak"));
+        string firstError=await first.StandardError.ReadToEndAsync(), secondError=await second.StandardError.ReadToEndAsync();
+        Check(first.ExitCode == 0 && second.ExitCode == 0 && new[] { 20, 70 }.Contains(EmulatorSettings.Load(path).AudioVolume) && File.Exists(path + ".bak"), $"Settings child exits {first.ExitCode}/{second.ExitCode}; first={firstError}; second={secondError}");
     });
 }
 else
