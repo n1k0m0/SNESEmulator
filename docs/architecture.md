@@ -161,12 +161,12 @@ M9b now runs the live console on a portable controlled worker; remaining
 persistence/network/distribution work and sustained realtime acceptance stay open. M8 was independently accepted on10164c7.
 
 
-M9b Worker/UI wurde unabh‰ngig auf1074c36 abgenommen; die dokumentierten
-Hardware-/Eingabe-/Soak- und Dauerleistungsgrenzen bleiben bestehen. M9c erg‰nzt
+M9b Worker/UI wurde unabh√§ngig auf1074c36 abgenommen; die dokumentierten
+Hardware-/Eingabe-/Soak- und Dauerleistungsgrenzen bleiben bestehen. M9c erg√§nzt
 begrenzte, atomar geflushte Persistenz mit validierten Backups, sichtbarer Recovery,
 30s-Dirty-SRAM-Snapshots und transaktionalen ROM-Session-Leases. State-Dekodierung
-l‰uft an einer abgetrennten Maschine auﬂerhalb des Hardwareowners und installiert
-nur bei unver‰nderter Epoche. Format9/VID3/AUD2 bleiben erhalten. Der volle Gate
-auf `ed62a20` besteht; unabh‰ngige M9c-Abnahme steht aus. Siehe
+l√§uft an einer abgetrennten Maschine au√üerhalb des Hardwareowners und installiert
+nur bei unver√§nderter Epoche. Format9/VID3/AUD2 bleiben erhalten. Der volle Gate
+auf `ed62a20` besteht; M9c wurde unabh√§ngig auf `cfe4ed2` abgenommen. Siehe
 [Persistenzvertrag](m9-persistence-contract.md) und [Baseline](baselines/m9c.json).
 M9a-Dauerleistung, Netzwerk, aktuelle Distribution und M9/Release bleiben offen.

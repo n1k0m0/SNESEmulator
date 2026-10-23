@@ -1,6 +1,6 @@
 {
   "milestone": "M9c",
-  "status": "Implementation validated; independent root acceptance pending. M9 and release incomplete.",
+  "status": "Independently accepted on cfe4ed2; M9 and release incomplete.",
   "implementationCommit": "ed62a2016c68d8130e907a0fff8e23484ffac8ae",
   "fullGate": {
     "command": "python tools/test-lab.py --windows --full",
@@ -99,5 +99,13 @@
   ],
   "notOffered": "No separate PowerCycle/Clear-SRAM menu action. Reset preserves SRAM; Same-ROM reload flushes/loads battery before PowerOn.",
   "developmentEvidenceLimits": "All captured failed/repeated development reports retained separately; disposition records missing initial full build log/source-snapshot limits.",
-  "rootAcceptance": "pending"
+  "rootAcceptance": {
+    "commit": "cfe4ed2fa1199f5b73332febc916bbdf758589d3",
+    "portableTotal": 239,
+    "windowsGroups": 10,
+    "acceptanceSha256": "e823b2c271a6abdfe9c851dd2c027458e2dd07ceb373cafb89396d0fe84fa8a2",
+    "manifestSha256": "d363601d0a81d23fb0ca3c6e5f616df21a7341f4d5116b235f101a9b77b07913",
+    "files": 1380,
+    "decompressedBytes": 47215015
+  }
 }

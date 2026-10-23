@@ -142,8 +142,8 @@ lock-screen/browser workaround remains in force; no new OS automation was used.
 
 The M8 `test-lab.py` pin changes solely to add the persistence supervisor and native
 persistence probe. Existing acquired fixtures, reference adapters, golden outputs
-and known-error thresholds remain unchanged. Root independent acceptance is a
-separate pending step; final clean-commit measurements are recorded in the baseline.
+and known-error thresholds remain unchanged. Root independently accepted M9c on `cfe4ed2`; final measurements are recorded
+in the baseline.
 
 
 ## Clean implementation result
@@ -171,4 +171,10 @@ length, SHA256 and fresh disk-original comparisons. Captured development failure
 remain separate, with an explicit disposition noting that the initial build's
 complete standalone log and per-attempt source snapshots were not retained.
 Prior M9b implementation/root archive and manifest identities remain unchanged.
-Independent M9c root product acceptance is pending; M9/release is incomplete.
+Independent M9c root product acceptance passed on `cfe4ed2`: 239 portable and
+10 Windows groups, both native probe types, 122368 literal pixels/5 checks,
+unchanged stereo SHA and actual periodic SRAM saves at 30.0395s/1803 fields
+and 60.0449s/3606 fields. Root evidence: `artifacts/root-m9c-evidence/acceptance.json`
+SHA256 `e823b2c271a6abdfe9c851dd2c027458e2dd07ceb373cafb89396d0fe84fa8a2`;
+manifest SHA256 `d363601d0a81d23fb0ca3c6e5f616df21a7341f4d5116b235f101a9b77b07913`.
+Its 3 archives/1380 files/47,215,015 bytes were fully verified. M9/release remains incomplete.

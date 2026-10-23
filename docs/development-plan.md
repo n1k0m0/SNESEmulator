@@ -484,8 +484,7 @@ Video-/Audio√ºbergabe; [Vertrag und Nachweisgrenzen](m9-worker-contract.md).
 Saubere Implementierung43c566d: voller Windows-Gate Exit0,209 bisherige portable,
 16 getrennte Runtime- und10 Windows-Gruppen plus nativer App-Probe.
 [Drei60-s-App-Messungen und unver√§nderte Grenzen](m9-worker-contract.md) sowie
-[Baseline](baselines/m9b.json) trennen Implementierungsnachweis und noch offene
-unabh√§ngige Produktabnahme. NTSC/PAL-Dauerleistung, mehrst√ºndiger A/V-/Threading-
+[Baseline](baselines/m9b.json) dokumentieren die unabh√§ngige Root-Abnahme auf `1074c36`. NTSC/PAL-Dauerleistung, mehrst√ºndiger A/V-/Threading-
 Soak und die weiteren Produkt-/Distributionsphasen bleiben vor M9-/Releasefreigabe offen.
 
 
@@ -494,10 +493,11 @@ sichtbare Recovery, begrenzte periodische Dirty-SRAM-Snapshots, transaktionale
 ROM-Session-Leases und begrenzte State-Reader. [Persistenzvertrag](m9-persistence-contract.md)
 und [Baseline](baselines/m9c.json) nennen Commit, Dateien, Hashes und Grenzen.
 Saubere Implementierung `ed62a20`: voller Windows-Gate Exit0,209 bisherige portable,
-16 Runtime-,14 Persistenz- und10 Windows-Gruppen; tats‰chliche native Periodik,
-Preview/Recovery/Close plus negative SRAM-/Settings-/Log-Fehlerf‰lle bestanden.
-Zus‰tzliche native Wiederholungen pr¸ften je28 unmittelbar zuvor/danach erfasste
-Buildidentit‰ten. Drei Archive/7744 Dateien (5.613.078.150 dekomprimierte Bytes)
-wurden gegen CRC/L‰nge/SHA256 und alle Diskoriginale erneut gepr¸ft. Unabh‰ngige
-M9c-Rootabnahme steht aus. Das schlieﬂt weder M9a-Dauerleistung noch Netzwerk,
-Distribution/Manager, mehrst¸ndigen Soak oder M9/Release insgesamt ab.
+16 Runtime-,14 Persistenz- und10 Windows-Gruppen; tats√§chliche native Periodik,
+Preview/Recovery/Close plus negative SRAM-/Settings-/Log-Fehlerf√§lle bestanden.
+Zus√§tzliche native Wiederholungen pr√ºften je28 unmittelbar zuvor/danach erfasste
+Buildidentit√§ten. Drei Archive/7744 Dateien (5.613.078.150 dekomprimierte Bytes)
+wurden gegen CRC/L√§nge/SHA256 und alle Diskoriginale erneut gepr√ºft. Unabh√§ngige
+M9c-Rootabnahme auf `cfe4ed2` bestanden (239 portable/10 Windows-Gruppen,
+beide nativen Probearten, 122368 Pixel/5 Checks und unver√§nderte Stereo-SHA). Das schlie√üt weder M9a-Dauerleistung noch Netzwerk,
+Distribution/Manager, mehrst√ºndigen Soak oder M9/Release insgesamt ab.

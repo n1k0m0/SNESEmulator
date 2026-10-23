@@ -215,4 +215,4 @@ Its3 archives/1020 files/43,635,978 bytes were independently reread.
 See [M9b baseline](baselines/m9b.json). M9a sustained realtime, several emulated
 hours of A/V/threading, physical OS focus/gamepads, transport and
 current distribution remain open as listed above. Persistence is now the separate
-[M9c implementation](m9-persistence-contract.md), pending independent acceptance.
+[M9c implementation](m9-persistence-contract.md), independently accepted on `cfe4ed2`.
