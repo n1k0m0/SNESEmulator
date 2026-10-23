@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 23.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M8 unabhängig abgenommen. M9a: Genauigkeitsgate auf `2dbeb5f` bestanden, Dauerleistungsziel rot (38/62 NTSC-Fenster); M9 bleibt unvollständig. M9b Worker/UI, M9c Persistenz, M9d Netzwerk und M9e Manager sind unabhängig abgenommen. M9f Distribution/CI folgt; Dauerleistung, mehrstündiger Soak, Genauigkeitstriage und M10 bleiben offen.
+Status: M0–M8 unabhängig abgenommen. M9a: Genauigkeitsgate auf `2dbeb5f` bestanden, Dauerleistungsziel rot (38/62 NTSC-Fenster); M9 bleibt unvollständig. M9b Worker/UI, M9c Persistenz, M9d Netzwerk und M9e Manager sind unabhängig abgenommen. M9f Distribution/CI ist implementiert und eingefroren; unabhängige Root-Abnahme steht aus. Dauerleistung, PAL-Messung, mehrstündiger Soak, Genauigkeitstriage und M10 bleiben offen.
 
 ## Ziel und Nachweis
 
@@ -538,10 +538,12 @@ they were not run as implementation evidence.
 See [M9d baseline](baselines/m9d.json) for exact hashes, counts and raw paths.
 M9d was independently accepted on `2a5ae39` (Root full gate exit0,256 portable/23 Windows groups). M9a sustained performance, M8 audio
 reds, source-adjudicated raw SPC differences, distribution/Manager/CI, prolonged
-soak and M10 remain open; publish remains PRE-M0. No physical SNES/input/DAC,
+soak and M10 remained open at this M9d snapshot; publish was then PRE-M0. No physical SNES/input/DAC,
 OS-focus or clean-VM claim is added.
 
 
 M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. Independent Root acceptance passed on `2534dba` (267 portable/31 Windows groups); implementation `a397fca` and frozen evidence remain separately identified. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.
 
-M9f implementiert selbständige Windowspakete beider Apps, Paketmanifest/Notices/Locks, einen explizit konfigurierten Updatepfad, isolierte Inno-Install/Repair/Uninstall-Prüfungen sowie echte Linux-Portabilitätsprüfung. [Distributionsvertrag](m9-distribution-contract.md). Finale Implementierungsgates und unabhängige Abnahme stehen noch aus; M9/Release bleiben unvollständig.
+M9f implementiert selbständige Windowspakete beider Apps, Paketmanifest/Notices/Locks, einen explizit konfigurierten Updatepfad, isolierte Inno-Install/Repair/Uninstall-Prüfungen sowie echte Linux-Portabilitätsprüfung. [Distributionsvertrag](m9-distribution-contract.md). Vollständiger Windowsgate auf sauberem `9db1edd`:276 portable/31 Windowsgruppen; nach ausschließlich Testharness-/Dokumentationshärtung auf `9058878` gezielt11 portable/8 native Managergruppen und alle Paketproben. Vollständiger Linuxgate auf sauberem `9058878`:276 portable Gruppen und alle Vollkorpora. Keine Behauptung eines vollen Windowsgates auf dem späteren Commit; Root führt ihn unabhängig aus.
+
+`publish/` enthält jetzt das verifizierte aktuelle Paket; das komplette PRE-M0-Verzeichnis bleibt als `publish-pre-m9f-9058878/` erhalten. Der allgemeine CMD-Starter bestand einen weiteren20s-Nativlauf mit dem lokalen Spiel. Dessen separate Verknüpfung, alle412 Dateien der bisherigen spielbaren Kopie und Original-ROM bleiben unverändert. Evidenz:4.581 eindeutige Objekte/4.987.831.365 Bytes,66.951 Originalverweise/29.513.259.971 Bytes; Archiv und alle Originale vollständig nachgelesen. [Exakte Baseline](baselines/m9f.json). Unabhängige Abnahme, Dauerleistung/Soak, offene Genauigkeitsfragen und M10 bleiben ausstehend; M9/Release sind unvollständig.

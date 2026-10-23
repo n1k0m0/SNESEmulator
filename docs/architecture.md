@@ -142,7 +142,7 @@ Der Vollgate auf7cf7cc1 bestand mit182 portablen und10 Windowsgruppen. Die spät
 
 WAI führt fortlaufende6-Master-Idlezyklen aus. CPU-/DMA-MMIO-Effekte liegen bei gleichem Timestamp vor der betreffenden PPU-Phase; auch H0-Latches und Feldallokation folgen diesem Commit. V128 übernimmt den am V0 erfassten Display-Interlacewert. Format9 weist alte Formate1–8 wegen nicht eindeutig rekonstruierbarer WAI-/H0-Zustände ab. Neue Beobachter-Saves werden gegen ungeladene durchgehende Referenzläufe geprüft. VID3 und AUD2 bleiben unverändert.
 
-Die Produktprofile bleiben analytische separate-chip2/1/3-Ziele. Veröffentlichte Forced-Blank-Korruption, Early-read/DMA-Errata und analoge Transienten sind weiterhin nicht nachgebildet. Gemessene SMP-Frequenzen liefern zusätzliche Parameterfälle, keine neue Board-Zertifizierung. Standard32000 und das ausdrücklich erzwungene32040-Referenzprofil sind getrennt. M9 muss weiterhin Leistung und Produktbetrieb bearbeiten; publish/ bleibt PRE-M0.
+Die Produktprofile bleiben analytische separate-chip2/1/3-Ziele. Veröffentlichte Forced-Blank-Korruption, Early-read/DMA-Errata und analoge Transienten sind weiterhin nicht nachgebildet. Gemessene SMP-Frequenzen liefern zusätzliche Parameterfälle, keine neue Board-Zertifizierung. Standard32000 und das ausdrücklich erzwungene32040-Referenzprofil sind getrennt. M9 ergänzt Worker/UI, Persistenz, Netzwerk, Manager und Distribution; Dauerleistung und Soak bleiben offen.
 
 
 Der saubere M8-Vollgate auf `47f91cb` bestand mit 209 portablen und
@@ -208,8 +208,17 @@ they were not run as implementation evidence.
 See [M9d baseline](baselines/m9d.json) for exact hashes, counts and raw paths.
 M9d was independently accepted on `2a5ae39` (Root full gate exit0,256 portable/23 Windows groups). M9a sustained performance, M8 audio
 reds, source-adjudicated raw SPC differences, distribution/Manager/CI, prolonged
-soak and M10 remain open; publish remains PRE-M0. No physical SNES/input/DAC,
+soak and M10 remained open at this M9d snapshot; publish was then PRE-M0. No physical SNES/input/DAC,
 OS-focus or clean-VM claim is added.
 
 
 M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. Independent Root acceptance passed on `2534dba`,267 portable/31 Windows groups; see the separate implementation and Root evidence in baseline m9e.json. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.
+
+M9f freezes selfcontained Windows packages for emulator/relative Manager/Updater,
+an explicit bounded update workflow, isolated preservation-first installer tests
+and actual Linux portability. Package defaults remain immutable; operator policy
+lives in user data and is edited through F10 SETTINGS UPDATE SOURCE. The current
+publish is verified; its complete PRE-M0 predecessor is retained. Full Windows
+276/31 belongs to9db; test-only lifecycle hardening905 has targeted11/8 Windows
+Manager evidence, all real package probes and a complete276-group Linux gate.
+Independent Root acceptance remains pending; see [M9f baseline](baselines/m9f.json).

@@ -5,11 +5,12 @@ Architekturkonzept von [C64Emulator](https://github.com/n1k0m0/C64Emulator).
 Der SNES-Kern wird hier selbst entwickelt; es wird kein Snes9x-, bsnes- oder
 Libretro-Kern eingebunden.
 
-**Stand: 0.1.0-dev – eigener Entwicklungskern, noch keine allgemeine
+**Stand: 0.1.0-preview – eigener Entwicklungskern, noch keine allgemeine
 Spielekompatibilität.** M0–M8 sowie M9b Worker/UI und M9c Persistenz sind unabhängig geprüft. Die getaktete
 Mode0–7-PPU bietet Sprites, Fenster, Farbmathematik, OPT, Hires und Mode7.
-M9d networking was independently accepted on2a5ae39. M9e adds the separate WPF Manager and local versioned IPC; independent acceptance is pending.
-M9a-Dauerleistung, Distribution und M9/Release bleiben offen. 20 unveränderte
+M9d Netzwerk und M9e Manager sind unabhängig abgenommen (`2a5ae39`/`2534dba`).
+M9f Distribution/CI ist implementiert und lokal geprüft; die unabhängige
+Root-Abnahme steht noch aus. M9a-Dauerleistung und M9/Release bleiben offen. 20 unveränderte
 lizenzierte Testprogramme und ein externes Techdemo laufen über den eigenen
 Kern und zwei separat gebaute Referenzen. Bekannte Audioabweichungen und
 veröffentlichte Hardwarefehler bleiben ausdrücklich offen. Der eigene S-DSP
@@ -24,10 +25,21 @@ und [Titelmatrix](docs/m8-title-matrix.md).
 
 ## Starten
 
-`Start-SNESEmulator.cmd` doppelklicken. Ein vorhandener Build in `publish` wird
-direkt gestartet, andernfalls wird das Projekt mit dem .NET 10 SDK gebaut.
-Das vorhandene `publish/` ist weiterhin PRE-M0. Für den aktuellen
-Entwicklungsstand den folgenden SDK-Build verwenden; M9 erneuert das Paket.
+`Start-SNESEmulator.cmd` doppelklicken. Das geprüfte `publish/` enthält den
+aktuellen Emulator sowie `Manager/` und `Updater/` mit eigener Windows-x64-
+Runtime10.0.13; zum Start ist kein SDK nötig. Argumente mit Leerzeichen werden
+weitergereicht. Das frühere PRE-M0-Verzeichnis bleibt vollständig unter
+`publish-pre-m9f-9058878/` erhalten. Die separate lokale Spielverknüpfung und
+ihre spielbare Kopie bleiben unverändert.
+
+Zum Entwickeln ist das exakt gepinnte SDK10.0.402 nötig. Der folgende Build
+setzt dieses SDK auf PATH voraus; die lokale private Toolchain und genaue
+Prüfpfade stehen in [M9f](docs/baselines/m9f.json).
+
+Updates sind standardmäßig deaktiviert. Eine eigene Quelle wird unter
+F10 → SETTINGS → UPDATE SOURCE gespeichert; die Prüfung erfolgt ausdrücklich
+über UPDATES im Hauptmenü. Es gibt keine erfundene oder automatisch konfigurierte
+öffentliche Releasequelle.
 
 ```powershell
 dotnet build SNESEmulator.sln -c Release
@@ -50,7 +62,7 @@ andere Cartridge-Hardware sind nicht unterstützt.
 
 | Taste | Funktion |
 |---|---|
-| F10 | MAIN MENU mit SETTINGS, NETWORK, MEDIA, RESET |
+| F10 | MAIN MENU mit SETTINGS, NETWORK, MEDIA, RESET, MANAGER und UPDATES |
 | F11 | Vollbild umschalten |
 | F12 | Savestates mit Screenshot-Vorschau, Speichern/Laden/Löschen |
 | F9 | Turbo mit vierfacher Zielgeschwindigkeit |

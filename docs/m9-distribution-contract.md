@@ -129,3 +129,30 @@ The20s success criterion remains; an additional bounded failure-drain interval
 cannot turn that failure green. Product, project, lock and build sources stay
 identical to9db. The successful full9db Windows evidence is distinguished from
 later targeted harness/native-package reports and the required full Linux run.
+
+## Frozen agent handoff
+
+Implementation9058878509de17b62d246b27441e08aaa0333195 has a clean full Linux
+gate (276 portable groups/all external corpora), targeted Windows Manager11/8
+and actual native package/update/installer/game probes. The prior full Windows
+276/31 remains explicitly on9db1edd; independent Root full Windows acceptance
+on the final source is pending. Product/project/lock/build sources did not change
+between these commits; the only code change hardens the test child lifecycle.
+
+`publish/` is now byte-identical to the verified905 package. Its971 inventory
+entries total365805361B; with its manifest it has972 files/366055525B. The old
+294-file PRE-M0 tree is preserved completely at `publish-pre-m9f-9058878/`,
+excluded only through the repo-local `.git/info/exclude`. The general CMD passed
+a further20s native game/menu/state/reset/close probe with SDK discovery hidden.
+The supplied ROM,412-file earlier playable snapshot and its desktop shortcut
+remain unchanged; no user process was stopped.
+
+`artifacts/m9f-frozen-evidence/objects.zip` stores4581 distinct byte objects
+(4987831365B expanded). `files.json` maps66951 originals/29513259971B to those
+objects with length/SHA256/CRC32; all archive objects and all selected originals
+were independently reread. Only new phase evidence is stored; prior immutable
+milestone archives, user-smw, SDK trees and Root helpers are excluded. Available
+development failures remain failures, with missing early-draft limits disclosed.
+Exact archive/manifest/acceptance hashes and reproduction commands are in
+[the baseline](baselines/m9f.json). This is a frozen agent handoff, not a release
+or whole-M9 acceptance.
