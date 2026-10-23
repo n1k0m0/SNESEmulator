@@ -14,7 +14,7 @@ internal static class BindingEditor
     internal static string? Edit(string name,string current,bool keyboard,bool mappedReferences,Action<Form,TextBox,Button>? shown=null)
     {
         using var dialog=new Form{Text="SNES binding: "+name,Width=600,Height=260,StartPosition=FormStartPosition.CenterScreen,FormBorderStyle=FormBorderStyle.FixedDialog,MaximizeBox=false,MinimizeBox=false};
-        var help=new Label{Left=16,Top=16,Width=550,Height=65,Text="; = alternatives, & = simultaneous chord. Empty = unbound.\n"+(keyboard?"Keys: Up, Enter, ShiftRight, F1..F12, A..Z, Number0..9 ...":"Inputs: Button0..255, Axis0+ / Axis0-, Hat0Up; actions also @Start ...")+"\nFrontend actions take priority; release all held inputs before playing."};
+        var help=new Label{UseMnemonic=false,Left=16,Top=16,Width=550,Height=65,Text="; = alternatives, & = simultaneous chord. Empty = unbound.\n"+(keyboard?"Keys: Up, Enter, ShiftRight, F1..F12, A..Z, Number0..9 ...":"Inputs: Button0..255, Axis0+ / Axis0-, Hat0Up; actions also @Start ...")+"\nFrontend actions take priority; release all held inputs before playing."};
         var input=new TextBox{Left=16,Top=90,Width=550,Text=current,MaxLength=128};
         var error=new Label{Left=16,Top=125,Width=550,Height=35,ForeColor=System.Drawing.Color.Firebrick};
         input.TextChanged+=(_,_)=>error.Text="";
