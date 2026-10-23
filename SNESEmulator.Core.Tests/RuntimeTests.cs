@@ -48,6 +48,7 @@ static class RuntimeTests
         test("M9b load preserves format9 controller bytes and partial-field application",()=>{
             var rom=AudioDiagnosticRom.Create();var d=new SnesSystem();d.Insert(new Cartridge(rom));d.RunUntil(123456);d.Bus.Controllers.Buttons[0]=(ushort)SnesButtons.B;d.Bus.Controllers.Buttons[1]=(ushort)SnesButtons.R;
             byte[] raw=StateSerializer.Capture(d);string path=Path.Combine(root,"worker-partial.snessav");StateSerializer.SaveCaptured(raw,path);
+            string directPath=Path.Combine(root,"direct-partial.snessav");StateSerializer.Save(d,directPath);Check(File.ReadAllBytes(path).SequenceEqual(File.ReadAllBytes(directPath)),"captured compression preserves old Save bytes");
             using var w=new EmulationWorker();Await(w.InsertAsync(rom));long epoch=w.Status.Epoch;Await(w.LoadAsync(File.ReadAllBytes(path)));
             Check(Await(w.CaptureAsync()).SequenceEqual(raw),"load/capture exact including held controller bytes");Check(w.Status.Epoch>epoch&&w.Latest==null&&w.Status.PendingOutput==0,"load clears presentation");
             d.Bus.Apu.Dsp.ClearPresentation();var input=new FieldInput((ushort)SnesButtons.A,0);d.Bus.Controllers.Buttons[0]=input.Port1;d.Bus.Controllers.Buttons[1]=0;long when=d.Clock.Now;d.RunFrame();

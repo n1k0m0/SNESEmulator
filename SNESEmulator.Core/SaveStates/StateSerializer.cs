@@ -34,7 +34,9 @@ public static class StateSerializer
     {
         var cart=machine.Bus.Cartridge??throw new InvalidOperationException("Load a cartridge first.");
         using var zip=compress?new GZipStream(destination,CompressionLevel.Fastest,true):null;
-        using (var w = new BinaryWriter(zip??destination,System.Text.Encoding.UTF8,true))
+        // Preserve the original compressed byte stream: closing BinaryWriter
+        // must close GZip directly, rather than issuing a leave-open SyncFlush.
+        using (var w = new BinaryWriter(zip??destination,System.Text.Encoding.UTF8,!compress))
         {
             w.Write("SNESSAV"); w.Write(9); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));w.Write(machine.ProfileForced);w.Write((int)cart.Mapping);w.Write(JsonSerializer.Serialize(cart.Options));
             var c = machine.Cpu; var b = machine.Bus; var p = b.Ppu;
