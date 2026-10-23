@@ -16,8 +16,9 @@ internal static class PersistenceSmoke
         byte[] code=[0x78,0xaf,0,0,0x70,0x1a,0x8f,0,0,0x70,0x80,0xf5];code.CopyTo(rom,0x2000);rom[0x7ffc]=0;rom[0x7ffd]=0xa0;
         string romPath=Path.Combine(output,"battery-loop.sfc");File.WriteAllBytes(romPath,rom);var cart=new Cartridge(rom,romPath);
         using var window=new SnesWindow(romPath);FileStream? blocker=null;var watch=Stopwatch.StartNew();var rows=new List<object>();int stage=0;long firstField=0;string? statePath=null;byte[]? firstBattery=null;long loadEpoch=0;double ready=0;
+        window.ProbeInput(true,null,new HashSet<string>(),new HashSet<string>());
         string batteryPath=BatteryPersistence.ProtectedPath(Path.Combine(UserDataPaths.GetBaseDirectory(),"battery",cart.Hash+".srm"));
-        void Check(bool ok,string why){if(!ok)throw new InvalidOperationException("Persistence native probe: "+why);}
+        void Check(bool ok,string why){if(!ok){File.WriteAllText(Path.Combine(output,"failure.json"),JsonSerializer.Serialize(new{Why=why,Stage=stage,Seconds=watch.Elapsed.TotalSeconds,Menu=window.CurrentMenu,Selection=window.ProbeSelection,Metrics=window.RuntimeMetrics,Rows=rows}));throw new InvalidOperationException("Persistence native probe: "+why);}}
         void Press(Key key)=>window.ProbeKey(key);
         void Row(string name)=>rows.Add(new{Name=name,Seconds=watch.Elapsed.TotalSeconds,Metrics=window.RuntimeMetrics});
         window.RenderFrame+=frameArgs=>{
@@ -78,6 +79,6 @@ internal static class PersistenceSmoke
         finally{blocker?.Dispose();}
         foreach(string path in Directory.GetFiles(UserDataPaths.GetSaveDirectory(),"*.snessav",SearchOption.AllDirectories))_ = StateSerializer.Load(cart,path);
         _ = BatteryPersistence.Decode(File.ReadAllBytes(batteryPath),cart.Hash,cart.Sram.Length);
-        File.WriteAllText(Path.Combine(output,"result.json"),JsonSerializer.Serialize(new{Success=true,Mode=mode,ReadySeconds=ready,Rows=rows,Limits="Synthetic app callbacks and OS-file locks; no physical power-cut guarantee"},new JsonSerializerOptions{WriteIndented=true}));
+        File.WriteAllText(Path.Combine(output,"result.json"),JsonSerializer.Serialize(new{Success=true,Mode=mode,ReadySeconds=ready,Rows=rows,Limits="Synthetic app callbacks with synthetic focus and OS-file locks; no physical power-cut guarantee"},new JsonSerializerOptions{WriteIndented=true}));
     }
 }

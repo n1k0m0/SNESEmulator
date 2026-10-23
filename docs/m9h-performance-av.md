@@ -183,3 +183,9 @@ neutrale Eingaben, wie bereits InteractionSmoke. Echte Fokusverlustlogik wird
 weiter separat dort geprüft; die Produktlogik bleibt unverändert. Fehlerberichte
 enthalten künftig Menü, Selection und Runtime. Nur die noch fehlenden nativen
 Stufen werden hierfür erneut ausgeführt, keine unveränderten CPU-Vollkorpora.
+Die folgende Persistenzprobe auf f982ae9 verließ ihr natives Fenster nach rund
+36s vor dem erwarteten Abschluss. Die damalige Abschlussstufe war nicht
+protokolliert; eine externe Schließaktion oder Produktursache ist nicht bewiesen.
+Auch dieser Fehllauf bleibt erhalten. Die Persistenzprobe verwendet nun ebenfalls
+synthetisch neutralen Fokus und schreibt bei Assertionfehlern Stage, Laufzeit,
+Menü und gesammelte Metrics. Das ändert weder Speicherpolitik noch Zeitbudgets.
