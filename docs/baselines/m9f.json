@@ -62,5 +62,26 @@
     "realtimeThresholdsUnchanged": true,
     "interpretation": "Two240s Windows timeouts and one complete227.372s run; variability observed, no proved runtime regression or parallel-load cause."
   },
-  "operatorPolicy": "Immutable hashed package defaults; mutable UserData/updates/update-policy.json is written through actual F10 SETTINGS UPDATE SOURCE dialog with M9c atomic save. Native delayed-load/save close probes; no test-env policy bypass."
+  "operatorPolicy": "Immutable hashed package defaults; mutable UserData/updates/update-policy.json is written through actual F10 SETTINGS UPDATE SOURCE dialog with M9c atomic save. Native delayed-load/save close probes; no test-env policy bypass.",
+  "windowsFullGate9db": {
+    "commit": "9db1edd1503057bdc489ef4c13b52bf6bb3b0d92",
+    "exit": 0,
+    "portable": 276,
+    "windows": 31,
+    "log": "artifacts/m9f-final-fullgate02.log",
+    "summary": "artifacts/m9f-final-windows-summary.json",
+    "nativeIdentities": 1194,
+    "coreWallSeconds": 225.605031,
+    "scope": "Successful complete gate on clean9db before the test-only settings-child lifecycle hardening. Later targeted reports are kept separate; no whole-gate claim for a later commit."
+  },
+  "linuxSettingsTimeout": {
+    "failedRun": "artifacts/m9f-final-linux03.log",
+    "commit": "9db1edd1503057bdc489ef4c13b52bf6bb3b0d92",
+    "result": "Distribution9/9; Manager10/11, settings writers exceeded original20s total success deadline",
+    "cause": "Unresolved. No lock-hang, runtime regression or IO-duration explanation has been established.",
+    "unchangedBinaryReduction": "Three pairs of actual30-write children completed60transactions in2.270/2.035/2.040s, bothExit0/stderr empty. Three externally observed complete Manager suites passed11/11 in20.074/17.975/18.145s including the required15s partial-packet wait.",
+    "hardening": "Test harness immediately drains stderr, records PID/start-kind/token/Wall/CPU/proc diagnostics, preserves the original20s success deadline, observes later normal failure completion for at most60s and kills/joins only still-owned children. No Core/runtime/product/build/lock change.",
+    "negativeLifecycleProof": "Owned Linux apphost/input-barrier fixture delays actual writer input25s. The suite remains correctly red at the original20s deadline; both actual writer chains subsequently exit0, joined diagnostics prove no surviving settings child. Positive11/11 and expected negative10/11 are separate development reports under artifacts/m9f-development/linux-harness-validation02.",
+    "limits": "A later normal exit does not make a timeout green. The original03 failure and earlier unknown Linux settings failure remain retained and unexplained."
+  }
 }

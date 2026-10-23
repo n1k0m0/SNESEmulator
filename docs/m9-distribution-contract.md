@@ -117,3 +117,15 @@ M9a sustained performance, PAL measurement, multi-hour soak, known18 M8 audio re
 7000 source-adjudicated raw SPC bus differences and M10 remain open. M9/release
 remain incomplete. Final implementation/gate/freeze identities belong in baseline
 m9f.json after completed execution; development attempts do not substitute for it.
+
+The clean9db implementation passed the full Windows gate (276 portable/31 Windows
+groups, all external corpora and native probes). A later Linux run stopped at the
+existing two-process settings test's20s deadline. The cause remains unresolved:
+three unchanged-binary writer reductions and three complete Manager suites then
+ended normally. The subsequent change is confined to Manager.Tests lifecycle and
+diagnostics: stderr is drained immediately, PID/start identity and Wall/CPU/proc
+evidence are retained, and failures join or explicitly terminate their own children.
+The20s success criterion remains; an additional bounded failure-drain interval
+cannot turn that failure green. Product, project, lock and build sources stay
+identical to9db. The successful full9db Windows evidence is distinguished from
+later targeted harness/native-package reports and the required full Linux run.

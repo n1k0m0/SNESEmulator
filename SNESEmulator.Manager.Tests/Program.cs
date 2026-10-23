@@ -416,11 +416,68 @@ if (!args.Contains("--windows"))
         string path = Path.Combine(root, "concurrent-settings.json");
         using var first = Child("--settings-write", path, "20");
         using var second = Child("--settings-write", path, "70");
-        Check(await first.StandardOutput.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(10)) == "READY" && await second.StandardOutput.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(10)) == "READY");
-        await first.StandardInput.WriteLineAsync();
-        await second.StandardInput.WriteLineAsync();
-        await Task.WhenAll(first.WaitForExitAsync(), second.WaitForExitAsync()).WaitAsync(TimeSpan.FromSeconds(20));
-        string firstError=await first.StandardError.ReadToEndAsync(), secondError=await second.StandardError.ReadToEndAsync();
+        var children = new[] { first, second };
+        var tokens = children.Select(Discovery.StartIdentity).ToArray();
+        var errors = children.Select(p => p.StandardError.ReadToEndAsync()).ToArray();
+        var elapsed = Stopwatch.StartNew();
+        var observations = new List<Dictionary<string, object?>>();
+        void Observe(string phase)
+        {
+            for (int i = 0; i < children.Length; i++)
+            {
+                var child = children[i];
+                var item = new Dictionary<string, object?> { ["phase"] = phase, ["pid"] = child.Id, ["identityKind"] = Discovery.StartIdentityKind, ["startToken"] = tokens[i], ["wallSeconds"] = elapsed.Elapsed.TotalSeconds };
+                try
+                {
+                    item["exited"] = child.HasExited;
+                    item["exitCode"] = child.HasExited ? child.ExitCode : null;
+                    item["cpuSeconds"] = child.TotalProcessorTime.TotalSeconds;
+                }
+                catch (Exception e) { item["processObservationError"] = e.Message; }
+                if (OperatingSystem.IsLinux())
+                    foreach (string name in new[] { "stat", "io", "wchan" })
+                        try { item[name] = File.ReadAllText($"/proc/{child.Id}/{name}"); }
+                        catch (IOException e) { item[name] = e.Message; }
+                observations.Add(item);
+            }
+            File.WriteAllText(Path.Combine(root, "settings-children.json"), JsonSerializer.Serialize(observations));
+        }
+        Exception? failure = null;
+        try
+        {
+            Observe("started");
+            Check(await first.StandardOutput.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(10)) == "READY" && await second.StandardOutput.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(10)) == "READY");
+            await first.StandardInput.WriteLineAsync();
+            await second.StandardInput.WriteLineAsync();
+            // This remains the original success deadline. A later normal exit never
+            // turns a timeout green; the extra wait only preserves its actual cause.
+            await Task.WhenAll(children.Select(p => p.WaitForExitAsync())).WaitAsync(TimeSpan.FromSeconds(20));
+        }
+        catch (Exception e)
+        {
+            failure = e;
+            Observe("failed-deadline");
+            foreach (var child in children)
+                try { child.StandardInput.Close(); }
+                catch (IOException closeError) { observations.Add(new() { ["phase"] = "input-close-error", ["pid"] = child.Id, ["error"] = closeError.Message }); }
+            try { await Task.WhenAll(children.Select(p => p.WaitForExitAsync())).WaitAsync(TimeSpan.FromSeconds(60)); }
+            catch (TimeoutException) { Observe("drain-deadline"); }
+        }
+        finally
+        {
+            for (int i = 0; i < children.Length; i++)
+                try
+                {
+                    if (!children[i].HasExited && Discovery.StartIdentity(children[i]) == tokens[i]) children[i].Kill(entireProcessTree: true);
+                }
+                catch (Exception e) when ((e is IOException or InvalidOperationException or System.ComponentModel.Win32Exception) && children[i].HasExited) { }
+            await Task.WhenAll(children.Select(p => p.WaitForExitAsync())).WaitAsync(TimeSpan.FromSeconds(10));
+            Observe("joined");
+            for (int i = 0; i < errors.Length; i++) File.WriteAllText(Path.Combine(root, $"settings-child-{children[i].Id}.stderr.log"), await errors[i].WaitAsync(TimeSpan.FromSeconds(5)));
+            report.Metadata["settingsChildren"] = observations;
+        }
+        string firstError = await errors[0], secondError = await errors[1];
+        if (failure != null) throw new Exception($"Settings child success deadline failed; actual final exits {first.ExitCode}/{second.ExitCode}; first={firstError}; second={secondError}; diagnostics {Path.Combine(root, "settings-children.json")}", failure);
         Check(first.ExitCode == 0 && second.ExitCode == 0 && new[] { 20, 70 }.Contains(EmulatorSettings.Load(path).AudioVolume) && File.Exists(path + ".bak"), $"Settings child exits {first.ExitCode}/{second.ExitCode}; first={firstError}; second={secondError}");
     });
 }
