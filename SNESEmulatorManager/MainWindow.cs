@@ -157,7 +157,7 @@ public sealed class MainWindow : Window
         homeActions.Children.Add(Button("Fortsetzen", () => SetMode(false, false)));
         homeActions.Children.Add(Button("Pause", () => SetMode(true, false)));
         homeActions.Children.Add(Button("Turbo", () => SetMode(false, true)));
-        homeActions.Children.Add(Button("Reset (gew�hlter Modus; SRAM bleibt)", () => Send("Reset")));
+        homeActions.Children.Add(Button("Reset (gewählter Modus; SRAM bleibt)", () => Send("Reset")));
         AddTab("Dashboard", home);
         var lib = new DockPanel();
         var tools = new WrapPanel();
@@ -368,6 +368,7 @@ public sealed class MainWindow : Window
 
         if (initialArgs.Contains("--manager-smoke"))
             await Smoke();
+        if(initialArgs.Contains("--settings-extensions-smoke"))await OfflineSettingsExtensionsSmoke();
         if (initialArgs.Contains("--settings-smoke"))
             await OfflineSettingsSmoke();
     }
@@ -641,7 +642,8 @@ public sealed class MainWindow : Window
                 };
                 box.Checked += (_, _) => model.SettingsDirty = true;
                 box.Unchecked += (_, _) => model.SettingsDirty = true;
-                box.IsEnabled = !effect.StartsWith("LOCKED");
+                box.IsEnabled = effect!="READ ONLY"&&!effect.StartsWith("LOCKED");
+                settingControls[property.Name]=box;
                 row.Children.Add(box);
                 editors[property.Name] = () => JsonSerializer.SerializeToElement(box.IsChecked == true);
             }
@@ -684,7 +686,7 @@ public sealed class MainWindow : Window
             }
             else if(effect=="READ ONLY")
             {
-                row.Children.Add(new TextBlock{Text=property.Value.GetRawText(),TextWrapping=TextWrapping.Wrap,MaxWidth=650});var preserved=property.Value.Clone();editors[property.Name]=()=>preserved;
+                var readonlyValue=new TextBlock{Text=property.Value.GetRawText(),TextWrapping=TextWrapping.Wrap,MaxWidth=650,IsEnabled=false};row.Children.Add(readonlyValue);settingControls[property.Name]=readonlyValue;var preserved=property.Value.Clone();editors[property.Name]=()=>preserved;
             }
             else if (property.Name is "Filter" or "Upscale" or "ControllerPort")
             {
@@ -732,7 +734,7 @@ public sealed class MainWindow : Window
         ["ControllerPort"] = "Lokaler Controller",
         ["GamepadDevice"] = "Gamepadgerät (-1=erstes;0–255)",
         ["GamepadControls"] = "12 SNES-Tasten (; = alternativ, & = gleichzeitig)",
-        ["GamepadActions"] = "Gamepad-Men�aktionen (; alternativ, & gleichzeitig)",
+        ["GamepadActions"] = "Gamepad-Menüaktionen (; alternativ, & gleichzeitig)",
         ["KeyboardControls"] = "Tastatur/Hotkeys (; alternativ, & gleichzeitig)",
         ["RenderFrameLimit"] = "Darstellungsrate (0=unbegrenzt,60,120 Hz)",
         ["PresentationVSync"] = "Darstellung mit VSync",
@@ -821,6 +823,27 @@ public sealed class MainWindow : Window
         encoder.Frames.Add(BitmapFrame.Create(bitmap));
         using (var file = File.Create(Path.Combine(output, "settings.png"))) encoder.Save(file);
         File.WriteAllText(Path.Combine(output, "result.json"), JsonSerializer.Serialize(new { Warning = warning, Visible = settingsNotice.IsVisible, Volume = ((TextBox)settingControls["AudioVolume"]).Text, ReadThread = settingsReadThread, UiThread = Environment.CurrentManagedThreadId, SyntheticAppHooks = true }));
+        Close();
+    }
+
+    private async Task OfflineSettingsExtensionsSmoke()
+    {
+        string output=Argument(initialArgs,"--settings-extensions-smoke")??throw new ArgumentException("Extensions probe output");
+        Directory.CreateDirectory(output);await LoadSettings();
+        string[] names=["FutureEnabled","FutureText","FutureObject"];
+        var before=names.ToDictionary(name=>name,name=>JsonSerializer.Serialize(model.LoadedSettings!.Settings.GetProperty(name)));
+        var disabled=names.ToDictionary(name=>name,name=>settingControls.TryGetValue(name,out var control)&&!control.IsEnabled);
+        if(disabled.Values.Any(value=>!value))throw new InvalidOperationException("Unknown settings control was editable");
+        ((TextBox)settingControls["AudioVolume"]).Text="55";await ApplySettings();
+        using var saved=JsonDocument.Parse(File.ReadAllBytes(UserDataPaths.GetSettingsPath()));
+        var after=names.ToDictionary(name=>name,name=>JsonSerializer.Serialize(saved.RootElement.GetProperty(name)));
+        if(before.Any(entry=>after[entry.Key]!=entry.Value)||saved.RootElement.GetProperty("AudioVolume").GetInt32()!=55)
+            throw new InvalidOperationException("Apply changed unknown JSON values");
+        tabs.SelectedIndex=3;UpdateLayout();if(settingRows.Parent is ScrollViewer scroll)scroll.ScrollToEnd();
+        await Dispatcher.InvokeAsync(()=>{},DispatcherPriority.ApplicationIdle);
+        var bitmap=new RenderTargetBitmap((int)ActualWidth,(int)ActualHeight,96,96,PixelFormats.Pbgra32);bitmap.Render(this);
+        var encoder=new PngBitmapEncoder();encoder.Frames.Add(BitmapFrame.Create(bitmap));using(var file=File.Create(Path.Combine(output,"settings-extensions.png")))encoder.Save(file);
+        File.WriteAllText(Path.Combine(output,"result.json"),JsonSerializer.Serialize(new{Success=true,Disabled=disabled,Before=before,After=after,Volume=55,SyntheticAppHooks=true,Meaning="Unknown bool/string/object values retain identical canonical JSON after actual offline Apply; entire settings file changes deliberately for volume."}));
         Close();
     }
 

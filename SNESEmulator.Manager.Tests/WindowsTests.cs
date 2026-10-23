@@ -118,6 +118,20 @@ internal static class WindowsTests
         InstanceInfo? ai = null, bi = null;
         try
         {
+            await test("M9g real offline WPF unknown bool string object disabled and preserved on Apply",async()=>
+            {
+                string data=Path.Combine(root,"unknown settings apply");Directory.CreateDirectory(data);
+                using var future=JsonDocument.Parse("{\"array\":[1,true,\"keep\"],\"number\":1.2300}");
+                var settings=new EmulatorSettings{AudioVolume=27,AdditionalSettings=new(){["FutureEnabled"]=JsonSerializer.SerializeToElement(true),["FutureText"]=JsonSerializer.SerializeToElement("future\ntext \u2603"),["FutureObject"]=future.RootElement.Clone()}};
+                string path=Path.Combine(data,"settings.json");settings.Save(path);
+                var process=StartInDataRoot(manager,"unknown-settings-apply",data,"--settings-extensions-smoke",data);
+                await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(30));check(process.ExitCode==0,"Unknown-settings WPF probe failed");
+                using var result=JsonDocument.Parse(File.ReadAllBytes(Path.Combine(data,"result.json")));var r=result.RootElement;
+                check(r.GetProperty("Success").GetBoolean()&&r.GetProperty("Volume").GetInt32()==55,"Actual offline apply missing");
+                foreach(string name in new[]{"FutureEnabled","FutureText","FutureObject"})check(r.GetProperty("Disabled").GetProperty(name).GetBoolean()&&r.GetProperty("Before").GetProperty(name).GetString()==r.GetProperty("After").GetProperty(name).GetString(),"Unknown JSON changed or remained editable: "+name);
+                var loaded=EmulatorSettings.Load(path);check(loaded.AudioVolume==55&&loaded.AdditionalSettings!["FutureEnabled"].GetBoolean()&&loaded.AdditionalSettings["FutureText"].GetString()=="future\ntext \u2603"&&loaded.AdditionalSettings["FutureObject"].GetProperty("number").GetRawText()=="1.2300","Exact persisted future values");
+                check(new FileInfo(Path.Combine(data,"settings-extensions.png")).Length>1000,"WPF rendering absent");
+            });
             await test("M9e real offline WPF settings recovery unavailable normalization visible and read-only", async () =>
             {
                 foreach (string mode in new[] { "recovered", "unavailable", "normalized" })
