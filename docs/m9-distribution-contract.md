@@ -136,7 +136,7 @@ Implementation9058878509de17b62d246b27441e08aaa0333195 has a clean full Linux
 gate (276 portable groups/all external corpora), targeted Windows Manager11/8
 and actual native package/update/installer/game probes. The prior full Windows
 276/31 remains explicitly on9db1edd; independent Root full Windows acceptance
-on the final source is pending. Product/project/lock/build sources did not change
+on `0f8aadc` subsequently passed276 portable/31 Windows groups. Product/project/lock/build sources did not change
 between these commits; the only code change hardens the test child lifecycle.
 
 `publish/` is now byte-identical to the verified905 package. Its971 inventory
@@ -156,3 +156,7 @@ development failures remain failures, with missing early-draft limits disclosed.
 Exact archive/manifest/acceptance hashes and reproduction commands are in
 [the baseline](baselines/m9f.json). This is a frozen agent handoff, not a release
 or whole-M9 acceptance.
+
+## Independent Root acceptance
+
+Root accepted M9f on `0f8aadc`: complete Windows gate,1194 unchanged native identities,122368 literal pixels/five checks, unchanged stereo hash,20s HiRes UI, real package/update and isolated installer install/repair/uninstall. All4581 agent objects and3090 Root evidence files were reread. The software AV comparison measured300 video/301 audio/300 driver blocks over5.0080399s, maximum16.651861ms;24 cumulative drops include2.524596s cold start. No physical, clean-VM or remote-CI evidence is inferred. Exact evidence hashes are in the baseline. M9a sustained performance, PAL, hours soak, interaction parity, accuracy audit and M10 remain open; this does not accept M9 or a release.

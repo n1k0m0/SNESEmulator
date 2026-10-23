@@ -1,6 +1,6 @@
 {
   "schema": "m9f-distribution-baseline-v1",
-  "status": "agent validation complete and frozen; independent Root complete Windows acceptance pending",
+  "status": "independently accepted by Root on 0f8aadcd602a3f72472096df63e2158654987952; M9 and release incomplete",
   "releaseAccepted": false,
   "priorPortable": 267,
   "priorWindows": 31,
@@ -197,5 +197,21 @@
     "canonicalSourceBundle": "artifacts/m9f-source-9058878.bundle",
     "sourceBundleSha256": "489185af10b807d281783200e7d59ea268207ecdbdc18eeb7a9df726c4840bdc",
     "warning": "Scripts using original output names refuse existing destinations; choose fresh output/log names for a new run. No remote CI execution."
+  },
+  "rootAcceptance": {
+    "commit": "0f8aadcd602a3f72472096df63e2158654987952",
+    "portable": 276,
+    "windows": 31,
+    "fullWindowsExit": 0,
+    "nativeIdentitiesUnchanged": 1194,
+    "literalPixels": 122368,
+    "literalChecks": 5,
+    "stereoSha256": "a0ca8a2262b4c3ca022f3ae157efb10ed7c1de0555d1d239d19ed25314db8e48",
+    "evidence": "artifacts/root-m9f-evidence",
+    "filesSha256": "7cdc686a4ab83de66936a6525800c8cb892241b230e516e1c2ca200952206a13",
+    "acceptanceSha256": "4528cd5ac3711570257de4c9d7f1a912001f0981f981e465ab4958a6f1fa0f5e",
+    "files": 3090,
+    "bytes": 517145182,
+    "scope": "Full Windows gate, literal video/audio, native UI/package/update/isolated installer and software AV comparison; no physical hardware, fresh VM or remote CI claim."
   }
 }

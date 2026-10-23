@@ -221,4 +221,4 @@ lives in user data and is edited through F10 SETTINGS UPDATE SOURCE. The current
 publish is verified; its complete PRE-M0 predecessor is retained. Full Windows
 276/31 belongs to9db; test-only lifecycle hardening905 has targeted11/8 Windows
 Manager evidence, all real package probes and a complete276-group Linux gate.
-Independent Root acceptance remains pending; see [M9f baseline](baselines/m9f.json).
+Independent Root acceptance passed on `0f8aadc`; see [M9f baseline](baselines/m9f.json). M9 and release acceptance remain incomplete.
