@@ -549,3 +549,10 @@ pre-M9 SPC suspension cases,128 field-horizon comparisons,8 derived-cache cases,
 comparisons. These prior-core regressions do not change independent hardware or
 software accuracy evidence. Exact benchmark boundaries, extended/sustained flags,
 20-byte timestamped PCM records and limitations: [contract](m9-performance-contract.md).
+
+M9a measured result on clean `2dbeb5f`: the full gate passes, including14 exact
+output cases. The extra realtime gate fails:37000 NTSC game fields average
+1.025350x but38/62 consecutive600-field windows fall below1x (minimum0.882206x).
+PAL sustained did not run after that assertion. This is an open performance
+failure; see [the contract](m9-performance-contract.md) and frozen partial
+[baseline](baselines/m9a.json). No failed report or expected value was replaced.

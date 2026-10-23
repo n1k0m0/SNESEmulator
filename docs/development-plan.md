@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M8 unabhängig abgenommen. M9a Performance wird implementiert; weitere M9-Phasen und M10 bleiben offen.
+Status: M0–M8 unabhängig abgenommen. M9a: Genauigkeitsgate auf `2dbeb5f` bestanden, Dauerleistungsziel rot (38/62 NTSC-Fenster); M9 bleibt unvollständig. Worker/UI folgt als nächstes Arbeitspaket; weitere M9-Phasen und M10 bleiben offen.
 
 ## Ziel und Nachweis
 
@@ -477,4 +477,4 @@ M8-Implementierungsvollgate: sauberer Commit `47f91cb`,
 10 Windows-Gruppen. Die unabhängige Root-Abnahme auf `10164c7` bestand mit Exit0 (`artifacts/root-m8-validation.log`). Genauigkeitsfehler
 bleiben in den gesonderten Berichten rot; [Baseline M8](baselines/m8.json) und
 [M8-Vertrag](m8-compatibility-contract.md) halten Repros und Nachweisgrenzen fest.
-M9a Performance wird implementiert; weitere M9-Produktphasen und M10 bleiben offen.
+M9a ist unvollständig: Das volle Genauigkeitsgate auf `2dbeb5f` besteht; das Dauerleistungsziel scheitert in 38/62 NTSC-Fenstern. Worker/UI folgt gemäß Root-Sequenzierung; vor M9-/Releaseabnahme müssen NTSC/PAL-Dauerleistung und die übrigen M9-Produktphasen abgeschlossen werden.

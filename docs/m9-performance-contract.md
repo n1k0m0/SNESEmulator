@@ -1,5 +1,7 @@
 # M9a performance contract
 
+Status: **M9a incomplete. The sustained realtime gate is red.**
+
 Scope: preserve the complete own CPU/SPC/PPU/DSP accuracy path while reaching
 real time on NILSPC1 (AMD Ryzen9 9900X,12 cores/24 logical processors, Windows
 10.0.26200, .NET10.0.12 x64). UI threading, input/menu parity, networking,
@@ -123,3 +125,54 @@ python tools/test-performance.py --output artifacts/m9a-final-extra --long --sus
 
 Final clean-commit results and frozen archive/file identities are recorded in
 [the M9a baseline](baselines/m9a.json). Parent acceptance remains separate.
+
+## Measured implementation result and open gate
+
+Clean implementation commit `2dbeb5ff61511c0cdf279f7849c5456802953f61`
+produced core DLL SHA256
+`0ea2e86d2f3a0de5c16cedd40276150cd7cf42ecb34ff8d1cc050200140cf83c`.
+The full Windows/portable gate passed with Exit0 (209 portable and10 Windows
+groups), including all independent earlier milestone checks and the14 frozen
+M9 output comparisons. This is accuracy regression evidence for that commit;
+it does not accept M9 performance or turn known audio differences green.
+
+| Workload | Short realtime factor | 1200-field extended factor |
+|---|---:|---:|
+| Diagnostic NTSC |1.500|1.448|
+| Two-voice audio NTSC |2.206|2.116|
+| Hires/interlace/239 NTSC |1.748|1.654|
+| Hires/interlace/239 PAL |1.943|1.827|
+| Game/replay NTSC |1.363|1.467|
+| Game/replay PAL |1.482|1.583|
+
+These numbers describe this head and host with the stated boundaries. They do
+not establish general game compatibility. Short throughput is insufficient:
+the37000-field NTSC run covers615.652749 emulated seconds, averages1.025350x,
+and retains zero drops and a35,838,864-byte maximum observed managed heap, but
+**38 of62 consecutive600-field windows fail realtime**. The minimum is0.882206x
+starting at field6610. Its GC collections are10225/4397/3568 (Gen0/1/2).
+The extended command exits1 at this assertion; the PAL sustained case therefore
+has not run. No failed report was replaced, and the threshold is unchanged.
+
+Loaded-state diagnostic repros include process CPU/wall time, allocations, GC,
+output hashes, exact final states and DLL identities. One original-core OS
+probe reads Normal priority, base priority8, and power-throttling control/state
+masks0/0. No priority, affinity, QoS, power setting or foreign process changed.
+An EventPipe sample reports approximately0.497 seconds of GC suspension in
+16.920 seconds; this does not establish GC as the cause of the deficit. CPU/wall
+ratios near one likewise do not prove host contention.
+
+The packed-bitplane PPU candidate was measured between original controls and
+was slower, despite exact video/stereo/state outputs over2400 fields. Other
+isolated clock/JIT/SPC allocation candidates also failed to demonstrate a
+reliable gain. None was adopted. Their source, binaries and raw diagnostics
+remain in the evidence, with limitations in `diagnostic-disposition.json`.
+Allocation reduction alone was not treated as a performance success.
+
+Following the parent review's sequencing decision, worker/UI work proceeds
+next. Sustained NTSC/PAL performance remains an explicit prerequisite before
+M9 or release acceptance; hours-long A/V/threading soak remains later work.
+The frozen evidence preserves this **partial result and failed gate**, not a
+performance acceptance. See `artifacts/m9a-implementation-evidence/acceptance.json`
+for archive identities, every-file hashes and reread verification. The final
+commit after implementation changes documentation only.

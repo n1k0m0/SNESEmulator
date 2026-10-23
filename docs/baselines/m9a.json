@@ -1,9 +1,33 @@
 {
   "schema": "m9a-performance-baseline-v1",
-  "status": "Implementation in progress; clean full/extended/sustained validation and independent parent acceptance pending",
+  "status": "INCOMPLETE: full accuracy gate passed; sustained realtime gate FAILED; M9/release acceptance withheld",
   "startingCoreCommit": "10164c78e24124dfc613764cffd859409aeed1f8",
   "baseline": "artifacts/m9a/baseline",
   "contract": "docs/m9-performance-contract.md",
   "noHardwareAccuracyUpgrade": true,
-  "knownRedM8WholeConsoleAudioRows": 18
+  "knownRedM8WholeConsoleAudioRows": 18,
+  "implementationCommit": "2dbeb5ff61511c0cdf279f7849c5456802953f61",
+  "coreDllSha256": "0ea2e86d2f3a0de5c16cedd40276150cd7cf42ecb34ff8d1cc050200140cf83c",
+  "fullGate": {
+    "exitCode": 0,
+    "portableGroups": 209,
+    "windowsGroups": 10,
+    "log": "artifacts/m9a/full-validation.log"
+  },
+  "extraGate": {
+    "exitCode": 1,
+    "log": "artifacts/m9a/extra-validation.log",
+    "ntscEmulatedSeconds": 615.6527492063492,
+    "ntscTotalRealtimeFactor": 1.0253501222709491,
+    "failed600FieldWindows": 38,
+    "totalWindows": 62,
+    "minimumRealtimeFactor": 0.8822064102889489,
+    "presentationDrops": 0,
+    "managedMaxBytes": 35838864,
+    "palSustained": "Not run after NTSC assertion"
+  },
+  "evidence": "artifacts/m9a-implementation-evidence/acceptance.json",
+  "diagnosticDisposition": "artifacts/m9a/diagnostic-disposition.json",
+  "next": "Worker/UI phase per parent sequencing decision; revisit sustained NTSC/PAL before M9/release acceptance",
+  "parentAcceptance": "Pending independent review; no performance acceptance claimed"
 }
