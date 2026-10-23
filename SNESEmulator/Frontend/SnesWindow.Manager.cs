@@ -108,6 +108,7 @@ public sealed partial class SnesWindow
     private SettingsInfo ManagerSettings() => new(settingsRevision, JsonSerializer.SerializeToElement(settings), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite && p.Name!="AdditionalSettings").ToDictionary(p => p.Name, p => p.Name=="TurboMode"&&client.IsConnected?"LOCKED: host owns turbo":new[] { "Host", "Port", "RelayHost", "RelayPort", "ConnectionId", "PlayerName", "Relay", "Observer" }.Contains(p.Name) ? (client.IsConnected || server.IsRunning ? "LOCKED: active network session" : "NEXT CONNECTION") : "IMMEDIATE"), settings.PersistenceNotice);
     private async Task<Response> HandleManagerRequest(Request r, CancellationToken token)
     {
+        ManagerRequestForProbe?.Invoke(r.Command);
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(token, lifetime.Token);
         token = linked.Token;
         try

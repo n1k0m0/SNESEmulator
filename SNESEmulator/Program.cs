@@ -11,6 +11,7 @@ internal static class Program
     {
         try
         {
+            if(args.Length==6&&args[0]=="--ui-soak"){return SoakSmoke.Run(args[1],args[2],double.Parse(args[3],System.Globalization.CultureInfo.InvariantCulture),args[4],args[5]);}
             if(args.Length>=2&&args[0]=="--ui-interaction-smoke"){InteractionSmoke.Run(args[1]);return 0;}
             if(args.Length>=2&&args[0]=="--ui-update-smoke"){UpdateSmoke.Run(args[1],args.Length>2?args[2]:"check",args.Length>3?args[3]:null);return 0;}
             if(args.Length>=2&&args[0]=="--manager-ipc-probe"){ManagerIpcProbe.Run(args[1],args.Length>2?args[2]:null);return 0;}

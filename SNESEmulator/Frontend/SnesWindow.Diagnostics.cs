@@ -21,6 +21,10 @@ public sealed partial class SnesWindow
     private double maximumUiInterval;
     private int updates;
     internal WorkerStatus RuntimeStatus=>worker.Status;
+    internal SNESEmulator.Network.SnesNetServer ProbeServer=>server;
+    internal FieldOutput? ProbeOutput=>worker.Latest;
+    internal Task<byte[]> CaptureStateForProbe()=>worker.CaptureAsync();
+    internal Action<string>? ManagerRequestForProbe {get;set;}
     internal string CurrentMenu=>menu.ToString();
     internal bool MediaOperationPending=>mediaBusy;
     internal bool HasPresentedImage=>worker.Latest!=null;
