@@ -1,7 +1,7 @@
 {
   "milestone": "M9d",
-  "status": "Implementation prepared; final clean-commit gate and independent root acceptance pending. M9/release incomplete.",
-  "implementationCommit": null,
+  "status": "Implementation gate passed on clean b432a976; frozen evidence verified; independent root acceptance pending. M9/release incomplete.",
+  "implementationCommit": "b432a976e3315ecf45f55a7c5db2ba35dc54eaf2",
   "wireVersion": "0x534e0004",
   "stateFormat": 9,
   "codecPayloads": "VID3/AUD2 unchanged within explicit epoch envelope",
@@ -21,5 +21,107 @@
     "Linear remote3:2 presentation resampler differs from local WDL; native samples unchanged",
     "No physical SNES/gamepad/OS focus/cleanVM/hours-long soak claim",
     "Distribution/Manager/CI and M10 remain open; publish is PRE-M0"
-  ]
+  ],
+  "fullGate": {
+    "command": "python tools/test-lab.py --windows --full",
+    "exitCode": 0,
+    "portableGroups": {
+      "core": 129,
+      "video-conformance": 35,
+      "m8-state": 27,
+      "audio-conformance": 17,
+      "audio-long-run": 1,
+      "runtime-conformance": 16,
+      "persistence-conformance": 14,
+      "network-conformance": 14,
+      "network-relay-contract": 3
+    },
+    "portableTotal": 256,
+    "windowsGroups": {
+      "windows-integration": 10,
+      "network-windows-conformance": 13
+    },
+    "windowsTotal": 23,
+    "nativeRuntime": true,
+    "nativePersistenceModes": [
+      "normal",
+      "settings-failure",
+      "battery-failure",
+      "log-failure"
+    ],
+    "nativeBuildIdentities": 28,
+    "nativeBuildIdentitiesUnchanged": true,
+    "cpuSemanticCases": 5080400,
+    "cpuBusCases": 5080400,
+    "cpuBusCycles": 26184846,
+    "spcCases": 256000,
+    "nativeRuntimeOutput": "artifacts/m9b-ui-gate-20261023-065146",
+    "nativePersistenceOutput": "artifacts/m9c-ui-gate-20261023-065200"
+  },
+  "actualSoftwareDriverAv": {
+    "Kind": "actual-driver-av",
+    "ColdSeconds": 2.3852309,
+    "MeasurementSeconds": 5.0086057,
+    "fields": 443,
+    "Video": 297,
+    "Audio": 301,
+    "DriverVideo": 297,
+    "Dropped": 23,
+    "MaximumSoftwareAvErrorSeconds": 0.0333088524801588,
+    "MaximumSchedulingErrorSeconds": 0.1731707165017724,
+    "MaximumQueueLatencySeconds": 0.2650648998096585,
+    "Fault": null
+  },
+  "evidence": {
+    "directory": "artifacts/m9d-implementation-evidence",
+    "acceptanceSha256": "c806fa3e54a9779ba28e0a6dba1c814a01b19faa7dc060698504c370a6316844",
+    "filesManifestSha256": "67ad34272acd7a873c0e581e8505772a4b9c7a32925c7351d929bfee7624afc4",
+    "verificationSha256": "2586ea81f97e61c5a70ba89d483e50ac0503f11af29b5b69d4a48c147c2f192f",
+    "archives": [
+      {
+        "path": "artifacts\\m9d-implementation-evidence\\m9d-inputs.zip",
+        "sha256": "d59ae0d83d53636a15765f2fec0f34e7c9f32015884e48947ab56fe37bca31ad",
+        "crc32": "d8fec2f4",
+        "bytes": 573540602,
+        "files": 4231,
+        "uncompressedBytes": 3039265890
+      },
+      {
+        "path": "artifacts\\m9d-implementation-evidence\\m9d-fullgate.zip",
+        "sha256": "4450ae3473f95dda973391e29d773daab9213a4e3865bfa850bf1ed6b8cdf76a",
+        "crc32": "3541dfb3",
+        "bytes": 180809579,
+        "files": 2599,
+        "uncompressedBytes": 2577008416
+      },
+      {
+        "path": "artifacts\\m9d-implementation-evidence\\m9d-development.zip",
+        "sha256": "d7c3c8daa7b1f58dc41d94baa6f567a1c563072f75b8c826e8f9be46459e2646",
+        "crc32": "b0d5d6d1",
+        "bytes": 34149318,
+        "files": 1941,
+        "uncompressedBytes": 129695745
+      }
+    ],
+    "verification": {
+      "archives": 3,
+      "entries": 8771,
+      "stagedOriginalRereads": 8771,
+      "liveOriginalRereads": 8771,
+      "nestedZipEntries": 0
+    },
+    "decompressedBytes": 5745970051
+  },
+  "protectedM9cManifestsUnchanged": {
+    "artifacts/m9c-implementation-evidence/files.json": "df2d8a0cc2b8b48da9cf46a2eeacdacfe3549c277054dd0cb340553a20c677d9",
+    "artifacts/m9c-implementation-evidence/acceptance.json": "29f55698e8aa825be35a7bb44cc973863c00217ac1e67225a8425250e822a211",
+    "artifacts/root-m9c-evidence/files.json": "d363601d0a81d23fb0ca3c6e5f616df21a7341f4d5116b235f101a9b77b07913",
+    "artifacts/root-m9c-evidence/acceptance.json": "e823b2c271a6abdfe9c851dd2c027458e2dd07ceb373cafb89396d0fe84fa8a2"
+  },
+  "c64Unchanged": {
+    "head": "f01750e17a2c3f4cabfd57dc0c470dac93a91a23",
+    "status": "?? C64Emulator.Contracts/\n?? C64Emulator/Ipc/\n?? C64EmulatorManager/\n?? docs/C64EmulatorManager-Konzept.md\n"
+  },
+  "developmentEvidenceLimits": "Raw failed reports and available per-attempt source/DLL captures are retained. Earliest reused child report names were overwritten before per-attempt capture was introduced; no claim of complete early child-report retention. Build8/9 accidental old core test process was owned and terminated; no foreign processes terminated. No archived prior ZIP is nested.",
+  "noProductBuildAfterFinalNativeStarts": true
 }

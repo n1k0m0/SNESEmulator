@@ -178,3 +178,35 @@ A/V wird an einer ausdrücklich begrenzten Software-/Drivergrenze gemessen;
 physischer DAC und Displaytransport bleiben ungemessen. Hardware-/Inputgenerationen
 sind Worker-Metadaten außerhalb von Format9. Siehe [Netzwerkvertrag](m9-network-contract.md).
 Unabhängige M9d-Abnahme, Distribution und M9/Release bleiben offen.
+
+### M9d clean implementation gate and frozen handoff
+
+Implementation `b432a976e3315ecf45f55a7c5db2ba35dc54eaf2` passed
+`python tools/test-lab.py --windows --full` with exit0 on a clean checkout:
+256 portable groups (previous239 +14 network +3 relay) and23 Windows groups
+(previous10 +13 real socket/TLS/relay/driver groups). Full CPU semantics and bus
+each executed5,080,400 cases;26,184,846 bus cycles and256,000 SPC cases passed
+their existing gates. Native runtime and all four persistence modes passed;
+the same28 DLL/EXE/deps/runtimeconfig identities bracket every final native start.
+
+The real A/V run retained2.3852309s cold readiness separately, then observed
+5.0086057s with297 video,301 audio and297 actual driver/video comparisons;
+maximum software A/V distance33.308853ms,23 presentation drops, no provider fault.
+Maximum queue residence265.064900ms and scheduling error173.170717ms include
+late rejected/cold work; they are not physical device-latency claims.
+
+The three frozen archives contain8,771 entries /5,745,970,051 decompressed bytes.
+Every archive and entry has SHA256/CRC32/length identities; every entry was read
+back and compared to both staged and live originals. No nested ZIP or active log
+is included. The separate developmental archive retains available failed-run
+captures and explicitly records early overwritten child-report limits. A first
+incomplete archive attempt was rejected for selecting its own active supervisor
+log; only that owned freezer was stopped and the corrected run was verified.
+Three prepared Root helper scripts are ancillary copies in the report archive;
+they were not run as implementation evidence.
+
+See [M9d baseline](baselines/m9d.json) for exact hashes, counts and raw paths.
+M9d still awaits independent Root review. M9a sustained performance, M8 audio
+reds, source-adjudicated raw SPC differences, distribution/Manager/CI, prolonged
+soak and M10 remain open; publish remains PRE-M0. No physical SNES/input/DAC,
+OS-focus or clean-VM claim is added.
