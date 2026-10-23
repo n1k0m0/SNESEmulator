@@ -11,14 +11,15 @@ public sealed partial class SnesWindow
     internal bool UpdateReady => preparedUpdate != null;
     internal string UpdateVisibleStatus => status;
     internal void ProbeUpdateMenu() { Open(Menu.Main); selection = 5; Activate(1); }
+    internal void ProbeConfigureUpdate() { Open(Menu.Settings); selection = 10; Activate(1); }
     internal PreparedUpdate? InstallAfterNormalClose { get; private set; }
     private void CheckPreviousUpdateFailure()
     {
         _ = Task.Run(() =>
         {
-            string data=SNESEmulator.Core.UserDataPaths.GetBaseDirectory();
-            string error=Path.Combine(data,"last-update-error.log"),success=Path.Combine(data,"last-update-success.json");
-            if(File.Exists(error) && (!File.Exists(success)||File.GetLastWriteTimeUtc(error)>File.GetLastWriteTimeUtc(success)))
+            string data = SNESEmulator.Core.UserDataPaths.GetBaseDirectory();
+            string error = Path.Combine(data, "last-update-error.log"), success = Path.Combine(data, "last-update-success.json");
+            if (File.Exists(error) && (!File.Exists(success) || File.GetLastWriteTimeUtc(error) > File.GetLastWriteTimeUtc(success)))
                 pending.SetStatus("PREVIOUS UPDATE FAILED - SEE last-update-error.log; INSTALLATION RETAINED");
         });
     }
@@ -32,7 +33,7 @@ public sealed partial class SnesWindow
         {
             try
             {
-                string policy = Environment.GetEnvironmentVariable("SNESEMULATOR_UPDATE_POLICY") ?? Path.Combine(AppContext.BaseDirectory, "update-policy.json");
+                string policy = ReleaseUpdates.SelectPolicyPath(AppContext.BaseDirectory);
                 if (!File.Exists(policy)) { pending.SetStatus("UPDATES DISABLED: NO RELEASE SOURCE CONFIGURED"); return; }
                 string currentVersion = File.Exists(Path.Combine(AppContext.BaseDirectory, "package-manifest.json")) ? ReleaseUpdates.VerifyPackage(AppContext.BaseDirectory, allowUserFiles: true).Version : "0.1.0-preview";
                 var result = await ReleaseUpdates.PrepareAsync(policy, currentVersion, Path.GetDirectoryName(AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar))!, lifetime.Token);

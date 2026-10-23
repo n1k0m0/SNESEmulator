@@ -6,7 +6,7 @@ namespace SNESEmulator;
 
 internal static class UpdateSmoke
 {
-    internal static void Run(string output, string mode)
+    internal static void Run(string output, string mode, string? sourceUrl = null)
     {
         Directory.CreateDirectory(output);
         SNESEmulator.Management.PreparedUpdate? install;
@@ -16,7 +16,16 @@ internal static class UpdateSmoke
             window.RenderFrame += _ =>
             {
                 if (time.Elapsed.TotalSeconds > 150) throw new TimeoutException("Update apphook stage " + stage);
-                if (stage == 0) { window.ProbeUpdateMenu(); stage = 1; return; }
+                if (stage == 0)
+                {
+                    if (mode is "configure" or "configure-close-load" or "configure-close-save")
+                    {
+                        if (sourceUrl == null) throw new ArgumentException("Source URL required for configuration probe");
+                        UpdateSourceDialog.SyntheticProbe = new(sourceUrl, Path.Combine(output, "source-dialog.png"), mode == "configure-close-load" ? "close-load" : mode == "configure-close-save" ? "close-save" : "normal");
+                        window.ProbeConfigureUpdate();
+                    }
+                    window.ProbeUpdateMenu(); stage = 1; return;
+                }
                 if (stage == 1 && !window.UpdateCheckPending)
                 {
                     RuntimeSmoke.Screenshot(window, Path.Combine(output, "updates.png"));

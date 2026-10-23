@@ -122,8 +122,8 @@
     },
     {
       "path": "tools/video-mutations.py",
-      "sha256": "59021d126a5e819339356ba2aed6d0fb8f0f81357cac3f38ff975576834243e6",
-      "bytes": 2970
+      "sha256": "d89b9b01b70a68cbb84a21e22517b7fff7d84aea27884f957fe74411eae582ab",
+      "bytes": 3435
     },
     {
       "path": "testdata/hardware-profiles.json",

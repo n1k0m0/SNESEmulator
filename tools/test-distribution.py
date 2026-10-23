@@ -63,11 +63,22 @@ try:
  url='http://127.0.0.1:'+str(server.server_port)+'/'
  (fixture/'manifest.json').write_text(json.dumps({'schema':1,'version':'0.2.0-preview','packageUrl':url+'package.zip','bytes':archive.stat().st_size,'sha256':sha(archive)}))
  policy=out/'policy.json';policy.write_text(json.dumps({'schema':1,'enabled':True,'manifestUrl':url+'manifest.json'}))
+ operatorenv=env_for('operator-policy')
+ run('operator-policy-dialog',[package/'SNESEmulator.exe','--ui-update-smoke',out/'operator-policy','configure',url+'manifest.json'],operatorenv)
+ operator_policy=out/'operator-policy/data/updates/update-policy.json'
+ assert json.loads(operator_policy.read_text())['enabled'] and json.loads((out/'operator-policy/check.json').read_text())['Ready']
+ assert (out/'operator-policy/source-dialog.png').stat().st_size>1000
+ for phase in ['close-load','close-save']:
+  case='operator-'+phase;caseenv=env_for(case)
+  run(case,[package/'SNESEmulator.exe','--ui-update-smoke',out/case,'configure-'+phase,url+'manifest.json'],caseenv)
+  dialog=json.loads((out/case/'source-dialog.json').read_text())
+  if phase=='close-load':assert not dialog['Saved'] and dialog['AbandonedLoad'] and not (out/case/'data/updates/update-policy.json').exists()
+  else:assert dialog['Saved'] and dialog['BlockedCloses']>=1 and json.loads((out/case/'check.json').read_text())['Ready']
  # Failure before helper start: M9c final settings write is deliberately locked.
  for mode,expected in [('settings-failure',1),('install',0)]:
   target=out/('installed-'+mode);shutil.copytree(package,target);target_before=identities(target)
   userfile=target/'user-progress.srm';userfile.write_bytes(b'user progress retained')
-  env=env_for(mode);env['SNESEMULATOR_UPDATE_POLICY']=str(policy)
+  env=env_for(mode);user_policy=out/mode/'data/updates/update-policy.json';user_policy.parent.mkdir(parents=True);shutil.copyfile(operator_policy,user_policy)
   run('update-'+mode,[target/'SNESEmulator.exe','--ui-update-smoke',out/mode,mode],env,expected,timeout=240)
   check=json.loads((out/mode/'check.json').read_text());assert check['Ready']
   if expected:
@@ -84,7 +95,7 @@ try:
    else:raise AssertionError('Update helper did not install the new package')
    assert list(out.glob('installed-'+mode+'.previous-*'))
    assert userfile.read_bytes()==b'user progress retained'
-   currentenv=env_for('current-version');currentenv['SNESEMULATOR_UPDATE_POLICY']=str(policy)
+   currentenv=env_for('current-version');current_policy=out/'current-version/data/updates/update-policy.json';current_policy.parent.mkdir(parents=True);shutil.copyfile(operator_policy,current_policy)
    run('update-current-version',[target/'SNESEmulator.exe','--ui-update-smoke',out/'current-version','check'],currentenv)
    assert not json.loads((out/'current-version/check.json').read_text())['Ready'],'Installed current version was offered again'
 finally:server.shutdown();server.server_close();thread.join()

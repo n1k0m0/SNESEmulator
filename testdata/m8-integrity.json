@@ -30,7 +30,7 @@
     {
       "path": "testdata/m7-video-manifest.json",
       "bytes": 6296,
-      "sha256": "8b38f3eefabf118f1446b5d84e657f96931a4347a98ada7e65e58442e93e97a5"
+      "sha256": "3fbd88d21d22036b425a2636b1c5d44d92c03a2c1937b95fbac06a53e22c8c6e"
     },
     {
       "path": "testdata/m8-audio-repros.json",
@@ -7169,8 +7169,8 @@
     },
     {
       "path": "tools/test-lab.py",
-      "bytes": 12519,
-      "sha256": "a5218c211e16a0f8aac5a66da429573d65803cf8a539d624ecb7c16cf057b875"
+      "bytes": 12567,
+      "sha256": "b732fa33e9d0bcb37b6d9aa901850e5151d2632ad6a8c9e9a2b053503be9154e"
     },
     {
       "path": "tools/verify-m8-testdata.py",

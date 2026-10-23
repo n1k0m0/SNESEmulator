@@ -39,8 +39,14 @@ No compiler or production application is installed by tests.
 
 F10 has CHECK FOR UPDATES. The shipped `update-policy.json` is disabled and has
 no release URL. No unsolicited network check or invented release endpoint exists.
-An operator can explicitly configure policy `{schema:1,enabled:true,manifestUrl}`;
-`SNESEMULATOR_UPDATE_POLICY` selects a separate policy for controlled local tests.
+F10 → SETTINGS → UPDATE SOURCE opens the actual configuration dialog. It writes
+mutable operator policy under UserData/updates/update-policy.json through M9c
+atomic persistence. The disabled package default remains immutable and hashed.
+The product selects the user policy when present, otherwise the package default;
+no policy-environment shortcut is used. The actual native probe configures the
+source through the same dialog. Save runs off-UI; Cancel/X cannot close during
+commit, and a load finishing after close never accesses disposed controls.
+Separate delayed-load/save probes exercise these lifecycle boundaries.
 The UI performs bounded work off its dispatcher and drains it at shutdown.
 Current version comes from its verified package, not a hardcoded release number.
 
@@ -92,9 +98,13 @@ SHA256 `475ac577f9b37f5145a8d244dba2d6f2d6179c5da5867bc42098c6071b13dccf`.
 Every compressed source hash matches the unchanged old baseline. Windows keeps
 both compressed and raw checks; Linux checks pinned raw bytes and every other
 hardware/PCM/image/trace value unchanged. No current output became an oracle.
-The old240s core functional watchdog was measured separately on Linux after a
-timeout near the last PPU snapshots; Linux uses a bounded600s snapshot-suite
-watchdog. Windows240s and all realtime/sustained thresholds remain unchanged.
+The same129-group suite existed before M9f. Its prior recorded group-duration
+sum was209.8s on401/12; current402/13 Windows attempts hit240s twice, while a
+complete separately bound run passed in227.372s wall /157.516s process CPU
+(135.797s user,21.719s kernel). Linux calibration passed in270.21s wall. These
+measurements show host/runtime-test-duration variability; they do not establish a
+.NET regression or parallel-load cause. Both OSes now use a bounded600s functional
+snapshot-suite watchdog. All realtime/sustained thresholds remain unchanged.
 
 CI pins402 and separates hosted portable/headless package work from opt-in actual
 native tests requiring an explicitly configured interactive self-hosted runner.

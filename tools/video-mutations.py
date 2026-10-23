@@ -31,8 +31,15 @@ try:
   source.write_bytes(data)
 finally:
  for path,data in original.items():path.write_bytes(data)
- restored=subprocess.run(['dotnet','build','SNESEmulator.sln','-c','Release','--nologo'],cwd=ROOT,capture_output=True,text=True,timeout=60)
- (ROOT/'artifacts/m7-mutants-restored-build.txt').write_text(restored.stdout+restored.stderr,encoding='utf8')
- if restored.returncode:raise RuntimeError('Restored product build failed')
+ # Linux validates the portable product, not the Windows-only WPF/OpenTK solution.
+ # Both consumers must receive the restored Core DLL after the last mutation.
+ restore_targets=['SNESEmulator.sln'] if sys.platform=='win32' else ['SNESEmulator.Core.Tests','SNESEmulator.Lab']
+ restore_logs=[];restore_failed=False
+ for target in restore_targets:
+  restored=subprocess.run(['dotnet','build',target,'-c','Release','--nologo'],cwd=ROOT,capture_output=True,text=True,timeout=60)
+  restore_logs.append(target+'\n'+restored.stdout+restored.stderr+'\nEXIT '+str(restored.returncode))
+  restore_failed|=restored.returncode!=0
+ (ROOT/'artifacts/m7-mutants-restored-build.txt').write_text('\n'.join(restore_logs),encoding='utf8')
+ if restore_failed:raise RuntimeError('Restored product build failed')
 (ROOT/'artifacts/m7-implementation-mutations.json').write_text(json.dumps({'actualImplementationMutants':results,'exactSourceRestored':True},indent=2)+'\n')
 print(f'{len(results)} actual PPU implementation mutants rejected; exact sources restored')

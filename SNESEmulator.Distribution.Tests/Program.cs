@@ -9,6 +9,7 @@ using SNESEmulator.Management;
 using SNESEmulator.Testing;
 
 string root = Path.Combine(Path.GetTempPath(), "SNESEmulator-distribution-tests-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
+Environment.SetEnvironmentVariable("SNESEMULATOR_DATA_DIR", root);
 var report = new TestReport("distribution-portable"); report.Metadata["temporaryRoot"] = root;
 int failures = 0;
 void Check(bool condition, string reason = "Check failed") { if (!condition) throw new Exception(reason); }
@@ -19,6 +20,7 @@ string Package(string name, string version = "2.0.0")
 {
     string dir = Path.Combine(root, name); Directory.CreateDirectory(Path.Combine(dir, "Manager"));
     File.WriteAllText(Path.Combine(dir, "SNESEmulator.exe"), "owned-test-fixture-" + version); File.WriteAllText(Path.Combine(dir, "Manager/SNESEmulatorManager.exe"), "owned-manager-fixture-" + version);
+    File.WriteAllText(Path.Combine(dir, "update-policy.json"), JsonSerializer.Serialize(new UpdatePolicy(1, false, null, "Immutable defaults")));
     var files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories).Select(p => new PackageFile(Path.GetRelativePath(dir, p).Replace('\\', '/'), new FileInfo(p).Length, Hash(File.ReadAllBytes(p)))).ToArray();
     File.WriteAllText(Path.Combine(dir, "package-manifest.json"), JsonSerializer.Serialize(new PackageManifest("snes-package-v1", "SNESEmulator", version, new string('a', 40), false, "win-x64", true, files)));
     return dir;
@@ -36,6 +38,22 @@ await Test("M9f package inventory checks actual bytes size hashes and extra file
 await Test("M9f atomic install preserves unknown user data and keeps previous generation", () => { string old = Package("installed", "1.0.0"), next = Package("incoming"); Directory.CreateDirectory(Path.Combine(old, "saves")); File.WriteAllText(Path.Combine(old, "saves/user.snessav"), "user-state"); string backup = ReleaseUpdates.Install(next, old); Check(File.ReadAllText(Path.Combine(old, "saves/user.snessav")) == "user-state"); Check(ReleaseUpdates.VerifyPackage(old, true).Version == "2.0.0"); Check(ReleaseUpdates.VerifyPackage(backup, true).Version == "1.0.0"); return Task.CompletedTask; });
 await Test("M9f every install failure boundary rolls back exact previous files", () => { foreach (string boundary in new[] { "before-backup", "after-backup", "after-install" }) { string old = Package("old-" + boundary, "1.0.0"), next = Package("new-" + boundary); var before = Directory.GetFiles(old, "*", SearchOption.AllDirectories).ToDictionary(p => Path.GetRelativePath(old, p), p => Hash(File.ReadAllBytes(p))); Reject(() => ReleaseUpdates.Install(next, old, p => { if (p == boundary) throw new IOException("injected " + boundary); })); Check(before.All(x => Hash(File.ReadAllBytes(Path.Combine(old, x.Key))) == x.Value), boundary); } return Task.CompletedTask; });
 await Test("M9f conflicting user file and non-sibling targets leave installation intact", () => { string old = Package("conflict-old", "1.0.0"), next = Package("conflict-new"); File.WriteAllText(Path.Combine(old, "release-source.json"), "metadata"); Directory.CreateDirectory(Path.Combine(old, "Manager")); File.WriteAllText(Path.Combine(old, "Manager/custom.txt"), "preserve"); File.WriteAllText(Path.Combine(next, "Manager/custom.txt"), "unlisted"); Reject(() => ReleaseUpdates.Install(next, old)); Check(File.ReadAllText(Path.Combine(old, "Manager/custom.txt")) == "preserve"); Reject(() => ReleaseUpdates.Install(old, old)); return Task.CompletedTask; });
+await Test("M9f user policy atomic generations preserve immutable packaged defaults", () =>
+{
+    string package = Package("operator-defaults"), defaults = Path.Combine(package, "update-policy.json");
+    string original = Hash(File.ReadAllBytes(defaults));
+    Check(ReleaseUpdates.SelectPolicyPath(package) == defaults);
+    ReleaseUpdates.SaveUserPolicy(new(1, true, "https://updates.example.invalid/manifest.json", "Inert configuration fixture; never requested"));
+    Check(ReleaseUpdates.SelectPolicyPath(package) == ReleaseUpdates.UserPolicyPath && ReleaseUpdates.ReadPolicy(ReleaseUpdates.UserPolicyPath).Enabled);
+    Check(Hash(File.ReadAllBytes(defaults)) == original); ReleaseUpdates.VerifyPackage(package);
+    ReleaseUpdates.SaveUserPolicy(new(1, false, null, "Explicitly disabled"));
+    byte[] primary = File.ReadAllBytes(ReleaseUpdates.UserPolicyPath), backup = File.ReadAllBytes(ReleaseUpdates.UserPolicyPath + ".bak");
+    using (var locked = new FileStream(ReleaseUpdates.UserPolicyPath + ".lock", FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+        Reject(() => ReleaseUpdates.SaveUserPolicy(new(1, false, null, "Blocked write")));
+    Check(File.ReadAllBytes(ReleaseUpdates.UserPolicyPath).SequenceEqual(primary) && File.ReadAllBytes(ReleaseUpdates.UserPolicyPath + ".bak").SequenceEqual(backup));
+    Check(!ReleaseUpdates.ReadPolicy(ReleaseUpdates.UserPolicyPath).Enabled && Hash(File.ReadAllBytes(defaults)) == original);
+    return Task.CompletedTask;
+});
 await Test("M9f actual loopback download verifies hash origin version and executable-free staging", async () =>
 {
     string directory = Package("download"); byte[] zip = Archive(directory);

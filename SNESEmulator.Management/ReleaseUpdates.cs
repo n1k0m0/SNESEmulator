@@ -17,6 +17,17 @@ public static class ReleaseUpdates
     static readonly JsonSerializerOptions Json = new() { PropertyNameCaseInsensitive = true, MaxDepth = 16 };
     static string Hash(byte[] bytes) => Convert.ToHexString(SHA256.HashData(bytes)).ToLowerInvariant();
     static bool Digest(string? value) => value is { Length: 64 } && value.All(Uri.IsHexDigit);
+    public static string UserPolicyPath => System.IO.Path.Combine(SNESEmulator.Core.UserDataPaths.GetBaseDirectory(), "updates", "update-policy.json");
+    public static string SelectPolicyPath(string packageDirectory) => File.Exists(UserPolicyPath) || File.Exists(UserPolicyPath + ".bak")
+        ? UserPolicyPath : System.IO.Path.Combine(packageDirectory, "update-policy.json");
+    public static void SaveUserPolicy(UpdatePolicy policy)
+    {
+        if (policy.Schema != 1 || (policy.Enabled && string.IsNullOrWhiteSpace(policy.ManifestUrl))) throw new InvalidDataException("Enabled updates require an explicit release source");
+        if (!string.IsNullOrWhiteSpace(policy.ManifestUrl)) _ = AllowedUri(policy.ManifestUrl);
+        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(policy, new JsonSerializerOptions(Json) { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        if (bytes.Length > 8192) throw new InvalidDataException("Update policy exceeds8192 bytes");
+        SNESEmulator.Core.AtomicFile.Write(UserPolicyPath, stream => stream.Write(bytes), path => { _ = ReadPolicy(path); return true; });
+    }
     public static UpdatePolicy ReadPolicy(string path)
     {
         using var stream = File.OpenRead(path);
@@ -24,6 +35,7 @@ public static class ReleaseUpdates
         var policy = JsonSerializer.Deserialize<UpdatePolicy>(stream, Json) ?? throw new InvalidDataException("Missing update policy");
         if (policy.Schema != 1) throw new InvalidDataException("Unknown update policy schema");
         if (policy.Enabled && string.IsNullOrWhiteSpace(policy.ManifestUrl)) throw new InvalidDataException("Enabled updates require an explicit release source");
+        if (policy.Enabled) _ = AllowedUri(policy.ManifestUrl!);
         return policy;
     }
     static Uri AllowedUri(string text)

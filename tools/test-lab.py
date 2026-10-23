@@ -38,9 +38,10 @@ run([sys.executable,'tools/test-performance.py'])
 run([sys.executable,'tools/dsp-reference.py','--verify'])
 run([sys.executable,'tools/verify-dsp-gaussian.py'])
 # M5 adds334 full-system PPU snapshots and42 graphics groups to87 prior groups.
-# Core includes hundreds of full JSON/deflate snapshot continuations. Linux zlib
-# and hosted VM costs differ; this functional watchdog is not a realtime budget.
-supervised('core',['dotnet',str(CORE)],timeout=240 if sys.platform=='win32' else 600)
+# The existing129 groups include hundreds of JSON/deflate snapshot continuations.
+# Measured Windows/runtime13 wall times vary near240s; both OSes use a bounded
+# functional watchdog. This is separate from unchanged realtime/sustained budgets.
+supervised('core',['dotnet',str(CORE)],timeout=600)
 supervised('video-conformance',['dotnet',str(CORE),'--video-only'],timeout=180)
 run([sys.executable,'tools/test-video-cli.py'])
 run([sys.executable,'tools/video-mutations.py'])

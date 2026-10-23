@@ -176,7 +176,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         Menu.Settings => [$"VIDEO FILTER    {new[]{"SHARP","CRT","TV"}[settings.Filter]}",
             $"VIDEO UPSCALE   {((SharpPixelsGpuUpscaleMode)settings.Upscale).ToString().ToUpperInvariant()}",
             $"FULLSCREEN      {settings.Fullscreen}", $"GAMEPAD         {settings.Gamepad}",
-            $"CONTROLLER PORT {settings.ControllerPort}", "CONTROLLER MAPPING", "RUN DIAGNOSTIC ROM", $"AUDIO VOLUME    {settings.AudioVolume}%", "RUN AUDIO DIAGNOSTIC ROM",$"GAMEPAD DEVICE  {(settings.GamepadDevice<0?"FIRST CONNECTED":settings.GamepadDevice.ToString())}"],
+            $"CONTROLLER PORT {settings.ControllerPort}", "CONTROLLER MAPPING", "RUN DIAGNOSTIC ROM", $"AUDIO VOLUME    {settings.AudioVolume}%", "RUN AUDIO DIAGNOSTIC ROM",$"GAMEPAD DEVICE  {(settings.GamepadDevice<0?"FIRST CONNECTED":settings.GamepadDevice.ToString())}", "UPDATE SOURCE"],
         Menu.Network => NetworkRows(),
         Menu.Media => entries.Select(p => p==Directory.GetParent(settings.MediaDirectory)?.FullName ? "[..] PARENT DIRECTORY" : (Directory.Exists(p) ? "[DIR] " : "") + Path.GetFileName(p)).ToArray(),
         Menu.Saves => entries.Select(Path.GetFileNameWithoutExtension).Select(n => n ?? "").ToArray(),
@@ -266,6 +266,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
                     case 7: settings.AudioVolume=Math.Clamp(settings.AudioVolume+direction*10,0,100);break;
                     case 8: LoadAudioDiagnostic();break;
                     case 9: var devices=JoystickStates.Where(p=>p!=null).Select(p=>p.Id).Prepend(-1).ToArray();int index=Array.IndexOf(devices,settings.GamepadDevice);settings.GamepadDevice=devices[(index+direction+devices.Length)%devices.Length];ResetLocalInput();break;
+                    case 10: if(UpdateSourceDialog.ShowEditor())status="UPDATE SOURCE SAVED"; break;
                 }
                 SaveSettings(); break;
             case Menu.Controller: capturing=true;captureArmed=false; break;
