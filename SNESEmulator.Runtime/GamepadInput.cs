@@ -38,7 +38,7 @@ public static class GamepadMapping
     public static ushort Read(IReadOnlyDictionary<string,string> bindings,IReadOnlySet<string> active)
     {
         ushort result=0;
-        foreach(string name in Names)if(bindings.TryGetValue(name,out string? value)&&value!=null&&value.Split(';',StringSplitOptions.RemoveEmptyEntries).Any(active.Contains)&&Enum.TryParse<SnesButtons>(name,out var button))result|=(ushort)button;
+        foreach(string name in Names)if(bindings.TryGetValue(name,out string? value)&&value!=null&&InputBindings.Matches(value,active)&&Enum.TryParse<SnesButtons>(name,out var button))result|=(ushort)button;
         return result;
     }
 }

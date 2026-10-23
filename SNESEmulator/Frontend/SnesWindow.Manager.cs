@@ -105,7 +105,7 @@ public sealed partial class SnesWindow
         return new(Environment.ProcessId, s.Epoch, s.Field, s.Title, s.CartridgeHash, previewCartridge?.SourcePath ?? "", s.Paused, s.Turbo, menu != Menu.None, client.IsConnected ? "CLIENT" : server.IsRunning ? "HOST" : "LOCAL", settingsRevision, s.Fault);
     }
 
-    private SettingsInfo ManagerSettings() => new(settingsRevision, JsonSerializer.SerializeToElement(settings), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite).ToDictionary(p => p.Name, p => new[] { "Host", "Port", "RelayHost", "RelayPort", "ConnectionId", "PlayerName", "Relay", "Observer" }.Contains(p.Name) ? (client.IsConnected || server.IsRunning ? "LOCKED: active network session" : "NEXT CONNECTION") : "IMMEDIATE"), settings.PersistenceNotice);
+    private SettingsInfo ManagerSettings() => new(settingsRevision, JsonSerializer.SerializeToElement(settings), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite && p.Name!="AdditionalSettings").ToDictionary(p => p.Name, p => p.Name=="TurboMode"&&client.IsConnected?"LOCKED: host owns turbo":new[] { "Host", "Port", "RelayHost", "RelayPort", "ConnectionId", "PlayerName", "Relay", "Observer" }.Contains(p.Name) ? (client.IsConnected || server.IsRunning ? "LOCKED: active network session" : "NEXT CONNECTION") : "IMMEDIATE"), settings.PersistenceNotice);
     private async Task<Response> HandleManagerRequest(Request r, CancellationToken token)
     {
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(token, lifetime.Token);
@@ -150,11 +150,11 @@ public sealed partial class SnesWindow
                 foreach (var effect in ManagerSettings().Effects.Where(e => e.Value.StartsWith("LOCKED")))
                     if (apply.Settings.GetProperty(effect.Key).GetRawText() != JsonSerializer.SerializeToElement(settings).GetProperty(effect.Key).GetRawText())
                         return Task.FromResult(Response.Fail(r, "NETWORK_CLIENT_LOCKED", "Leave active network session before editing network settings"));
+                if(client.IsConnected&&candidate.TurboMode!=settings.TurboMode)
+                    return Task.FromResult(Response.Fail(r,"NETWORK_CLIENT_LOCKED","Host owns turbo mode"));
                 bool fullscreen = candidate.Fullscreen != settings.Fullscreen;
                 settings = candidate;
-                settings.GamepadControls ??= GamepadMapping.Defaults();
-                foreach (var b in GamepadMapping.Defaults())
-                    settings.GamepadControls.TryAdd(b.Key, b.Value);
+                InputBindings.Ensure(settings);turbo=settings.TurboMode;ApplyPresentationSettings();
                 ResetLocalInput();
                 if (fullscreen)
                     ToggleFullscreen();
@@ -164,7 +164,7 @@ public sealed partial class SnesWindow
                 if (client.IsConnected)
                     return Task.FromResult(Response.Fail(r, "NETWORK_CLIENT_LOCKED", "Host owns hardware mode"));
                 managerPaused = r.Payload.GetProperty("Paused").GetBoolean();
-                turbo = r.Payload.GetProperty("Turbo").GetBoolean();
+                turbo = r.Payload.GetProperty("Turbo").GetBoolean();settings.TurboMode=turbo;SaveSettings();
                 sentPause = null;
                 sentTurbo = null;
                 return ApplyManagerMode(r, token);
@@ -208,6 +208,7 @@ public sealed partial class SnesWindow
 
     private async Task<Response> RunManagerMedia(Request r, PathCommand? path, Cartridge? cart, CancellationToken token)
     {
+        bool powerCycle=settings.ResetMode=="Power";
         Response result;
         Cartridge? installed = null;
         bool installationCommitted = false;
@@ -227,7 +228,7 @@ public sealed partial class SnesWindow
                         installationCommitted = true;
                         break;
                     case "Reset":
-                        await worker.ResetAsync(token);
+                        if(powerCycle)await worker.PowerCycleAsync(token);else await worker.ResetAsync(token);
                         break;
                     case "LoadState":
                         if (cart == null)

@@ -32,6 +32,7 @@ run([sys.executable,'tools/verify-m8-testdata.py'])
 supervised('network-conformance',['dotnet',str(CORE),'--network-only'],timeout=180)
 supervised('network-relay-contract',[sys.executable,'tools/test-network-relay.py'],timeout=60)
 supervised('persistence-conformance',['dotnet',str(CORE),'--persistence-only'],timeout=180)
+supervised('interaction-conformance',['dotnet',str(CORE),'--interaction-only'],timeout=180)
 supervised('runtime-conformance',['dotnet',str(CORE),'--runtime-only'],timeout=180)
 # M9 frozen preoptimization state/trace regression, separate from accuracy oracles.
 run([sys.executable,'tools/test-performance.py'])
@@ -115,6 +116,7 @@ if args.windows:
  native_before={str(p.relative_to(ROOT)):__import__('hashlib').sha256(p.read_bytes()).hexdigest() for directory in ['SNESEmulator/bin/Release/net10.0-windows','SNESEmulatorManager/bin/Release/net10.0-windows','SNESEmulator.Contracts/bin/Release/net10.0','SNESEmulator.Management/bin/Release/net10.0','SNESEmulator.Core/bin/Release/net10.0','SNESEmulator.Runtime/bin/Release/net10.0'] for p in (ROOT/directory).rglob('*') if p.is_file() if p.name.endswith(('.dll','.exe','.deps.json','.runtimeconfig.json'))}
  (ROOT/'artifacts/m9e-gate-native-identities-before.json').write_text(json.dumps(native_before,indent=2))
  run([sys.executable,'tools/test-ui-runtime.py','--output','artifacts/m9b-ui-gate-'+__import__('datetime').datetime.now().strftime('%Y%m%d-%H%M%S')])
+ run([sys.executable,'tools/test-ui-interaction.py','--output','artifacts/m9g-ui-gate-'+__import__('datetime').datetime.now().strftime('%Y%m%d-%H%M%S')])
  run([sys.executable,'tools/test-ui-persistence.py','--output','artifacts/m9c-ui-gate-'+__import__('datetime').datetime.now().strftime('%Y%m%d-%H%M%S')])
  supervised('manager-windows-conformance',['dotnet',str(ROOT/'SNESEmulator.Manager.Tests/bin/Release/net10.0/SNESEmulator.Manager.Tests.dll'),'--windows'],timeout=180)
  supervised('windows-integration',['dotnet',str(ROOT/'SNESEmulator.Tests/bin/Release/net10.0-windows/SNESEmulator.Tests.dll')])

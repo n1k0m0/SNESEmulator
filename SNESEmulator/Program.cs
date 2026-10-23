@@ -11,6 +11,7 @@ internal static class Program
     {
         try
         {
+            if(args.Length>=2&&args[0]=="--ui-interaction-smoke"){InteractionSmoke.Run(args[1]);return 0;}
             if(args.Length>=2&&args[0]=="--ui-update-smoke"){UpdateSmoke.Run(args[1],args.Length>2?args[2]:"check",args.Length>3?args[3]:null);return 0;}
             if(args.Length>=2&&args[0]=="--manager-ipc-probe"){ManagerIpcProbe.Run(args[1],args.Length>2?args[2]:null);return 0;}
             if(args.Length>=2&&args[0]=="--ui-persistence-smoke"){PersistenceSmoke.Run(args[1],args.Length>=3?args[2]:"normal");return 0;}
@@ -35,7 +36,7 @@ internal static class Program
                     count++;
                     if(count==5 && args.Length>=3)
                     {
-                        void Key(OpenTK.Input.Key key) => preview.OnUserKeyDown(new SharpPixels.KeyEventArgs(key,0));
+                        void Key(OpenTK.Input.Key key) => preview.ProbeKey(key);
                         switch(args[2])
                         {
                             case "demo": Key(OpenTK.Input.Key.F6); break;
@@ -49,8 +50,8 @@ internal static class Program
                     if(count>=15 && !savesTriggered && args.Length>=3 && args[2]=="saves"&&!preview.MediaOperationPending&&preview.RuntimeStatus.Field>0)
                     {
                         savesTriggered=true;
-                        preview.OnUserKeyDown(new SharpPixels.KeyEventArgs(OpenTK.Input.Key.F12,0));
-                        preview.OnUserKeyDown(new SharpPixels.KeyEventArgs(OpenTK.Input.Key.S,0));
+                        preview.ProbeKey(OpenTK.Input.Key.F12);
+                        preview.ProbeKey(OpenTK.Input.Key.S);
                     }
                     if(count<30||preview.MediaOperationPending) return;
                     if(args.Length>=3&&args[2] is "demo" or "saves"&&!preview.HasPresentedImage)return;

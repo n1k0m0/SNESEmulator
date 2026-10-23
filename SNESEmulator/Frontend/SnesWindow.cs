@@ -11,7 +11,7 @@ namespace SNESEmulator.Frontend;
 
 public sealed partial class SnesWindow : SharpPixelsWindow
 {
-    private enum Menu { None, Main, Settings, Network, Media, Saves, Reset, Delete, Controller }
+    private enum Menu { None, Main, Settings, Network, Media, Saves, Reset, Delete, Controller, Keyboard }
     private readonly EmulationWorker worker = new();
     private readonly BatteryPersistence battery;
     private readonly BatteryAutosave autosave;
@@ -32,10 +32,19 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private bool turbo, busy, capturing, mediaBusy,closing;
     private bool? sentPause,sentTurbo;
     private bool localSuppressed=true,captureArmed;
-    private readonly GamepadSession padSession=new();
+    private readonly HashSet<string> capturedTokens=[];
+    private readonly FrontendInputSession padSession=new(),keyboardSession=new();
+    private double keyboardRepeat;
+    private bool? probeFocus;
+    private bool InputFocused=>probeFocus??IsFocused;
     private HashSet<string> rawPad=[];
-    private string? padIdentity;
-    private string? lastPadIdentity;
+    private string? padIdentity,previousPadIdentity;
+    private IReadOnlySet<string>? probeKeyboard,probePad;
+    private string? probePadIdentity;
+    private HashSet<string> previousKeyboardRaw=[];
+    private bool keyboardReady,keyboardOverflow;
+    private const int KeyboardEventCapacity=256;
+    private readonly Queue<(Key Key,bool Down,KeyModifiers Modifiers)> keyboardEvents=new();
     private ushort padButtons;
     private int mappingGeneration;
     private double inputTimer, repeatTimer;
@@ -51,21 +60,15 @@ public sealed partial class SnesWindow : SharpPixelsWindow
 
     private readonly string? startupRom;
     private static readonly Dictionary<char, byte[]> Font = CreateOverlayFont();
-    private static readonly (Key key, SnesButtons button)[] KeyboardMap =
-    [
-        (Key.Up,SnesButtons.Up),(Key.Down,SnesButtons.Down),(Key.Left,SnesButtons.Left),(Key.Right,SnesButtons.Right),
-        (Key.Z,SnesButtons.B),(Key.X,SnesButtons.A),(Key.A,SnesButtons.Y),(Key.S,SnesButtons.X),
-        (Key.Q,SnesButtons.L),(Key.W,SnesButtons.R),(Key.Enter,SnesButtons.Start),(Key.ShiftRight,SnesButtons.Select)
-    ];
     public SnesWindow(string? rom = null) : base(512, 288, "SNESEmulator - C# core")
     {
+        FocusedChanged+=e=>InputFocusChanged();
         battery=new(()=>worker.BatteryAsync(),BatteryPath,pending.SetStatus);
         autosave=new(battery,pending.SetStatus);
         settingsPersistence=new(pending.SetStatus);
         if(settings.PersistenceNotice!=null)status=settings.PersistenceNotice;
         server=new(256,224);
-        if(settings.GamepadControls==null){settings.GamepadControls=GamepadMapping.Defaults();foreach(var binding in settings.GamepadBindings)if(GamepadMapping.Names.Contains(binding.Key)&&binding.Value>=0)settings.GamepadControls[binding.Key]="Button"+binding.Value;}
-        foreach(var binding in GamepadMapping.Defaults())settings.GamepadControls.TryAdd(binding.Key,binding.Value);
+        InputBindings.Ensure(settings);turbo=settings.TurboMode;
         presentation=new(worker,server,pending.SetStatus);
         startupRom = rom; ClientSize = new Vector2i(1024, 576); UpdateFrequency = 60;
         server.StatusChanged += pending.SetStatus;
@@ -81,7 +84,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     public override void OnUserInitialize()
     {
         // SharpPixels resets this during OnLoad, so apply the cap after that reset.
-        UpdateFrequency = 60;
+        ApplyPresentationSettings();
         if (settings.Fullscreen) ToggleFullscreen();
         Directory.CreateDirectory(UserDataPaths.GetMediaDirectory());
         if (startupRom != null) Try(() => LoadRom(startupRom));
@@ -96,12 +99,12 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         pending.Drain();
         if(pending.TakeStatus() is {} message)status=message;
         if(Interlocked.Exchange(ref nextHostMenu,null) is {} overlay)hostMenu=overlay;
-        PollGamepad(time);client.AudioVolume=settings.AudioVolume/100f;presentation.Volume=settings.AudioVolume/100f;
+        PollGamepad(time);PollKeyboard(time);client.AudioVolume=settings.AudioVolume/100f;presentation.Volume=settings.AudioVolume/100f;
         bool remote = client.IsConnected;
-        ushort raw=(ushort)(KeyboardButtons()|padButtons);
-        if(!IsFocused||menu!=Menu.None||mediaBusy)localSuppressed=true;
-        if(raw==0&&IsFocused&&menu==Menu.None&&!mediaBusy)localSuppressed=false;
-        ushort input = menu == Menu.None && IsFocused&&!localSuppressed ? raw : (ushort)0;
+        ushort raw=(ushort)(keyboardButtons|padButtons);
+        if(!InputFocused||menu!=Menu.None||mediaBusy)localSuppressed=true;
+        if(raw==0&&InputFocused&&menu==Menu.None&&!mediaBusy)localSuppressed=false;
+        ushort input = menu == Menu.None && InputFocused&&!localSuppressed ? raw : (ushort)0;
         if (remote)
         {
             inputTimer += time;
@@ -132,7 +135,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         uint[] pixels=field!=null?drawnPixels:[];int width=field?.Geometry.Width??256,height=field?.Geometry.Height??224;
         if(remote){var frame=remoteVideo.Read(client.TimelineIdentity);pixels=frame?.Pixels??[];width=frame?.Width??256;height=frame?.Height??224;}
         if (pixels.Length>0)
-            DrawArgbPixelsGpuPresented(pixels,width,height,0,0,width,height,85,12,342,256,
+            DrawArgbPixelsGpuPresented(pixels,width,height,settings.VideoZoom?width/20:0,settings.VideoZoom?height/20:0,settings.VideoZoom?width-width/10:width,settings.VideoZoom?height-height/10:height,85,12,342,256,
                 (SharpPixelsGpuFilterMode)settings.Filter,(SharpPixelsGpuUpscaleMode)settings.Upscale,
                 settings.Upscale is 2 or 4 ? 3 : settings.Upscale == 5 ? 4 : 2,8,10,18);
         else
@@ -165,7 +168,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private uint[] drawnPixels=[];
     private void Open(Menu next)
     {
-        menu = next; selection = 0; capturing = false;localSuppressed=true;
+        menu = next; selection = 0;capturing=false;capturedTokens.Clear();localSuppressed=true;
         worker.SubmitInput(default);
         if (next == Menu.Media) RefreshMedia();
         if (next == Menu.Saves) { RefreshSaves(); previewPath=null; savePreview=null; }
@@ -176,13 +179,14 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         Menu.Settings => [$"VIDEO FILTER    {new[]{"SHARP","CRT","TV"}[settings.Filter]}",
             $"VIDEO UPSCALE   {((SharpPixelsGpuUpscaleMode)settings.Upscale).ToString().ToUpperInvariant()}",
             $"FULLSCREEN      {settings.Fullscreen}", $"GAMEPAD         {settings.Gamepad}",
-            $"CONTROLLER PORT {settings.ControllerPort}", "CONTROLLER MAPPING", "RUN DIAGNOSTIC ROM", $"AUDIO VOLUME    {settings.AudioVolume}%", "RUN AUDIO DIAGNOSTIC ROM",$"GAMEPAD DEVICE  {(settings.GamepadDevice<0?"FIRST CONNECTED":settings.GamepadDevice.ToString())}", "UPDATE SOURCE"],
+            $"CONTROLLER PORT {settings.ControllerPort}", "CONTROLLER MAPPING", "RUN DIAGNOSTIC ROM", $"AUDIO VOLUME    {settings.AudioVolume}%", "RUN AUDIO DIAGNOSTIC ROM",$"GAMEPAD DEVICE  {(settings.GamepadDevice<0?"FIRST CONNECTED":settings.GamepadDevice.ToString())}", "UPDATE SOURCE",$"RENDER LIMIT    {(settings.RenderFrameLimit==0?"UNLIMITED":settings.RenderFrameLimit+" HZ")}",$"PRESENT VSYNC   {settings.PresentationVSync}",$"VIDEO ZOOM 10%  {settings.VideoZoom}",$"TURBO           {turbo}","KEYBOARD / HOTKEY MAPPING",$"RESET MODE      {settings.ResetMode.ToUpperInvariant()}"],
         Menu.Network => NetworkRows(),
         Menu.Media => entries.Select(p => p==Directory.GetParent(settings.MediaDirectory)?.FullName ? "[..] PARENT DIRECTORY" : (Directory.Exists(p) ? "[DIR] " : "") + Path.GetFileName(p)).ToArray(),
         Menu.Saves => entries.Select(Path.GetFileNameWithoutExtension).Select(n => n ?? "").ToArray(),
-        Menu.Reset => ["NO - RETURN", "YES - RESET MACHINE"],
+        Menu.Reset => ["NO - RETURN", $"YES - {settings.ResetMode.ToUpperInvariant()} RESET (KEEP SRAM)"],
         Menu.Delete => ["NO - KEEP SAVESTATE", "YES - DELETE SAVESTATE"],
-        Menu.Controller => GamepadMapping.Names.Select((name,i)=>name+"    "+settings.GamepadControls![name]+(capturing&&selection==i?"  RELEASE THEN MOVE / PRESS":"")).ToArray(),
+        Menu.Controller => InputBindings.Buttons.Concat(InputBindings.Actions).Select(name=>name+"    "+(InputBindings.Buttons.Contains(name)?settings.GamepadControls!:settings.GamepadActions!)[name]+(capturing&&MappingName()==name?" [CAPTURE]":"")).ToArray(),
+        Menu.Keyboard => InputBindings.Buttons.Concat(InputBindings.Actions).Select(name=>name+"    "+settings.KeyboardControls![name]+(capturing&&MappingName()==name?" [CAPTURE]":"")).ToArray(),
         _ => []
     };
     private void DrawMenu()
@@ -192,7 +196,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         DrawLine(x,y,x+w,y,108,214,182); DrawLine(x,y+h,x+w,y+h,108,214,182);
         DrawLine(x,y,x,y+h,108,214,182); DrawLine(x+w,y,x+w,y+h,108,214,182);
         Text(x+16,y+12,menu == Menu.Main ? "MAIN MENU" : menu.ToString(),2);
-        Text(x+16,y+34,menu == Menu.Saves ? "S/F5 SAVE  ENTER LOAD  DEL DELETE  ESC BACK" : "UP/DOWN SELECT  ENTER CHANGE  ESC BACK",1,192,210,225);
+        Text(x+16,y+34,capturing?"RELEASE - HOLD CHORD - RELEASE TO SAVE / ESC CANCEL":menu is Menu.Controller or Menu.Keyboard?"ENTER CAPTURE  M EDIT TOKENS  DEL CLEAR  ESC BACK":menu == Menu.Saves ? "S/F5 SAVE  ENTER LOAD  DEL DELETE  ESC BACK" : "UP/DOWN SELECT  ENTER CHANGE  ESC BACK",1,192,210,225);
         var rows = Rows(); int first = Math.Max(0,selection-8);
         for (int i = first; i < Math.Min(rows.Length,first+10); i++)
             Text(x+16,y+56+(i-first)*15,(selection == i ? "> " : "  ")+Clip(rows[i],menu==Menu.Saves?38:66),1,
@@ -215,19 +219,30 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         if (rows.Length == 0) Text(x+16,y+60,"NO ENTRIES",1);
         Text(x+16,y+h-17,menu == Menu.Media ? Clip(settings.MediaDirectory,67) : $"{Math.Min(selection+1,rows.Length)}/{rows.Length}",1,108,214,182);
     }
-    public override void OnUserKeyDown(SharpPixels.KeyEventArgs e) => Try(() => HandleKey(e.Key,e.Modifiers));
+    public override void OnUserKeyDown(SharpPixels.KeyEventArgs e)=>QueueKeyboardEvent(e.Key,true,e.Modifiers);
+    private void QueueKeyboardEvent(Key key,bool down,KeyModifiers modifiers)
+    {
+        if(!InputFocused||closing)return;
+        if(keyboardEvents.Count==KeyboardEventCapacity){keyboardEvents.Clear();keyboardOverflow=true;return;}
+        if(!keyboardOverflow)keyboardEvents.Enqueue((key,down,modifiers));
+    }
+    private void InputFocusChanged()
+    {
+        capturing=false;capturedTokens.Clear();ResetLocalInput();keyboardOverflow=false;
+    }
     private void HandleKey(Key key, KeyModifiers modifiers = 0)
     {
-        if(!IsFocused||closing)return;
+        if(!InputFocused||closing)return;
         if (key == Key.F11) { settings.Fullscreen = !settings.Fullscreen; ToggleFullscreen(); SaveSettings(); return; }
         if (key == Key.F10) { Open(menu == Menu.None ? Menu.Main : Menu.None); return; }
         if (key == Key.F12) { if (client.IsConnected) { status="SAVESTATES ARE MANAGED BY HOST"; return; } Open(menu==Menu.Saves?Menu.None:Menu.Saves); return; }
-        if (key == Key.F9 && !client.IsConnected) { turbo = !turbo; return; }
+        if (key == Key.F9 && !client.IsConnected) { SetTurbo(!turbo); return; }
         if (key == Key.F6 && !client.IsConnected) { LoadDiagnostic(); return; }
         if (menu == Menu.None) return;
         if (key == Key.Escape) { Open(menu == Menu.Main ? Menu.None : menu is Menu.Delete ? Menu.Saves : Menu.Main); return; }
-        if (capturing) return;
+        if(capturing)return;
         var rows = Rows();
+        if(menu is Menu.Controller or Menu.Keyboard&&key==Key.M){EditMapping();return;}
         if (key == Key.Up) { selection = (selection+Math.Max(1,rows.Length)-1)%Math.Max(1,rows.Length); return; }
         if (key == Key.Down) { selection = (selection+1)%Math.Max(1,rows.Length); return; }
         if (key == Key.PageDown) { selection = Math.Min(Math.Max(0,rows.Length-1),selection+10); return; }
@@ -243,7 +258,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             return;
         }
         if (menu == Menu.Saves && key is Key.S or Key.F5) { Save(); return; }
-        if(menu==Menu.Controller&&key==Key.Delete){settings.GamepadControls![GamepadMapping.Names[selection]]="";SaveSettings();ResetLocalInput();return;}
+        if(menu is Menu.Controller or Menu.Keyboard && key==Key.Delete){Mapping()[MappingName()]="";SaveSettings();ResetLocalInput();return;}
         if (menu == Menu.Saves && key == Key.Delete && entries.Count > 0) { deletePath=entries[selection]; Open(Menu.Delete); return; }
         if (menu == Menu.Network && EditNetwork(key,modifiers)) return;
         if (key is Key.Enter or Key.Right or Key.Left || menu == Menu.Saves && key == Key.L) Activate(key == Key.Left ? -1 : 1);
@@ -267,9 +282,16 @@ public sealed partial class SnesWindow : SharpPixelsWindow
                     case 8: LoadAudioDiagnostic();break;
                     case 9: var devices=JoystickStates.Where(p=>p!=null).Select(p=>p.Id).Prepend(-1).ToArray();int index=Array.IndexOf(devices,settings.GamepadDevice);settings.GamepadDevice=devices[(index+direction+devices.Length)%devices.Length];ResetLocalInput();break;
                     case 10: if(UpdateSourceDialog.ShowEditor())status="UPDATE SOURCE SAVED"; break;
+                    case 11: int[] limits=[0,60,120];settings.RenderFrameLimit=limits[(Array.IndexOf(limits,settings.RenderFrameLimit)+direction+3)%3];ApplyPresentationSettings();break;
+                    case 12: settings.PresentationVSync=!settings.PresentationVSync;ApplyPresentationSettings();break;
+                    case 13: settings.VideoZoom=!settings.VideoZoom;break;
+                    case 14: if(!client.IsConnected)SetTurbo(!turbo);else status="TURBO IS MANAGED BY HOST";break;
+                    case 15: Open(Menu.Keyboard);break;
+                    case 16: settings.ResetMode=settings.ResetMode=="Warm"?"Power":"Warm";break;
                 }
                 SaveSettings(); break;
-            case Menu.Controller: capturing=true;captureArmed=false; break;
+            case Menu.Controller:
+            case Menu.Keyboard: capturing=true;captureArmed=false;capturedTokens.Clear();ResetLocalInput();break;
             case Menu.Media:
                 if (client.IsConnected) { status="LEAVE REMOTE SESSION BEFORE LOADING MEDIA"; break; }
                 if(entries.Count==0) break;
@@ -281,7 +303,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
                 if (client.IsConnected || entries.Count==0) break;
                 string statePath=entries[selection];RunMedia(async()=>{byte[] bytes=ReadStateBytes(statePath);await worker.LoadAsync(bytes);},()=>{Open(Menu.None);status="SAVESTATE LOADED";});break;
             case Menu.Reset:
-                if(selection==1 && !client.IsConnected)RunMedia(()=>worker.ResetAsync(),()=>{Open(Menu.None);status="RESET";});else Open(Menu.Main);break;
+                if(selection==1 && !client.IsConnected)RunMedia(()=>settings.ResetMode=="Power"?worker.PowerCycleAsync():worker.ResetAsync(),()=>{Open(Menu.None);status=settings.ResetMode.ToUpperInvariant()+" RESET - SRAM RETAINED";});else Open(Menu.Main);break;
             case Menu.Delete:
                 if(selection==1 && deletePath!=null){string removed=deletePath;RunMedia(()=>Task.Run(()=>AtomicFile.DeleteLogical(removed)),()=>Open(Menu.Saves));}
                 else Open(Menu.Saves); break;
@@ -354,13 +376,13 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         try { action(); } catch(Exception e) { status=e.Message; }
     }
     public override void OnUserKeyPress(SharpPixels.KeyEventArgs e) { }
-    public override void OnUserKeyUp(SharpPixels.KeyEventArgs e) { }
+    public override void OnUserKeyUp(SharpPixels.KeyEventArgs e)=>QueueKeyboardEvent(e.Key,false,e.Modifiers);
     public override void OnUserMouseMove(int x,int y) { }
     public override void OnUserMouseClick(int x,int y,MouseState state) { }
-    public override void OnUserFileDrop(string[] names) { if(!client.IsConnected && names.Length>0) Try(()=>LoadRom(names[0])); }
+    public override void OnUserFileDrop(string[] names) { if(client.IsConnected){status="LEAVE REMOTE SESSION BEFORE LOADING MEDIA";return;}if(names.Length>0)Try(()=>LoadRom(names[0])); }
     protected override void OnUnload()
     {
-        closing=true;lifetime.Cancel();var errors=new List<Exception>();
+        closing=true;keyboardEvents.Clear();lifetime.Cancel();var errors=new List<Exception>();
         void Finish(Action action){try{action();}catch(Exception e){errors.Add(e);}}
         // Own I/O drains before final capture. Failures survive window shutdown:
         // Program records last-error.log, returns nonzero and shows a normal-launch
@@ -380,15 +402,77 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         Finish(client.Dispose);Finish(server.Dispose);Finish(pending.Dispose);Finish(lifetime.Dispose);base.OnUnload();
         if(errors.Count!=0)throw new AggregateException("Shutdown save failed. Previous valid files were retained; see last-error.log and retry after fixing the storage error.",errors);
     }
-    private ushort KeyboardButtons()
+    private ushort keyboardButtons;
+    private string MappingName()=>InputBindings.Buttons.Concat(InputBindings.Actions).ElementAt(selection);
+    private Dictionary<string,string> Mapping()=>menu==Menu.Keyboard?settings.KeyboardControls!:InputBindings.Buttons.Contains(MappingName())?settings.GamepadControls!:settings.GamepadActions!;
+    private void EditMapping()
     {
-        ushort buttons=0;
-        foreach(var binding in KeyboardMap) if(IsKeyPressed(binding.key)) buttons|=(ushort)binding.button;
-        return buttons;
+        string name=MappingName();string? edited=BindingEditor.Edit(name,Mapping().GetValueOrDefault(name,""),menu==Menu.Keyboard,menu==Menu.Controller&&InputBindings.Actions.Contains(name));
+        if(edited!=null){Mapping()[name]=edited;SaveSettings();ResetLocalInput();}
+    }
+    private void CaptureMapping(IReadOnlySet<string> raw,bool keyboard)
+    {
+        if(!InputFocused){capturing=false;capturedTokens.Clear();ResetLocalInput();return;}
+        if(keyboard&&raw.Contains("Escape")){capturing=false;capturedTokens.Clear();ResetLocalInput();status="CAPTURE CANCELLED";return;}
+        if(!captureArmed){if(raw.Count==0)captureArmed=true;return;}
+        if(raw.Count!=0){capturedTokens.UnionWith(raw);return;}
+        if(capturedTokens.Count==0)return;
+        string expression=string.Join('&',capturedTokens.Order(StringComparer.Ordinal));
+        if(InputBindings.Valid(expression,keyboard)){Mapping()[MappingName()]=expression;SaveSettings();status="BINDING SAVED: "+expression;}else status="CAPTURE EXCEEDS FOUR INPUTS; PREVIOUS BINDING RETAINED";
+        capturing=false;capturedTokens.Clear();ResetLocalInput();
+    }
+    private void ApplyPresentationSettings(){UpdateFrequency=settings.RenderFrameLimit;PresentationVSyncEnabled=settings.PresentationVSync;}
+    private void SetTurbo(bool value){if(client.IsConnected){status="TURBO IS MANAGED BY HOST";return;}turbo=value;settings.TurboMode=value;SaveSettings();}
+    private void PollKeyboard(double time)
+    {
+        HashSet<string> snapshot=probeKeyboard?.ToHashSet()??InputBindings.KeyboardKeys.Where(name=>Enum.TryParse<Key>(name,out var key)&&IsKeyPressed(key)).ToHashSet();
+        if(!InputFocused){keyboardEvents.Clear();keyboardOverflow=false;}
+        if(keyboardOverflow){keyboardEvents.Clear();keyboardOverflow=false;ResetLocalInput();status="KEYBOARD EVENT OVERFLOW - RELEASE ALL INPUTS";}
+        var eventRaw=previousKeyboardRaw.ToHashSet();
+        while(keyboardEvents.TryDequeue(out var edge))
+        {
+            string? token=InputBindings.KeyboardKeys.FirstOrDefault(name=>Enum.TryParse<Key>(name,out var key)&&key==edge.Key);
+            if(token==null)continue;
+            if(edge.Down)eventRaw.Add(token);else eventRaw.Remove(token);
+            PollKeyboardSample(eventRaw,0,edge.Modifiers,edge.Down?edge.Key:null);
+        }
+        PollKeyboardSample(snapshot,time);
+    }
+    private void PollKeyboardSample(HashSet<string> raw,double time,KeyModifiers? eventModifiers=null,Key? eventKey=null)
+    {
+        var controls=settings.KeyboardControls!;
+        var decision=keyboardSession.Update(InputFocused,"keyboard:"+mappingGeneration,raw,controls,controls.Where(x=>InputBindings.Actions.Contains(x.Key)).ToDictionary(),menu!=Menu.None,capturing);
+        if(capturing){keyboardButtons=0;if(menu==Menu.Keyboard)CaptureMapping(raw,true);else if(raw.Contains("Escape")){capturing=false;capturedTokens.Clear();ResetLocalInput();}return;}
+        keyboardReady=decision.Active;keyboardButtons=decision.GameButtons;
+        var newlyPressed=raw.Except(previousKeyboardRaw).ToArray();previousKeyboardRaw=raw.ToHashSet();
+        if(eventKey is {} typed){string? token=InputBindings.KeyboardKeys.FirstOrDefault(name=>Enum.TryParse<Key>(name,out var key)&&key==typed);if(token!=null&&(newlyPressed.Contains(token)||menu==Menu.Network))newlyPressed=[token];}
+        var mapped=(SnesButtons)GamepadMapping.Read(controls,raw);
+        ProcessInputDecision(decision,mapped,time,ref keyboardRepeat);
+        // Exactly one routing stage: configured frontend actions precede navigation,
+        // and configured navigation precedes contextual browser/network/state keys.
+        bool actionHeld=InputBindings.Actions.Any(name=>(menu!=Menu.None||name is not ("MenuSelect" or "MenuBack"))&&InputBindings.Matches(controls[name],raw));
+        if(!keyboardReady||menu==Menu.None||actionHeld||(mapped&(SnesButtons.Up|SnesButtons.Down|SnesButtons.Left|SnesButtons.Right))!=0)return;
+        var modifiers=eventModifiers??(raw.Contains("ShiftLeft")||raw.Contains("ShiftRight")?KeyModifiers.Shift:0);
+        foreach(string name in newlyPressed)if(Enum.TryParse<Key>(name,out var key)&&key is not (Key.Up or Key.Down or Key.Left or Key.Right or Key.Enter or Key.Escape or Key.F9 or Key.F10 or Key.F11 or Key.F12 or Key.F6))Try(()=>HandleKey(key,modifiers));
+    }
+    private void ProcessInputDecision(FrontendInputDecision decision,SnesButtons pad,double time,ref double repeat,bool controller=false)
+    {
+        if(!decision.Active)return;
+        // Stable priority makes conflicting user bindings deterministic. UI actions
+        // consume gameplay until every held member has been released.
+        foreach(var (name,key) in new[]{("SaveStates",Key.F12),("MainMenu",Key.F10),("Fullscreen",Key.F11),("Turbo",Key.F9),("Diagnostic",Key.F6)})
+            if(decision.Actions.Contains(name)){HandleKey(key);return;}
+        if(menu==Menu.None)return;
+        if(decision.Actions.Contains("MenuBack")){HandleKey(Key.Escape);return;}
+        if(decision.Actions.Contains("MenuSelect")){Try(()=>HandleKey(Key.Enter));return;}
+        var pressed=(SnesButtons)decision.Pressed;repeat-=time;
+        if(pressed!=0||repeat<=0){if((pad&SnesButtons.Up)!=0)HandleKey(Key.Up);if((pad&SnesButtons.Down)!=0)HandleKey(Key.Down);if((pad&SnesButtons.Left)!=0)HandleKey(Key.Left);if((pad&SnesButtons.Right)!=0)HandleKey(Key.Right);repeat=pressed!=0?.35:.1;}
+        if(controller&&menu==Menu.Saves&&(pressed&SnesButtons.X)!=0)Try(Save);
+        if(controller&&menu==Menu.Saves&&(pressed&SnesButtons.Y)!=0)HandleKey(Key.Delete);
     }
     private void ResetLocalInput()
     {
-        padSession.Reset();mappingGeneration++;localSuppressed=true;padButtons=0;worker.SubmitInput(default);
+        padSession.Reset();keyboardSession.Reset();keyboardReady=false;previousKeyboardRaw.Clear();keyboardEvents.Clear();keyboardButtons=0;mappingGeneration++;localSuppressed=true;padButtons=0;worker.SubmitInput(default);
         if(client.IsConnected)client.SendJoystickState(ushort.MaxValue,true);
     }
     private void PollGamepad(double time)
@@ -409,39 +493,13 @@ public sealed partial class SnesWindow : SharpPixelsWindow
                 if(hat is Hat.Right or Hat.RightUp or Hat.RightDown)rawPad.Add("Hat"+i+"Right");
             }
         }
+        if(probePad!=null){rawPad=probePad.ToHashSet();padIdentity=probePadIdentity;}
+        if(padIdentity!=previousPadIdentity){previousPadIdentity=padIdentity;if(capturing&&menu==Menu.Controller){captureArmed=false;capturedTokens.Clear();}}
         var pad=(SnesButtons)GamepadMapping.Read(settings.GamepadControls!,rawPad);
-        if(padIdentity!=lastPadIdentity){lastPadIdentity=padIdentity;captureArmed=false;}
-        var decision=padSession.Update(IsFocused,padIdentity,(ushort)pad,rawPad.Count>0,menu!=Menu.None,capturing);
+        var decision=padSession.Update(InputFocused,padIdentity,rawPad,settings.GamepadControls!,settings.GamepadActions!,menu!=Menu.None,capturing);
         padButtons=decision.GameButtons;
-        if(!IsFocused){capturing=false;localSuppressed=true;return;}
-        if(capturing)
-        {
-            if(rawPad.Count==0)captureArmed=true;
-            else if(captureArmed&&joystick!=null)
-            {
-                settings.GamepadControls![GamepadMapping.Names[selection]]=rawPad.Order(StringComparer.Ordinal).First();
-                capturing=false;SaveSettings();ResetLocalInput();
-            }
-            return;
-        }
-        if(decision.Saves)HandleKey(Key.F12);
-        else if(decision.MainMenu)HandleKey(Key.F10);
-        else if(menu!=Menu.None&&decision.Active)
-        {
-            var pressed=(SnesButtons)decision.Pressed;
-            repeatTimer-=time;
-            if(pressed!=0||repeatTimer<=0)
-            {
-                if((pad&SnesButtons.Up)!=0)HandleKey(Key.Up);
-                if((pad&SnesButtons.Down)!=0)HandleKey(Key.Down);
-                if((pad&SnesButtons.Left)!=0)HandleKey(Key.Left);
-                if((pad&SnesButtons.Right)!=0)HandleKey(Key.Right);
-                repeatTimer=pressed!=0?.35:.1;
-            }
-            if((pressed&SnesButtons.A)!=0)Try(()=>HandleKey(Key.Enter));
-            if((pressed&SnesButtons.B)!=0)HandleKey(Key.Escape);
-            if(menu==Menu.Saves&&(pressed&SnesButtons.X)!=0)Try(Save);
-            if(menu==Menu.Saves&&(pressed&SnesButtons.Y)!=0)HandleKey(Key.Delete);
-        }
+        if(capturing){padButtons=0;if(menu==Menu.Controller)CaptureMapping(rawPad,false);return;}
+        if(!InputFocused){localSuppressed=true;return;}
+        ProcessInputDecision(decision,pad,time,ref repeatTimer,true);
     }
 }

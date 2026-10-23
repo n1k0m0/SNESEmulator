@@ -157,7 +157,7 @@ public sealed class MainWindow : Window
         homeActions.Children.Add(Button("Fortsetzen", () => SetMode(false, false)));
         homeActions.Children.Add(Button("Pause", () => SetMode(true, false)));
         homeActions.Children.Add(Button("Turbo", () => SetMode(false, true)));
-        homeActions.Children.Add(Button("Reset", () => Send("Reset")));
+        homeActions.Children.Add(Button("Reset (gew�hlter Modus; SRAM bleibt)", () => Send("Reset")));
         AddTab("Dashboard", home);
         var lib = new DockPanel();
         var tools = new WrapPanel();
@@ -611,7 +611,8 @@ public sealed class MainWindow : Window
                 if (Discovery.List().Count > 0)
                     throw new InvalidOperationException("Laufende Instanz wählen, bevor Einstellungen bearbeitet werden.");
                 var value = EmulatorSettings.Load();
-                return new SettingsInfo(0, JsonSerializer.SerializeToElement(value), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite).ToDictionary(p => p.Name, p => "NEXT EMULATOR START"), value.PersistenceNotice);
+                SNESEmulator.Core.InputBindings.Ensure(value);
+                return new SettingsInfo(0, JsonSerializer.SerializeToElement(value), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite&&p.Name!="AdditionalSettings").ToDictionary(p => p.Name, p => "NEXT EMULATOR START"), value.PersistenceNotice);
             }, lifetime.Token);
         }
 
@@ -644,12 +645,13 @@ public sealed class MainWindow : Window
                 row.Children.Add(box);
                 editors[property.Name] = () => JsonSerializer.SerializeToElement(box.IsChecked == true);
             }
-            else if (property.Name == "GamepadControls")
+            else if (property.Name is "GamepadControls" or "GamepadActions" or "KeyboardControls")
             {
                 var bindings = new StackPanel();
-                var values = property.Value.ValueKind == JsonValueKind.Object ? property.Value.Deserialize<Dictionary<string, string>>()! : SNESEmulator.Runtime.GamepadMapping.Defaults();
+                var defaults=property.Name=="GamepadControls"?SNESEmulator.Core.InputBindings.SNESEmulatorPadDefaults():property.Name=="GamepadActions"?SNESEmulator.Core.InputBindings.PadActions():SNESEmulator.Core.InputBindings.KeyboardDefaults();
+                var values = property.Value.ValueKind == JsonValueKind.Object ? property.Value.Deserialize<Dictionary<string, string>>()! : defaults;
                 var controls = new Dictionary<string, ComboBox>();
-                foreach (string name in SNESEmulator.Runtime.GamepadMapping.Names)
+                foreach (string name in defaults.Keys)
                 {
                     var line = new StackPanel
                     {
@@ -660,7 +662,7 @@ public sealed class MainWindow : Window
                     {
                         IsEditable = true,
                         Width = 260,
-                        ItemsSource = BindingChoices,
+                        ItemsSource = property.Name=="KeyboardControls"?SNESEmulator.Core.InputBindings.KeyboardKeys:BindingChoices,
                         Text = values.GetValueOrDefault(name, "")
                     };
                     combo.AddHandler(System.Windows.Controls.Primitives.TextBoxBase.TextChangedEvent, new TextChangedEventHandler((_, _) => model.SettingsDirty = true));
@@ -671,6 +673,18 @@ public sealed class MainWindow : Window
 
                 row.Children.Add(bindings);
                 editors[property.Name] = () => JsonSerializer.SerializeToElement(controls.ToDictionary(x => x.Key, x => x.Value.Text));
+            }
+            else if(property.Name=="ResetMode")
+            {
+                var combo=new ComboBox{ItemsSource=new[]{"Warm","Power"},SelectedItem=property.Value.GetString(),Width=260};combo.SelectionChanged+=(_,_)=>model.SettingsDirty=true;row.Children.Add(combo);editors[property.Name]=()=>JsonSerializer.SerializeToElement((string?)combo.SelectedItem??"Warm");
+            }
+            else if(property.Name=="RenderFrameLimit")
+            {
+                var combo=new ComboBox{ItemsSource=new[]{0,60,120},SelectedItem=property.Value.GetInt32(),Width=260};combo.SelectionChanged+=(_,_)=>model.SettingsDirty=true;row.Children.Add(combo);editors[property.Name]=()=>JsonSerializer.SerializeToElement((int?)combo.SelectedItem??60);
+            }
+            else if(effect=="READ ONLY")
+            {
+                row.Children.Add(new TextBlock{Text=property.Value.GetRawText(),TextWrapping=TextWrapping.Wrap,MaxWidth=650});var preserved=property.Value.Clone();editors[property.Name]=()=>preserved;
             }
             else if (property.Name is "Filter" or "Upscale" or "ControllerPort")
             {
@@ -717,7 +731,14 @@ public sealed class MainWindow : Window
         ["Gamepad"] = "Gamepad aktiv",
         ["ControllerPort"] = "Lokaler Controller",
         ["GamepadDevice"] = "Gamepadgerät (-1=erstes;0–255)",
-        ["GamepadControls"] = "12 SNES-Tasten (optional Bindings mit ; kombinieren)",
+        ["GamepadControls"] = "12 SNES-Tasten (; = alternativ, & = gleichzeitig)",
+        ["GamepadActions"] = "Gamepad-Men�aktionen (; alternativ, & gleichzeitig)",
+        ["KeyboardControls"] = "Tastatur/Hotkeys (; alternativ, & gleichzeitig)",
+        ["RenderFrameLimit"] = "Darstellungsrate (0=unbegrenzt,60,120 Hz)",
+        ["PresentationVSync"] = "Darstellung mit VSync",
+        ["VideoZoom"] = "Bildrand um10% beschneiden",
+        ["TurboMode"] = "Turbo (Host)",
+        ["ResetMode"] = "Resetmodus (Warm/Power; SRAM bleibt)",
         ["MediaDirectory"] = "Medienordner",
         ["Host"] = "LAN-Server",
         ["Port"] = "LAN-Port1–65535",

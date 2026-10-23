@@ -1,10 +1,22 @@
 using System.Diagnostics;
 using SNESEmulator.Runtime;
+using SNESEmulator.Core;
 
 namespace SNESEmulator.Frontend;
 
 public sealed partial class SnesWindow
 {
+    internal void ProbeFocusCallback(bool focused){probeFocus=focused;InputFocusChanged();}
+    internal void ProbeKey(OpenTK.Input.Key key)=>Try(()=>HandleKey(key));
+    internal void ProbeInput(bool focused,string? device,IReadOnlySet<string> pad,IReadOnlySet<string> keyboard){probeFocus=focused;probePadIdentity=device;probePad=pad;probeKeyboard=keyboard;}
+    internal EmulatorSettings ProbeSettings=>settings;
+    internal int ProbeSelection=>selection;
+    internal bool ProbeCapturing=>capturing;
+    internal void ProbeOpen(string name,int row=0){Open(Enum.Parse<Menu>(name));selection=row;}
+    internal void ProbeActivate()=>Activate(1);
+    internal void ProbeApplySettings(){InputBindings.Ensure(settings);ApplyPresentationSettings();ResetLocalInput();SaveSettings();}
+    internal ushort ProbeKeyboardButtons=>keyboardButtons;
+    internal ushort ProbePadButtons=>padButtons;
     private long lastUiTimestamp;
     private double maximumUiInterval;
     private int updates;

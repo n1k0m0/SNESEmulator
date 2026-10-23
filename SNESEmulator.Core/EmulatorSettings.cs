@@ -7,6 +7,15 @@ public sealed class EmulatorSettings
     public int AudioVolume {get;set;}=80;
     public int Filter { get; set; }
     public int Upscale { get; set; }
+    public int RenderFrameLimit {get;set;}=60; // 0=unlimited, 60, 120; presentation only.
+    public bool PresentationVSync {get;set;}
+    public bool VideoZoom {get;set;}
+    public bool TurboMode {get;set;}
+    public string ResetMode {get;set;}="Warm";
+    public Dictionary<string,string>? GamepadActions {get;set;}
+    public Dictionary<string,string>? KeyboardControls {get;set;}
+    [System.Text.Json.Serialization.JsonExtensionData]
+    public Dictionary<string,JsonElement>? AdditionalSettings {get;set;}
     public bool Fullscreen { get; set; }
     public bool Gamepad { get; set; } = true;
     public int ControllerPort { get; set; } = 1;
@@ -33,6 +42,10 @@ public sealed class EmulatorSettings
     private static readonly JsonSerializerOptions JsonOptions=new(){MaxDepth=16,WriteIndented=true};
     public void Validate()
     {
+        if(RenderFrameLimit is not (0 or 60 or 120))RenderFrameLimit=60;
+        if(ResetMode is not ("Warm" or "Power"))ResetMode="Warm";
+        if(GamepadActions!=null)GamepadActions=GamepadActions.Where(x=>InputBindings.Actions.Contains(x.Key)&&InputBindings.Valid(x.Value,false,true)).ToDictionary();
+        if(KeyboardControls!=null)KeyboardControls=KeyboardControls.Where(x=>(InputBindings.Actions.Contains(x.Key)||InputBindings.Buttons.Contains(x.Key))&&InputBindings.Valid(x.Value,true)).ToDictionary();
         AudioVolume=Math.Clamp(AudioVolume,0,100);Filter=Math.Clamp(Filter,0,2);Upscale=Math.Clamp(Upscale,0,5);
         ControllerPort=Math.Clamp(ControllerPort,1,2);GamepadDevice=Math.Clamp(GamepadDevice,-1,255);
         Port=Math.Clamp(Port,1,65535);RelayPort=Math.Clamp(RelayPort,1,65535);
@@ -52,7 +65,7 @@ public sealed class EmulatorSettings
             {
                 string token=entry.Value??"";
                 bool valid=token.Length<=128&&token.Split(';').Length<=4&&token.Split(';').All(part=>System.Text.RegularExpressions.Regex.IsMatch(part,@"^(Button(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|Axis(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])[+-]|Hat(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(?:Up|Down|Left|Right))?$",System.Text.RegularExpressions.RegexOptions.CultureInvariant));
-                if(valid)controls[entry.Key]=token;
+                if(valid||InputBindings.Valid(token,false))controls[entry.Key]=token;
             }
             GamepadControls=controls;
         }

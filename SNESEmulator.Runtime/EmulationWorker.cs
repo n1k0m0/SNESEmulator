@@ -77,6 +77,7 @@ public sealed class EmulationWorker : IDisposable
         return Enqueue(()=>{var cart=new Cartridge(ownRom,source);if(ownSram.Length!=0){if(ownSram.Length!=cart.Sram.Length)throw new InvalidDataException("Battery size mismatch");ownSram.CopyTo(cart.Sram,0);}
             machine.Insert(cart);fault=null;Discontinuity();return true;},cancellation);
     }
+    public Task PowerCycleAsync(CancellationToken cancellation=default)=>Enqueue(()=>{machine.PowerOn();fault=null;Discontinuity();return true;},cancellation);
     public Task ResetAsync(CancellationToken cancellation=default)=>Enqueue(()=>{machine.Reset();fault=null;Discontinuity();return true;},cancellation);
     public Task LoadAsync(byte[] compressed,CancellationToken cancellation=default)
     {

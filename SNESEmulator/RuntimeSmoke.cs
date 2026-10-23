@@ -15,7 +15,7 @@ internal static class RuntimeSmoke
         using var window=new SnesWindow(rom);
         var timer=Stopwatch.StartNew();var rows=new List<object>();int step=0;double since=0,paceStart=0,nextSample=0;long master=0,field=0;bool loaded=false,deletedOnce=false;long epochBeforeLoad=0;
         void Check(bool ok,string why){if(!ok)throw new InvalidOperationException("UI runtime smoke: "+why);}
-        void Press(Key key)=>window.OnUserKeyDown(new SharpPixels.KeyEventArgs(key,0));
+        void Press(Key key)=>window.ProbeKey(key);
         void Row(string name)=>rows.Add(new{Name=name,WallSeconds=timer.Elapsed.TotalSeconds,Metrics=window.RuntimeMetrics});
         void Next(){step++;since=timer.Elapsed.TotalSeconds;}
         window.RenderFrame+=_=>{
@@ -41,7 +41,7 @@ internal static class RuntimeSmoke
                     Check(runtime.MasterClock==master,"menu clock stable");Press(Key.Enter);Next();break;
                 case 4:Check(window.CurrentMenu=="Settings","settings path");Press(Key.F11);Row("fullscreen");Next();break;
                 case 5:Press(Key.F11);for(int i=0;i<5;i++)Press(Key.Down);Press(Key.Enter);Next();break;
-                case 6:Check(window.CurrentMenu=="Controller","mapping menu path");Screenshot(window,Path.Combine(output,"mapping.png"));Press(Key.Enter);Press(Key.Escape);Press(Key.F10);Press(Key.F12);Next();break;
+                case 6:Check(window.CurrentMenu=="Controller","mapping menu path");Screenshot(window,Path.Combine(output,"mapping.png"));Press(Key.Escape);Press(Key.F10);Press(Key.F12);Next();break;
                 case 7:Check(window.CurrentMenu=="Saves","F12 saves path");Press(Key.S);Next();break;
                 case 8:
                     if(window.MediaOperationPending)return;

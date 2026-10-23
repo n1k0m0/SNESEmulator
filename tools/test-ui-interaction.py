@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+"""Actual native host with synthetic raw input snapshots; no OS/physical input claim."""
+import argparse,json,pathlib,os,subprocess,hashlib
+ROOT=pathlib.Path(__file__).resolve().parents[1]
+p=argparse.ArgumentParser();p.add_argument('--output',required=True);a=p.parse_args();out=(ROOT/a.output).resolve();out.mkdir(parents=True,exist_ok=False);data=out/'isolated data';data.mkdir();env=os.environ.copy();env['SNESEMULATOR_DATA_DIR']=str(data);env.pop('SNESEMULATOR_IPL',None)
+exe=ROOT/'SNESEmulator/bin/Release/net10.0-windows/SNESEmulator.exe';command=[str(exe),'--ui-interaction-smoke',str(out)];identity=lambda:{str(f.relative_to(ROOT)):hashlib.sha256(f.read_bytes()).hexdigest() for folder in ['SNESEmulator/bin/Release/net10.0-windows','SNESEmulatorManager/bin/Release/net10.0-windows'] for f in (ROOT/folder).rglob('*') if f.is_file() and f.name.endswith(('.exe','.dll','.deps.json','.runtimeconfig.json'))}
+before=identity();run=subprocess.run(command,cwd=ROOT,env=env,capture_output=True,text=True,timeout=120);after=identity();(out/'process.log').write_text(run.stdout+'\n'+run.stderr,encoding='utf-8');(out/'identities.json').write_text(json.dumps({'before':before,'after':after,'equal':before==after,'exit':run.returncode,'command':command},indent=2));assert run.returncode==0,(run.returncode,run.stderr);assert before==after;report=json.loads((out/'result.json').read_text());assert report['Success'] and report['Completed']>100;assert not list(data.rglob('*.tmp'));print('M9g native interaction stages passed:',report['Completed'])

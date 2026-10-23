@@ -18,7 +18,7 @@ internal static class PersistenceSmoke
         using var window=new SnesWindow(romPath);FileStream? blocker=null;var watch=Stopwatch.StartNew();var rows=new List<object>();int stage=0;long firstField=0;string? statePath=null;byte[]? firstBattery=null;long loadEpoch=0;double ready=0;
         string batteryPath=BatteryPersistence.ProtectedPath(Path.Combine(UserDataPaths.GetBaseDirectory(),"battery",cart.Hash+".srm"));
         void Check(bool ok,string why){if(!ok)throw new InvalidOperationException("Persistence native probe: "+why);}
-        void Press(Key key)=>window.OnUserKeyDown(new SharpPixels.KeyEventArgs(key,0));
+        void Press(Key key)=>window.ProbeKey(key);
         void Row(string name)=>rows.Add(new{Name=name,Seconds=watch.Elapsed.TotalSeconds,Metrics=window.RuntimeMetrics});
         window.RenderFrame+=frameArgs=>{
             if(watch.Elapsed.TotalSeconds>110)throw new TimeoutException("Persistence probe stage "+stage);
