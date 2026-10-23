@@ -9,22 +9,22 @@ internal static class HelloTests
         await test("M9e Hello and response correlation rejects real wrong-peer greetings", async () =>
         {
             var request = Request.Create("Hello");
-            var good = Response.Ok(request, new HelloInfo(1, ["Echo"], Framing.MaximumBytes));
+            var good = Response.Ok(request, new HelloInfo(IpcProtocol.Version, ["Echo"], Framing.MaximumBytes));
             check(Framing.ValidateHello(good, request).Capabilities.Single() == "Echo", "Valid capabilities");
             foreach (var invalid in new[]
             {
                 good with
                 {
-                    Version = 2
+                    Version = 1
                 },
                 good with
                 {
                     RequestId = Guid.NewGuid().ToString("N")
                 },
-                Response.Ok(request, new HelloInfo(2, ["Echo"], Framing.MaximumBytes)),
-                Response.Ok(request, new HelloInfo(1, null!, Framing.MaximumBytes)),
-                Response.Ok(request, new HelloInfo(1, ["Echo", "Echo"], Framing.MaximumBytes)),
-                Response.Ok(request, new HelloInfo(1, ["Echo"], Framing.MaximumBytes + 1))
+                Response.Ok(request, new HelloInfo(1, ["Echo"], Framing.MaximumBytes)),
+                Response.Ok(request, new HelloInfo(IpcProtocol.Version, null!, Framing.MaximumBytes)),
+                Response.Ok(request, new HelloInfo(IpcProtocol.Version, ["Echo", "Echo"], Framing.MaximumBytes)),
+                Response.Ok(request, new HelloInfo(IpcProtocol.Version, ["Echo"], Framing.MaximumBytes + 1))
             }
 
             )
@@ -49,17 +49,17 @@ internal static class HelloTests
             {
                 using var current = Process.GetCurrentProcess();
                 string name = "SNESEmulator." + Environment.ProcessId + "." + Guid.NewGuid().ToString("N");
-                var instance = new InstanceInfo(Environment.ProcessId, Discovery.StartIdentity(current), name, 1, Environment.ProcessPath ?? "", Discovery.StartIdentityKind);
+                var instance = new InstanceInfo(Environment.ProcessId, Discovery.StartIdentity(current), name, IpcProtocol.Version, Environment.ProcessPath ?? "", Discovery.StartIdentityKind);
                 using var stop = new CancellationTokenSource(5000);
                 using var fake = new NamedPipeServerStream(name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
                 var server = Task.Run(async () =>
                 {
                     await fake.WaitForConnectionAsync(stop.Token);
                     var hello = await Framing.ReadAsync<Request>(fake, stop.Token);
-                    var response = Response.Ok(hello, new HelloInfo(1, ["Echo"], Framing.MaximumBytes));
+                    var response = Response.Ok(hello, new HelloInfo(wrongVersion?1:IpcProtocol.Version, ["Echo"], Framing.MaximumBytes));
                     response = wrongVersion ? response with
                     {
-                        Version = 2
+                        Version = 1
                     }
 
                     : response with

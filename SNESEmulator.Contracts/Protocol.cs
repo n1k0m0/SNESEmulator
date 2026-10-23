@@ -4,15 +4,22 @@ using System.Text.Json;
 
 namespace SNESEmulator.Contracts;
 
+public static class IpcProtocol
+{
+    // M9g settings include structured keyboard/frontend bindings and host-owned
+    // turbo/reset semantics. Version1 Managers cannot preserve this schema safely.
+    public const int Version=2;
+}
+
 public sealed record Request(int Version, string RequestId, string Command, JsonElement Payload)
 {
-    public static Request Create(string command, object? payload = null) => new(1, Guid.NewGuid().ToString("N"), command, JsonSerializer.SerializeToElement(payload ?? new { }));
+    public static Request Create(string command, object? payload = null) => new(IpcProtocol.Version, Guid.NewGuid().ToString("N"), command, JsonSerializer.SerializeToElement(payload ?? new { }));
 }
 
 public sealed record Response(int Version, string RequestId, bool Success, string Code, string Message, JsonElement Data)
 {
-    public static Response Ok(Request r, object? value = null) => new(1, r.RequestId, true, "OK", "OK", JsonSerializer.SerializeToElement(value ?? new { }));
-    public static Response Fail(Request r, string code, string message) => new(1, r.RequestId, false, code, message, JsonSerializer.SerializeToElement(new { }));
+    public static Response Ok(Request r, object? value = null) => new(IpcProtocol.Version, r.RequestId, true, "OK", "OK", JsonSerializer.SerializeToElement(value ?? new { }));
+    public static Response Fail(Request r, string code, string message) => new(IpcProtocol.Version, r.RequestId, false, code, message, JsonSerializer.SerializeToElement(new { }));
     public T Value<T>() => Data.Deserialize<T>() ?? throw new InvalidDataException("Missing response value");
 }
 
@@ -87,7 +94,7 @@ public static class Framing
 
     public static void ValidateResponse(Response response, Request request)
     {
-        if (response == null || response.Version != 1 || response.RequestId != request.RequestId)
+        if (response == null || response.Version != IpcProtocol.Version || response.RequestId != request.RequestId)
             throw new InvalidDataException("Response version/requestId mismatch");
     }
 
@@ -106,7 +113,7 @@ public static class Framing
             throw new InvalidDataException("Invalid Hello capabilities", error);
         }
 
-        if (info.Version != 1 || info.MaximumBytes != MaximumBytes || info.Capabilities == null || info.Capabilities.Length > 32 || info.Capabilities.Any(c => string.IsNullOrWhiteSpace(c) || c.Length > 64 || c.Any(char.IsControl)) || info.Capabilities.Distinct(StringComparer.Ordinal).Count() != info.Capabilities.Length)
+        if (info.Version != IpcProtocol.Version || info.MaximumBytes != MaximumBytes || info.Capabilities == null || info.Capabilities.Length > 32 || info.Capabilities.Any(c => string.IsNullOrWhiteSpace(c) || c.Length > 64 || c.Any(char.IsControl)) || info.Capabilities.Distinct(StringComparer.Ordinal).Count() != info.Capabilities.Length)
             throw new InvalidDataException("Unsupported or malformed Hello capabilities");
         return info;
     }

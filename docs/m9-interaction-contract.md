@@ -69,3 +69,27 @@ Known7000 source-adjudicated SPC raw mismatches,18 full-audio comparison rows,
 M10 follows the later performance and base-accuracy phases.
 
 Linux targeted development on clean dee54e4 passed interaction8/runtime16/persistence14/Manager11. An additional unchanged distribution fixture failed8/9 during its own canceled Accept loop (SocketException22 at Dispose after listener.Stop). Its guard now accepts socket shutdown exceptions only when the fixture owns an already-canceled token, and always disposes that token after joining. Product update/network code is unchanged. Original report and source commit remain retained; this is test-lifecycle hardening, not a hardware or product fix. An initial Linux wrapper CRLF parsing failure is retained separately.
+
+## Manager compatibility boundary
+
+IPC is explicitly version2. The new structured keyboard/frontend settings and
+persisted host-owned turbo/reset semantics cannot be safely applied by an old
+version1 Manager. Discovery/Hello reject that peer before any settings mutation;
+all messages use one shared version constant. Both apps must come from the same
+build. Hardware State9, VID3, AUD2 and the unrelated network Protocol4 stay exact.
+One separate portable Manager group covers actual IPC1 requests/discovery.
+
+The first Windows full-gate attempt stopped at the M8 adapter integrity check:
+the expanded tools/test-lab.py pin had not yet been updated. Only that adapter's
+length/SHA changed in m8-integrity.json; no hardware fixture or expected output
+was changed. The original failed gate log remains retained.
+
+Discovery intentionally filters incompatible instances; they are absent from the
+instance list. Direct requests report an explicit incompatible-version error;
+this phase does not add a cross-version discovery UI. Old-manager source at
+0f8aadc only special-cases GamepadControls; its generic editor parses other
+non-string settings with int.Parse, including the newly structured dictionaries.
+The version boundary prevents older full snapshots from resetting new bindings.
+New client/old server response rejection and old client/new server request
+rejection both run over real named pipes; no command is forwarded after a bad
+Hello. New portable totals are prior276 plus8 interaction plus1 IPC boundary.

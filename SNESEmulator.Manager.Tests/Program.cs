@@ -172,6 +172,20 @@ if (!args.Contains("--windows"))
         using var oversized = new MemoryStream(new byte[] { 255, 255, 255, 127 });
         await Throws<InvalidDataException>(async () => _ = await Framing.ReadAsync<Request>(oversized, default));
     });
+    await Test("M9g historical IPC1 peers cannot apply structured settings",async()=>
+    {
+        int calls=0;await using var server=new IpcServer((request,token)=>{Interlocked.Increment(ref calls);return Task.FromResult(Response.Ok(request));});
+        foreach(string command in new[]{"Hello","ApplySettings"})
+        {
+            using var pipe=new NamedPipeClientStream(".",server.PipeName,PipeDirection.InOut,PipeOptions.Asynchronous|PipeOptions.CurrentUserOnly);
+            using var deadline=new CancellationTokenSource(5000);await pipe.ConnectAsync(deadline.Token);
+            var old=Request.Create(command) with{Version=1};await Framing.WriteAsync(pipe,old,deadline.Token);var response=await Framing.ReadAsync<Response>(pipe,deadline.Token);
+            Check(!response.Success&&response.Code=="PROTOCOL_MISMATCH"&&response.Version==IpcProtocol.Version,"old peer rejected explicitly");
+        }
+        Check(calls==0,"historical peer mutated settings");
+        using var current=Process.GetCurrentProcess();var oldInfo=new InstanceInfo(Environment.ProcessId,Discovery.StartIdentity(current),server.PipeName,1,Environment.ProcessPath??"",Discovery.StartIdentityKind);
+        Check(!Discovery.IsAlive(oldInfo),"old discovery accepted");await Throws<IOException>(()=>new IpcClient(oldInfo).SendAsync(Request.Create("Settings")));
+    });
     await HelloTests.Run(Test, Check);
     await Test("M9e canonical copierheader library notes favorites missing and relink", async () =>
     {

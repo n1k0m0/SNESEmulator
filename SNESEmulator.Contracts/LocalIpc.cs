@@ -27,7 +27,7 @@ public static class Discovery
         try
         {
             using var p = Process.GetProcessById(info.ProcessId);
-            return info.StartIdentityKind == StartIdentityKind && !p.HasExited && StartIdentity(p) == info.StartTicks && info.Version == 1 && info.PipeName != null && info.PipeName.StartsWith("SNESEmulator." + info.ProcessId + ".", StringComparison.Ordinal) && info.PipeName.Length < 128;
+            return info.StartIdentityKind == StartIdentityKind && !p.HasExited && StartIdentity(p) == info.StartTicks && info.Version == IpcProtocol.Version && info.PipeName != null && info.PipeName.StartsWith("SNESEmulator." + info.ProcessId + ".", StringComparison.Ordinal) && info.PipeName.Length < 128;
         }
         catch
         {
@@ -76,6 +76,7 @@ public sealed class IpcClient(InstanceInfo instance)
 {
     public async Task<Response> SendAsync(Request request, CancellationToken token = default)
     {
+        if(instance.Version!=IpcProtocol.Version)throw new IOException("Incompatible IPC version; restart Manager and emulator from the same build");
         if (!Discovery.IsAlive(instance))
             throw new IOException("Selected emulator instance ended or PID was reused");
         using var deadline = CancellationTokenSource.CreateLinkedTokenSource(token);
@@ -115,7 +116,7 @@ public sealed class IpcServer : IAsyncDisposable
             Directory.CreateDirectory(Discovery.DirectoryPath);
             discovery = Path.Combine(Discovery.DirectoryPath, Environment.ProcessId + ".json");
             using var p = Process.GetCurrentProcess();
-            var info = new InstanceInfo(Environment.ProcessId, Discovery.StartIdentity(p), PipeName, 1, Environment.ProcessPath ?? "", Discovery.StartIdentityKind);
+            var info = new InstanceInfo(Environment.ProcessId, Discovery.StartIdentity(p), PipeName, IpcProtocol.Version, Environment.ProcessPath ?? "", Discovery.StartIdentityKind);
             string tmp = discovery + "." + Guid.NewGuid().ToString("N") + ".tmp";
             File.WriteAllBytes(tmp, JsonSerializer.SerializeToUtf8Bytes(info));
             File.Move(tmp, discovery, true);
@@ -145,14 +146,14 @@ public sealed class IpcServer : IAsyncDisposable
                     var r = await Framing.ReadAsync<Request>(pipe, token);
                     Framing.Validate(r);
                     Response response;
-                    if (r.Version != 1)
-                        response = Response.Fail(r, "PROTOCOL_MISMATCH", "IPC version1 required");
+                    if (r.Version != IpcProtocol.Version)
+                        response = Response.Fail(r, "PROTOCOL_MISMATCH", "IPC version2 required; restart Manager and emulator from the same build");
                     else if (!hello && r.Command != "Hello")
                         response = Response.Fail(r, "HELLO_REQUIRED", "Hello must be first");
                     else if (r.Command == "Hello")
                     {
                         hello = true;
-                        response = Response.Ok(r, new HelloInfo(1, capabilities, Framing.MaximumBytes));
+                        response = Response.Ok(r, new HelloInfo(IpcProtocol.Version, capabilities, Framing.MaximumBytes));
                     }
                     else
                     {
@@ -202,7 +203,7 @@ public sealed class IpcServer : IAsyncDisposable
                     }
 
                     await Framing.WriteAsync(pipe, response, token);
-                    if (!hello || r.Version != 1)
+                    if (!hello || r.Version != IpcProtocol.Version)
                         break;
                 }
             }
