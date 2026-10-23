@@ -62,7 +62,8 @@ internal static class WindowsTests
 
         var children = new List<Process>();
         var logs = new List<Task>();
-        Process Start(string executable, string name, params string[] args)
+        Process Start(string executable, string name, params string[] args) => StartInDataRoot(executable, name, root, args);
+        Process StartInDataRoot(string executable, string name, string dataRoot, params string[] args)
         {
             var start = new ProcessStartInfo(executable)
             {
@@ -71,13 +72,17 @@ internal static class WindowsTests
                 RedirectStandardError = true,
                 WorkingDirectory = repo
             };
-            start.Environment["SNESEMULATOR_DATA_DIR"] = root;
-            start.Environment["SNESEMULATOR_IPC_DIR"] = root;
-            start.Environment["SNESEMULATOR_MANAGER_TEST_ID"] = Path.GetFileName(root);
+            start.Environment["SNESEMULATOR_DATA_DIR"] = dataRoot;
+            start.Environment["SNESEMULATOR_IPC_DIR"] = dataRoot;
+            start.Environment["SNESEMULATOR_MANAGER_TEST_ID"] = Path.GetFileName(dataRoot);
             foreach (var arg in args)
                 start.ArgumentList.Add(arg);
+            var launchIdentity = Identities();
+            File.WriteAllText(Path.Combine(root, name + ".identity-before.json"), JsonSerializer.Serialize(launchIdentity));
             var p = Process.Start(start)!;
             children.Add(p);
+            var exited = p.WaitForExitAsync();
+            logs.Add(exited.ContinueWith(_ => File.WriteAllText(Path.Combine(root, name + ".identity-after.json"), JsonSerializer.Serialize(Identities()))));
             logs.Add(p.StandardOutput.ReadToEndAsync().ContinueWith(t => File.WriteAllText(Path.Combine(root, name + ".stdout.log"), t.Result)));
             logs.Add(p.StandardError.ReadToEndAsync().ContinueWith(t => File.WriteAllText(Path.Combine(root, name + ".stderr.log"), t.Result)));
             return p;
@@ -102,6 +107,35 @@ internal static class WindowsTests
         InstanceInfo? ai = null, bi = null;
         try
         {
+            await test("M9e real offline WPF settings recovery unavailable normalization visible and read-only", async () =>
+            {
+                foreach (string mode in new[] { "recovered", "unavailable", "normalized" })
+                {
+                    string data = Path.Combine(root, "offline-" + mode);
+                    Directory.CreateDirectory(data);
+                    string path = Path.Combine(data, "settings.json");
+                    if (mode == "recovered")
+                    {
+                        new EmulatorSettings { AudioVolume = 23 }.Save(path);
+                        new EmulatorSettings { AudioVolume = 24 }.Save(path);
+                        File.WriteAllText(path, "corrupt primary retained");
+                    }
+                    else File.WriteAllText(path, mode == "normalized" ? JsonSerializer.Serialize(new EmulatorSettings { AudioVolume = 999 }) : "unreadable settings retained");
+                    byte[] primary = File.ReadAllBytes(path);
+                    byte[]? backup = File.Exists(path + ".bak") ? File.ReadAllBytes(path + ".bak") : null;
+                    var process = StartInDataRoot(manager, "offline-" + mode, data, "--settings-smoke", data);
+                    await process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(30));
+                    check(process.ExitCode == 0, "Offline WPF probe failed " + mode);
+                    using var result = JsonDocument.Parse(File.ReadAllText(Path.Combine(data, "result.json")));
+                    var r = result.RootElement;
+                    string marker = mode == "recovered" ? "RECOVERED" : mode == "normalized" ? "NORMALIZED" : "UNAVAILABLE";
+                    check(r.GetProperty("Visible").GetBoolean() && r.GetProperty("Warning").GetString()!.Contains(marker), "Missing visible warning " + mode);
+                    check(r.GetProperty("Volume").GetString() == (mode == "recovered" ? "23" : mode == "normalized" ? "100" : "80"), "Wrong recovered editor value " + mode);
+                    check(r.GetProperty("ReadThread").GetInt32() != r.GetProperty("UiThread").GetInt32(), "Settings read blocked dispatcher");
+                    check(primary.SequenceEqual(File.ReadAllBytes(path)) && (backup == null ? !File.Exists(path + ".bak") : backup.SequenceEqual(File.ReadAllBytes(path + ".bak"))), "Read changed settings source " + mode);
+                    check(new FileInfo(Path.Combine(data, "settings.png")).Length > 1000, "Actual WPF rendering missing");
+                }
+            });
             await test("M9e real emulator two instance discovery exact target and transactional ROM load", async () =>
             {
                 a = Start(exe, "emulator-a", "--manager-ipc-probe", aDir);

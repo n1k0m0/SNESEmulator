@@ -138,3 +138,5 @@ outputs. All apphooks are synthetic; Windows was locked. No OS focus, physical
 keyboard/gamepad, SNES/DAC, clean VM, hours-long soak or performance acceptance is
 inferred. Published hardware tests remain the user's chosen route for later
 console validation. See baseline m9e.json for the final clean gate and archive IDs.
+
+Offline settings reads and discovery checks execute on a bounded operation worker rather than the WPF dispatcher. Recovery, unavailable/default and normalization notices remain visible in a dedicated settings warning area across status refreshes. The Settings IPC DTO also carries the live instance persistence notice. Three separate WPF processes verify actual recovered values (23), unavailable defaults (80), normalized values (100), retained source/backup bytes and rendered warning areas. Native product identities are recorded immediately before and after every owned process start.

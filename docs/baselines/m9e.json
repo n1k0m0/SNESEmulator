@@ -4,7 +4,7 @@
   "priorPortable": 256,
   "priorWindows": 23,
   "newPortable": 11,
-  "newWindows": 7,
+  "newWindows": 8,
   "contract": "docs/m9-manager-contract.md",
   "releaseAccepted": false,
   "firstFullGate": {
@@ -14,5 +14,13 @@
     "windows": 30,
     "retained": "artifacts/m9e-development/fullgate1",
     "reason": "Final protocol audit added shared Hello/response validation to Manager activation; final clean gate must repeat"
+  },
+  "secondFullGate": {
+    "commit": "a3ab7a4fff9d733d9b51574c555d5e40d32ff8fa",
+    "exit": 0,
+    "portable": 267,
+    "windows": 30,
+    "retained": "artifacts/m9e-development/fullgate2",
+    "reason": "Offline settings recovery visibility corrected after independent source review; final complete gate repeated"
   }
 }

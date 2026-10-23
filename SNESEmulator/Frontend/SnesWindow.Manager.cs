@@ -104,7 +104,7 @@ public sealed partial class SnesWindow
         return new(Environment.ProcessId, s.Epoch, s.Field, s.Title, s.CartridgeHash, previewCartridge?.SourcePath ?? "", s.Paused, s.Turbo, menu != Menu.None, client.IsConnected ? "CLIENT" : server.IsRunning ? "HOST" : "LOCAL", settingsRevision, s.Fault);
     }
 
-    private SettingsInfo ManagerSettings() => new(settingsRevision, JsonSerializer.SerializeToElement(settings), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite).ToDictionary(p => p.Name, p => new[] { "Host", "Port", "RelayHost", "RelayPort", "ConnectionId", "PlayerName", "Relay", "Observer" }.Contains(p.Name) ? (client.IsConnected || server.IsRunning ? "LOCKED: active network session" : "NEXT CONNECTION") : "IMMEDIATE"));
+    private SettingsInfo ManagerSettings() => new(settingsRevision, JsonSerializer.SerializeToElement(settings), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite).ToDictionary(p => p.Name, p => new[] { "Host", "Port", "RelayHost", "RelayPort", "ConnectionId", "PlayerName", "Relay", "Observer" }.Contains(p.Name) ? (client.IsConnected || server.IsRunning ? "LOCKED: active network session" : "NEXT CONNECTION") : "IMMEDIATE"), settings.PersistenceNotice);
     private async Task<Response> HandleManagerRequest(Request r, CancellationToken token)
     {
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(token, lifetime.Token);

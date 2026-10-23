@@ -89,6 +89,8 @@ public sealed class MainWindow : Window
     };
     private readonly TextBox stateName = new();
     private readonly StackPanel settingRows = new();
+    private readonly TextBlock settingsNotice = new() { TextWrapping = TextWrapping.Wrap, Margin = new(12), Background = Brushes.LightGoldenrodYellow, Visibility = Visibility.Collapsed };
+    private int settingsReadThread;
     private readonly Dictionary<string, Func<JsonElement>> editors = new();
     private readonly Dictionary<string, FrameworkElement> settingControls = new();
     private readonly Queue<string[]> argumentQueue = new();
@@ -242,6 +244,8 @@ public sealed class MainWindow : Window
         settings.Children.Add(settingsTools);
         settingsTools.Children.Add(Button("Aktuelle Einstellungen laden", LoadSettings));
         settingsTools.Children.Add(Button("Validieren und anwenden", ApplySettings));
+        DockPanel.SetDock(settingsNotice, Dock.Top);
+        settings.Children.Add(settingsNotice);
         settings.Children.Add(new ScrollViewer { Content = settingRows, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
         AddTab("Einstellungen", settings);
         AddTab("Katalog", new TextBlock { Text = "Kein freigegebener SNES-Provider eingerichtet. Der Katalog bleibt deaktiviert. Eigene .sfc/.smc-Dateien können lokal importiert werden.", Margin = new(24), TextWrapping = TextWrapping.Wrap, FontSize = 17 });
@@ -329,7 +333,7 @@ public sealed class MainWindow : Window
         catch (Exception e)
         {
             notice.Text = e.Message;
-            if (initialArgs.Contains("--manager-smoke"))
+            if (initialArgs.Contains("--manager-smoke") || initialArgs.Contains("--settings-smoke"))
             {
                 Console.Error.WriteLine(e);
                 ExitCode = 1;
@@ -364,6 +368,8 @@ public sealed class MainWindow : Window
 
         if (initialArgs.Contains("--manager-smoke"))
             await Smoke();
+        if (initialArgs.Contains("--settings-smoke"))
+            await OfflineSettingsSmoke();
     }
 
     public void DeliverArguments(string[] args)
@@ -594,18 +600,24 @@ public sealed class MainWindow : Window
     {
         if (model.SettingsDirty && MessageBox.Show(this, "Nicht angewendete Änderungen verwerfen?", "Einstellungen", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
             return;
-        if (model.Selected != null)
+        var target = model.Selected;
+        if (target != null)
             model.LoadedSettings = (await Send("Settings")).Value<SettingsInfo>();
         else
         {
-            if (Discovery.List().Count > 0)
-                throw new InvalidOperationException("Laufende Instanz wählen, bevor Einstellungen bearbeitet werden.");
-            var value = EmulatorSettings.Load();
-            model.LoadedSettings = new(0, JsonSerializer.SerializeToElement(value), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite).ToDictionary(p => p.Name, p => "NEXT EMULATOR START"));
+            model.LoadedSettings = await Task.Run(() =>
+            {
+                settingsReadThread = Environment.CurrentManagedThreadId;
+                if (Discovery.List().Count > 0)
+                    throw new InvalidOperationException("Laufende Instanz wählen, bevor Einstellungen bearbeitet werden.");
+                var value = EmulatorSettings.Load();
+                return new SettingsInfo(0, JsonSerializer.SerializeToElement(value), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite).ToDictionary(p => p.Name, p => "NEXT EMULATOR START"), value.PersistenceNotice);
+            }, lifetime.Token);
         }
 
+        ShowSettingsNotice(model.LoadedSettings.PersistenceNotice);
         model.Revision = model.LoadedSettings.Revision;
-        model.SettingsInstance = model.Selected;
+        model.SettingsInstance = target;
         settingRows.Children.Clear();
         editors.Clear();
         settingControls.Clear();
@@ -746,7 +758,7 @@ public sealed class MainWindow : Window
             throw new InvalidDataException("Ungültige Werte oder Bindings; nichts angewendet.");
         if (model.Selected == null)
         {
-            if (Discovery.List().Count > 0)
+            if (await Task.Run(() => Discovery.List().Count > 0, lifetime.Token))
                 throw new InvalidOperationException("Instanz wurde gestartet. Verbinden und Einstellungen erneut laden.");
             await Task.Run(() => SNESEmulator.Runtime.SettingsPersistence.WriteOrdered(candidate.Serialize()), lifetime.Token);
             notice.Text = "Gespeichert für nächsten Emulatorstart.";
@@ -760,6 +772,35 @@ public sealed class MainWindow : Window
         }
 
         model.SettingsDirty = false;
+    }
+
+    private void ShowSettingsNotice(string? value)
+    {
+        settingsNotice.Text = value ?? "";
+        settingsNotice.Visibility = string.IsNullOrEmpty(value) ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    private async Task OfflineSettingsSmoke()
+    {
+        string output = Argument(initialArgs, "--settings-smoke") ?? throw new ArgumentException("Settings smoke output");
+        Directory.CreateDirectory(output);
+        await LoadSettings();
+        string warning = settingsNotice.Text;
+        if (settingsNotice.Visibility != Visibility.Visible || settingsReadThread == Environment.CurrentManagedThreadId)
+            throw new InvalidOperationException("Settings notice or background read missing");
+        await RefreshAsync(false);
+        if (settingsNotice.Text != warning || settingsNotice.Visibility != Visibility.Visible)
+            throw new InvalidOperationException("Refresh erased settings recovery notice");
+        tabs.SelectedIndex = 3;
+        UpdateLayout();
+        await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle);
+        var bitmap = new RenderTargetBitmap((int)ActualWidth, (int)ActualHeight, 96, 96, PixelFormats.Pbgra32);
+        bitmap.Render(this);
+        var encoder = new PngBitmapEncoder();
+        encoder.Frames.Add(BitmapFrame.Create(bitmap));
+        using (var file = File.Create(Path.Combine(output, "settings.png"))) encoder.Save(file);
+        File.WriteAllText(Path.Combine(output, "result.json"), JsonSerializer.Serialize(new { Warning = warning, Visible = settingsNotice.IsVisible, Volume = ((TextBox)settingControls["AudioVolume"]).Text, ReadThread = settingsReadThread, UiThread = Environment.CurrentManagedThreadId, SyntheticAppHooks = true }));
+        Close();
     }
 
     private async Task ReloadStates()

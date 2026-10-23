@@ -18,7 +18,7 @@ public sealed record Response(int Version, string RequestId, bool Success, strin
 public sealed record InstanceInfo(int ProcessId, long StartTicks, string PipeName, int Version, string Executable);
 public sealed record HelloInfo(int Version, string[] Capabilities, int MaximumBytes);
 public sealed record StatusInfo(int ProcessId, long Epoch, long Field, string Title, string CartridgeHash, string RomPath, bool Paused, bool Turbo, bool MenuOpen, string Network, long SettingsRevision, string? Fault);
-public sealed record SettingsInfo(long Revision, JsonElement Settings, Dictionary<string, string> Effects);
+public sealed record SettingsInfo(long Revision, JsonElement Settings, Dictionary<string, string> Effects, string? PersistenceNotice = null);
 public sealed record ApplySettings(long ExpectedRevision, JsonElement Settings);
 public sealed record PathCommand(string Path, long ExpectedEpoch = 0, bool Recover = false);
 public sealed record StateInfo(string Path, string Name, string Hash, int Format, int Width, int Height, uint[]? Pixels, string? Error, bool RecoveryAvailable);
