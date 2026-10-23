@@ -67,3 +67,5 @@ limits remain visible. Independent Root acceptance is a later step.
 Known7000 source-adjudicated SPC raw mismatches,18 full-audio comparison rows,
 38/62 failed NTSC sustained windows, unperformed PAL and hours soak remain open.
 M10 follows the later performance and base-accuracy phases.
+
+Linux targeted development on clean dee54e4 passed interaction8/runtime16/persistence14/Manager11. An additional unchanged distribution fixture failed8/9 during its own canceled Accept loop (SocketException22 at Dispose after listener.Stop). Its guard now accepts socket shutdown exceptions only when the fixture owns an already-canceled token, and always disposes that token after joining. Product update/network code is unchanged. Original report and source commit remain retained; this is test-lifecycle hardening, not a hardware or product fix. An initial Linux wrapper CRLF parsing failure is retained separately.
