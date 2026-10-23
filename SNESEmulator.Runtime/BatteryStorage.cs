@@ -1,3 +1,4 @@
+using SNESEmulator.Core;
 namespace SNESEmulator.Runtime;
 
 public static class BatteryStorage
@@ -6,8 +7,8 @@ public static class BatteryStorage
     {
         var snapshot=await capture().ConfigureAwait(false);
         if(snapshot==null||snapshot.Bytes.Length==0)return;
-        string path=pathFor(snapshot.Hash);Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        await File.WriteAllBytesAsync(path+".tmp",snapshot.Bytes).ConfigureAwait(false);File.Move(path+".tmp",path,true);
+        string path=pathFor(snapshot.Hash);
+        AtomicFile.Write(path,file=>file.Write(snapshot.Bytes),candidate=>new FileInfo(candidate).Length==snapshot.Bytes.Length);
     }
     public static async Task<byte[]> FlushAndReadAsync(Func<Task<BatterySnapshot?>> capture,Func<string,string> pathFor,string targetHash)
     {

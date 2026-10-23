@@ -13,6 +13,9 @@ public sealed partial class SnesWindow : SharpPixelsWindow
 {
     private enum Menu { None, Main, Settings, Network, Media, Saves, Reset, Delete, Controller }
     private readonly EmulationWorker worker = new();
+    private readonly BatteryPersistence battery;
+    private readonly BatteryAutosave autosave;
+    private readonly SettingsPersistence settingsPersistence;
     private readonly HostPresentation presentation;
     // Detached media is used only for previews; it is never the worker cartridge.
     private Cartridge? previewCartridge;
@@ -22,6 +25,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private readonly UiMailbox pending = new();
     private readonly CancellationTokenSource lifetime=new();
     private Task mediaTask=Task.CompletedTask,previewTask=Task.CompletedTask,networkTask=Task.CompletedTask;
+    private Exception? unreportedMediaError;
     private string? nextHostMenu;
     private Menu menu;
     private int selection, selectedClient;
@@ -55,6 +59,10 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     ];
     public SnesWindow(string? rom = null) : base(512, 288, "SNESEmulator - C# core")
     {
+        battery=new(()=>worker.BatteryAsync(),BatteryPath,pending.SetStatus);
+        autosave=new(battery,pending.SetStatus);
+        settingsPersistence=new(pending.SetStatus);
+        if(settings.PersistenceNotice!=null)status=settings.PersistenceNotice;
         server=new(256,224);
         if(settings.GamepadControls==null){settings.GamepadControls=GamepadMapping.Defaults();foreach(var binding in settings.GamepadBindings)if(GamepadMapping.Names.Contains(binding.Key)&&binding.Value>=0)settings.GamepadControls[binding.Key]="Button"+binding.Value;}
         foreach(var binding in GamepadMapping.Defaults())settings.GamepadControls.TryAdd(binding.Key,binding.Value);
@@ -81,6 +89,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     public override void OnUserUpdate(double time)
     {
         MeasureUi();
+        autosave.Tick(time,!closing&&!mediaBusy);
         pending.Drain();
         if(pending.TakeStatus() is {} message)status=message;
         if(Interlocked.Exchange(ref nextHostMenu,null) is {} overlay)hostMenu=overlay;
@@ -191,7 +200,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             if(previewPath!=path&&!previewBusy)
             {
                 previewPath=path; savePreview=null;previewBusy=true;
-                previewTask=Task.Run(()=>{try {var saved=StateSerializer.Load(cart,path).Bus.Ppu;var image=saved.CompletedFrame??saved.Frame;var copy=image.Argb.ToArray();Post(()=>{if(previewPath==path){savePreview=copy;previewWidth=image.Geometry.Width;previewHeight=image.Geometry.Height;}});}catch(Exception e){pending.SetStatus("PREVIEW UNAVAILABLE: "+e.Message);}finally{Post(()=>previewBusy=false);}});
+                previewTask=Task.Run(()=>{try {using var compressed=new MemoryStream(ReadStateBytes(path),false);var saved=StateSerializer.Load(cart,compressed).Bus.Ppu;var image=saved.CompletedFrame??saved.Frame;var copy=image.Argb.ToArray();Post(()=>{if(previewPath==path){savePreview=copy;previewWidth=image.Geometry.Width;previewHeight=image.Geometry.Height;}});}catch(Exception e){pending.SetStatus("PREVIEW UNAVAILABLE: "+e.Message);}finally{Post(()=>previewBusy=false);}});
             }
             if(savePreview!=null) { DrawArgbPixelsCroppedStretched(savePreview,previewWidth,previewHeight,0,0,previewWidth,previewHeight,330,112,128,96); Text(330,98,"PREVIEW",1,108,214,182); }
         }
@@ -207,7 +216,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private void HandleKey(Key key, KeyModifiers modifiers = 0)
     {
         if(!IsFocused||closing)return;
-        if (key == Key.F11) { settings.Fullscreen = !settings.Fullscreen; ToggleFullscreen(); settings.Save(); return; }
+        if (key == Key.F11) { settings.Fullscreen = !settings.Fullscreen; ToggleFullscreen(); SaveSettings(); return; }
         if (key == Key.F10) { Open(menu == Menu.None ? Menu.Main : Menu.None); return; }
         if (key == Key.F12) { if (client.IsConnected) { status="SAVESTATES ARE MANAGED BY HOST"; return; } Open(menu==Menu.Saves?Menu.None:Menu.Saves); return; }
         if (key == Key.F9 && !client.IsConnected) { turbo = !turbo; return; }
@@ -231,7 +240,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             return;
         }
         if (menu == Menu.Saves && key is Key.S or Key.F5) { Save(); return; }
-        if(menu==Menu.Controller&&key==Key.Delete){settings.GamepadControls![GamepadMapping.Names[selection]]="";settings.Save();ResetLocalInput();return;}
+        if(menu==Menu.Controller&&key==Key.Delete){settings.GamepadControls![GamepadMapping.Names[selection]]="";SaveSettings();ResetLocalInput();return;}
         if (menu == Menu.Saves && key == Key.Delete && entries.Count > 0) { deletePath=entries[selection]; Open(Menu.Delete); return; }
         if (menu == Menu.Network && EditNetwork(key,modifiers)) return;
         if (key is Key.Enter or Key.Right or Key.Left || menu == Menu.Saves && key == Key.L) Activate(key == Key.Left ? -1 : 1);
@@ -255,25 +264,32 @@ public sealed partial class SnesWindow : SharpPixelsWindow
                     case 8: LoadAudioDiagnostic();break;
                     case 9: var devices=JoystickStates.Where(p=>p!=null).Select(p=>p.Id).Prepend(-1).ToArray();int index=Array.IndexOf(devices,settings.GamepadDevice);settings.GamepadDevice=devices[(index+direction+devices.Length)%devices.Length];ResetLocalInput();break;
                 }
-                settings.Save(); break;
+                SaveSettings(); break;
             case Menu.Controller: capturing=true;captureArmed=false; break;
             case Menu.Media:
                 if (client.IsConnected) { status="LEAVE REMOTE SESSION BEFORE LOADING MEDIA"; break; }
                 if(entries.Count==0) break;
                 string path=entries[selection];
-                if(Directory.Exists(path)) { settings.MediaDirectory=path; selection=0; RefreshMedia(); settings.Save(); }
+                if(Directory.Exists(path)) { settings.MediaDirectory=path; selection=0; RefreshMedia(); SaveSettings(); }
                 else LoadRom(path);
                 break;
             case Menu.Saves:
                 if (client.IsConnected || entries.Count==0) break;
-                string statePath=entries[selection];RunMedia(async()=>{byte[] bytes=await File.ReadAllBytesAsync(statePath);await worker.LoadAsync(bytes);},()=>{Open(Menu.None);status="SAVESTATE LOADED";});break;
+                string statePath=entries[selection];RunMedia(async()=>{byte[] bytes=ReadStateBytes(statePath);await worker.LoadAsync(bytes);},()=>{Open(Menu.None);status="SAVESTATE LOADED";});break;
             case Menu.Reset:
                 if(selection==1 && !client.IsConnected)RunMedia(()=>worker.ResetAsync(),()=>{Open(Menu.None);status="RESET";});else Open(Menu.Main);break;
             case Menu.Delete:
-                if(selection==1 && deletePath!=null) File.Delete(deletePath);
-                Open(Menu.Saves); break;
+                if(selection==1 && deletePath!=null){string removed=deletePath;RunMedia(()=>Task.Run(()=>AtomicFile.DeleteLogical(removed)),()=>Open(Menu.Saves));}
+                else Open(Menu.Saves); break;
             case Menu.Network: ActivateNetwork(direction); break;
         }
+    }
+    private byte[] ReadStateBytes(string path)
+    {
+        var cart=previewCartridge??throw new InvalidOperationException("Load matching cartridge first.");
+        byte[] bytes=StateSerializer.ReadForLoad(cart,path,out bool recovered);
+        if(recovered)pending.SetStatus("STATE RECOVERED FROM VALIDATED BACKUP; DAMAGED FILE RETAINED");
+        return bytes;
     }
     private void Post(Action action)
     {
@@ -286,7 +302,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         if(mediaBusy){status="MEDIA OPERATION IN PROGRESS";return;}
         mediaBusy=true;ResetLocalInput();
         mediaTask=Task.Run(async()=>{try{await worker.SetModeAsync(true,turbo);await action();Post(()=>{mediaBusy=false;sentPause=null;completed();});}
-            catch(Exception e){Post(()=>{mediaBusy=false;sentPause=null;status=e.Message;});}});
+            catch(Exception e){unreportedMediaError=e;Post(()=>{mediaBusy=false;sentPause=null;status=e.Message;unreportedMediaError=null;});}});
     }
     private void LoadAudioDiagnostic()=>LoadImage(AudioDiagnosticRom.Create(),"ORIGINAL CPU -> SPC -> DSP STEREO DIAGNOSTIC");
     private void LoadDiagnostic()=>LoadImage(DiagnosticRom.Create(),"ORIGINAL SNES DIAGNOSTIC - CPU / DMA / PPU");
@@ -295,8 +311,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         if(client.IsConnected)return;
         RunMedia(async()=>{
             var cartridge=new Cartridge(image,source);
-            byte[] bytes=await BatteryStorage.FlushAndReadAsync(()=>worker.BatteryAsync(),BatteryPath,cartridge.Hash);
-            await worker.InsertAsync(image,bytes,source);
+            await battery.SwitchAsync(cartridge.Hash,cartridge.Sram.Length,bytes=>worker.InsertAsync(image,bytes,source));
             Post(()=>previewCartridge=cartridge);
         },()=>{Open(Menu.None);status=message;});
     }
@@ -306,13 +321,13 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         // Disk/validation/compression run outside the UI and hardware loops.
         RunMedia(async()=>{
             var image=await File.ReadAllBytesAsync(path);var cartridge=new Cartridge(image,path);
-            byte[] bytes=await BatteryStorage.FlushAndReadAsync(()=>worker.BatteryAsync(),BatteryPath,cartridge.Hash);
-            await worker.InsertAsync(image,bytes,path);
+            await battery.SwitchAsync(cartridge.Hash,cartridge.Sram.Length,bytes=>worker.InsertAsync(image,bytes,path));
             Post(()=>previewCartridge=cartridge);
         },()=>{Open(Menu.None);status="LOADED "+worker.Status.Title;});
     }
     private static string BatteryPath(string hash)=>Path.Combine(UserDataPaths.GetBaseDirectory(),"battery",hash+".srm");
-    private Task FlushSramAsync()=>BatteryStorage.FlushAsync(()=>worker.BatteryAsync(),BatteryPath);
+    private Task FlushSramAsync()=>battery.FlushAsync();
+    private void SaveSettings()=>settingsPersistence.Queue(settings.Serialize());
     private void RefreshMedia()
     {
         if(!Directory.Exists(settings.MediaDirectory)) settings.MediaDirectory=UserDataPaths.GetMediaDirectory();
@@ -323,12 +338,12 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         entries.AddRange(Directory.GetFiles(settings.MediaDirectory).Where(p=>new[]{".sfc",".smc"}.Contains(Path.GetExtension(p).ToLowerInvariant())).Order(StringComparer.OrdinalIgnoreCase));
     }
     private string SaveFolder() => Path.Combine(UserDataPaths.GetSaveDirectory(),worker.Status.CartridgeHash.Length==0?"no-cartridge":worker.Status.CartridgeHash);
-    private void RefreshSaves() => entries=Directory.Exists(SaveFolder()) ? Directory.GetFiles(SaveFolder(),"*.snessav").OrderDescending().ToList() : [];
+    private void RefreshSaves() => entries=Directory.Exists(SaveFolder()) ? Directory.GetFiles(SaveFolder(),"*.snessav").Concat(Directory.GetFiles(SaveFolder(),"*.snessav.bak").Select(p=>p[..^4])).Distinct(StringComparer.OrdinalIgnoreCase).OrderDescending().ToList() : [];
     private void Save()
     {
         if(client.IsConnected) return;
         string path=Path.Combine(SaveFolder(),DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-fff")+".snessav");
-        RunMedia(async()=>{byte[] state=await worker.CaptureAsync();StateSerializer.SaveCaptured(state,path);},()=>{RefreshSaves();selection=0;status="SAVESTATE SAVED";});
+        RunMedia(async()=>{byte[] state=await worker.CaptureAsync();StateSerializer.SaveCaptured(state,path,previewCartridge??throw new InvalidOperationException("Load a cartridge first."));},()=>{RefreshSaves();selection=0;status="SAVESTATE SAVED";});
     }
     private void Try(Action action)
     {
@@ -341,15 +356,23 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     public override void OnUserFileDrop(string[] names) { if(!client.IsConnected && names.Length>0) Try(()=>LoadRom(names[0])); }
     protected override void OnUnload()
     {
-        closing=true;
-        lifetime.Cancel();
-        // Complete owned I/O before the final battery capture/write. UI posts are
-        // canceled; no operation can race the same .tmp file during shutdown.
-        Try(()=>mediaTask.GetAwaiter().GetResult());
-        Try(()=>previewTask.GetAwaiter().GetResult());
-        Try(()=>networkTask.GetAwaiter().GetResult());
-        Try(()=>{worker.SetModeAsync(true,false).GetAwaiter().GetResult();FlushSramAsync().GetAwaiter().GetResult();settings.Save();});
-        presentation.Dispose();worker.Dispose();client.Dispose();server.Dispose();pending.Dispose();lifetime.Dispose();base.OnUnload();
+        closing=true;lifetime.Cancel();var errors=new List<Exception>();
+        void Finish(Action action){try{action();}catch(Exception e){errors.Add(e);}}
+        // Own I/O drains before final capture. Failures survive window shutdown:
+        // Program records last-error.log, returns nonzero and shows a normal-launch
+        // error dialog. CLI probes never display blocking dialogs.
+        Finish(()=>mediaTask.GetAwaiter().GetResult());
+        if(unreportedMediaError!=null)errors.Add(unreportedMediaError);
+        Finish(()=>previewTask.GetAwaiter().GetResult());
+        Finish(()=>networkTask.GetAwaiter().GetResult());
+        Finish(()=>autosave.Pending.GetAwaiter().GetResult());
+        Finish(()=>settingsPersistence.Pending.GetAwaiter().GetResult());
+        Finish(()=>worker.SetModeAsync(true,false).GetAwaiter().GetResult());
+        Finish(()=>Task.Run(FlushSramAsync).GetAwaiter().GetResult());
+        Finish(()=>Task.Run(()=>settings.Save()).GetAwaiter().GetResult());
+        Finish(battery.Dispose);Finish(presentation.Dispose);Finish(worker.Dispose);
+        Finish(client.Dispose);Finish(server.Dispose);Finish(pending.Dispose);Finish(lifetime.Dispose);base.OnUnload();
+        if(errors.Count!=0)throw new AggregateException("Shutdown save failed. Previous valid files were retained; see last-error.log and retry after fixing the storage error.",errors);
     }
     private ushort KeyboardButtons()
     {
@@ -391,7 +414,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             else if(captureArmed&&joystick!=null)
             {
                 settings.GamepadControls![GamepadMapping.Names[selection]]=rawPad.Order(StringComparer.Ordinal).First();
-                capturing=false;settings.Save();ResetLocalInput();
+                capturing=false;SaveSettings();ResetLocalInput();
             }
             return;
         }

@@ -11,6 +11,7 @@ internal static class Program
     {
         try
         {
+            if(args.Length>=2&&args[0]=="--ui-persistence-smoke"){PersistenceSmoke.Run(args[1],args.Length>=3?args[2]:"normal");return 0;}
             if(args.Length>=2&&args[0]=="--ui-runtime-smoke"){RuntimeSmoke.Run(args[1],args.Length>=3&&args[2]!="-"?args[2]:null,args.Length>=4?double.Parse(args[3],System.Globalization.CultureInfo.InvariantCulture):8);return 0;}
             if(args.Length>=2 && args[0]=="--write-diagnostic-rom")
             { File.WriteAllBytes(args[1],DiagnosticRom.Create()); return 0; }
@@ -69,9 +70,11 @@ internal static class Program
         }
         catch(Exception e)
         {
-            Directory.CreateDirectory(UserDataPaths.GetBaseDirectory());
-            File.WriteAllText(Path.Combine(UserDataPaths.GetBaseDirectory(),"last-error.log"),e.ToString());
-            if(args.Length==0) System.Windows.Forms.MessageBox.Show(e.Message,"SNESEmulator");
+            try{Directory.CreateDirectory(UserDataPaths.GetBaseDirectory());File.WriteAllText(Path.Combine(UserDataPaths.GetBaseDirectory(),"last-error.log"),e.ToString());}
+            catch(Exception logError){Console.Error.WriteLine("Could not write last-error.log: "+logError.Message);}
+            Console.Error.WriteLine(e);
+            bool automated=args.Length>0&&args[0].StartsWith("--",StringComparison.Ordinal);
+            if(!automated)System.Windows.Forms.MessageBox.Show(e.Message,"SNESEmulator");
             return 1;
         }
     }

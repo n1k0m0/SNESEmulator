@@ -11,24 +11,29 @@ public static class StateSerializer
     public static void Save(SnesSystem machine, string path)
     {
         var cart = machine.Bus.Cartridge ?? throw new InvalidOperationException("Load a cartridge first.");
-        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
-        string temporary = path + ".tmp";
-        using (var file = File.Create(temporary)) Write(machine,file);
-        File.Move(temporary, path, true);
+        AtomicFile.Write(path,stream=>Write(machine,stream),candidate=>Valid(cart,candidate));
     }
+    private static bool Valid(Cartridge cartridge,string path)
+    {
+        try{using var file=File.OpenRead(path);_ = Load(cartridge,file);return true;}
+        catch(Exception e) when(e is IOException or InvalidDataException or JsonException or ArgumentException or OverflowException or InvalidOperationException){return false;}
+    }
+    // Format9: <=512 KiB SRAM, <=512*239 pixels (7 bytes/pixel), fixed
+    // RAM, plus bounded JSON pipelines. 32 MiB leaves >10x normal-state headroom.
+    // Increase these explicit versioned budgets when adding hardware, never from input.
+    public const int MaximumCompressedBytes=16*1024*1024, MaximumRawBytes=32*1024*1024, MaximumStringBytes=8*1024*1024;
+    private static readonly JsonSerializerOptions JsonOptions=new(){MaxDepth=32};
     // The host captures uncompressed hardware bytes on its owner thread, then
     // compresses/writes those owned bytes outside the emulation loop.
     public static byte[] Capture(SnesSystem machine)
     {
         using var stream=new MemoryStream();Write(machine,stream,false);return stream.ToArray();
     }
-    public static void SaveCaptured(byte[] bytes,string path)
+    public static void SaveCaptured(byte[] bytes,string path,Cartridge cartridge)
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
-        string temporary=path+".tmp";
-        using(var file=File.Create(temporary))
-        using(var zip=new GZipStream(file,CompressionLevel.Fastest))zip.Write(bytes);
-        File.Move(temporary,path,true);
+        ArgumentNullException.ThrowIfNull(cartridge);
+        if(bytes.Length>MaximumRawBytes)throw new InvalidDataException("Captured state exceeds format9 size limit.");
+        AtomicFile.Write(path,file=>{using var zip=new GZipStream(file,CompressionLevel.Fastest,true);zip.Write(bytes);},candidate=>Valid(cartridge,candidate));
     }
     private static void Write(SnesSystem machine,Stream destination,bool compress=true)
     {
@@ -63,18 +68,71 @@ public static class StateSerializer
     }
     public static SnesSystem Load(Cartridge cartridge, string path)
     {
-        using var file = File.OpenRead(path);
-        return Load(cartridge,file);
+        using var source=File.OpenRead(path);return Load(cartridge,source);
+    }
+    public static byte[] ReadForLoad(Cartridge cartridge,string path,out bool recovered)
+        =>AtomicFile.Read(path,MaximumCompressedBytes,bytes=>{
+            try{using var stream=new MemoryStream(bytes,false);_ = Load(cartridge,stream);return true;}
+            catch(Exception e) when(e is IOException or InvalidDataException){return false;}
+        },out recovered);
+    private static readonly uint[] CrcTable=BuildCrcTable();
+    private static uint[] BuildCrcTable()
+    {
+        var table=new uint[256];for(uint i=0;i<256;i++){uint value=i;for(int bit=0;bit<8;bit++)value=(value&1)!=0?0xedb88320^(value>>1):value>>1;table[i]=value;}return table;
+    }
+    public static byte[] Decode(Stream source)
+    {
+        using var compressed=new MemoryStream();byte[] block=new byte[8192];int count;
+        while((count=source.Read(block))!=0){if(compressed.Length+count>MaximumCompressedBytes)throw new InvalidDataException("Compressed savestate exceeds 16 MiB limit.");compressed.Write(block,0,count);}
+        if(compressed.Length<18)throw new InvalidDataException("Truncated gzip savestate.");
+        byte[] encoded=compressed.ToArray();
+        compressed.Position=0;using var zip=new GZipStream(compressed,CompressionMode.Decompress);using var raw=new MemoryStream();
+        while((count=zip.Read(block))!=0){if(raw.Length+count>MaximumRawBytes)throw new InvalidDataException("Decompressed savestate exceeds 32 MiB limit.");raw.Write(block,0,count);}
+        var decoded=raw.ToArray();uint crc=uint.MaxValue;
+        foreach(byte value in decoded)crc=CrcTable[(crc^value)&255]^(crc>>8);
+        if(System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(encoded.AsSpan(encoded.Length-8))!=~crc||System.Buffers.Binary.BinaryPrimitives.ReadUInt32LittleEndian(encoded.AsSpan(encoded.Length-4))!=(uint)decoded.Length)
+            throw new InvalidDataException("Truncated or corrupt gzip savestate checksum/length.");
+        return decoded;
+    }
+    private sealed class LimitedReader(Stream stream):BinaryReader(stream)
+    {
+        public override string ReadString()
+        {
+            int length=Read7BitEncodedInt();if(length<0||length>MaximumStringBytes||length>BaseStream.Length-BaseStream.Position)throw new InvalidDataException("Invalid or oversized savestate string.");
+            return new System.Text.UTF8Encoding(false,true).GetString(ReadBytes(length));
+        }
     }
     public static SnesSystem Load(Cartridge cartridge,Stream source)
     {
-        using var zip = new GZipStream(source, CompressionMode.Decompress,true);
-        using var r = new BinaryReader(zip);
+        try{return LoadCore(cartridge,source);}
+        catch(Exception e) when(e is JsonException or ArgumentException or OverflowException or InvalidOperationException or NullReferenceException or IndexOutOfRangeException or FormatException)
+        {throw new InvalidDataException("Invalid savestate contents: "+e.Message,e);}
+    }
+    private static T? Json<T>(string text)
+    {
+        using var document=JsonDocument.Parse(text,new JsonDocumentOptions{MaxDepth=32});
+        int nodes=0;
+        void Inspect(JsonElement element)
+        {
+            if(++nodes>1000000)throw new InvalidDataException("Savestate JSON node budget exceeded.");
+            if(element.ValueKind==JsonValueKind.Array)
+            {
+                if(element.GetArrayLength()>512*239)throw new InvalidDataException("Savestate JSON array exceeds native field capacity.");
+                foreach(var item in element.EnumerateArray())Inspect(item);
+            }
+            else if(element.ValueKind==JsonValueKind.Object)foreach(var property in element.EnumerateObject())Inspect(property.Value);
+        }
+        Inspect(document.RootElement);return document.RootElement.Deserialize<T>(JsonOptions);
+    }
+    private static SnesSystem LoadCore(Cartridge cartridge,Stream source)
+    {
+        using var raw=new MemoryStream(Decode(source),false);
+        using var r = new LimitedReader(raw);
         if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 9 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
             throw new InvalidDataException("Savestate requires format9 (continuous WAI phase, pending PPU bus endpoints and field-start display latches). Formats1-8 lack an unambiguous corrected timing state; start the ROM again. The cartridge must also match.");
-        var profile=JsonSerializer.Deserialize<HardwareProfile>(r.ReadString())??throw new InvalidDataException("Missing hardware profile");
+        var profile=Json<HardwareProfile>(r.ReadString())??throw new InvalidDataException("Missing hardware profile");
         bool forced=r.ReadBoolean();var mapping=(CartridgeMapping)r.ReadInt32();
-        var options=JsonSerializer.Deserialize<CartridgeOptions>(r.ReadString())??throw new InvalidDataException("Missing cartridge options");
+        var options=Json<CartridgeOptions>(r.ReadString())??throw new InvalidDataException("Missing cartridge options");
         if(!Enum.IsDefined(mapping)||mapping!=cartridge.Mapping)throw new InvalidDataException("Savestate cartridge mapper does not match.");
         var restoredCart=new Cartridge(cartridge.Rom,cartridge.SourcePath,options);
         if(restoredCart.Mapping!=mapping)throw new InvalidDataException("Invalid saved mapper options");
@@ -88,25 +146,25 @@ public static class StateSerializer
         Read(r, p.Vram); Read(r, p.Cgram); Read(r, p.Oam); Read(r, p.Registers);
         p.VramAddress = r.ReadUInt16(); p.CgramAddress = r.ReadUInt16(); p.OamAddress = r.ReadUInt16(); p.ScrollLatch = r.ReadByte(); p.Scanline = r.ReadInt32();
         for (int i = 0; i < p.Scroll.Length; i++) p.Scroll[i] = r.ReadUInt16();
-        p.RestoreGeometry(JsonSerializer.Deserialize<PpuGeometry>(r.ReadString())??throw new InvalidDataException("Missing video geometry"));
+        p.RestoreGeometry(Json<PpuGeometry>(r.ReadString())??throw new InvalidDataException("Missing video geometry"));
         if(r.ReadInt32()!=p.Pixels.Length)throw new InvalidDataException("Invalid video array length");
         for (int i = 0; i < p.Pixels.Length; i++) p.Pixels[i] = r.ReadUInt32();
-        for(int i=0;i<p.NativePixels.Length;i++)p.NativePixels[i]=r.ReadUInt16();Read(r,p.Brightness);p.RestorePipeline(JsonSerializer.Deserialize<PpuPipelineState>(r.ReadString())??throw new InvalidDataException("Missing PPU pipeline"));
-        b.Apu.Restore(JsonSerializer.Deserialize<ApuState>(r.ReadString())??throw new InvalidDataException("Missing APU state"));
+        for(int i=0;i<p.NativePixels.Length;i++)p.NativePixels[i]=r.ReadUInt16();Read(r,p.Brightness);p.RestorePipeline(Json<PpuPipelineState>(r.ReadString())??throw new InvalidDataException("Missing PPU pipeline"));
+        b.Apu.Restore(Json<ApuState>(r.ReadString())??throw new InvalidDataException("Missing APU state"));
         for (int i = 0; i < 4; i++) b.Controllers.Buttons[i] = r.ReadUInt16();
         for (int i = 0; i < 4; i++) b.Controllers.Latched[i] = r.ReadUInt16();
         for (int i = 0; i < 2; i++) b.Controllers.Position[i] = r.ReadInt32();
         b.Controllers.Restore(r.ReadBoolean());for(int i=0;i<2;i++)b.Controllers.AuxiliaryConnected[i]=r.ReadBoolean();
-        m.Clock.Restore(JsonSerializer.Deserialize<ClockState>(r.ReadString())??throw new InvalidDataException("Missing clock state"));
-        m.RestorePhase(JsonSerializer.Deserialize<ExecutionPhase>(r.ReadString())??throw new InvalidDataException("Missing CPU phase"));
-        b.CpuIo.Restore(JsonSerializer.Deserialize<IoState>(r.ReadString())??throw new InvalidDataException("Missing I/O state"));
-        b.Dma.Restore(JsonSerializer.Deserialize<DmaState>(r.ReadString())??throw new InvalidDataException("Missing DMA state"));
-        c.RestoreContinuation(JsonSerializer.Deserialize<CpuContinuation>(r.ReadString()));
-        c.RestoreInterrupts(JsonSerializer.Deserialize<CpuInterruptState>(r.ReadString())??throw new InvalidDataException("Missing interrupt state"));
+        m.Clock.Restore(Json<ClockState>(r.ReadString())??throw new InvalidDataException("Missing clock state"));
+        m.RestorePhase(Json<ExecutionPhase>(r.ReadString())??throw new InvalidDataException("Missing CPU phase"));
+        b.CpuIo.Restore(Json<IoState>(r.ReadString())??throw new InvalidDataException("Missing I/O state"));
+        b.Dma.Restore(Json<DmaState>(r.ReadString())??throw new InvalidDataException("Missing DMA state"));
+        c.RestoreContinuation(Json<CpuContinuation>(r.ReadString()));
+        c.RestoreInterrupts(Json<CpuInterruptState>(r.ReadString())??throw new InvalidDataException("Missing interrupt state"));
         p.ValidateClock();
         if(frames!=m.Frames||remainder!=m.MasterRemainder)throw new InvalidDataException("Inconsistent clock state");
         if (b.WramAddress is < 0 or > 0x1FFFF || p.Scanline is < 0 or > 312 || p.CgramAddress>511 || p.OamAddress>1023 || p.Brightness.Any(x=>x>15) || p.NativePixels.Any(x=>x>32767) ||
-            b.Controllers.Position.Any(v => v is < 0 or > 16) || m.MasterRemainder is < 0 or > 600000 || zip.ReadByte() != -1)
+            b.Controllers.Position.Any(v => v is < 0 or > 16) || m.MasterRemainder is < 0 or > 600000 || raw.ReadByte() != -1)
             throw new InvalidDataException("Invalid savestate values.");
         return m;
     }

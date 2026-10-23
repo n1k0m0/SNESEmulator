@@ -65,7 +65,7 @@ public sealed partial class SnesWindow
                 }
                 break;
         }
-        settings.Save();
+        SaveSettings();
     }
     private bool EditNetwork(Key key,KeyModifiers modifiers)
     {
@@ -100,7 +100,7 @@ public sealed partial class SnesWindow
             case 13: settings.ConnectionId=value; break;
             case 14: relayPassword=value; break;
         }
-        settings.Save(); return true;
+        SaveSettings(); return true;
     }
     private void BeginConnection(bool host)
     {

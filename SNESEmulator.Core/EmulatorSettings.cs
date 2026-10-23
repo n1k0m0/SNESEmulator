@@ -27,25 +27,59 @@ public sealed class EmulatorSettings
         ["B"] = 0, ["A"] = 1, ["Y"] = 2, ["X"] = 3,
         ["L"] = 4, ["R"] = 5, ["Select"] = 6, ["Start"] = 7
     };
-    public static EmulatorSettings Load()
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string? PersistenceNotice {get;private set;}
+    public const int MaximumBytes=64*1024;
+    private static readonly JsonSerializerOptions JsonOptions=new(){MaxDepth=16,WriteIndented=true};
+    public void Validate()
+    {
+        AudioVolume=Math.Clamp(AudioVolume,0,100);Filter=Math.Clamp(Filter,0,2);Upscale=Math.Clamp(Upscale,0,5);
+        ControllerPort=Math.Clamp(ControllerPort,1,2);GamepadDevice=Math.Clamp(GamepadDevice,-1,255);
+        Port=Math.Clamp(Port,1,65535);RelayPort=Math.Clamp(RelayPort,1,65535);
+        string Clean(string? value,string fallback,int limit)
+        {string cleaned=new string((value??"").Where(c=>!char.IsControl(c)).Take(limit).ToArray());return string.IsNullOrWhiteSpace(cleaned)?fallback:cleaned;}
+        Host=Clean(Host,"localhost",253);RelayHost=Clean(RelayHost,"localhost",253);
+        ConnectionId=Clean(ConnectionId,"snes-session",128);PlayerName=Clean(PlayerName,"player",64);
+        MediaDirectory=Clean(MediaDirectory,UserDataPaths.GetMediaDirectory(),1024);
+        try{MediaDirectory=Path.GetFullPath(MediaDirectory);}catch(Exception e) when(e is ArgumentException or NotSupportedException or PathTooLongException){MediaDirectory=UserDataPaths.GetMediaDirectory();}
+        string[] names=["Up","Down","Left","Right","B","A","Y","X","L","R","Select","Start"];
+        GamepadBindings??=new EmulatorSettings().GamepadBindings;
+        GamepadBindings=GamepadBindings.Where(x=>names.Contains(x.Key)&&x.Value is >=0 and <=255).ToDictionary(x=>x.Key,x=>x.Value);
+        if(GamepadControls!=null)
+        {
+            var controls=new Dictionary<string,string>();
+            foreach(var entry in GamepadControls.Where(x=>names.Contains(x.Key)))
+            {
+                string token=entry.Value??"";
+                bool valid=token.Length<=128&&token.Split(';').Length<=4&&token.Split(';').All(part=>System.Text.RegularExpressions.Regex.IsMatch(part,@"^(Button(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])|Axis(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])[+-]|Hat(?:[0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(?:Up|Down|Left|Right))?$",System.Text.RegularExpressions.RegexOptions.CultureInvariant));
+                if(valid)controls[entry.Key]=token;
+            }
+            GamepadControls=controls;
+        }
+    }
+    private static bool Valid(byte[] bytes)
+    {
+        try{return bytes.Length<=MaximumBytes&&JsonSerializer.Deserialize<EmulatorSettings>(bytes,JsonOptions)!=null;}catch(JsonException){return false;}
+    }
+    public static EmulatorSettings Load(string? path=null)
     {
         try
         {
-            var s = JsonSerializer.Deserialize<EmulatorSettings>(File.ReadAllText(UserDataPaths.GetSettingsPath())) ?? new();
-            s.AudioVolume=Math.Clamp(s.AudioVolume,0,100);
-            s.Filter = Math.Clamp(s.Filter, 0, 2); s.Upscale = Math.Clamp(s.Upscale, 0, 5);
-            s.ControllerPort = Math.Clamp(s.ControllerPort, 1, 2);
-            s.Port = Math.Clamp(s.Port, 1, 65535); s.RelayPort = Math.Clamp(s.RelayPort, 1, 65535);
-            s.GamepadBindings ??= new EmulatorSettings().GamepadBindings;
-            return s;
+            byte[] bytes=AtomicFile.Read(path??UserDataPaths.GetSettingsPath(),MaximumBytes,Valid,out bool recovered);
+            var settings=JsonSerializer.Deserialize<EmulatorSettings>(bytes,JsonOptions)!;string before=JsonSerializer.Serialize(settings);settings.Validate();
+            settings.PersistenceNotice=recovered?"SETTINGS RECOVERED FROM BACKUP; DAMAGED FILE RETAINED":before!=JsonSerializer.Serialize(settings)?"INVALID SETTINGS NORMALIZED; REVIEW SETTINGS":null;
+            return settings;
         }
-        catch (Exception e) when (e is IOException or JsonException or UnauthorizedAccessException) { return new(); }
+        catch(FileNotFoundException){return new();}
+        catch(Exception e) when(e is IOException or InvalidDataException or JsonException or UnauthorizedAccessException or ArgumentException)
+        {return new(){PersistenceNotice="SETTINGS UNAVAILABLE: "+e.Message};}
     }
-    public void Save()
+    public string Serialize(){Validate();return JsonSerializer.Serialize(this,JsonOptions);}
+    public static void SaveSerialized(string json,string? path=null)
     {
-        Directory.CreateDirectory(UserDataPaths.GetBaseDirectory());
-        string path = UserDataPaths.GetSettingsPath();
-        File.WriteAllText(path + ".tmp", JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true }));
-        File.Move(path + ".tmp", path, true);
+        if(json.Length>MaximumBytes)throw new InvalidDataException("Settings exceed 64 KiB limit.");
+        byte[] bytes=System.Text.Encoding.UTF8.GetBytes(json);if(!Valid(bytes))throw new InvalidDataException("Invalid settings; existing file retained.");
+        AtomicFile.Write(path??UserDataPaths.GetSettingsPath(),stream=>stream.Write(bytes),candidate=>new FileInfo(candidate).Length<=MaximumBytes&&Valid(AtomicFile.ReadBytes(candidate,MaximumBytes)));
     }
+    public void Save(string? path=null)=>SaveSerialized(Serialize(),path);
 }

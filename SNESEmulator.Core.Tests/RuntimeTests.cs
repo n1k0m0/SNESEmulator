@@ -47,7 +47,7 @@ static class RuntimeTests
         });
         test("M9b load preserves format9 controller bytes and partial-field application",()=>{
             var rom=AudioDiagnosticRom.Create();var d=new SnesSystem();d.Insert(new Cartridge(rom));d.RunUntil(123456);d.Bus.Controllers.Buttons[0]=(ushort)SnesButtons.B;d.Bus.Controllers.Buttons[1]=(ushort)SnesButtons.R;
-            byte[] raw=StateSerializer.Capture(d);string path=Path.Combine(root,"worker-partial.snessav");StateSerializer.SaveCaptured(raw,path);
+            byte[] raw=StateSerializer.Capture(d);string path=Path.Combine(root,"worker-partial.snessav");StateSerializer.SaveCaptured(raw,path,d.Bus.Cartridge!);
             // Off-thread compression can choose different Deflate block boundaries;
             // the complete hardware payload must remain byte-for-byte identical.
             using(var compressed=File.OpenRead(path))using(var zip=new System.IO.Compression.GZipStream(compressed,System.IO.Compression.CompressionMode.Decompress))using(var uncompressed=new MemoryStream()){zip.CopyTo(uncompressed);Check(raw.SequenceEqual(uncompressed.ToArray()),"captured compression preserves every hardware byte");}

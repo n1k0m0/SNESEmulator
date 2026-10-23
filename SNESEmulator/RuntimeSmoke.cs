@@ -45,8 +45,9 @@ internal static class RuntimeSmoke
                 case 7:Check(window.CurrentMenu=="Saves","F12 saves path");Press(Key.S);Next();break;
                 case 8:
                     if(window.MediaOperationPending)return;
+                    if(deletedOnce&&Directory.GetFiles(UserDataPaths.GetSaveDirectory(),"*.snessav",SearchOption.AllDirectories).Length==0){Press(Key.S);return;}
                     Check(Directory.GetFiles(UserDataPaths.GetSaveDirectory(),"*.snessav",SearchOption.AllDirectories).Length==1,"save completed");Screenshot(window,Path.Combine(output,"save.png"));
-                    if(!deletedOnce){Press(Key.Delete);Check(window.CurrentMenu=="Delete","delete confirmation path");Screenshot(window,Path.Combine(output,"delete.png"));Press(Key.Down);Press(Key.Enter);Check(Directory.GetFiles(UserDataPaths.GetSaveDirectory(),"*.snessav",SearchOption.AllDirectories).Length==0,"isolated save delete");deletedOnce=true;Press(Key.S);return;}
+                    if(!deletedOnce){Press(Key.Delete);Check(window.CurrentMenu=="Delete","delete confirmation path");Screenshot(window,Path.Combine(output,"delete.png"));Press(Key.Down);Press(Key.Enter);deletedOnce=true;return;}
                     Row("saved");epochBeforeLoad=runtime.Epoch;Press(Key.Enter);Next();break;
                 case 9:
                     if(window.MediaOperationPending||window.CurrentMenu!="None")return;

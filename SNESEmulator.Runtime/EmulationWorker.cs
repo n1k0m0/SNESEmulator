@@ -1,6 +1,8 @@
 using SNESEmulator.Core;
 using SNESEmulator.SaveStates;
 
+[assembly:System.Runtime.CompilerServices.InternalsVisibleTo("SNESEmulator.Core.Tests")]
+
 namespace SNESEmulator.Runtime;
 
 public sealed record WorkerStatus(long Epoch,long Field,long MasterClock,string Title,string CartridgeHash,
@@ -17,7 +19,9 @@ public readonly record struct FieldInput(ushort Port1,ushort Port2);
 public sealed class EmulationWorker : IDisposable
 {
     public const int CommandCapacity=32,OutputCapacity=8;
-    private readonly object gate=new();
+    private readonly object gate=new(),loadGate=new();
+    private Task? activeLoad;
+    internal Action? BeforeStateInstall {get;set;}
     private readonly Queue<ICommand> commands=new();
     private readonly Queue<FieldOutput> outputs=new();
     private readonly AutoResetEvent changed=new(false);
@@ -76,9 +80,30 @@ public sealed class EmulationWorker : IDisposable
     public Task ResetAsync(CancellationToken cancellation=default)=>Enqueue(()=>{machine.Reset();fault=null;Discontinuity();return true;},cancellation);
     public Task LoadAsync(byte[] compressed,CancellationToken cancellation=default)
     {
+        lock(loadGate)
+        {
+            if(Volatile.Read(ref disposed))return Task.FromException(new ObjectDisposedException(nameof(EmulationWorker)));
+            if(activeLoad is {IsCompleted:false})return Task.FromException(new InvalidOperationException("A savestate load is already pending; wait for it to finish."));
+            if(compressed.Length>StateSerializer.MaximumCompressedBytes)return Task.FromException(new InvalidDataException("Compressed savestate exceeds size limit."));
+            activeLoad=LoadCoreAsync(compressed,cancellation);return activeLoad;
+        }
+    }
+    private async Task LoadCoreAsync(byte[] compressed,CancellationToken cancellation)
+    {
+        using var linked=CancellationTokenSource.CreateLinkedTokenSource(cancellation,stopping.Token);cancellation=linked.Token;
+        cancellation.ThrowIfCancellationRequested();
+        if(compressed.Length>StateSerializer.MaximumCompressedBytes)throw new InvalidDataException("Compressed savestate exceeds size limit.");
         byte[] owned=compressed.ToArray();
-        return Enqueue(()=>{using var stream=new MemoryStream(owned,false);var restored=StateSerializer.Load(machine.Bus.Cartridge??throw new InvalidOperationException("Load matching ROM first"),stream);
-            machine=restored;fault=null;Discontinuity();return true;},cancellation);
+        var identity=await Enqueue(()=>{
+            var cart=machine.Bus.Cartridge??throw new InvalidOperationException("Load matching ROM first");
+            return (Cart:new Cartridge(cart.Rom,cart.SourcePath,cart.Options),Epoch:epoch);
+        },cancellation).ConfigureAwait(false);
+        var restored=await Task.Run(()=>{cancellation.ThrowIfCancellationRequested();using var stream=new MemoryStream(owned,false);return StateSerializer.Load(identity.Cart,stream);},cancellation).ConfigureAwait(false);
+        BeforeStateInstall?.Invoke();cancellation.ThrowIfCancellationRequested();
+        await Enqueue(()=>{
+            if(epoch!=identity.Epoch||machine.Bus.Cartridge?.Hash!=identity.Cart.Hash)throw new InvalidOperationException("Machine changed while loading; retry the state load.");
+            machine=restored;fault=null;Discontinuity();return true;
+        },cancellation).ConfigureAwait(false);
     }
     public Task<byte[]> CaptureAsync(CancellationToken cancellation=default)=>Enqueue(()=>StateSerializer.Capture(machine),cancellation);
     public Task<BatterySnapshot?> BatteryAsync(CancellationToken cancellation=default)=>Enqueue(()=>machine.Bus.Cartridge is {} cart?new BatterySnapshot(cart.Hash,cart.Sram.ToArray()):null,cancellation);
@@ -144,6 +169,8 @@ public sealed class EmulationWorker : IDisposable
     {
         lock(gate){if(disposed)return;disposed=true;stopping.Cancel();changed.Set();}
         if(!thread.Join(TimeSpan.FromSeconds(10)))throw new TimeoutException("Emulation worker did not stop at field boundary");
+        Task? load;lock(loadGate)load=activeLoad;
+        if(load!=null){try{load.WaitAsync(TimeSpan.FromSeconds(10)).GetAwaiter().GetResult();}catch(Exception) when(load.IsCompleted){}}
         changed.Dispose();stopping.Dispose();
     }
 }
