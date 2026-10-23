@@ -159,3 +159,14 @@ M9a preserves format9 and all digital output while reducing scheduler suspension
 and observation allocation costs; see [performance contract](m9-performance-contract.md).
 M9b now runs the live console on a portable controlled worker; remaining
 persistence/network/distribution work and sustained realtime acceptance stay open. M8 was independently accepted on10164c7.
+
+
+M9b Worker/UI wurde unabh‰ngig auf1074c36 abgenommen; die dokumentierten
+Hardware-/Eingabe-/Soak- und Dauerleistungsgrenzen bleiben bestehen. M9c erg‰nzt
+begrenzte, atomar geflushte Persistenz mit validierten Backups, sichtbarer Recovery,
+30s-Dirty-SRAM-Snapshots und transaktionalen ROM-Session-Leases. State-Dekodierung
+l‰uft an einer abgetrennten Maschine auﬂerhalb des Hardwareowners und installiert
+nur bei unver‰nderter Epoche. Format9/VID3/AUD2 bleiben erhalten. Der volle Gate
+auf `ed62a20` besteht; unabh‰ngige M9c-Abnahme steht aus. Siehe
+[Persistenzvertrag](m9-persistence-contract.md) und [Baseline](baselines/m9c.json).
+M9a-Dauerleistung, Netzwerk, aktuelle Distribution und M9/Release bleiben offen.

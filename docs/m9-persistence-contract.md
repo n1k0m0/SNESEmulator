@@ -144,3 +144,31 @@ The M8 `test-lab.py` pin changes solely to add the persistence supervisor and na
 persistence probe. Existing acquired fixtures, reference adapters, golden outputs
 and known-error thresholds remain unchanged. Root independent acceptance is a
 separate pending step; final clean-commit measurements are recorded in the baseline.
+
+
+## Clean implementation result
+
+Implementation `ed62a2016c68d8130e907a0fff8e23484ffac8ae` passed the unchanged full
+Windows gate with209 previous portable,16 runtime,14 persistence and10 Windows
+groups, both native probe types, all external CPU/SPC/Original-IPL and frozen M9
+regressions. Two further sequential native runs captured28 final-build identities
+immediately before each start and verified them unchanged afterward. The earlier
+pre-Windowsbuild snapshot remains explicitly limited because that build updates
+assembly informational-version metadata. No product build followed the final runs.
+
+The real frontend's first/second periodic save occurred at approximately30/60
+seconds while its own CPU wrote SRAM; detailed raw rows are in the final native
+result and baseline. Settings, SRAM and even error-log failures produce the tested
+negative CLI result and preserve prior primary bytes. Normal GUI error dialogs
+are implemented; physical OS interaction remains unexecuted at the lock screen.
+
+Core DLL SHA256: `fcf8f2a01ed64e568af86913b98aea9c8645ddafb2c097189aea99d7b1209d52`.
+Frozen acceptance: `artifacts/m9c-implementation-evidence/acceptance.json`, SHA256
+`29f55698e8aa825be35a7bb44cc973863c00217ac1e67225a8425250e822a211`.
+Manifest SHA256 `df2d8a0cc2b8b48da9cf46a2eeacdacfe3549c277054dd0cb340553a20c677d9`.
+All3 archives/7744 files/5,613,078,150 decompressed bytes were reread with CRC,
+length, SHA256 and fresh disk-original comparisons. Captured development failures
+remain separate, with an explicit disposition noting that the initial build's
+complete standalone log and per-attempt source snapshots were not retained.
+Prior M9b implementation/root archive and manifest identities remain unchanged.
+Independent M9c root product acceptance is pending; M9/release is incomplete.

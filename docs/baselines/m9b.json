@@ -1,6 +1,6 @@
 {
   "milestone": "M9b",
-  "status": "Implementation validated; independent parent product acceptance pending. M9 and release incomplete.",
+  "status": "Independently accepted with documented physical-input/soak/performance limits. M9 and release incomplete.",
   "implementationCommit": "43c566d3874bb9828ecde9ccdf4c9a56c209ce5f",
   "fullGate": {
     "command": "python tools/test-lab.py --windows --full",
@@ -155,5 +155,17 @@
   ],
   "legacyUiSmokeLimit": "native/startup-menu modes can race asynchronous load; use readiness-based runtime probe",
   "preliminaryFreeze": "artifacts/m9b-preliminary-freeze retained unchanged; active output log excluded from final freeze",
-  "independentProductAcceptance": "pending"
+  "independentProductAcceptance": {
+    "status": "accepted",
+    "rootCommit": "1074c36a9590f1176145060aa3581ae72c54a93f",
+    "acceptance": "artifacts/root-m9b-evidence/acceptance.json",
+    "acceptanceSha256": "f33acdf207a5061199d9c7ce17f8f70908d4cdd68d700ab2e74fc74bb560dcec",
+    "manifestSha256": "83e689cefdd343d1f11f16dd7a286e05c348601145f60701b13b03ad3e5cd6f7",
+    "fullGateExit": 0,
+    "nativeLiteralChecks": 5,
+    "nativeLiteralPixels": 122368,
+    "audioRegressionSha256": "a0ca8a2262b4c3ca022f3ae157efb10ed7c1de0555d1d239d19ed25314db8e48",
+    "archiveFiles": 1020,
+    "decompressedBytes": 43635978
+  }
 }

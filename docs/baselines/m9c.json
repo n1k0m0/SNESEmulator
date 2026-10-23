@@ -1,0 +1,103 @@
+{
+  "milestone": "M9c",
+  "status": "Implementation validated; independent root acceptance pending. M9 and release incomplete.",
+  "implementationCommit": "ed62a2016c68d8130e907a0fff8e23484ffac8ae",
+  "fullGate": {
+    "command": "python tools/test-lab.py --windows --full",
+    "exitCode": 0,
+    "previousPortableGroups": 209,
+    "runtimeGroups": 16,
+    "persistenceGroups": 14,
+    "portableTotal": 239,
+    "windowsGroups": 10,
+    "nativeRuntimeProbe": true,
+    "nativePersistenceModes": [
+      "normal",
+      "settings-failure",
+      "battery-failure",
+      "log-failure"
+    ]
+  },
+  "extraNativeValidation": {
+    "bothExitCode": 0,
+    "preAndPostActualBuildIdentitiesPerRun": 28,
+    "unchanged": true,
+    "path": "artifacts/m9c-final/extra-native-identities.json",
+    "noBuildAfterFinalNativeStarts": true,
+    "earlierPreWindowsBuildSnapshot": "retained as a limited metadata comparison, not asserted unchanged"
+  },
+  "actualFrontendPeriodicSram": [
+    {
+      "name": "first-periodic-save",
+      "wallSeconds": 30.0616633,
+      "field": 1804,
+      "masterClock": 644688264,
+      "paused": false,
+      "writes": 1,
+      "attempts": 1
+    },
+    {
+      "name": "second-periodic-save",
+      "wallSeconds": 60.0464654,
+      "field": 3606,
+      "masterClock": 1288661796,
+      "paused": false,
+      "writes": 2,
+      "attempts": 2
+    }
+  ],
+  "coreDllSha256": "fcf8f2a01ed64e568af86913b98aea9c8645ddafb2c097189aea99d7b1209d52",
+  "stateFormat": 9,
+  "wireFormats": "VID3/AUD2 unchanged",
+  "evidence": {
+    "acceptance": "artifacts/m9c-implementation-evidence/acceptance.json",
+    "acceptanceSha256": "29f55698e8aa825be35a7bb44cc973863c00217ac1e67225a8425250e822a211",
+    "manifestSha256": "df2d8a0cc2b8b48da9cf46a2eeacdacfe3549c277054dd0cb340553a20c677d9",
+    "verificationSha256": "6b3bab5030e20e65b7264c63f7478f4d81b025f3b473fa111ce7755db364fd8d",
+    "archives": [
+      {
+        "file": "m9c-inputs.zip",
+        "bytes": 571750917,
+        "sha256": "9d4abf102c36570b64b57e581fb481207158f93a06582c4a442951dadea8cce4",
+        "files": 3686
+      },
+      {
+        "file": "m9c-fullgate.zip",
+        "bytes": 181792205,
+        "sha256": "b316bf503d5a2b2e5d7b459d6be8f21ec3281e20bb79649e33ae6a68f8bb233e",
+        "files": 3212
+      },
+      {
+        "file": "m9c-development.zip",
+        "bytes": 326384,
+        "sha256": "2a5290cedf9e1cf440218537ceb1fff6144db7e8f02a4f0b7e7548ab93c5d3fb",
+        "files": 846
+      }
+    ],
+    "files": 7744,
+    "decompressedBytes": 5613078150,
+    "everyArchiveFileAndDiskOriginalVerified": true
+  },
+  "bounds": {
+    "compressedStateBytes": 16777216,
+    "rawStateBytes": 33554432,
+    "stateStringBytes": 8388608,
+    "jsonDepth": 32,
+    "jsonArrayElements": 122368,
+    "jsonNodesPerDocument": 1000000,
+    "settingsBytes": 65536,
+    "sramBytes": 524288
+  },
+  "knownLimits": [
+    "No physical power-cut or directory-fsync guarantee",
+    "No physical console/gamepad or OS focus verification",
+    "No hours-long A/V soak",
+    "M9a sustained NTSC red; PAL sustained unexecuted",
+    "18 whole-console audio errors remain red;7000 raw SPC mismatches retain adjudication",
+    "Network revoke/regrant held-input gap remains open",
+    "publish remains PRE-M0; no distribution/clean-VM claim"
+  ],
+  "notOffered": "No separate PowerCycle/Clear-SRAM menu action. Reset preserves SRAM; Same-ROM reload flushes/loads battery before PowerOn.",
+  "developmentEvidenceLimits": "All captured failed/repeated development reports retained separately; disposition records missing initial full build log/source-snapshot limits.",
+  "rootAcceptance": "pending"
+}

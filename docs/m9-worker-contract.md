@@ -205,7 +205,14 @@ acceptance SHA256:
 The earlier preliminary freeze remains unchanged separately; its active output
 log was excluded from the final payload. The parent independently reread all
 three final archives/7131 files (3,018,207,938 decompressed bytes); its archive
-verification is separate from still-pending independent product acceptance.
+verification was followed by independent product acceptance on1074c36: full
+Windows gate Exit0, five literal native checks/122368 pixels, unchanged audio
+SHA256 and actual Hires/async-preview probes. Root evidence:
+`artifacts/root-m9b-evidence/acceptance.json`, manifest SHA256
+`83e689cefdd343d1f11f16dd7a286e05c348601145f60701b13b03ad3e5cd6f7`,
+acceptance SHA256 `f33acdf207a5061199d9c7ce17f8f70908d4cdd68d700ab2e74fc74bb560dcec`.
+Its3 archives/1020 files/43,635,978 bytes were independently reread.
 See [M9b baseline](baselines/m9b.json). M9a sustained realtime, several emulated
-hours of A/V/threading, physical OS focus/gamepads, transport/persistence and
-current distribution remain open as listed above.
+hours of A/V/threading, physical OS focus/gamepads, transport and
+current distribution remain open as listed above. Persistence is now the separate
+[M9c implementation](m9-persistence-contract.md), pending independent acceptance.

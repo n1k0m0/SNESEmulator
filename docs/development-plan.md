@@ -1,6 +1,6 @@
 # Entwicklungsplan: mÃ¶glichst originalgetreuer SNES-Emulator
 
-Stand: 22.10.2026. Ausgangspunkt: Commit `7145184`.
+Stand: 23.10.2026. Ausgangspunkt: Commit `7145184`.
 Status: M0â€“M8 unabhÃ¤ngig abgenommen. M9a: Genauigkeitsgate auf `2dbeb5f` bestanden, Dauerleistungsziel rot (38/62 NTSC-Fenster); M9 bleibt unvollstÃ¤ndig. Worker/UI folgt als nÃ¤chstes Arbeitspaket; weitere M9-Phasen und M10 bleiben offen.
 
 ## Ziel und Nachweis
@@ -487,3 +487,17 @@ Saubere Implementierung43c566d: voller Windows-Gate Exit0,209 bisherige portable
 [Baseline](baselines/m9b.json) trennen Implementierungsnachweis und noch offene
 unabhÃ¤ngige Produktabnahme. NTSC/PAL-Dauerleistung, mehrstÃ¼ndiger A/V-/Threading-
 Soak und die weiteren Produkt-/Distributionsphasen bleiben vor M9-/Releasefreigabe offen.
+
+
+M9c implementiert atomar geflushte, validierte State-/SRAM-/Settings-Generationen,
+sichtbare Recovery, begrenzte periodische Dirty-SRAM-Snapshots, transaktionale
+ROM-Session-Leases und begrenzte State-Reader. [Persistenzvertrag](m9-persistence-contract.md)
+und [Baseline](baselines/m9c.json) nennen Commit, Dateien, Hashes und Grenzen.
+Saubere Implementierung `ed62a20`: voller Windows-Gate Exit0,209 bisherige portable,
+16 Runtime-,14 Persistenz- und10 Windows-Gruppen; tatsächliche native Periodik,
+Preview/Recovery/Close plus negative SRAM-/Settings-/Log-Fehlerfälle bestanden.
+Zusätzliche native Wiederholungen prüften je28 unmittelbar zuvor/danach erfasste
+Buildidentitäten. Drei Archive/7744 Dateien (5.613.078.150 dekomprimierte Bytes)
+wurden gegen CRC/Länge/SHA256 und alle Diskoriginale erneut geprüft. Unabhängige
+M9c-Rootabnahme steht aus. Das schließt weder M9a-Dauerleistung noch Netzwerk,
+Distribution/Manager, mehrstündigen Soak oder M9/Release insgesamt ab.
