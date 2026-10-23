@@ -212,4 +212,4 @@ soak and M10 remain open; publish remains PRE-M0. No physical SNES/input/DAC,
 OS-focus or clean-VM claim is added.
 
 
-M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. The final implementation gate and independent acceptance remain separate. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.
+M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. Independent Root acceptance passed on `2534dba`,267 portable/31 Windows groups; see the separate implementation and Root evidence in baseline m9e.json. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.

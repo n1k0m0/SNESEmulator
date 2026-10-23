@@ -167,5 +167,5 @@ The active freeze log, user-owned ROM directory and `artifacts/user-smw/` are
 excluded. No user ROM, installation, file association or distribution release is
 part of M9e evidence. After freezing, only this contract and baseline m9e.json
 change in the docs-only handoff commit; final source/bin audit is separate.
-Independent Root acceptance remains pending. Existing performance, audio,
+Independent Root acceptance passed on `2534dbad709c2b309820a42e0f556d7e1492d8db`:267 portable/31 Windows groups, full corpora, both earlier native probe types,122368 independent pixel values/5 checks, exact stereo SHA and actual20s Hires UI. Root independently reread every implementation archive entry. Its separate3 archives/1950 files/207729480 bytes have acceptance SHA256 `22b87649fafa16c07e32754a75ebe4b4f438b0fe43e670bdb281912ea086c792` and manifest SHA256 `59836e32444c41ed172c82d2b442f47337c09a77838b74a9a448919481ef4cbc`. Existing performance, audio,
 physical-hardware, prolonged-soak and later distribution/CI limits remain open.

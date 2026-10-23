@@ -1,6 +1,6 @@
 {
   "schema": "m9e-manager-baseline-v1",
-  "status": "implementation frozen and full gate passed; independent Root acceptance pending",
+  "status": "independently accepted by Root; M9/release remain incomplete",
   "priorPortable": 256,
   "priorWindows": 23,
   "newPortable": 11,
@@ -75,7 +75,20 @@
     "decompressedBytes": 27390121287,
     "nativeIdentityCount": 367
   },
-  "independentRootAcceptance": "pending",
+  "independentRootAcceptance": {
+    "commit": "2534dbad709c2b309820a42e0f556d7e1492d8db",
+    "implementationCommit": "a397fca7e49ffd4bcbe97920cd400755d097d458",
+    "exit": 0,
+    "portable": 267,
+    "windows": 31,
+    "evidence": "artifacts/root-m9e-evidence",
+    "archives": 3,
+    "files": 1950,
+    "uncompressedBytes": 207729480,
+    "acceptanceSha256": "22b87649fafa16c07e32754a75ebe4b4f438b0fe43e670bdb281912ea086c792",
+    "manifestSha256": "59836e32444c41ed172c82d2b442f47337c09a77838b74a9a448919481ef4cbc",
+    "additional": "122368 independent native pixels /5 checks; unchanged stereo SHA a0ca8a2262b4c3ca022f3ae157efb10ed7c1de0555d1d239d19ed25314db8e48; actual20s Hires UI;14 console identities /18952 SPC suspensions /128 horizons;367 native identities"
+  },
   "excluded": "User-owned ROMs and artifacts/user-smw/; own active freeze log; old evidence archives are hash-audited and never nested",
   "openLimits": [
     "M9a sustained NTSC performance red38/62 and PAL unperformed",

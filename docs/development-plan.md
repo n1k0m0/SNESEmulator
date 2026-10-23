@@ -1,7 +1,7 @@
 # Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
 
 Stand: 23.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M8 unabhängig abgenommen. M9a: Genauigkeitsgate auf `2dbeb5f` bestanden, Dauerleistungsziel rot (38/62 NTSC-Fenster); M9 bleibt unvollständig. Worker/UI folgt als nächstes Arbeitspaket; weitere M9-Phasen und M10 bleiben offen.
+Status: M0–M8 unabhängig abgenommen. M9a: Genauigkeitsgate auf `2dbeb5f` bestanden, Dauerleistungsziel rot (38/62 NTSC-Fenster); M9 bleibt unvollständig. M9b Worker/UI, M9c Persistenz, M9d Netzwerk und M9e Manager sind unabhängig abgenommen. M9f Distribution/CI folgt; Dauerleistung, mehrstündiger Soak, Genauigkeitstriage und M10 bleiben offen.
 
 ## Ziel und Nachweis
 
@@ -477,7 +477,7 @@ M8-Implementierungsvollgate: sauberer Commit `47f91cb`,
 10 Windows-Gruppen. Die unabhängige Root-Abnahme auf `10164c7` bestand mit Exit0 (`artifacts/root-m8-validation.log`). Genauigkeitsfehler
 bleiben in den gesonderten Berichten rot; [Baseline M8](baselines/m8.json) und
 [M8-Vertrag](m8-compatibility-contract.md) halten Repros und Nachweisgrenzen fest.
-M9a ist unvollständig: Das volle Genauigkeitsgate auf `2dbeb5f` besteht; das Dauerleistungsziel scheitert in 38/62 NTSC-Fenstern. Worker/UI folgt gemäß Root-Sequenzierung; vor M9-/Releaseabnahme müssen NTSC/PAL-Dauerleistung und die übrigen M9-Produktphasen abgeschlossen werden.
+M9a ist unvollständig: Das volle Genauigkeitsgate auf `2dbeb5f` besteht; das Dauerleistungsziel scheitert in 38/62 NTSC-Fenstern. Historisch folgte hier Worker/UI, inzwischen als M9b abgenommen; vor M9-/Releaseabnahme müssen NTSC/PAL-Dauerleistung und die übrigen M9-Produktphasen abgeschlossen werden.
 
 M9b implementiert den kontrollierten Worker, feldgebundene Eingaben und getrennte
 Video-/Audioübergabe; [Vertrag und Nachweisgrenzen](m9-worker-contract.md).
@@ -505,7 +505,7 @@ Distribution/Manager, mehrstündigen Soak oder M9/Release insgesamt ab.
 M9d implementiert den versionierten LAN/TLS-/Relaybetrieb mit neutralem Rechtewechsel,
 begrenzten Queues/Ressourcen, drainbarem Shutdown, Trust-Recovery und gemessener
 Software-A/V-Zeitachse; [Netzwerkvertrag](m9-network-contract.md). Unabhängige
-M9d-Abnahme steht aus. Neue Gruppen werden zusätzlich ausgewiesen; die bisherigen
+M9d-Abnahme auf `2a5ae39` bestanden. Neue Gruppen wurden zusätzlich ausgewiesen; die bisherigen
 239 portablen und10 Windows-Gruppen sowie externe Vollkorpora bleiben erhalten.
 M9a-Dauerleistung, Distribution/Manager/CI, mehrstündiger Soak und M10 bleiben offen.
 
@@ -542,4 +542,4 @@ soak and M10 remain open; publish remains PRE-M0. No physical SNES/input/DAC,
 OS-focus or clean-VM claim is added.
 
 
-M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. The final implementation gate and independent acceptance remain separate. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.
+M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. Independent Root acceptance passed on `2534dba` (267 portable/31 Windows groups); implementation `a397fca` and frozen evidence remain separately identified. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.
