@@ -1,6 +1,6 @@
 {
   "schema": "m9e-manager-baseline-v1",
-  "status": "implementation awaiting clean full gate and independent Root acceptance",
+  "status": "implementation frozen and full gate passed; independent Root acceptance pending",
   "priorPortable": 256,
   "priorWindows": 23,
   "newPortable": 11,
@@ -22,5 +22,66 @@
     "windows": 30,
     "retained": "artifacts/m9e-development/fullgate2",
     "reason": "Offline settings recovery visibility corrected after independent source review; final complete gate repeated"
-  }
+  },
+  "implementationCommit": "a397fca7e49ffd4bcbe97920cd400755d097d458",
+  "finalFullGate": {
+    "command": "python tools/test-lab.py --windows --full",
+    "session": 92715,
+    "exit": 0,
+    "portable": 267,
+    "windows": 31,
+    "rawLog": "artifacts/m9e-final-fullgate.log",
+    "finalGateArchive": "artifacts/m9e-implementation-evidence/m9e-fullgate.zip"
+  },
+  "evidence": {
+    "directory": "artifacts/m9e-implementation-evidence",
+    "acceptanceSha256": "3601576de14eed4e3df38b61b51ed80181f9e3cd792746d92ec718a09133732c",
+    "manifestSha256": "f93b6504f11edd2811bdccf2dd058dfa4cb4b3c3fe2e8f6e066fc32765b319e2",
+    "provenanceSha256": "cadac2891f4d2b32223ffd0a211ceea6264dcba08eb5795cc02102d8c21917fb",
+    "manifestSchema": "top-level array of archive, entry, original, staged, sha256, crc32, bytes",
+    "archives": [
+      {
+        "path": "artifacts\\m9e-implementation-evidence\\m9e-inputs.zip",
+        "files": 3980,
+        "uncompressedBytes": 3308439394,
+        "sha256": "bb9484a3685e8a62e1dd1b4e515d6a259b879bd5ff25d2c2d78e68ac9f28e73d",
+        "crc32": "47442177",
+        "bytes": 858569842
+      },
+      {
+        "path": "artifacts\\m9e-implementation-evidence\\m9e-fullgate.zip",
+        "files": 3697,
+        "uncompressedBytes": 2688656786,
+        "sha256": "2c658338a009e33b3dbc4c67184373eea5393ed31f67269e139f07ab79274b37",
+        "crc32": "0520aa80",
+        "bytes": 229965844
+      },
+      {
+        "path": "artifacts\\m9e-implementation-evidence\\m9e-development.zip",
+        "files": 48847,
+        "uncompressedBytes": 21393025107,
+        "sha256": "fd6a9f9b6983c9f43eb847c9576376e7abca44266586bc9baf59ad2dacd27c4a",
+        "crc32": "5f1500a8",
+        "bytes": 7791479464
+      }
+    ],
+    "verification": {
+      "archives": 3,
+      "entries": 56524,
+      "stagedOriginalRereads": 56524,
+      "liveOriginalRereads": 56524,
+      "nestedZipEntries": 0
+    },
+    "decompressedBytes": 27390121287,
+    "nativeIdentityCount": 367
+  },
+  "independentRootAcceptance": "pending",
+  "excluded": "User-owned ROMs and artifacts/user-smw/; own active freeze log; old evidence archives are hash-audited and never nested",
+  "openLimits": [
+    "M9a sustained NTSC performance red38/62 and PAL unperformed",
+    "18 M8 full-audio differences and7000 source-adjudicated raw SPC mismatches",
+    "Multi-hour soak",
+    "Distribution installer CI execution",
+    "M10 enhancement chips"
+  ]
 }

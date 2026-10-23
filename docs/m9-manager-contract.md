@@ -140,3 +140,32 @@ inferred. Published hardware tests remain the user's chosen route for later
 console validation. See baseline m9e.json for the final clean gate and archive IDs.
 
 Offline settings reads and discovery checks execute on a bounded operation worker rather than the WPF dispatcher. Recovery, unavailable/default and normalization notices remain visible in a dedicated settings warning area across status refreshes. The Settings IPC DTO also carries the live instance persistence notice. Three separate WPF processes verify actual recovered values (23), unavailable defaults (80), normalized values (100), retained source/backup bytes and rendered warning areas. Native product identities are recorded immediately before and after every owned process start.
+
+## Frozen implementation handoff
+
+Implementation commit `a397fca7e49ffd4bcbe97920cd400755d097d458` passed
+`python tools/test-lab.py --windows --full` with actual Exit0 (session92715):
+267 portable groups and31 Windows groups, including11/8 separate Manager groups.
+All previous256 portable and23 Windows groups remain present. Both earlier
+successful full gates and all development failures remain separately retained;
+none substitutes for the third clean implementation gate.
+
+`artifacts/m9e-implementation-evidence/` contains three nonnested ZIPs with56,524
+entries and27,390,121,287 uncompressed bytes. Every archive and entry was checked
+for SHA256, CRC32 and length; every entry was decompressed and its staged and
+live original independently reread. The native identity boundary covers367
+DLL/EXE/deps/runtimeconfig files. `files.json` is a top-level array of per-entry
+archive/path/original/staged/hash/CRC/length records, matching the prior evidence
+manifest shape. Archive identities and exact counts are in baseline m9e.json.
+
+Acceptance SHA256:
+`3601576de14eed4e3df38b61b51ed80181f9e3cd792746d92ec718a09133732c`.
+Manifest SHA256:
+`f93b6504f11edd2811bdccf2dd058dfa4cb4b3c3fe2e8f6e066fc32765b319e2`.
+
+The active freeze log, user-owned ROM directory and `artifacts/user-smw/` are
+excluded. No user ROM, installation, file association or distribution release is
+part of M9e evidence. After freezing, only this contract and baseline m9e.json
+change in the docs-only handoff commit; final source/bin audit is separate.
+Independent Root acceptance remains pending. Existing performance, audio,
+physical-hardware, prolonged-soak and later distribution/CI limits remain open.
