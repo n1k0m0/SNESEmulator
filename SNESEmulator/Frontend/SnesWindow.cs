@@ -48,7 +48,9 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private ushort padButtons;
     private int mappingGeneration;
     private double inputTimer, repeatTimer;
-    private string status = "F10 MENU - F12 SAVESTATES - F6 DIAGNOSTIC ROM";
+    private string statusText = "F10 MENU - F12 SAVESTATES - F6 DIAGNOSTIC ROM";
+    private double statusRemaining = 6;
+    private string status { get => statusText; set { statusText=value;statusRemaining=6; } }
     private string hostMenu = "", password = "", relayPassword = "";
     private List<string> entries = [];
     private string? deletePath;
@@ -93,6 +95,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     }
     public override void OnUserUpdate(double time)
     {
+        statusRemaining=Math.Max(0,statusRemaining-time);
         MeasureUi();
         if(managerCloseAfter!=0&&System.Diagnostics.Stopwatch.GetTimestamp()>=managerCloseAfter){Close();return;}
         autosave.Tick(time,!closing&&!mediaBusy);
@@ -134,8 +137,9 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         if(field!=null&&!ReferenceEquals(drawnField,field)){drawnField=field;drawnPixels=field.Argb.ToArray();}
         uint[] pixels=field!=null?drawnPixels:[];int width=field?.Geometry.Width??256,height=field?.Geometry.Height??224;
         if(remote){var frame=remoteVideo.Read(client.TimelineIdentity);pixels=frame?.Pixels??[];width=frame?.Width??256;height=frame?.Height??224;}
+        var layout=VideoPresentationLayout.Calculate(ClientSize.X,ClientSize.Y,settings.VideoStretch);
         if (pixels.Length>0)
-            DrawArgbPixelsGpuPresented(pixels,width,height,settings.VideoZoom?width/20:0,settings.VideoZoom?height/20:0,settings.VideoZoom?width-width/10:width,settings.VideoZoom?height-height/10:height,85,12,342,256,
+            DrawArgbPixelsGpuPresented(pixels,width,height,settings.VideoZoom?width/20:0,settings.VideoZoom?height/20:0,settings.VideoZoom?width-width/10:width,settings.VideoZoom?height-height/10:height,layout.X,layout.Y,layout.Width,layout.Height,
                 (SharpPixelsGpuFilterMode)settings.Filter,(SharpPixelsGpuUpscaleMode)settings.Upscale,
                 settings.Upscale is 2 or 4 ? 3 : settings.Upscale == 5 ? 4 : 2,8,10,18);
         else
@@ -148,7 +152,11 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             Text(34,196,"CORE: CPU / SPC700 / DMA / HDMA / PPU0-7",1);
             Text(34,214,"SPRITES / COLOR MATH / NATIVE STEREO DSP",1,255,220,140);
         }
-        Text(8,276,Clip(!worker.Status.Paused&&worker.Status.PacingLateSeconds>.25?$"EMULATION LATE {worker.Status.PacingLateSeconds:F2} S - HARDWARE TICKS PRESERVED":status,82),1,192,210,225);
+        if(menu!=Menu.None||pixels.Length==0||statusRemaining>0||worker.Status.Fault!=null||!worker.Status.AudioSupported||!worker.Status.Paused&&worker.Status.PacingLateSeconds>.25)
+        {
+            DrawFilledRectangleWithAlpha(0,272,512,16,8,10,18,210);
+            Text(8,276,Clip(!worker.Status.Paused&&worker.Status.PacingLateSeconds>.25?$"EMULATION LATE {worker.Status.PacingLateSeconds:F2} S - HARDWARE TICKS PRESERVED":status,82),1,192,210,225);
+        }
         if (remote && hostMenu.Length > 0) { DrawFilledRectangleWithAlpha(8,4,496,18,10,14,24,240); Text(14,9,Clip(hostMenu,78),1); }
         if (turbo) Text(452,8,"TURBO",1,255,220,140);
         if (menu != Menu.None) DrawMenu();
@@ -179,7 +187,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         Menu.Settings => [$"VIDEO FILTER    {new[]{"SHARP","CRT","TV"}[settings.Filter]}",
             $"VIDEO UPSCALE   {((SharpPixelsGpuUpscaleMode)settings.Upscale).ToString().ToUpperInvariant()}",
             $"FULLSCREEN      {settings.Fullscreen}", $"GAMEPAD         {settings.Gamepad}",
-            $"CONTROLLER PORT {settings.ControllerPort}", "CONTROLLER MAPPING", "RUN DIAGNOSTIC ROM", $"AUDIO VOLUME    {settings.AudioVolume}%", "RUN AUDIO DIAGNOSTIC ROM",$"GAMEPAD DEVICE  {(settings.GamepadDevice<0?"FIRST CONNECTED":settings.GamepadDevice.ToString())}", "UPDATE SOURCE",$"RENDER LIMIT    {(settings.RenderFrameLimit==0?"UNLIMITED":settings.RenderFrameLimit+" HZ")}",$"PRESENT VSYNC   {settings.PresentationVSync}",$"VIDEO ZOOM 10%  {settings.VideoZoom}",$"TURBO           {turbo}","KEYBOARD / HOTKEY MAPPING",$"RESET MODE      {settings.ResetMode.ToUpperInvariant()}"],
+            $"CONTROLLER PORT {settings.ControllerPort}", "CONTROLLER MAPPING", "RUN DIAGNOSTIC ROM", $"AUDIO VOLUME    {settings.AudioVolume}%", "RUN AUDIO DIAGNOSTIC ROM",$"GAMEPAD DEVICE  {(settings.GamepadDevice<0?"FIRST CONNECTED":settings.GamepadDevice.ToString())}", "UPDATE SOURCE",$"RENDER LIMIT    {(settings.RenderFrameLimit==0?"UNLIMITED":settings.RenderFrameLimit+" HZ")}",$"PRESENT VSYNC   {settings.PresentationVSync}",$"VIDEO ZOOM 10%  {settings.VideoZoom}",$"TURBO           {turbo}","KEYBOARD / HOTKEY MAPPING",$"RESET MODE      {settings.ResetMode.ToUpperInvariant()}",$"VIDEO STRETCH   {settings.VideoStretch}"],
         Menu.Network => NetworkRows(),
         Menu.Media => entries.Select(p => p==Directory.GetParent(settings.MediaDirectory)?.FullName ? "[..] PARENT DIRECTORY" : (Directory.Exists(p) ? "[DIR] " : "") + Path.GetFileName(p)).ToArray(),
         Menu.Saves => entries.Select(Path.GetFileNameWithoutExtension).Select(n => n ?? "").ToArray(),
@@ -288,6 +296,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
                     case 14: if(!client.IsConnected)SetTurbo(!turbo);else status="TURBO IS MANAGED BY HOST";break;
                     case 15: Open(Menu.Keyboard);break;
                     case 16: settings.ResetMode=settings.ResetMode=="Warm"?"Power":"Warm";break;
+                    case 17: settings.VideoStretch=!settings.VideoStretch;break;
                 }
                 SaveSettings(); break;
             case Menu.Controller:

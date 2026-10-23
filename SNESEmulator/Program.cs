@@ -45,6 +45,11 @@ internal static class Program
                             case "settings": Key(OpenTK.Input.Key.F10); Key(OpenTK.Input.Key.Enter); break;
                             case "network": Key(OpenTK.Input.Key.F10); Key(OpenTK.Input.Key.Down); Key(OpenTK.Input.Key.Enter); break;
                             case "saves": Key(OpenTK.Input.Key.F6); break;
+                            case "display-stretch":
+                                preview.ProbeInput(true,null,new HashSet<string>(),new HashSet<string>());
+                                preview.ProbeOpen("Settings",17);preview.ProbeActivate();
+                                if(!preview.ProbeSettings.VideoStretch)throw new InvalidOperationException("Stretch menu did not enable stretching");
+                                Key(OpenTK.Input.Key.F10);break;
                         }
                     }
                     if(count>1800)throw new TimeoutException("Native preview did not reach a completed worker field");
@@ -55,6 +60,9 @@ internal static class Program
                         preview.ProbeKey(OpenTK.Input.Key.S);
                     }
                     if(count<30||preview.MediaOperationPending) return;
+                    // Allow transient notifications to fade when inspecting the
+                    // complete display area; these modes use isolated probe settings.
+                    if(args.Length>=3&&args[2].StartsWith("display",StringComparison.Ordinal)&&(count<480||!preview.HasPresentedImage))return;
                     if(args.Length>=3&&args[2] is "demo" or "saves"&&!preview.HasPresentedImage)return;
                     if(args.Length>=3&&args[2]=="saves"&&!savesTriggered)return;
                     using var screenshot=new System.Drawing.Bitmap(preview.ClientSize.X,preview.ClientSize.Y);

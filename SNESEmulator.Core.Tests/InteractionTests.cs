@@ -7,6 +7,18 @@ static class InteractionTests
     static void Check(bool ok,string why){if(!ok)throw new Exception(why);}
     public static void Run(Action<string,Action> test,string root)
     {
+        test("Presentation fills height at4:3 and stretch fills arbitrary clients",()=>{
+            Check(VideoPresentationLayout.Calculate(1920,1080,false)==new VideoPresentationLayout(64,0,384,288),"16:9 full height and centered4:3");
+            Check(VideoPresentationLayout.Calculate(1600,1200,false)==new VideoPresentationLayout(0,0,512,288),"4:3 client fills both axes");
+            foreach(var size in new[]{(1920,1080),(3440,1440),(800,1200),(1024,576)}){
+                var fit=VideoPresentationLayout.Calculate(size.Item1,size.Item2,false);
+                double displayedAspect=(fit.Width*size.Item1/512.0)/(fit.Height*size.Item2/288.0);
+                Check(System.Math.Abs(displayedAspect-4.0/3)<.012,"resized client preserves aspect");
+                Check(fit.X>=0&&fit.Y>=0&&fit.X+fit.Width<=512&&fit.Y+fit.Height<=288,"no crop");
+                Check(VideoPresentationLayout.Calculate(size.Item1,size.Item2,true)==new VideoPresentationLayout(0,0,512,288),"stretch fills both axes");
+            }
+            Check(!new EmulatorSettings().VideoStretch,"existing settings default to aspect correct");
+        });
         test("M9g binding grammar preserves positive axes alternatives and explicit chords",()=>{
             foreach(string expression in new[]{"Axis1+;Hat0Down","Axis1+&Button2","Axis1-&Hat0Left;Button255","Button0&Button1&Button2&Button3",""})Check(InputBindings.Valid(expression,false),"valid "+expression);
             foreach(string expression in new[]{"Axis256+","Button256","Button1&&Button2",";Button1","Button1;","Button0&Button1&Button2&Button3&Button4","@Start"})Check(!InputBindings.Valid(expression,false),"reject "+expression);
@@ -36,7 +48,7 @@ static class InteractionTests
             var b=InputBindings.KeyboardDefaults();var a=b.Where(x=>InputBindings.Actions.Contains(x.Key)).ToDictionary();var s=new FrontendInputSession();s.Update(true,"k",new HashSet<string>(),b,a,false,false);Check(s.Update(true,"k",new HashSet<string>{"Enter"},b,a,false,false).GameButtons==(ushort)SnesButtons.Start,"Enter is gameplay Start");Check(!s.Update(true,"k",new HashSet<string>{"Enter"},b,a,true,false).Actions.Contains("MenuSelect"),"held Start not select");s.Update(true,"k",new HashSet<string>(),b,a,true,false);Check(s.Update(true,"k",new HashSet<string>{"Enter"},b,a,true,false).Actions.Contains("MenuSelect"),"fresh menu select");
         });
         test("M9g settings preserve unknown JSON and roundtrip presentation input reset options",()=>{
-            var settings=JsonSerializer.Deserialize<EmulatorSettings>("{\"FutureSetting\":{\"values\":[1,true,\"keep\"]},\"GamepadBindings\":{\"B\":18}}")!;InputBindings.Ensure(settings);settings.RenderFrameLimit=120;settings.PresentationVSync=true;settings.VideoZoom=true;settings.TurboMode=true;settings.ResetMode="Power";settings.KeyboardControls!["Turbo"]="ControlLeft&F7";string path=Path.Combine(root,"interaction-settings.json");settings.Save(path);var loaded=EmulatorSettings.Load(path);Check(loaded.AdditionalSettings!["FutureSetting"].GetProperty("values")[2].GetString()=="keep","unknown setting retained");Check(loaded.GamepadControls!["B"]=="Button18"&&loaded.KeyboardControls!["Turbo"]=="ControlLeft&F7"&&loaded.RenderFrameLimit==120&&loaded.PresentationVSync&&loaded.VideoZoom&&loaded.TurboMode&&loaded.ResetMode=="Power","roundtrip");
+            var settings=JsonSerializer.Deserialize<EmulatorSettings>("{\"FutureSetting\":{\"values\":[1,true,\"keep\"]},\"GamepadBindings\":{\"B\":18}}")!;InputBindings.Ensure(settings);settings.RenderFrameLimit=120;settings.PresentationVSync=true;settings.VideoZoom=true;settings.VideoStretch=true;settings.TurboMode=true;settings.ResetMode="Power";settings.KeyboardControls!["Turbo"]="ControlLeft&F7";string path=Path.Combine(root,"interaction-settings.json");settings.Save(path);var loaded=EmulatorSettings.Load(path);Check(loaded.AdditionalSettings!["FutureSetting"].GetProperty("values")[2].GetString()=="keep","unknown setting retained");Check(loaded.GamepadControls!["B"]=="Button18"&&loaded.KeyboardControls!["Turbo"]=="ControlLeft&F7"&&loaded.RenderFrameLimit==120&&loaded.PresentationVSync&&loaded.VideoZoom&&loaded.VideoStretch&&loaded.TurboMode&&loaded.ResetMode=="Power","roundtrip");
         });
         test("M9g owner reset and power preserve dirty SRAM and invalidate output epochs",()=>{
             byte[] rom=DiagnosticRom.Create();rom[0x7fd8]=1;var cart=new Cartridge(rom);var initial=new SnesSystem();initial.Insert(cart);cart.Sram[3]=0x5a;initial.Bus.Wram[3]=0x7a;string path=Path.Combine(root,"reset-seed.snessav");StateSerializer.Save(initial,path);using var worker=new EmulationWorker();worker.InsertAsync(rom).GetAwaiter().GetResult();

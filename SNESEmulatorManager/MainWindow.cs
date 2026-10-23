@@ -739,6 +739,7 @@ public sealed class MainWindow : Window
         ["RenderFrameLimit"] = "Darstellungsrate (0=unbegrenzt,60,120 Hz)",
         ["PresentationVSync"] = "Darstellung mit VSync",
         ["VideoZoom"] = "Bildrand um10% beschneiden",
+        ["VideoStretch"] = "Bild auf gesamte Fensterbreite strecken",
         ["TurboMode"] = "Turbo (Host)",
         ["ResetMode"] = "Resetmodus (Warm/Power; SRAM bleibt)",
         ["MediaDirectory"] = "Medienordner",

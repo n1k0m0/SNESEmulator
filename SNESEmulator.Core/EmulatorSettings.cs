@@ -10,6 +10,7 @@ public sealed class EmulatorSettings
     public int RenderFrameLimit {get;set;}=60; // 0=unlimited, 60, 120; presentation only.
     public bool PresentationVSync {get;set;}
     public bool VideoZoom {get;set;}
+    public bool VideoStretch {get;set;}
     public bool TurboMode {get;set;}
     public string ResetMode {get;set;}="Warm";
     public Dictionary<string,string>? GamepadActions {get;set;}
