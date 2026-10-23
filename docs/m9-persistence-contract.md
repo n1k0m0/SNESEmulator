@@ -178,3 +178,18 @@ and 60.0449s/3606 fields. Root evidence: `artifacts/root-m9c-evidence/acceptance
 SHA256 `e823b2c271a6abdfe9c851dd2c027458e2dd07ceb373cafb89396d0fe84fa8a2`;
 manifest SHA256 `d363601d0a81d23fb0ca3c6e5f616df21a7341f4d5116b235f101a9b77b07913`.
 Its 3 archives/1380 files/47,215,015 bytes were fully verified. M9/release remains incomplete.
+
+
+## R1 persistence and CI follow-up (2026-10-24)
+
+The current follow-up is documented in [r1-persistence-ci.md](r1-persistence-ci.md).
+It replaces the mixed one-second CPU-throughput assertion with stronger bounded
+owner-to-disk proofs, adds actual periodic conflict/error/retry and settings mutex
+budget tests, and retains independent results for both CI operating systems.
+Full local portable gates passed 287 groups on Windows and actual Ubuntu; a later
+observation-clock correction passed all 13 affected Manager groups on each OS.
+Four actual native persistence modes passed, with a second run explicitly proving
+the private 10.0.13 CLR. No save format, SRAM policy or product timing changed.
+The historical CI failure's exact cause, old Linux backend exceptions and early
+native closures remain unproven; local green runs do not retrospectively explain
+them. Remote acceptance belongs to the subsequent exact GitHub run.

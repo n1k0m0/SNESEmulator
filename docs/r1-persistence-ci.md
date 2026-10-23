@@ -49,11 +49,40 @@ a new passing probe does not explain the old closure.
 
 ## Validation
 
-Targeted Windows and actual Ubuntu persistence: 15/15 groups each.
-Targeted Windows manager, including the new budget test: 13/13 groups.
-Targeted Ubuntu manager before that new group: 12/12 groups.
-Full portable gates, new Ubuntu budget test and native persistence modes: pending.
-Remote follow-up: pending a coordinated commit/push and the resulting exact run.
+The full portable gates on clean implementation commit `83138b6` passed on both
+Windows and actual Ubuntu: **287/287 positive functional groups per OS**.
+Windows took 717.83s; Ubuntu took 1164.94s of real wrapper wall time. Each run
+retained 248 fresh report/diagnostic files (about 2.54MB on Windows), and all
+copied file SHA256 values were reread. Both starting source inventories match.
+The count comprises core 129, video 35, M8-state 27, DSP 17 plus long 1, manager 13,
+persistence 15, runtime 16, interaction 9, network 16 and distribution 9.
+Intentional failing mutation/watchdog controls and the existing 18 red M8 audio
+accuracy comparisons remain separately reported. A green functional gate is not
+full commercial-game compatibility, full external CPU coverage or hardware proof.
+
+A later test-only review moved the settings observation clock before child
+creation so delayed parent scheduling cannot shorten the observed mutex wait.
+The affected manager suite was rerun on each OS: **13/13 passed per OS**. The
+complete gates above remain attributed to `83138b6`; their source and module
+identities were not rewritten to the later test observation change. Production
+code, deadlines and persistence policy did not change for this follow-up.
+
+The actual native persistence probe passed all four modes (normal,
+settings-failure, battery-failure and log-failure) twice. The second run explicitly
+used the private runtime and its running process's `coreclr.dll` path/version
+proved 10.0.13. It completed in 71.305s; all 1379 native dependency-file hashes
+were identical immediately before and after. The normal probe first observed
+periodic commits at 30.055s / observed field 1803 and 60.063s / observed field 3607, with different CPU-written
+SRAM. Those field numbers are observed status after completion, not atomic SRAM
+capture timestamps. Recovery/preview/load/delete/close and all negative final
+save policies passed. The first native run took 70.414s and passed, but its actual
+CLR module was not captured and DOTNET_ROOT was not explicitly set; it is not
+claimed as pinned-runtime evidence. Native binaries were built from the preceding
+HEAD with the documented R1 diagnostic/comment patch before commit; their assembly
+version metadata is not relabelled as the later clean commit.
+
+Remote follow-up remains pending the coordinated push and its exact resulting
+run. The old remote failure is not declared fixed solely from local success.
 
 Commands use SDK 10.0.402/runtime 10.0.13, with process-local DOTNET_ROOT/PATH:
 

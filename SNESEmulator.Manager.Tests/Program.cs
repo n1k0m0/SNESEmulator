@@ -457,10 +457,12 @@ if (!args.Contains("--windows"))
         try
         {
             Check(await holder.StandardOutput.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(10))=="LOCKED","serialization holder did not start");
+            // Include child startup: parent scheduling delays must never shorten
+            // our observation of the child's full two-second mutex wait.
+            var elapsed=Stopwatch.StartNew();
             using var contender=Child("--settings-write-once",path,"70");
             var error=contender.StandardError.ReadToEndAsync();
             var output=contender.StandardOutput.ReadToEndAsync();
-            var elapsed=Stopwatch.StartNew();
             await contender.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(20));
             string text=await output;
             Check(contender.ExitCode==2&&text.StartsWith("BLOCKED Another settings write exceeded"),"contention was not the explicit bounded failure: "+text+await error);
