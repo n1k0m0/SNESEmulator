@@ -107,11 +107,103 @@ static class PersistenceTests
             long writes=store.Writes;autosave.Tick(1,true);Await(autosave.Pending);Check(store.Writes==writes&&errors.Count==0,"clean capture does not write");
         });
         test("M9c running CPU periodic battery capture writes dirty SRAM without pausing",()=>{
-            string PathFor(string hash)=>Path.Combine(root,"running",hash+".srm");using var worker=new EmulationWorker();Await(worker.InsertAsync(BatteryRom()));
-            using var store=new BatteryPersistence(()=>worker.BatteryAsync(),PathFor);var errors=new List<string>();var autosave=new BatteryAutosave(store,errors.Add,.05);Await(worker.SetModeAsync(false,false));
-            var watch=Stopwatch.StartNew();while(watch.Elapsed<TimeSpan.FromSeconds(1)){autosave.Tick(.05,true);Await(autosave.Pending);Thread.Sleep(30);}
-            Check(worker.Status.Field>10&&!worker.Status.Paused&&store.Writes>1&&errors.Count==0,"actual CPU dirty snapshots while running");Await(worker.SetModeAsync(true,false));Await(store.FlushAsync());
-            var snapshot=Await(worker.BatteryAsync())!;Check(BatteryPersistence.Decode(File.ReadAllBytes(BatteryPersistence.ProtectedPath(PathFor(snapshot.Hash))),snapshot.Hash,snapshot.Bytes.Length).SequenceEqual(snapshot.Bytes),"final disk exactly matches owned SRAM");
+            string PathFor(string hash)=>Path.Combine(root,"running",hash+".srm");
+            using var worker=new EmulationWorker();
+            Await(worker.InsertAsync(BatteryRom()));
+            var initial=Await(worker.BatteryAsync())!;
+            var captures=new List<(long ObservedFieldAfterCapture,string Digest,byte[] Bytes)>();
+            async Task<BatterySnapshot?> CaptureObserved()
+            {
+                var snapshot=await worker.BatteryAsync().ConfigureAwait(false);
+                // Status is observed after the owner snapshot completes; the owner
+                // can already have advanced. This is not an atomic SRAM timestamp.
+                if(snapshot!=null)
+                    captures.Add((worker.Status.Field,Convert.ToHexString(SHA256.HashData(snapshot.Bytes)),snapshot.Bytes));
+                return snapshot;
+            }
+            using var store=new BatteryPersistence(CaptureObserved,PathFor);
+            var errors=new List<string>();
+            var autosave=new BatteryAutosave(store,errors.Add,.05);
+            Await(worker.SetModeAsync(false,false));
+            var watch=Stopwatch.StartNew();
+            double previous=0;
+            long validatedWrites=0;
+            var persistedDigests=new HashSet<string>();
+            string path=BatteryPersistence.ProtectedPath(PathFor(initial.Hash));
+            // This is a persistence/liveness proof, not a one-second throughput
+            // benchmark. Cold JIT or a slower CI runner must still complete the
+            // same hardware and disk transitions; the watchdog remains bounded.
+            try
+            {
+                while(worker.Status.Field<=10||persistedDigests.Count<2)
+                {
+                    Check(watch.Elapsed<TimeSpan.FromSeconds(15),"battery progress watchdog expired");
+                    Check(worker.IsAlive&&!worker.Status.Paused&&worker.Status.Fault==null,"owner stopped during periodic capture");
+                    double now=watch.Elapsed.TotalSeconds;
+                    autosave.Tick(now-previous,true);
+                    previous=now;
+                    autosave.Pending.WaitAsync(TimeSpan.FromSeconds(15)-watch.Elapsed).GetAwaiter().GetResult();
+                    Check(errors.Count==0,"periodic SRAM failure: "+string.Join("; ",errors));
+                    if(store.Writes>validatedWrites)
+                    {
+                        // Validate while the CPU is still running. The file must
+                        // contain the immutable owner snapshot, not merely exist.
+                        byte[] disk=BatteryPersistence.Decode(File.ReadAllBytes(path),initial.Hash,initial.Bytes.Length);
+                        Check(captures.Count>0&&disk.SequenceEqual(captures[^1].Bytes),"periodic disk differs from captured SRAM");
+                        Check(!worker.Status.Paused&&worker.Status.Fault==null,"periodic write paused owner");
+                        persistedDigests.Add(Convert.ToHexString(SHA256.HashData(disk)));
+                        validatedWrites=store.Writes;
+                    }
+                    while(worker.TryDequeue(out _)){} // A real consumer; output backpressure is irrelevant here.
+                    Thread.Sleep(10);
+                }
+                Check(store.Writes>1&&autosave.Attempts>1,"two periodic writes were not completed");
+                Check(captures.Any(c=>!c.Bytes.SequenceEqual(initial.Bytes)),"diagnostic CPU never dirtied initial SRAM");
+                // The previous complete generation must also remain readable.
+                _ = BatteryPersistence.Decode(File.ReadAllBytes(path+".bak"),initial.Hash,initial.Bytes.Length);
+            }
+            finally
+            {
+                Console.WriteLine("RUNNING_BATTERY_OBSERVATION "+System.Text.Json.JsonSerializer.Serialize(new{
+                    Seconds=watch.Elapsed.TotalSeconds,Status=worker.Status,Writes=store.Writes,Attempts=autosave.Attempts,
+                    DistinctValidatedSnapshots=persistedDigests.Count,Errors=errors,
+                    Captures=captures.Take(64).Select(c=>new{c.ObservedFieldAfterCapture,c.Digest}),Limits="Bounded functional persistence; not realtime performance"}));
+            }
+            Await(worker.SetModeAsync(true,false));
+            var final=Await(worker.BatteryAsync())!;
+            Await(store.FlushAsync());
+            Check(BatteryPersistence.Decode(File.ReadAllBytes(path),final.Hash,final.Bytes.Length).SequenceEqual(final.Bytes),"final disk exactly matches owned SRAM");
+        });
+        test("M9c periodic write conflict reports failure and retains the last committed SRAM",()=>{
+            string PathFor(string hash)=>Path.Combine(root,"periodic-conflict",hash+".srm");
+            using var worker=new EmulationWorker();
+            Await(worker.InsertAsync(BatteryRom()));
+            using var store=new BatteryPersistence(()=>worker.BatteryAsync(),PathFor);
+            Await(store.FlushAsync());
+            var initial=Await(worker.BatteryAsync())!;
+            string path=BatteryPersistence.ProtectedPath(PathFor(initial.Hash));
+            byte[] committed=File.ReadAllBytes(path);
+            var errors=new List<string>();
+            var autosave=new BatteryAutosave(store,errors.Add,.05);
+            Await(worker.SetModeAsync(false,false));
+            // An owned file lock injects a real transaction conflict on both OSes;
+            // no permissions assumption or test-side SRAM write is involved.
+            using(var blocked=new FileStream(path+".lock",FileMode.OpenOrCreate,FileAccess.ReadWrite,FileShare.None))
+            {
+                Check(SpinWait.SpinUntil(()=>worker.Status.Field>2||worker.Status.Fault!=null,TimeSpan.FromSeconds(15)),"owner made no hardware progress");
+                autosave.Tick(.04,true);
+                Check(autosave.Attempts==0,"autosave ran before interval");
+                autosave.Tick(.01,true);
+                Await(autosave.Pending);
+                Check(autosave.Attempts==1&&errors.Count==1&&errors[0].StartsWith("SRAM SAVE FAILED:"),"periodic failure was not visible");
+                Check(store.Writes==1&&File.ReadAllBytes(path).SequenceEqual(committed),"failed periodic write changed committed generation");
+                Check(!worker.Status.Paused&&worker.Status.Fault==null,"storage error stopped hardware owner");
+            }
+            Await(worker.SetModeAsync(true,false));
+            var final=Await(worker.BatteryAsync())!;
+            Check(!final.Bytes.SequenceEqual(initial.Bytes),"CPU never dirtied SRAM during conflict");
+            Await(store.FlushAsync());
+            Check(store.Writes==2&&BatteryPersistence.Decode(File.ReadAllBytes(path),final.Hash,final.Bytes.Length).SequenceEqual(final.Bytes),"retry did not commit exact final SRAM");
         });
         test("M9c captured states retain independent validated backup and explicit recovery",()=>{
             var machine=new SnesSystem();machine.Insert(new Cartridge(BatteryRom()));machine.RunUntil(12345);var cart=machine.Bus.Cartridge!;byte[] first=StateSerializer.Capture(machine);string path=Path.Combine(root,"state","save.snessav");StateSerializer.SaveCaptured(first,path,cart);

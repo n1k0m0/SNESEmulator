@@ -10,6 +10,29 @@ using SNESEmulator.Management;
 using SNESEmulator.SaveStates;
 using SNESEmulator.Testing;
 
+// The holder intentionally uses the documented path-derived serialization name.
+// Its stdin lifetime lets the parent distinguish a true two-second contention
+// failure from a crashed child or a failed disk transaction.
+if (args.FirstOrDefault() == "--settings-hold")
+{
+    string target=Path.GetFullPath(args[1]);
+    string identity=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(target.ToUpperInvariant())));
+    using var mutex=new Mutex(false,"SNESEmulator.Settings."+identity);
+    if(!mutex.WaitOne(TimeSpan.FromSeconds(2))) return 3;
+    try { Console.WriteLine("LOCKED");Console.Out.Flush();Console.ReadLine(); }
+    finally { mutex.ReleaseMutex(); }
+    return 0;
+}
+if (args.FirstOrDefault() == "--settings-write-once")
+{
+    try
+    {
+        SNESEmulator.Runtime.SettingsPersistence.WriteOrdered(new EmulatorSettings{AudioVolume=int.Parse(args[2])}.Serialize(),args[1]);
+        Console.WriteLine("SAVED");return 0;
+    }
+    catch(IOException e) { Console.WriteLine("BLOCKED "+e.Message);return 2; }
+}
+
 if (args.FirstOrDefault() == "--settings-write")
 {
     Console.WriteLine("READY");
@@ -424,6 +447,36 @@ if (!args.Contains("--windows"))
             await child.StandardInput.WriteLineAsync();
             await child.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(20));
         }
+    });
+    await Test("R1 settings contention budget preserves bytes and permits a real-process retry",async()=>
+    {
+        string path=Path.Combine(root,"settings-budget.json");
+        SNESEmulator.Runtime.SettingsPersistence.WriteOrdered(new EmulatorSettings{AudioVolume=20}.Serialize(),path);
+        byte[] original=File.ReadAllBytes(path);
+        using var holder=Child("--settings-hold",path);
+        try
+        {
+            Check(await holder.StandardOutput.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(10))=="LOCKED","serialization holder did not start");
+            using var contender=Child("--settings-write-once",path,"70");
+            var error=contender.StandardError.ReadToEndAsync();
+            var output=contender.StandardOutput.ReadToEndAsync();
+            var elapsed=Stopwatch.StartNew();
+            await contender.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(20));
+            string text=await output;
+            Check(contender.ExitCode==2&&text.StartsWith("BLOCKED Another settings write exceeded"),"contention was not the explicit bounded failure: "+text+await error);
+            Check(elapsed.Elapsed>=TimeSpan.FromSeconds(1.8),"serialization budget was skipped");
+            Check(File.ReadAllBytes(path).SequenceEqual(original)&&!File.Exists(path+".bak"),"failed contender changed a generation");
+            report.Metadata["settingsBudget"]=new{HolderPid=holder.Id,ContenderPid=contender.Id,Seconds=elapsed.Elapsed.TotalSeconds,ExitCode=contender.ExitCode,Output=text};
+        }
+        finally
+        {
+            await holder.StandardInput.WriteLineAsync();
+            await holder.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(20));
+        }
+        Check(holder.ExitCode==0,"serialization holder failed");
+        using var retry=Child("--settings-write-once",path,"70");
+        await retry.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(20));
+        Check(retry.ExitCode==0&&EmulatorSettings.Load(path).AudioVolume==70&&File.ReadAllBytes(path+".bak").SequenceEqual(original),"retry lost current or previous settings generation");
     });
     await Test("M9e two actual processes serialize settings generations", async () =>
     {

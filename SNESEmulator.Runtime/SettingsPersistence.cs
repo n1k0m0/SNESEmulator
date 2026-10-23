@@ -10,6 +10,11 @@ public sealed class SettingsPersistence(Action<string> error, Action<string>? sa
     {
         string target = Path.GetFullPath(path ?? UserDataPaths.GetSettingsPath());
         string identity = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(target.ToUpperInvariant())));
+        // Serialize independently launched menu/Manager writers before opening
+        // AtomicFile's transaction lock. A slow holder is an explicit bounded
+        // failure; callers must retain/report it, never silently drop settings.
+        // Named-mutex construction itself can fail in the OS/runtime backend;
+        // that exception deliberately propagates with its original details.
         using var mutex = new Mutex(false, "SNESEmulator.Settings." + identity);
         bool owned = false;
         try
@@ -24,7 +29,7 @@ public sealed class SettingsPersistence(Action<string> error, Action<string>? sa
             }
 
             if (!owned)
-                throw new IOException("Another settings write exceeded the2second serialization budget");
+                throw new IOException("Another settings write exceeded the 2 second serialization budget");
             EmulatorSettings.SaveSerialized(json, target);
         }
         finally

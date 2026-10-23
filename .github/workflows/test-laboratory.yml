@@ -11,6 +11,8 @@ on:
 jobs:
   portable:
     strategy:
+      # Preserve the other OS result when one portable job fails.
+      fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-2025]
     runs-on: ${{ matrix.os }}
@@ -30,6 +32,8 @@ jobs:
           path: |
             artifacts/*.json
             artifacts/*.junit.xml
+            artifacts/*.stdout.txt
+            artifacts/*.stderr.txt
             artifacts/m9-performance/result.json
             artifacts/m9-performance/commands.log
   external-cpu-and-spc:
@@ -92,8 +96,12 @@ jobs:
           path: |
             artifacts/*.json
             artifacts/*.junit.xml
+            artifacts/*.stdout.txt
+            artifacts/*.stderr.txt
             artifacts/m9b-ui-gate-*/result.json
             artifacts/m9c-ui-gate-*/processes.json
-# This repository has no configured remote. These jobs have not executed remotely.
+# Remote run 39997641997 reached portable persistence on Windows; its failure
+# cancelled the Linux matrix job. External CPU/SPC and package jobs passed.
+# Current results belong to each concrete run; a cancelled job is unexecuted.
 # Hosted Windows agents do not provide a verified interactive OpenGL/audio device.
 # Native tests require the opt-in self-hosted runner; absence is unexecuted, never pass.

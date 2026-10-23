@@ -39,7 +39,7 @@ No compiler or production application is installed by tests.
 
 F10 has CHECK FOR UPDATES. The shipped `update-policy.json` is disabled and has
 no release URL. No unsolicited network check or invented release endpoint exists.
-F10 → SETTINGS → UPDATE SOURCE opens the actual configuration dialog. It writes
+F10 â†’ SETTINGS â†’ UPDATE SOURCE opens the actual configuration dialog. It writes
 mutable operator policy under UserData/updates/update-policy.json through M9c
 atomic persistence. The disabled package default remains immutable and hashed.
 The product selects the user policy when present, otherwise the package default;
@@ -108,7 +108,11 @@ snapshot-suite watchdog. All realtime/sustained thresholds remain unchanged.
 
 CI pins402 and separates hosted portable/headless package work from opt-in actual
 native tests requiring an explicitly configured interactive self-hosted runner.
-There is no configured remote and no remote CI execution claim. Local selfcontained
+The earlier M9f acceptance below predates the configured GitHub remote. Remote
+run [39997641997](https://github.com/n1k0m0/SNESEmulator/actions/runs/39997641997)
+passed the external CPU/SPC and package jobs, failed Windows portable persistence
+and cancelled Linux. The current follow-up is tracked in
+[r1-persistence-ci.md](r1-persistence-ci.md); this is not full CI acceptance. Local selfcontained
 starts hide SDK discovery and inspect PE/runtime assets; no fresh Windows VM was
 available or modified. Native apphooks are synthetic; OS focus, physical pads,
 DAC/display latency and original-console measurements are outside this phase.
