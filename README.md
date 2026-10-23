@@ -6,9 +6,9 @@ Der SNES-Kern wird hier selbst entwickelt; es wird kein Snes9x-, bsnes- oder
 Libretro-Kern eingebunden.
 
 **Stand: 0.1.0-dev – eigener Entwicklungskern, noch keine allgemeine
-Spielekompatibilität.** M0–M7 sind unabhängig geprüft. Die getaktete
+Spielekompatibilität.** M0–M8 sowie M9b Worker/UI und M9c Persistenz sind unabhängig geprüft. Die getaktete
 Mode0–7-PPU bietet Sprites, Fenster, Farbmathematik, OPT, Hires und Mode7.
-M8 ist implementiert und wartet auf die unabhängige Abnahme. 20 unveränderte
+M9a-Dauerleistung, M9d Netzwerk, Distribution und M9/Release bleiben offen. 20 unveränderte
 lizenzierte Testprogramme und ein externes Techdemo laufen über den eigenen
 Kern und zwei separat gebaute Referenzen. Bekannte Audioabweichungen und
 veröffentlichte Hardwarefehler bleiben ausdrücklich offen. Der eigene S-DSP
