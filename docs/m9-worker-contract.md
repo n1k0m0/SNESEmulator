@@ -68,8 +68,10 @@ then learns one raw control, and Delete clears a binding. Focus/device/config/
 port transitions require neutral before new actions. Background input cannot
 open menus or capture controls. Menu-era held buttons stay suppressed until
 released. Keyboard/gamepad local input is neutral in menus/background; remote
-client sends neutral immediately. Server permission/disconnect neutralization
-continues through the existing transport contract.
+client sends neutral immediately. The existing server permission/disconnect transport path is retained and its
+prior integration cases still run. M9b does not comprehensively validate that
+path: the known revoke/regrant held-input gap remains open for the later
+network package.
 
 ## Video/audio handoff and limits
 
@@ -144,3 +146,66 @@ Its M8 integrity source pin changes solely for those additional gate invocations
 No acquired fixture, golden image/audio, known-error expectation or M8 adapter
 changed. `publish/` remains PRE-M0 and must be rebuilt in a later distribution
 step before the preferred launcher publish path is current.
+
+
+## Clean implementation result
+
+Clean implementation `43c566d3874bb9828ecde9ccdf4c9a56c209ce5f` passed
+`python tools/test-lab.py --windows --full`, Exit0:209 prior portable groups,
+16 separate runtime groups,10 Windows groups and the additional actual native
+runtime app probe. All14 frozen M9 console/observer/state comparisons pass.
+Core DLL SHA256 is `37916f053a79dc8d10f5ca20e399a239d0bb7fc1d12b97a0b035c6306469e0b6`.
+The final document commit changes no executable source or expectations.
+
+Three separate60-second actual app observations ran sequentially on that clean
+commit, with isolated data and own IPL. NTSC/PAL diagnostics cover actual
+region-driven field pacing; the unchanged M8 game runs neutral title/title-music.
+App key callbacks operate menus and do not set the polled core keyboard state.
+Their per-second samples, complete state files, fully parsed close-with-save
+results, GL screenshots and hashes are frozen. End-of-window metrics:
+
+| App workload | Wall seconds | Fields / hardware seconds | Initial → final debt seconds | Catchup-muted fields | Device overflows / queue drops | Maximum observed UI interval ms |
+|---|---:|---:|---:|---:|---:|---:|
+| NTSC diagnostic |60.0063374|3668 /61.0328185|0.9490 →0.00150|235|0 /0|143.02|
+| PAL diagnostic |60.0057463|3048 /60.9514925|0.8355 →−0.00272|160|0 /0|229.26|
+| NTSC game title/music |60.0057579|3684 /61.2990467|1.3962 →0.00015|419|0 /0|171.78|
+
+Hardware seconds exceed the measured subwindow because it includes recovery of
+initial startup/JIT debt; there is no deadline rebase or skipped hardware tick.
+Last approximately15-second sampled windows are0.9994/0.9998/0.9994x, including
+whole-field sampling quantization. These are paced app observations, not an
+unpaced throughput or sustained realtime acceptance. Output queues reached one
+entry in the sampled rows. Audio source buffers remained bounded. UI maxima
+include startup, GL/fullscreen and screenshot instrumentation; no physical
+key-to-display or DAC latency claim is made. Earlier unmuted development runs
+with4/5 device overflows remain unchanged as negative presentation evidence.
+
+A separate native preview probe waits for the actual asynchronous preview,
+records its visible thumbnail and fully parses the resulting state; its small
+source/project and output are archived. A separate actual fullscreen main-menu
+snapshot is2560×1440. The older `--ui-smoke native` hook with a startup ROM does
+not wait for a completed field, and legacy startup menus can race async load
+completion. Those modes are not readiness-safe image evidence. Use the new
+runtime probe (which waits for20 worker fields) for startup-ROM/Hires checks.
+
+The first full attempt caught a compressed-byte regression from a BinaryWriter
+leave-open SyncFlush. Its1,550,497 decompressed bytes remained identical, SHA256
+`e1b7efc30d5e9ddb44fb357c35b494a3123be9a7e3966bfca8b7de0f252675fc`.
+The direct Save path now closes GZip exactly as before and retains all frozen
+compressed hashes. Capture→off-thread compression may choose different Deflate
+boundaries while preserving every raw format9 byte. The overstrict initial
+helper test and both red attempts are retained; no frozen expectation changed.
+
+Frozen final evidence: `artifacts/m9b-implementation-evidence/acceptance.json`,
+three archives and7131 files, reread with CRC/length/SHA256 checks against every
+source. Manifest SHA256:
+`c1aae8e27297792907d6521c2f3b9dd2b2158ee0b9248ffa220b3cd4fae0ab55`;
+acceptance SHA256:
+`71fd15da09f4d2ecd366b89bda3b150f9dc2facb7a15f6987d3ee01f3576d0e6`.
+The earlier preliminary freeze remains unchanged separately; its active output
+log was excluded from the final payload. The parent independently reread all
+three final archives/7131 files (3,018,207,938 decompressed bytes); its archive
+verification is separate from still-pending independent product acceptance.
+See [M9b baseline](baselines/m9b.json). M9a sustained realtime, several emulated
+hours of A/V/threading, physical OS focus/gamepads, transport/persistence and
+current distribution remain open as listed above.

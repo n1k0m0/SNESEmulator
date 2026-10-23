@@ -1,0 +1,159 @@
+{
+  "milestone": "M9b",
+  "status": "Implementation validated; independent parent product acceptance pending. M9 and release incomplete.",
+  "implementationCommit": "43c566d3874bb9828ecde9ccdf4c9a56c209ce5f",
+  "fullGate": {
+    "command": "python tools/test-lab.py --windows --full",
+    "exitCode": 0,
+    "priorPortableGroups": 209,
+    "separateRuntimeGroups": 16,
+    "windowsGroups": 10,
+    "additionalNativeAppProbe": true
+  },
+  "coreDllSha256": "37916f053a79dc8d10f5ca20e399a239d0bb7fc1d12b97a0b035c6306469e0b6",
+  "evidence": {
+    "acceptance": "artifacts/m9b-implementation-evidence/acceptance.json",
+    "acceptanceSha256": "71fd15da09f4d2ecd366b89bda3b150f9dc2facb7a15f6987d3ee01f3576d0e6",
+    "manifestSha256": "c1aae8e27297792907d6521c2f3b9dd2b2158ee0b9248ffa220b3cd4fae0ab55",
+    "files": 7131,
+    "archives": [
+      {
+        "file": "m9b-build-inputs.zip",
+        "bytes": 26747063,
+        "sha256": "7ee7ce9c8788f3faac3fcb411496c9dcffa509acfd1ac25dca515bedda6070ae",
+        "files": 2600
+      },
+      {
+        "file": "m9b-fullgate.zip",
+        "bytes": 192543593,
+        "sha256": "382694db75fe35d4d46de04a3f636fad19397764e3b9e5bc6799ab41f7d020ec",
+        "files": 4371
+      },
+      {
+        "file": "m9b-observations.zip",
+        "bytes": 10219501,
+        "sha256": "53c40ff28535e02b811ec0507c00275785b4867ae1eeb12e49e1999a99bf7362",
+        "files": 160
+      }
+    ],
+    "parentArchiveVerification": "artifacts/root-m9b-archive-verification.json"
+  },
+  "actualAppObservations": {
+    "implementationCommit": "43c566d3874bb9828ecde9ccdf4c9a56c209ce5f",
+    "runs": [
+      {
+        "name": "ntsc",
+        "scene": "own original diagnostic",
+        "processExit": 0,
+        "measurement": {
+          "Name": "measured-pace",
+          "WallSeconds": 60.0063374,
+          "Fields": 3668,
+          "MasterClocks": 1310818488,
+          "HardwareSeconds": 61.032818488888886,
+          "Meaning": "Actual native app sample including initial catchup debt; not sustained realtime acceptance"
+        },
+        "firstSampleDebtSeconds": 0.9489932,
+        "lastSampleDebtSeconds": 0.0015021,
+        "steadyWindowWallSeconds": 15.133699899999996,
+        "steadyWindowHardwareSeconds": 15.125090607407408,
+        "steadyWindowRatio": 0.9994311177934361,
+        "endPresentation": {
+          "Frames": 3688,
+          "SamplePairs": 1963699,
+          "Discontinuities": 1,
+          "DeviceOverflows": 0,
+          "MutedCatchupFields": 235,
+          "BufferedBytes": 24160,
+          "CapacityBytes": 32000
+        },
+        "endDroppedFields": 0,
+        "maximumUiIntervalMs": 143.0217,
+        "maximumOutputQueue": 1,
+        "romSha256": null
+      },
+      {
+        "name": "pal",
+        "scene": "own original diagnostic",
+        "processExit": 0,
+        "measurement": {
+          "Name": "measured-pace",
+          "WallSeconds": 60.0057463,
+          "Fields": 3048,
+          "MasterClocks": 1297131264,
+          "HardwareSeconds": 60.95149250259735,
+          "Meaning": "Actual native app sample including initial catchup debt; not sustained realtime acceptance"
+        },
+        "firstSampleDebtSeconds": 0.8355266,
+        "lastSampleDebtSeconds": -0.0027177,
+        "steadyWindowWallSeconds": 15.1011351,
+        "steadyWindowHardwareSeconds": 15.097892663865155,
+        "steadyWindowRatio": 0.9997852852707181,
+        "endPresentation": {
+          "Frames": 3068,
+          "SamplePairs": 1963246,
+          "Discontinuities": 1,
+          "DeviceOverflows": 0,
+          "MutedCatchupFields": 160,
+          "BufferedBytes": 23284,
+          "CapacityBytes": 32000
+        },
+        "endDroppedFields": 0,
+        "maximumUiIntervalMs": 229.2617,
+        "maximumOutputQueue": 1,
+        "romSha256": null
+      },
+      {
+        "name": "game-title",
+        "scene": "neutral title/title-music",
+        "processExit": 0,
+        "measurement": {
+          "Name": "measured-pace",
+          "WallSeconds": 60.0057579,
+          "Fields": 3684,
+          "MasterClocks": 1316536344,
+          "HardwareSeconds": 61.299046704761906,
+          "Meaning": "Actual native app sample including initial catchup debt; not sustained realtime acceptance"
+        },
+        "firstSampleDebtSeconds": 1.3961723,
+        "lastSampleDebtSeconds": 0.0001463,
+        "steadyWindowWallSeconds": 15.134014899999997,
+        "steadyWindowHardwareSeconds": 15.125090607407408,
+        "steadyWindowRatio": 0.999410315593611,
+        "endPresentation": {
+          "Frames": 3704,
+          "SamplePairs": 1972218,
+          "Discontinuities": 1,
+          "DeviceOverflows": 0,
+          "MutedCatchupFields": 419,
+          "BufferedBytes": 24748,
+          "CapacityBytes": 32000
+        },
+        "endDroppedFields": 0,
+        "maximumUiIntervalMs": 171.7804,
+        "maximumOutputQueue": 1,
+        "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+      }
+    ],
+    "limits": [
+      "60-second observations; no sustained M9a or multi-hour soak acceptance",
+      "Game run is neutral title/title-music; no core keyboard injection",
+      "Maximum UI intervals include startup/GL/fullscreen and instrumented screenshot costs",
+      "No measured DAC continuity/latency; counters concern bounded presentation only"
+    ]
+  },
+  "limits": [
+    "No hardware console validation",
+    "Physical gamepads/hotplug untested; synthetic session checks",
+    "Independent OS-key/focus check stopped at Windows lock screen",
+    "No multi-hour A/V/threading soak",
+    "M9a sustained NTSC realtime red, PAL sustained unexecuted",
+    "18 M8 whole-console audio rows remain red;7000 SPC raw mismatches retain adjudication",
+    "AUD2 nonnominal rational APU profiles muted, no wire format change",
+    "Permission revoke/regrant held-state transport gap remains for network phase",
+    "publish/ remains PRE-M0; no clean VM/no-SDK distribution acceptance"
+  ],
+  "legacyUiSmokeLimit": "native/startup-menu modes can race asynchronous load; use readiness-based runtime probe",
+  "preliminaryFreeze": "artifacts/m9b-preliminary-freeze retained unchanged; active output log excluded from final freeze",
+  "independentProductAcceptance": "pending"
+}

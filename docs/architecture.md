@@ -19,11 +19,13 @@ unversionierten Manager-/IPC-Arbeiten wurden nicht kopiert.
 | StateSerializer | eigener versionierter SNES-Serializer mit ROM-Hash |
 | SharpPixels | dieselbe Renderingbibliothek als lokale, eigenständige Kopie |
 
-Die Hardware hängt weder von OpenTK noch von NAudio oder Windows ab. Die GUI
-führt den Kern derzeit synchron pro Frame aus; Transport arbeitet separat mit
-begrenzten Queues. Der Frame-Takt verwendet einen begrenzten Zeitakkumulator.
-Für einen späteren genaueren Scheduler kann der Kern ohne Menü-/Netzwerkwechsel
-auf einen eigenen Emulationsthread umgestellt werden.
+Die Hardware hängt weder von OpenTK noch von NAudio oder Windows ab.
+`SNESEmulator.Runtime` besitzt die aktive Konsole auf genau einem Worker. UI und
+Transport erhalten abgeschlossene eigene Rohfelder/Sampleblöcke; begrenzte
+Befehle und feldgebundene Eingaben ersetzen direkte UI-Kernzugriffe. Rationale
+monotone Deadlines erhalten jeden Hardwaretick unabhängig von UI/Vsync. Der
+[M9b-Vertrag](m9-worker-contract.md) definiert Epochen, Ownership, Audio- und
+Fehlerregeln sowie noch offene Abnahmen.
 
 ## Hardwarebasis
 
