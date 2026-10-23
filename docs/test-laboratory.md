@@ -571,3 +571,7 @@ gamepad, sustained NTSC/PAL and hours-long soak gates: [M9b](m9-worker-contract.
 
 
 M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. The final implementation gate and independent acceptance remain separate. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.
+
+## M9g input and presentation checks
+
+[Baseline](baselines/m9g.json): pre-UI full Windows gate7effa47 passed285 portable/31 Windows groups. Final WPF-only source2ab409d passed Manager12 portable, complete32 native Windows groups and151 separate interaction stages with1194 exact before/after identities; the final full independent Root gate remains pending. Ubuntu WSL59 is targeted portability, not another full Linux corpus gate. Linux settings busy/ENOENT observations remain unresolved. Input snapshots/callbacks are synthetic through actual native windows; physical controllers and OS focus remain unmeasured.

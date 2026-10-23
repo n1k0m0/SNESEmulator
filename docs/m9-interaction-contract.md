@@ -1,6 +1,7 @@
 # M9g interaction parity contract
 
-Status: implementation in progress; no M9g, whole-M9 or release acceptance yet.
+Status: implementation complete on2ab409d; final independent Root acceptance pending.
+Whole-M9 and release remain incomplete.
 Baseline: M9f independently accepted on0f8aadc; this phase changes host input,
 settings and presentation, not hardware timing, State9, VID3, AUD2 or Protocol4.
 
@@ -60,10 +61,34 @@ flow; resetting never reloads stale disk battery bytes over dirty live SRAM.
 
 ## Validation and remaining work
 
-New portable groups are reported separately from the prior276/31. Actual native
-window/Manager checks, original regression suites, Linux portability and a clean
-full Windows gate are required before handoff. All raw failures and development
-limits remain visible. Independent Root acceptance is a later step.
+Prior276/31 groups remain preserved. Eight new portable input groups and one IPC
+boundary group give285 portable groups. The separate unknown-settings native
+Manager group raises Windows groups to32;151 interaction stages are additional.
+
+The complete clean Windows full gate on7effa47 passed285/31, all CPU/bus/SPC
+corpora and1194 exact native build identities. This is the **pre-UI-fix** gate.
+The final delta on2ab409d changes only WPF readonly controls/text and its native
+test: unknown bool/string/object values are disabled and preserved exactly by
+actual offline Apply, including lexical JSON number1.2300. Final clean checks
+passed Manager12 portable, all32 native Windows groups,151 interaction stages,
+runtime and all four persistence modes;1194 identities matched before/after.
+The full final independent Windows gate remains Root work.
+
+Actual Ubuntu WSL/private SDK10.0.402 passed59 targeted portable groups plus a
+second Distribution9 run on7effa47. This is not a repeated full Linux hardware
+gate. Original 2s settings-writer busy and named-mutex mkdirat ENOENT failures
+remain open; unchanged passing repeats do not establish a fix or a cause.
+No settings budget or production workaround changed.
+
+The delta freeze reuses protected M9f objects by archive SHA/entry rather than
+copying old corpora.912 new objects /35,579,041 expanded bytes,1,849 selected
+objects and4,773 disk originals were reread after the corrected freezer exited.
+The first freeze was rejected for selecting its active output log; final
+selection excludes active logs and the rejected archive. Root helpers, SDKs,
+original local ROM/IPL bytes and the user game snapshot are excluded. Exact
+commits, hashes, raw reports, retained failures and limits are in
+[the M9g baseline](baselines/m9g.json). C64, the user game/shortcut and publish
+remain unchanged. Independent Root acceptance is a later step.
 Known7000 source-adjudicated SPC raw mismatches,18 full-audio comparison rows,
 38/62 failed NTSC sustained windows, unperformed PAL and hours soak remain open.
 M10 follows the later performance and base-accuracy phases.

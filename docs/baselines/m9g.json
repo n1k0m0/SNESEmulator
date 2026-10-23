@@ -1,0 +1,125 @@
+{
+  "schema": "m9g-interaction-baseline-v1",
+  "status": "Implementation and targeted final native checks complete; independent final Root full Windows acceptance pending",
+  "releaseAccepted": false,
+  "implementationCommit": "2ab409d551962799551157e16a80344d86681185",
+  "priorAcceptedCommit": "0f8aadcd602a3f72472096df63e2158654987952",
+  "contract": "docs/m9-interaction-contract.md",
+  "counts": {
+    "priorPortable": 276,
+    "newPortableInteraction": 8,
+    "newPortableIpcBoundary": 1,
+    "portable": 285,
+    "priorWindows": 31,
+    "newWindowsReadonlyManager": 1,
+    "windows": 32,
+    "nativeInteractionStagesSeparate": 151
+  },
+  "preUiFullWindows": {
+    "commit": "7effa47724c50c07c0a70f080b78aa6c1faf3b64",
+    "clean": true,
+    "exit": 0,
+    "portable": 285,
+    "windows": 31,
+    "report": "artifacts/m9g-final-windows-summary.json",
+    "log": "artifacts/m9g-final-fullgate02.log",
+    "nativeBuildIdentities": 1194,
+    "cpuCases": 5080400,
+    "busCases": 5080400,
+    "busRows": 26184846,
+    "spcCases": 256000,
+    "scope": "Complete full gate before the final WPF readonly/encoding fix; not relabeled as final"
+  },
+  "finalTargeted": {
+    "commit": "2ab409d551962799551157e16a80344d86681185",
+    "clean": true,
+    "preUiFullWindowsCommit": "7effa47724c50c07c0a70f080b78aa6c1faf3b64",
+    "finalScope": "complete Manager and native Windows groups, not repeat full CPU corpus",
+    "counts": {
+      "manager-portable": 12,
+      "manager-native": 9,
+      "windows-integration": 10,
+      "network-native": 13
+    },
+    "windowsGroups": 32,
+    "interactionStages": 151,
+    "nativeIdentities": 1194,
+    "identitiesEqual": true
+  },
+  "postFullGateDelta": [
+    "SNESEmulatorManager/MainWindow.cs",
+    "SNESEmulator.Manager.Tests/WindowsTests.cs"
+  ],
+  "linuxTargeted": {
+    "commit": "7effa47724c50c07c0a70f080b78aa6c1faf3b64",
+    "groups": 59,
+    "interaction": 8,
+    "runtime": 16,
+    "persistence": 14,
+    "manager": 12,
+    "distribution": 9,
+    "distributionRepeated": 9,
+    "log": "artifacts/m9g-linux-targeted05.log",
+    "export": "artifacts/m9g-linux-targeted-final-7effa47",
+    "scope": "Actual Ubuntu WSL/private SDK10.0.402; targeted portable groups only. Final WPF-only delta does not alter portable sources. Historical full Linux M9f remains separate."
+  },
+  "contracts": {
+    "hardwareState": 9,
+    "video": 3,
+    "audio": 2,
+    "networkProtocol": 4,
+    "managerIpc": 2,
+    "ipcReason": "Older full settings snapshots cannot preserve new structured mappings/host settings; real named pipes reject both directions before mutation. Discovery hides incompatible instances."
+  },
+  "freeze": {
+    "path": "artifacts/m9g-frozen-evidence",
+    "acceptanceSha256": "3b5a3075abb898c351028c39082af1dafe1274a6e0ce005b65c3b11e43fb17d2",
+    "filesSha256": "90ecc2a74adb77dd61ce44aedfd584b52d6425a0db5c11cbf3badb5370f67e0d",
+    "objectsZipSha256": "a21cefbfbf37ea4672ad76fd133f9e3e4fa23c1186c9716f9ec5e40deb7dbe33",
+    "newUniqueObjects": 912,
+    "newExpandedBytes": 35579041,
+    "originalReferences": 4773,
+    "originalBytes": 3157464527,
+    "reusedReferences": 3651,
+    "selectedObjectsRead": 1849,
+    "priorArchive": {
+      "name": "../m9f-frozen-evidence/objects.zip",
+      "sha256": "85f0ed26847c02b1c74ddd4d461db7fabc5713bb6d751e00d5d6ec6d3871c0d6",
+      "filesJsonSha256": "805017741a7fdb5510adaebc6ca26eba71865d3f09cff57cd8756864166e7a55"
+    },
+    "postCloseReadback": {
+      "sourceCommit": "2ab409d551962799551157e16a80344d86681185",
+      "freezerProcessAlreadyJoined": true,
+      "acceptanceSha256": "3b5a3075abb898c351028c39082af1dafe1274a6e0ce005b65c3b11e43fb17d2",
+      "filesSha256": "90ecc2a74adb77dd61ce44aedfd584b52d6425a0db5c11cbf3badb5370f67e0d",
+      "archiveSha256": "a21cefbfbf37ea4672ad76fd133f9e3e4fa23c1186c9716f9ec5e40deb7dbe33",
+      "allSelectedObjectsReadAndCompared": 1849,
+      "allDiskOriginalsReadAndCompared": 4773,
+      "activeFreezeLogExcluded": true,
+      "seconds": 10.375
+    },
+    "postCloseReportSha256": "b21ed0d519e1ab1b624497cf29708182155def926314593742db7cdefcc17dc7",
+    "sourceBundleSha256": "a891f12a4d5da75c8468f768ffd2cf06874de5923db5c4de9693f371e3197b8f",
+    "sourceOriginals": "Immutable exact Git implementation snapshots in artifacts/m9g-source-snapshot; docs-only handoff does not change these originals"
+  },
+  "preservationReport": "artifacts/m9g-preservation-final.json",
+  "sessions": "All owned test/supervisor sessions joined; private Windows and Linux build servers shut down. No product processes present in final audit; user snapshot processes were never stopped.",
+  "developmentFailures": [
+    "First Windows full attempt stopped at the stale M8 adapter pin; only test-lab.py adapter length/hash updated, no fixture oracle or threshold changed.",
+    "Linux canceled fixture SocketException22 accepted only after its own cancellation; product unchanged.",
+    "Linux exact settings children exposed a 2s budget failure and a separate named-mutex mkdirat ENOENT. Original failures and observer data retained; later unchanged successes do not resolve either finding or prove a runtime cause.",
+    "Earlier native fixture directory/neutral-source assumptions and portable session drafts failed; corrected fixture or routing fixes and available raw logs retained. Not every earlier draft binary/overwritten initial child JSON survives.",
+    "First final targeted wrapper resolved global SDK401 and stopped before a product start; explicit private dotnet.exe corrected wrapper.",
+    "Preservation helper initially decoded a BOM manifest with default locale; explicit utf-8-sig corrected read-only helper.",
+    "First delta-freeze rejected because selected active output log changed after readback. Final active log and rejected archive excluded; corrected freeze and all originals read again after freezer exit."
+  ],
+  "open": [
+    "Independent Root full Windows gate on final source and final image review",
+    "M9a sustained performance:38/62 NTSC windows red; PAL and hours soak unperformed",
+    "18 M8 full-audio rows red;7000 raw SPC bus mismatches remain source-adjudicated",
+    "Warm PPU VRAM/CGRAM/OAM retention requires separate hardware/source audit; no speculative change here",
+    "Linux observed settings busy/ENOENT findings unresolved",
+    "Base-console accuracy audit, then M10 DSP1, SuperFX, SA1 and remaining chips/peripherals",
+    "No physical pad, real OS-focus, DAC, own-console, clean VM or remote CI proof; no release acceptance"
+  ]
+}

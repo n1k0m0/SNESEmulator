@@ -9,8 +9,10 @@ Libretro-Kern eingebunden.
 Spielekompatibilität.** M0–M8 sowie M9b Worker/UI und M9c Persistenz sind unabhängig geprüft. Die getaktete
 Mode0–7-PPU bietet Sprites, Fenster, Farbmathematik, OPT, Hires und Mode7.
 M9d Netzwerk und M9e Manager sind unabhängig abgenommen (`2a5ae39`/`2534dba`).
-M9f Distribution/CI ist implementiert und lokal geprüft; die unabhängige
-Root-Abnahme steht noch aus. M9a-Dauerleistung und M9/Release bleiben offen. 20 unveränderte
+M9f Distribution/CI ist unabhängig auf `0f8aadc` abgenommen. M9g erweitert
+konfigurierbare Eingaben, Anzeige und Resetbedienung; seine unabhängige finale
+Abnahme steht aus ([Nachweise](docs/baselines/m9g.json)). M9a-Dauerleistung
+und M9/Release bleiben offen. 20 unveränderte
 lizenzierte Testprogramme und ein externes Techdemo laufen über den eigenen
 Kern und zwei separat gebaute Referenzen. Bekannte Audioabweichungen und
 veröffentlichte Hardwarefehler bleiben ausdrücklich offen. Der eigene S-DSP
