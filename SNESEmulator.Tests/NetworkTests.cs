@@ -152,6 +152,9 @@ internal static class NetworkTests
         });
         test("M9d actual LAN source-timed stereo and nonzero driver-synchronized video presentation",()=>{
             using var host=new SnesNetServer(256,224);using var client=new SnesNetClient();using var worker=new EmulationWorker();host.Start(0,"p");Check(client.Connect("localhost",host.Port,"p",SnesNetClientRole.Observer,"av",out _));worker.InsertAsync(DiagnosticRom.Create()).GetAwaiter().GetResult();worker.SetModeAsync(false,false).GetAwaiter().GetResult();
+            bool observe=Environment.GetEnvironmentVariable("SNESEMULATOR_AV_OBSERVE")=="1";client.Playout.CaptureDiagnostics=observe;
+            double? measurementStart=null;
+            try{
             Check(client.AudioDeviceAvailable,"actual remote WinMM device is available");int receivedVideo=0;client.FrameReceived+=_=>Interlocked.Increment(ref receivedVideo);
             var timer=Stopwatch.StartNew();int fields=0;double stableSince=-1,lastRow=-1;
             void Pump(){host.UpdateHostStatus(worker.Status);if(worker.TryDequeue(out var output)){host.BroadcastOutput(output!,()=>worker.Status);fields++;}else Thread.Sleep(1);}
@@ -164,10 +167,12 @@ internal static class NetworkTests
             }
             Check(stableSince>=0&&timer.Elapsed.TotalSeconds<30,"bounded stable unmuted driver readiness");
             long beginVideo=client.Playout.PresentedVideo,beginAudio=client.Playout.PresentedAudio,beginDriver=client.Playout.DriverComparedVideo;double begin=timer.Elapsed.TotalSeconds;
+            measurementStart=Stopwatch.GetTimestamp()/(double)Stopwatch.Frequency;
             while(timer.Elapsed.TotalSeconds-begin<5)Pump();
             var playout=client.Playout;Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new{Kind="actual-driver-av",ColdSeconds=begin,MeasurementSeconds=timer.Elapsed.TotalSeconds-begin,fields,Video=playout.PresentedVideo-beginVideo,Audio=playout.PresentedAudio-beginAudio,DriverVideo=playout.DriverComparedVideo-beginDriver,playout.Dropped,playout.MaximumSoftwareAvErrorSeconds,playout.MaximumSchedulingErrorSeconds,playout.MaximumQueueLatencySeconds,playout.Fault}));
             Check(playout.PresentedVideo-beginVideo>=30&&playout.PresentedAudio-beginAudio>=30&&playout.DriverComparedVideo-beginDriver>=30,"nonzero measured audio and driver-synchronized video");
             Check(playout.Fault==null&&playout.MaximumSoftwareAvErrorSeconds<.04,"measured final-provider/driver A/V distance");client.Disconnect();host.Stop();Check(client.TasksDrained&&host.PendingTasks==0,"AV tasks drained");
+            }finally{if(observe){var playout=client.Playout;var rows=playout.DiagnosticSnapshot();string path=Path.Combine(root,"actual-driver-av-observations.json");File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(new{MeasurementStart=measurementStart,PhaseReached=measurementStart.HasValue?"measurement":"cold-readiness",CumulativeMaximum=playout.MaximumSoftwareAvErrorSeconds,Rows=rows,Limit=4096,Meaning="Opt-in software samples; legacy cumulative metric and selection policy unchanged; not physical DAC or original failing-run reconstruction"}));Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new{Kind="actual-driver-av-observations",Path=path,Count=rows.Length}));}}
         });
         test("M9d actual local TLS relay two clients v4 epochs stereo malformed budgets and kick",()=>{
             using var cert=Certificate();string certPath=Path.Combine(root,"m9d-relay.pem"),keyPath=Path.Combine(root,"m9d-relay.key");File.WriteAllText(certPath,cert.ExportCertificatePem());using(var rsa=cert.GetRSAPrivateKey())File.WriteAllText(keyPath,rsa!.ExportPkcs8PrivateKeyPem());

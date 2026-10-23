@@ -43,6 +43,16 @@ internal static class NetworkTimelineTests
             Check(audio==1800&&video==1800&&p.MaximumSoftwareAvErrorSeconds<.000001&&p.MaximumSchedulingErrorSeconds<.0013,"30s injected variable field deadlines");
             p.Enqueue(now,true,()=>throw new IOException("injected callback"));now+=.1;p.PumpOnce();Check(p.Fault?.Contains("injected callback")==true,"callback failure visible");
         });
+        test("M9g A/V observation distinguishes sampled selection commit and callback playheads",()=>{
+            double now=0,head=10;using var p=new NetworkPlayout(()=>{},()=>head,()=>now,false){CaptureDiagnostics=true};
+            p.Enqueue(10,false,()=>{head=10.06;now=.10;});now=.04;p.BeforeCommit=()=>{head=10.05;now=.09;};
+            Check(p.PumpOnce(),"selected video");var row=p.DiagnosticSnapshot().Single();
+            Check(row.Source==10&&row.SamplePlayhead==10&&row.CommitPlayhead==10.05&&row.CompletedPlayhead==10.06&&row.Delivered,"three source-time observations");
+            Check(row.SampleAt==.04&&row.CommitAt==.09&&row.CompletedAt==.10,"three host-time observations");
+            Check(p.MaximumSoftwareAvErrorSeconds==0,"instrumentation preserves legacy cumulative metric rather than silently fixing it");
+            p.BeforeCommit=null;head=10.05;now=.11;p.Enqueue(10,false,()=>{});now=.15;p.PumpOnce();
+            Check(Math.Abs(p.MaximumSoftwareAvErrorSeconds-.05)<1e-10,"cold and later samples remain cumulative");
+        });
         test("M9d final-provider initial padding underflow refill and exact stereo mapping",()=>{
             var b=new NetworkAudioBuffer();float[] output=new float[9600];b.Read(output,0,output.Length);
             Check(b.PaddingFrames==4800&&b.CrystalAtDriverFrame(0)==null,"startup silence has no source timestamp");

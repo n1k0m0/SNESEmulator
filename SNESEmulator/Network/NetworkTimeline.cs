@@ -37,6 +37,12 @@ public sealed record NetworkTimeline(long ConsoleEpoch,long StreamEpoch,long Mas
 /// <summary>One bounded software playout timeline for both media kinds. No DAC latency inference.</summary>
 public sealed class NetworkPlayout : IDisposable
 {
+    internal sealed record Observation(long Sequence,long Generation,double Source,double Arrival,double Due,double SampleAt,double CommitAt,double CompletedAt,double? SamplePlayhead,double? CommitPlayhead,double? CompletedPlayhead,bool Delivered,bool GenerationValid,double SchedulingError);
+    // Opt-in bounded software diagnostics; no production selection or metric policy changes.
+    internal bool CaptureDiagnostics {get;set;}
+    private readonly Queue<Observation> observations=new();
+    private long observationSequence;
+    internal Observation[] DiagnosticSnapshot(){lock(commitGate)return observations.ToArray();}
     private sealed record Item(double Source,double Arrival,bool Audio,long Generation,Action Deliver);
     private readonly object gate=new(),commitGate=new();
     internal Action? BeforeCommit {get;set;}
@@ -95,7 +101,7 @@ public sealed class NetworkPlayout : IDisposable
     }
     public bool PumpOnce()
     {
-        Item? selected=null;double error=0;double? playhead=audioPlayhead();
+        Item? selected=null;double error=0;double? playhead=audioPlayhead();double sampleAt=CaptureDiagnostics?Now:0,selectedDue=0;
             lock(gate)
             {
                 double now=Now;
@@ -107,7 +113,7 @@ public sealed class NetworkPlayout : IDisposable
                     // consumed-byte source playhead, including source/resampler/device queues.
                     if(!item.Audio&&needsAudio()&&!playhead.HasValue&&now-item.Arrival<.25)continue;
                     if(!item.Audio&&playhead.HasValue&&item.Source>playhead.Value+.008&&now-item.Arrival<.25)continue;
-                    queue.RemoveAt(i);selected=item;error=now-due;
+                    queue.RemoveAt(i);selected=item;error=now-due;selectedDue=due;
                     MaximumQueueLatencySeconds=Math.Max(MaximumQueueLatencySeconds,now-item.Arrival);
                     if(item.Audio||!playhead.HasValue)MaximumSchedulingErrorSeconds=Math.Max(MaximumSchedulingErrorSeconds,error);
                     break;
@@ -118,17 +124,20 @@ public sealed class NetworkPlayout : IDisposable
                 BeforeCommit?.Invoke();
                 lock(commitGate){
                 bool valid;lock(gate)valid=selected.Generation==generation;
+                bool observe=CaptureDiagnostics&&!selected.Audio,delivered=false;double commitAt=observe?Now:0;double? commitPlayhead=observe?audioPlayhead():null;
+                try{
                 if(!valid||!selected.Audio&&needsAudio()&&!playhead.HasValue||selected.Audio&&error>.1||!selected.Audio&&playhead.HasValue&&Math.Abs(playhead.Value-selected.Source)>.1){Dropped++;}
                 else
                 {
                     try
                     {
-                        current=this;selected.Deliver();
+                        current=this;selected.Deliver();delivered=true;
                         if(selected.Audio)PresentedAudio++;else{PresentedVideo++;if(playhead.HasValue){DriverComparedVideo++;MaximumSoftwareAvErrorSeconds=Math.Max(MaximumSoftwareAvErrorSeconds,Math.Abs(playhead.Value-selected.Source));}}
                     }
                     catch(Exception e){Fault=e.ToString();Failed?.Invoke(Fault);Dropped++;Reset();}
                     finally{current=null;}
                 }
+                }finally{if(observe){double? completedPlayhead=audioPlayhead();var observation=new Observation(++observationSequence,selected.Generation,selected.Source,selected.Arrival,selectedDue,sampleAt,commitAt,Now,playhead,commitPlayhead,completedPlayhead,delivered,valid,error);if(observations.Count==4096)observations.Dequeue();observations.Enqueue(observation);}}
                 }
             }
 
