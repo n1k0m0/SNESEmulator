@@ -43,15 +43,26 @@ internal static class NetworkTimelineTests
             Check(audio==1800&&video==1800&&p.MaximumSoftwareAvErrorSeconds<.000001&&p.MaximumSchedulingErrorSeconds<.0013,"30s injected variable field deadlines");
             p.Enqueue(now,true,()=>throw new IOException("injected callback"));now+=.1;p.PumpOnce();Check(p.Fault?.Contains("injected callback")==true,"callback failure visible");
         });
-        test("M9g A/V observation distinguishes sampled selection commit and callback playheads",()=>{
+        test("M9h A/V commit refreshes the driver and counts callback delay cumulatively",()=>{
             double now=0,head=10;using var p=new NetworkPlayout(()=>{},()=>head,()=>now,false){CaptureDiagnostics=true};
-            p.Enqueue(10,false,()=>{head=10.06;now=.10;});now=.04;p.BeforeCommit=()=>{head=10.05;now=.09;};
+            p.Enqueue(10,false,()=>{head=10.03;now=.07;});now=.04;p.BeforeCommit=()=>{head=10.02;now=.06;};
             Check(p.PumpOnce(),"selected video");var row=p.DiagnosticSnapshot().Single();
-            Check(row.Source==10&&row.SamplePlayhead==10&&row.CommitPlayhead==10.05&&row.CompletedPlayhead==10.06&&row.Delivered,"three source-time observations");
-            Check(row.SampleAt==.04&&row.CommitAt==.09&&row.CompletedAt==.10,"three host-time observations");
-            Check(p.MaximumSoftwareAvErrorSeconds==0,"instrumentation preserves legacy cumulative metric rather than silently fixing it");
+            Check(row.Source==10&&row.SamplePlayhead==10&&row.CommitPlayhead==10.02&&row.CompletedPlayhead==10.03&&row.Delivered,"three source-time observations");
+            Check(row.SampleAt==.04&&row.CommitAt==.06&&row.CompletedAt==.07,"three host-time observations");
+            Check(Math.Abs(p.MaximumSoftwareAvErrorSeconds-.03)<1e-10,"post-callback distance is measured instead of old zero-distance sample");
             p.BeforeCommit=null;head=10.05;now=.11;p.Enqueue(10,false,()=>{});now=.15;p.PumpOnce();
-            Check(Math.Abs(p.MaximumSoftwareAvErrorSeconds-.05)<1e-10,"cold and later samples remain cumulative");
+            Check(p.Dropped==1&&p.PresentedVideo==1&&p.DriverComparedVideo==1,"50ms old picture is discarded rather than accepted by legacy100ms policy");
+            Check(Math.Abs(p.MaximumSoftwareAvErrorSeconds-.03)<1e-10,"cold measurement remains cumulative after rejected picture");
+            head=11;now=.2;p.Enqueue(11,false,()=>head=11.06);now=.24;p.PumpOnce();
+            Check(p.PresentedVideo==2&&Math.Abs(p.MaximumSoftwareAvErrorSeconds-.06)<1e-10,"60ms callback remains a visible bound violation");
+        });
+        test("M9h stale and lost driver samples are rechecked at actual video commit",()=>{
+            foreach(bool lost in new[]{false,true}){
+                double now=0;double? head=10;int delivered=0;using var p=new NetworkPlayout(()=>{},()=>head,()=>now,false,()=>true){CaptureDiagnostics=true};
+                p.Enqueue(10,false,()=>delivered++);now=.04;p.BeforeCommit=()=>head=lost?null:10.05;
+                Check(p.PumpOnce()&&delivered==0&&p.Dropped==1&&p.DriverComparedVideo==0,"selection sample does not authorize stale or underflowed commit");
+                Check(p.DiagnosticSnapshot().Single().Delivered==false,"rejection remains observable");
+            }
         });
         test("M9d final-provider initial padding underflow refill and exact stereo mapping",()=>{
             var b=new NetworkAudioBuffer();float[] output=new float[9600];b.Read(output,0,output.Length);

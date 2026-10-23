@@ -38,7 +38,7 @@ public sealed record NetworkTimeline(long ConsoleEpoch,long StreamEpoch,long Mas
 public sealed class NetworkPlayout : IDisposable
 {
     internal sealed record Observation(long Sequence,long Generation,double Source,double Arrival,double Due,double SampleAt,double CommitAt,double CompletedAt,double? SamplePlayhead,double? CommitPlayhead,double? CompletedPlayhead,bool Delivered,bool GenerationValid,double SchedulingError);
-    // Opt-in bounded software diagnostics; no production selection or metric policy changes.
+    // Opt-in bounded software diagnostics, including rejected commit probes.
     internal bool CaptureDiagnostics {get;set;}
     private readonly Queue<Observation> observations=new();
     private long observationSequence;
@@ -70,6 +70,9 @@ public sealed class NetworkPlayout : IDisposable
     public int Pending {get{lock(gate)return queue.Count;}}
     public const int Capacity=32;
     public const double TargetLatencySeconds=.04;
+    // Audio is the presentation clock. Old pictures are discarded instead of
+    // publishing up to100ms behind it; no sample or reported metric is clamped.
+    public const double MaximumVideoDistanceSeconds=.04;
     private readonly Func<double> now;
     private double Now=>now();
     public NetworkPlayout(Action clear,Func<double?>? audioPlayhead=null,Func<double>? clock=null,bool automatic=true,Func<bool>? needsAudio=null)
@@ -124,15 +127,23 @@ public sealed class NetworkPlayout : IDisposable
                 BeforeCommit?.Invoke();
                 lock(commitGate){
                 bool valid;lock(gate)valid=selected.Generation==generation;
-                bool observe=CaptureDiagnostics&&!selected.Audio,delivered=false;double commitAt=observe?Now:0;double? commitPlayhead=observe?audioPlayhead():null;
+                bool observe=CaptureDiagnostics&&!selected.Audio,delivered=false;double commitAt=observe?Now:0;double? commitPlayhead=!selected.Audio?audioPlayhead():null;
                 try{
-                if(!valid||!selected.Audio&&needsAudio()&&!playhead.HasValue||selected.Audio&&error>.1||!selected.Audio&&playhead.HasValue&&Math.Abs(playhead.Value-selected.Source)>.1){Dropped++;}
+                if(!valid||!selected.Audio&&needsAudio()&&!commitPlayhead.HasValue||selected.Audio&&error>.1||!selected.Audio&&commitPlayhead.HasValue&&Math.Abs(commitPlayhead.Value-selected.Source)>=MaximumVideoDistanceSeconds){Dropped++;}
                 else
                 {
                     try
                     {
                         current=this;selected.Deliver();delivered=true;
-                        if(selected.Audio)PresentedAudio++;else{PresentedVideo++;if(playhead.HasValue){DriverComparedVideo++;MaximumSoftwareAvErrorSeconds=Math.Max(MaximumSoftwareAvErrorSeconds,Math.Abs(playhead.Value-selected.Source));}}
+                        if(selected.Audio)PresentedAudio++;else{
+                            PresentedVideo++;
+                            // Account for time spent waiting for the commit lock
+                            // AND in the delivery callback. A slow callback can
+                            // still violate the bound and must remain visible.
+                            double? completed=audioPlayhead();
+                            if(commitPlayhead.HasValue){DriverComparedVideo++;MaximumSoftwareAvErrorSeconds=Math.Max(MaximumSoftwareAvErrorSeconds,Math.Abs(commitPlayhead.Value-selected.Source));}
+                            if(completed.HasValue)MaximumSoftwareAvErrorSeconds=Math.Max(MaximumSoftwareAvErrorSeconds,Math.Abs(completed.Value-selected.Source));
+                        }
                     }
                     catch(Exception e){Fault=e.ToString();Failed?.Invoke(Fault);Dropped++;Reset();}
                     finally{current=null;}
