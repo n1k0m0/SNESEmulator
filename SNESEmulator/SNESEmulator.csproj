@@ -9,9 +9,16 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../SNESEmulatorManager/SNESEmulatorManager.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../SNESEmulator.Contracts/SNESEmulator.Contracts.csproj" />
+    <ProjectReference Include="../SNESEmulator.Management/SNESEmulator.Management.csproj" />
     <ProjectReference Include="../SNESEmulator.Core/SNESEmulator.Core.csproj" />
     <ProjectReference Include="../SNESEmulator.Runtime/SNESEmulator.Runtime.csproj" />
     <ProjectReference Include="../SharpPixels/SharpPixels.csproj" />
     <PackageReference Include="NAudio" Version="2.3.0" />
   </ItemGroup>
+  <Target Name="CopyManagerForDevelopment" AfterTargets="Build">
+    <ItemGroup><ManagerFiles Include="../SNESEmulatorManager/bin/$(Configuration)/net10.0-windows/**/*" /></ItemGroup>
+    <Copy SourceFiles="@(ManagerFiles)" DestinationFiles="@(ManagerFiles->'$(OutDir)Manager/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

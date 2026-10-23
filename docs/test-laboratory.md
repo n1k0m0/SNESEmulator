@@ -1,4 +1,4 @@
-# Test laboratory: M0–M7 CPU, bus, I/O, SPC700, native PPU and stereo DSP
+# Test laboratory: M0â€“M7 CPU, bus, I/O, SPC700, native PPU and stereo DSP
 
 M0 establishes measurement, not CPU or SNES accuracy. The original17 assertions
 are preserved as12 portable core regressions and5 Windows/network integrations.
@@ -6,7 +6,7 @@ are preserved as12 portable core regressions and5 Windows/network integrations.
 it does not load Windows Forms, OpenTK, the frontend, audio devices or TLS.
 `SNESEmulator.Tests` retains the existing Windows frontend/transport dependency.
 M1 adds12 portable semantic groups; M2 adds21 timing/continuation groups.
-M3 adds21 I/O/DMA groups (66 total through M3); M0–M3 were independently
+M3 adds21 I/O/DMA groups (66 total through M3); M0â€“M3 were independently
 accepted (`artifacts/root-m3-validation.log`). M4 adds21 groups (87 total
 portable groups); independently accepted on `0b1139436727c835c4fdbf944c74e3d0067c3944`
 (`artifacts/root-m4-validation.log`). M5 adds42 PPU groups (129 total), independently accepted on
@@ -234,8 +234,8 @@ WRAM conflicts, HDMA setup/direct/indirect/repeat/two-pass order and preemption,
 ALU intermediate states and real CPU edge placement, H/V/HV IRQ and NMI holds,
 counter latches, serial signatures and all four automatic JOY result lines.
 
-The original `IoDmaDiagnosticRom` generator executes80 CPU cases (8 modes ×2
-bus directions ×5 raster start classes), with WRAM signatures and protocol
+The original `IoDmaDiagnosticRom` generator executes80 CPU cases (8 modes Ã—2
+bus directions Ã—5 raster start classes), with WRAM signatures and protocol
 oracles independent of the incomplete PPU. Refresh integration asserts a real
 transfer straddling refresh, HBlank/VBlank use actual polling, and timer cases
 execute/acknowledge the IRQ vector. This is original test software, not a
@@ -252,7 +252,7 @@ ALU/DMA/JOY state before the unchanged final expectations. M2 system IRQ injecti
 uses the external bus IRQ wire because SnesSystem now owns CPU line wiring.
 
 Savestate4 stores all M3 intermediate state, cartridge options/mapper and the
-auto/forced profile choice. Same-ROM wrong-mapper loads and versions1–3 are
+auto/forced profile choice. Same-ROM wrong-mapper loads and versions1â€“3 are
 rejected. PPU/APU convenience reset and electrical effects explicitly deferred
 in the M3 contract are not claimed physically accurate.
 
@@ -283,7 +283,7 @@ any explicit oracle files. Replay checks compare CPU state, clocks, frame/WRAM
 hashes AND byte-identical CPU/bus/raster traces across two runs.
 
 **Device limitation:** timed traces distinguish `read-latch`, `write-latch` and
-`cycle-complete`. Valid reads latch after accessClocks−4 active clocks, followed
+`cycle-complete`. Valid reads latch after accessClocksâˆ’4 active clocks, followed
 by four active hold clocks; writes latch at completion. The earlier all-effects-
 at-endpoint model was materially incorrect and is superseded by this correction.
 The exact budget can end inside a pre-latch phase, trailing read hold, refresh
@@ -370,7 +370,7 @@ recorded in [M4 baseline](baselines/m4.json). Independent parent acceptance comp
 The [PPU contract](m5-ppu-contract.md) documents the source-informed two-chip
 Mode0/1 target, MMIO/latches, all128 OBJ, main/sub windows/math, mosaic, analytical
 fetch deadlines and the unverified absolute hardware epoch. Format6 saves the
-in-flight graphics pipeline and rejects formats1–5. 334 every-master-clock
+in-flight graphics pipeline and rejects formats1â€“5. 334 every-master-clock
 continuations compare to untouched uninterrupted reference runs, including actual
 DMA/HDMA/IRQ/active APU and timed transfer traces. Public fetch/pixel/APU observer
 snapshots exercise committed-state capture. Literal worksheet expectations and
@@ -385,7 +385,7 @@ Zlib external VRAM mid-scanline ROM/license/source are LF/hash-pinned by
 repeated active VRAM write loops, with an independent source-derived full-white
 native frame oracle. `tools/rebuild-ppu-fixture.py` reproduced the ROM exactly.
 This is one external software test, not broad M8 hardware certification. No own
-console is available. Modes2–7 and variable geometry remain M7; audio remains M6.
+console is available. Modes2â€“7 and variable geometry remain M7; audio remains M6.
 
 The clean M5 full gate passed on `9e5a7817af00428915e36f1171d748577e28953e`,
 exit0, `artifacts/m5-full-validation.log`:129 portable groups,5 Windows groups,
@@ -517,15 +517,15 @@ VRAM subslots, the first hires half-pixel and published physical INIDISP glitche
 have no new original-console measurement. M7 independently accepted on `439a655199647f325bef6b6b3074e67948a105dc`, full Windows gate exit0, `artifacts/root-m7-validation.log`; unchanged evidence in `artifacts/root-m7-evidence/`.
 
 
-## M8 Offline-Konsolenvergleiche und Zustände
+## M8 Offline-Konsolenvergleiche und ZustÃ¤nde
 
-Der [M8-Vertrag](m8-compatibility-contract.md) beschreibt20 unverändert gebaute externe Testprogramme, ein tatsächlich klingendes externes HiROM-Techdemo, getrennte Own-/Original-IPL-Datensätze und die vollständigen unabhängigen Cycle-PPU-Konsolenadapter. `tools/test-lab.py` führt `verify-m8-testdata.py`, `Core.Tests --compatibility-only` im eigenen360s-Watchdog und beide `m8-console-suite.py --verify`-Varianten aus. Jede Variante hat600s Gesamt- und120s Kindprozessgrenzen. Der Own-IPL-Datensatz läuft ohne Firmware/WSL/Netzwerk in CI. Fehlt das lokale Original-IPL, bleibt dessen Gate sichtbar skipped; Full verlangt dessen Ausführung.
+Der [M8-Vertrag](m8-compatibility-contract.md) beschreibt20 unverÃ¤ndert gebaute externe Testprogramme, ein tatsÃ¤chlich klingendes externes HiROM-Techdemo, getrennte Own-/Original-IPL-DatensÃ¤tze und die vollstÃ¤ndigen unabhÃ¤ngigen Cycle-PPU-Konsolenadapter. `tools/test-lab.py` fÃ¼hrt `verify-m8-testdata.py`, `Core.Tests --compatibility-only` im eigenen360s-Watchdog und beide `m8-console-suite.py --verify`-Varianten aus. Jede Variante hat600s Gesamt- und120s Kindprozessgrenzen. Der Own-IPL-Datensatz lÃ¤uft ohne Firmware/WSL/Netzwerk in CI. Fehlt das lokale Original-IPL, bleibt dessen Gate sichtbar skipped; Full verlangt dessen AusfÃ¼hrung.
 
-27 zusätzliche Gruppen prüfen externe Snapshotfortsetzungen, tatsächlich klingende Titelmusik, Spielraum/Input/SRAM, WAI-Restphasen, MMIO-Endpunkte, Pending-H0-Beobachter und sechs veröffentlichte Frequenzparameter. Große Game-State-Fälle erweitern nicht den alten240s-Core-Watchdog. Bildvergleiche prüfen native RGB555/Helligkeit und Parität mit fest begründeten Koordinaten. Audiodifferenzen innerhalb der gemeinsamen Samplefolge bleiben rot, selbst wenn die Aufnahmeenden verschieden sind. [Titelmatrix](m8-title-matrix.md), [Hardwareledger](../testdata/m8-hardware-evidence.json) und die separaten `accuracy.json`-Berichte enthalten die Grenzen.
+27 zusÃ¤tzliche Gruppen prÃ¼fen externe Snapshotfortsetzungen, tatsÃ¤chlich klingende Titelmusik, Spielraum/Input/SRAM, WAI-Restphasen, MMIO-Endpunkte, Pending-H0-Beobachter und sechs verÃ¶ffentlichte Frequenzparameter. GroÃŸe Game-State-FÃ¤lle erweitern nicht den alten240s-Core-Watchdog. Bildvergleiche prÃ¼fen native RGB555/Helligkeit und ParitÃ¤t mit fest begrÃ¼ndeten Koordinaten. Audiodifferenzen innerhalb der gemeinsamen Samplefolge bleiben rot, selbst wenn die Aufnahmeenden verschieden sind. [Titelmatrix](m8-title-matrix.md), [Hardwareledger](../testdata/m8-hardware-evidence.json) und die separaten `accuracy.json`-Berichte enthalten die Grenzen.
 
-`--accuracy-only` bewahrt den roten Genauigkeitsexit. `--verify` prüft lediglich unveränderte manuell geprüfte Unterschiede; es macht bekannte Fehler nicht zu bestandenen Genauigkeitsfällen. Negative Kontrollen lösen tatsächliche Pixel-/Kanal-/Koordinaten-/Samplefehler sowie Missing/Crash/Timeout aus. Referenzprogramme und Overlays sind vollständig gepinnt; die frei verteilbaren Fixtures sind offline hashgeprüft. Kein heutiger eigener Emulatoroutput dient als unabhängiges Sollbild. Historische rote Entwicklungsbefunde bleiben in der M8-Evidenz.
+`--accuracy-only` bewahrt den roten Genauigkeitsexit. `--verify` prÃ¼ft lediglich unverÃ¤nderte manuell geprÃ¼fte Unterschiede; es macht bekannte Fehler nicht zu bestandenen GenauigkeitsfÃ¤llen. Negative Kontrollen lÃ¶sen tatsÃ¤chliche Pixel-/Kanal-/Koordinaten-/Samplefehler sowie Missing/Crash/Timeout aus. Referenzprogramme und Overlays sind vollstÃ¤ndig gepinnt; die frei verteilbaren Fixtures sind offline hashgeprÃ¼ft. Kein heutiger eigener Emulatoroutput dient als unabhÃ¤ngiges Sollbild. Historische rote Entwicklungsbefunde bleiben in der M8-Evidenz.
 
-M8 korrigiert den alten M2-Test, der den WAI-Fehler als Null-Idle-Verhalten erwartete, sowie M7s Live-SETINI-Auslegung. Die korrigierten Erwartungen stammen aus beiden Quellen und tatsächlich ausgeführten ROM-/Bus-/Feldbeobachtern. Format9 lehnt unvollständig migrierbare ältere Saves ab. M6s isolierte DSP-Konformität bleibt eine andere Evidenzart als Ganzkonsolen-Audio.
+M8 korrigiert den alten M2-Test, der den WAI-Fehler als Null-Idle-Verhalten erwartete, sowie M7s Live-SETINI-Auslegung. Die korrigierten Erwartungen stammen aus beiden Quellen und tatsÃ¤chlich ausgefÃ¼hrten ROM-/Bus-/Feldbeobachtern. Format9 lehnt unvollstÃ¤ndig migrierbare Ã¤ltere Saves ab. M6s isolierte DSP-KonformitÃ¤t bleibt eine andere Evidenzart als Ganzkonsolen-Audio.
 
 
 M8 implementation validation is complete on clean `47f91cb`: full Windows gate
@@ -568,3 +568,6 @@ The initial development run caught up initial JIT debt with five device buffer
 overflows; raw findings are retained. Catchup audio is now explicitly muted
 above100ms without skipping hardware. Full contracts and open physical OS-focus/
 gamepad, sustained NTSC/PAL and hours-long soak gates: [M9b](m9-worker-contract.md).
+
+
+M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. The implementation gate and independent acceptance remain separate. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.

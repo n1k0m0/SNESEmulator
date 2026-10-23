@@ -1,0 +1,61 @@
+using System.Diagnostics;
+using System.Text.Json;
+using SNESEmulator.Frontend;
+
+namespace SNESEmulator;
+internal static class ManagerIpcProbe
+{
+    internal static void Run(string directory, string? rom)
+    {
+        Directory.CreateDirectory(directory);
+        using var window = new SnesWindow(rom);
+        var time = Stopwatch.StartNew();
+        bool ready = false;
+        window.RenderFrame += _ =>
+        {
+            if (!ready && window.ManagerPipe != null && !window.MediaOperationPending)
+            {
+                ready = true;
+                RuntimeSmoke.Screenshot(window, Path.Combine(directory, "emulator.png"));
+                File.WriteAllText(Path.Combine(directory, "ready.json"), JsonSerializer.Serialize(new { Pid = Environment.ProcessId, Pipe = window.ManagerPipe, window.RuntimeStatus }));
+            }
+
+            string command = Path.Combine(directory, "menu-volume");
+            if (File.Exists(command))
+            {
+                File.Delete(command);
+                window.ProbeMenuVolume();
+                File.WriteAllText(Path.Combine(directory, "menu-ack"), "synthetic app menu hook completed");
+            }
+
+            string launch = Path.Combine(directory, "launch-manager");
+            if (File.Exists(launch))
+            {
+                File.Delete(launch);
+                window.ProbeLaunchManager();
+            }
+
+            foreach (var pair in new[]
+            {
+                ("host-port", true),
+                ("join-port", false)
+            }
+
+            )
+            {
+                string network = Path.Combine(directory, pair.Item1);
+                if (File.Exists(network))
+                {
+                    int port = int.Parse(File.ReadAllText(network));
+                    File.Delete(network);
+                    window.ProbeNetwork(pair.Item2, port);
+                }
+            }
+
+            if (File.Exists(Path.Combine(directory, "close")) || time.Elapsed.TotalSeconds > 180)
+                window.Close();
+        };
+        window.Run();
+        File.WriteAllText(Path.Combine(directory, "closed.json"), JsonSerializer.Serialize(new { Success = true, SyntheticAppHooks = true }));
+    }
+}

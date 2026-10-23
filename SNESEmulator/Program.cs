@@ -11,6 +11,7 @@ internal static class Program
     {
         try
         {
+            if(args.Length>=2&&args[0]=="--manager-ipc-probe"){ManagerIpcProbe.Run(args[1],args.Length>2?args[2]:null);return 0;}
             if(args.Length>=2&&args[0]=="--ui-persistence-smoke"){PersistenceSmoke.Run(args[1],args.Length>=3?args[2]:"normal");return 0;}
             if(args.Length>=2&&args[0]=="--ui-runtime-smoke"){RuntimeSmoke.Run(args[1],args.Length>=3&&args[2]!="-"?args[2]:null,args.Length>=4?double.Parse(args[3],System.Globalization.CultureInfo.InvariantCulture):8);return 0;}
             if(args.Length>=2 && args[0]=="--write-diagnostic-rom")

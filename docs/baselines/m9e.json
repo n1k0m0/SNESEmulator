@@ -1,0 +1,10 @@
+{
+  "schema":"m9e-manager-baseline-v1",
+  "status":"implementation awaiting clean full gate and independent Root acceptance",
+  "priorPortable":256,
+  "priorWindows":23,
+  "newPortable":10,
+  "newWindows":7,
+  "contract":"docs/m9-manager-contract.md",
+  "releaseAccepted":false
+}

@@ -19,6 +19,8 @@ if args.inventory_only:
  # Return conformance exit code (1 for observed failures, 2 for unexecuted data).
  sys.exit(subprocess.run(['dotnet',str(LAB),'supervise','240','artifacts/conformance','dotnet',str(LAB),*(['cpu-full','artifacts/conformance-child','testdata/65816-full'] if args.full else ['cpu'])],cwd=ROOT).returncode)
 run(['dotnet','build','SNESEmulator.Core.Tests','-c','Release','--nologo'])
+run(['dotnet','build','SNESEmulator.Manager.Tests','-c','Release','--nologo'])
+supervised('manager-conformance',['dotnet',str(ROOT/'SNESEmulator.Manager.Tests/bin/Release/net10.0/SNESEmulator.Manager.Tests.dll')],timeout=180)
 run([sys.executable,'tools/fetch-testdata.py','--verify'])
 run([sys.executable,'tools/fetch-spc700.py','--verify',*(['--full'] if args.full else [])])
 run([sys.executable,'tools/own-ipl.py'])
@@ -105,13 +107,14 @@ supervised('spc-original-boot',['dotnet',str(LAB),'spc-boot-original','artifacts
 if args.full:assert original_expected==0, 'Original IPL execution unperformed: supply local64-byte firmware with SNESEMULATOR_IPL'
 if args.windows:
  run(['dotnet','build','SNESEmulator.Tests','-c','Release','--nologo'])
- native_before={str(p.relative_to(ROOT)):__import__('hashlib').sha256(p.read_bytes()).hexdigest() for directory in ['SNESEmulator/bin/Release/net10.0-windows','SNESEmulator.Core/bin/Release/net10.0','SNESEmulator.Runtime/bin/Release/net10.0'] for p in (ROOT/directory).glob('*') if p.name.endswith(('.dll','.exe','.deps.json','.runtimeconfig.json'))}
- (ROOT/'artifacts/m9d-gate-native-identities-before.json').write_text(json.dumps(native_before,indent=2))
+ native_before={str(p.relative_to(ROOT)):__import__('hashlib').sha256(p.read_bytes()).hexdigest() for directory in ['SNESEmulator/bin/Release/net10.0-windows','SNESEmulatorManager/bin/Release/net10.0-windows','SNESEmulator.Contracts/bin/Release/net10.0','SNESEmulator.Management/bin/Release/net10.0','SNESEmulator.Core/bin/Release/net10.0','SNESEmulator.Runtime/bin/Release/net10.0'] for p in (ROOT/directory).rglob('*') if p.is_file() if p.name.endswith(('.dll','.exe','.deps.json','.runtimeconfig.json'))}
+ (ROOT/'artifacts/m9e-gate-native-identities-before.json').write_text(json.dumps(native_before,indent=2))
  run([sys.executable,'tools/test-ui-runtime.py','--output','artifacts/m9b-ui-gate-'+__import__('datetime').datetime.now().strftime('%Y%m%d-%H%M%S')])
  run([sys.executable,'tools/test-ui-persistence.py','--output','artifacts/m9c-ui-gate-'+__import__('datetime').datetime.now().strftime('%Y%m%d-%H%M%S')])
+ supervised('manager-windows-conformance',['dotnet',str(ROOT/'SNESEmulator.Manager.Tests/bin/Release/net10.0/SNESEmulator.Manager.Tests.dll'),'--windows'],timeout=180)
  supervised('windows-integration',['dotnet',str(ROOT/'SNESEmulator.Tests/bin/Release/net10.0-windows/SNESEmulator.Tests.dll')])
  supervised('network-windows-conformance',['dotnet',str(ROOT/'SNESEmulator.Tests/bin/Release/net10.0-windows/SNESEmulator.Tests.dll'),'--network-only'],timeout=180)
- native_after={str(p.relative_to(ROOT)):__import__('hashlib').sha256(p.read_bytes()).hexdigest() for directory in ['SNESEmulator/bin/Release/net10.0-windows','SNESEmulator.Core/bin/Release/net10.0','SNESEmulator.Runtime/bin/Release/net10.0'] for p in (ROOT/directory).glob('*') if p.name.endswith(('.dll','.exe','.deps.json','.runtimeconfig.json'))}
- (ROOT/'artifacts/m9d-gate-native-identities-after.json').write_text(json.dumps(native_after,indent=2))
+ native_after={str(p.relative_to(ROOT)):__import__('hashlib').sha256(p.read_bytes()).hexdigest() for directory in ['SNESEmulator/bin/Release/net10.0-windows','SNESEmulatorManager/bin/Release/net10.0-windows','SNESEmulator.Contracts/bin/Release/net10.0','SNESEmulator.Management/bin/Release/net10.0','SNESEmulator.Core/bin/Release/net10.0','SNESEmulator.Runtime/bin/Release/net10.0'] for p in (ROOT/directory).rglob('*') if p.is_file() if p.name.endswith(('.dll','.exe','.deps.json','.runtimeconfig.json'))}
+ (ROOT/'artifacts/m9e-gate-native-identities-after.json').write_text(json.dumps(native_after,indent=2))
  assert native_before==native_after, 'Product build identity changed across native starts'
 print('Laboratory checks passed. '+('Full M1 CPU semantics verified.' if args.full else '2048 sampled semantics pass; 5,078,352 upstream cases remain explicitly unsampled.')+' Generic 65816 bus cycles verified separately; SNES profiles are analytical targets, not original-hardware measurements.')

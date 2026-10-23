@@ -19,7 +19,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     private readonly HostPresentation presentation;
     // Detached media is used only for previews; it is never the worker cartridge.
     private Cartridge? previewCartridge;
-    private readonly EmulatorSettings settings = EmulatorSettings.Load();
+    private EmulatorSettings settings = EmulatorSettings.Load();
     private readonly SnesNetServer server;
     private readonly SnesNetClient client = new();
     private readonly UiMailbox pending = new();
@@ -85,10 +85,12 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         if (settings.Fullscreen) ToggleFullscreen();
         Directory.CreateDirectory(UserDataPaths.GetMediaDirectory());
         if (startupRom != null) Try(() => LoadRom(startupRom));
+        StartManagerIpc();
     }
     public override void OnUserUpdate(double time)
     {
         MeasureUi();
+        if(managerCloseAfter!=0&&System.Diagnostics.Stopwatch.GetTimestamp()>=managerCloseAfter){Close();return;}
         autosave.Tick(time,!closing&&!mediaBusy);
         pending.Drain();
         if(pending.TakeStatus() is {} message)status=message;
@@ -111,7 +113,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
             if(settings.ControllerPort==1)p1|=input;else p2|=input;
             worker.SubmitInput(new(p1,p2));
         }
-        bool pause=menu!=Menu.None||remote||mediaBusy;
+        bool pause=menu!=Menu.None||remote||mediaBusy||managerPaused;
         if(sentPause!=pause||sentTurbo!=turbo){sentPause=pause;sentTurbo=turbo;Observe(worker.SetModeAsync(pause,turbo));}
         var runtime=worker.Status;
         if(runtime.Fault!=null)status="CORE STOPPED: "+runtime.Fault.Split('\n')[0];
@@ -169,7 +171,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     }
     private string[] Rows() => menu switch
     {
-        Menu.Main => ["SETTINGS", "NETWORK", "MEDIA    " + (worker.Status.Title.Length==0?"NO MEDIA":worker.Status.Title), "RESET"],
+        Menu.Main => ["SETTINGS", "NETWORK", "MEDIA    " + (worker.Status.Title.Length==0?"NO MEDIA":worker.Status.Title), "RESET", "MANAGER"],
         Menu.Settings => [$"VIDEO FILTER    {new[]{"SHARP","CRT","TV"}[settings.Filter]}",
             $"VIDEO UPSCALE   {((SharpPixelsGpuUpscaleMode)settings.Upscale).ToString().ToUpperInvariant()}",
             $"FULLSCREEN      {settings.Fullscreen}", $"GAMEPAD         {settings.Gamepad}",
@@ -249,7 +251,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     {
         switch (menu)
         {
-            case Menu.Main: Open(new[]{Menu.Settings,Menu.Network,Menu.Media,Menu.Reset}[selection]); break;
+            case Menu.Main: if(selection==4){LaunchManager();Open(Menu.None);}else Open(new[]{Menu.Settings,Menu.Network,Menu.Media,Menu.Reset}[selection]); break;
             case Menu.Settings:
                 switch(selection)
                 {
@@ -327,7 +329,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
     }
     private static string BatteryPath(string hash)=>Path.Combine(UserDataPaths.GetBaseDirectory(),"battery",hash+".srm");
     private Task FlushSramAsync()=>battery.FlushAsync();
-    private void SaveSettings()=>settingsPersistence.Queue(settings.Serialize());
+    private void SaveSettings(){settingsRevision++;settingsPersistence.Queue(settings.Serialize());}
     private void RefreshMedia()
     {
         if(!Directory.Exists(settings.MediaDirectory)) settings.MediaDirectory=UserDataPaths.GetMediaDirectory();
@@ -361,6 +363,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         // Own I/O drains before final capture. Failures survive window shutdown:
         // Program records last-error.log, returns nonzero and shows a normal-launch
         // error dialog. CLI probes never display blocking dialogs.
+        Finish(()=>{if(managerIpc!=null)managerIpc.DisposeAsync().AsTask().GetAwaiter().GetResult();});
         Finish(()=>mediaTask.GetAwaiter().GetResult());
         if(unreportedMediaError!=null)errors.Add(unreportedMediaError);
         Finish(()=>previewTask.GetAwaiter().GetResult());
@@ -369,7 +372,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         Finish(()=>settingsPersistence.Pending.GetAwaiter().GetResult());
         Finish(()=>worker.SetModeAsync(true,false).GetAwaiter().GetResult());
         Finish(()=>Task.Run(FlushSramAsync).GetAwaiter().GetResult());
-        Finish(()=>Task.Run(()=>settings.Save()).GetAwaiter().GetResult());
+        Finish(()=>Task.Run(()=>SettingsPersistence.WriteOrdered(settings.Serialize())).GetAwaiter().GetResult());
         Finish(battery.Dispose);Finish(presentation.Dispose);Finish(worker.Dispose);
         Finish(client.Dispose);Finish(server.Dispose);Finish(pending.Dispose);Finish(lifetime.Dispose);base.OnUnload();
         if(errors.Count!=0)throw new AggregateException("Shutdown save failed. Previous valid files were retained; see last-error.log and retry after fixing the storage error.",errors);

@@ -5,7 +5,7 @@ derived from the sibling C64Emulator. Preserve the original C64 repository.
 Do not replace the SNES hardware core with a native/external emulator core.
 
 Build: `dotnet build SNESEmulator.sln -c Release`
-Tests: `python tools/test-lab.py --windows` (original12 portable core +5 Windows integration cases).
+Tests: `python tools/test-lab.py --windows` (current separately reported core/runtime/persistence/network/manager suites; see docs/test-laboratory.md).
 Portable: `python tools/test-lab.py`. See `docs/test-laboratory.md` for the separate non-passing accuracy inventory.
 The integration tests require Python 3 for the local TLS relay test.
 

@@ -22,3 +22,10 @@ The external VRAM mid-scanline test ROM and retained source are Copyright
 2022 Marcus Rowe (undisbeliever), Zlib license. See
 testdata/ppu-external/upstream-LICENSE and testdata/m5-ppu-manifest.json.
 It is laboratory test data; no third-party emulator core code is included.
+
+Manager library metadata uses Microsoft.Data.Sqlite10.0.10 (Microsoft, MIT),
+SQLitePCLRaw.bundle_e_sqlite3/config/core/provider3.0.5 (SourceGear, Apache-2.0),
+and its SQLite3.53.4 native dependency (SQLite public domain). Exact dependency
+versions are retained in NuGet lockfiles; no UI framework beyond built-in WPF.
+The C64 Manager concept informed the architecture; its untracked files were read
+only and have not been incorporated or modified.
