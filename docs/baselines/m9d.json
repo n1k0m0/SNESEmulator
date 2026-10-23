@@ -123,5 +123,17 @@
     "status": "?? C64Emulator.Contracts/\n?? C64Emulator/Ipc/\n?? C64EmulatorManager/\n?? docs/C64EmulatorManager-Konzept.md\n"
   },
   "developmentEvidenceLimits": "Raw failed reports and available per-attempt source/DLL captures are retained. Earliest reused child report names were overwritten before per-attempt capture was introduced; no claim of complete early child-report retention. Build8/9 accidental old core test process was owned and terminated; no foreign processes terminated. No archived prior ZIP is nested.",
-  "noProductBuildAfterFinalNativeStarts": true
+  "noProductBuildAfterFinalNativeStarts": true,
+  "independentRootAcceptance": {
+    "head": "2a5ae39ec7e225866066aaf6b123afbac6972556",
+    "review": "artifacts/root-m9d-review.json",
+    "fullExit": 0,
+    "portable": 256,
+    "windows": 23,
+    "manifestSha256": "aab8d95936ac2b35e3c38306d60d1d438c17d00195e6f6a55b4652e21752035a",
+    "acceptanceSha256": "324e2af00d2912ba82795842d4b628dbf7fd3a0ea0fa75361481a562a27bfde6",
+    "archives": 3,
+    "files": 1473,
+    "uncompressedBytes": 55786880
+  }
 }

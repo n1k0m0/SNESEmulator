@@ -206,7 +206,7 @@ Three prepared Root helper scripts are ancillary copies in the report archive;
 they were not run as implementation evidence.
 
 See [M9d baseline](baselines/m9d.json) for exact hashes, counts and raw paths.
-M9d still awaits independent Root review. M9a sustained performance, M8 audio
+M9d was independently accepted on `2a5ae39` (Root full gate exit0,256 portable/23 Windows groups). M9a sustained performance, M8 audio
 reds, source-adjudicated raw SPC differences, distribution/Manager/CI, prolonged
 soak and M10 remain open; publish remains PRE-M0. No physical SNES/input/DAC,
 OS-focus or clean-VM claim is added.
