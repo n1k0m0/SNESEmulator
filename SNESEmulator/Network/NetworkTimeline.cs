@@ -60,6 +60,15 @@ public sealed class NetworkPlayout : IDisposable
     public string? Fault {get;private set;}
     public event Action<string>? Failed;
     public long Dropped {get;private set;}
+    internal readonly record struct DropCounters(long Total,long TimelineReset,long CapacityReset,long SourceDriftReset,long ShutdownReset,long FailureReset,long InvalidGeneration,long MissingAudioClock,long LateAudio,long DistantVideo,long DeliveryFailure)
+    {
+        public long ClassifiedTotal=>TimelineReset+CapacityReset+SourceDriftReset+ShutdownReset+FailureReset+InvalidGeneration+MissingAudioClock+LateAudio+DistantVideo+DeliveryFailure;
+    }
+    private enum ResetCause {Timeline,Capacity,SourceDrift,Shutdown,Failure}
+    private long timelineResetDrops,capacityResetDrops,sourceDriftResetDrops,shutdownResetDrops,failureResetDrops,invalidGenerationDrops,missingAudioClockDrops,lateAudioDrops,distantVideoDrops,deliveryFailureDrops;
+    // All mutations already occur under commitGate. Capture all reasons together
+    // so concurrent pumping/reset/shutdown cannot produce a misleading partial sum.
+    internal DropCounters ReadDropCounters(){lock(commitGate)return new(Dropped,timelineResetDrops,capacityResetDrops,sourceDriftResetDrops,shutdownResetDrops,failureResetDrops,invalidGenerationDrops,missingAudioClockDrops,lateAudioDrops,distantVideoDrops,deliveryFailureDrops);}
     public long Reanchors {get;private set;}
     public long PresentedVideo {get;private set;}
     public long PresentedAudio {get;private set;}
@@ -77,16 +86,23 @@ public sealed class NetworkPlayout : IDisposable
     private double Now=>now();
     public NetworkPlayout(Action clear,Func<double?>? audioPlayhead=null,Func<double>? clock=null,bool automatic=true,Func<bool>? needsAudio=null)
     {this.clear=clear;this.audioPlayhead=audioPlayhead??(()=>null);this.needsAudio=needsAudio??(()=>false);now=clock??(()=>Stopwatch.GetTimestamp()/(double)Stopwatch.Frequency);task=automatic?Task.Run(Run):Task.CompletedTask;}
-    public void Reset(Action? update=null)
+    // Explicit client timeline/disconnect resets share this entrypoint; phase
+    // snapshots distinguish normal shutdown from a reset during measurement.
+    public void Reset(Action? update=null)=>ResetCore(ResetCause.Timeline,update);
+    private void ResetCore(ResetCause cause,Action? update=null)
     {
-        lock(commitGate){lock(gate){Dropped+=queue.Count;queue.Clear();anchored=false;generation++;}update?.Invoke();clear();}
+        lock(commitGate){lock(gate){
+            int count=queue.Count;Dropped+=count;
+            switch(cause){case ResetCause.Timeline:timelineResetDrops+=count;break;case ResetCause.Capacity:capacityResetDrops+=count;break;case ResetCause.SourceDrift:sourceDriftResetDrops+=count;break;case ResetCause.Shutdown:shutdownResetDrops+=count;break;case ResetCause.Failure:failureResetDrops+=count;break;}
+            queue.Clear();anchored=false;generation++;
+        }update?.Invoke();clear();}
     }
     public void Enqueue(double source,bool audio,Action deliver)
     {
         if(!double.IsFinite(source)||source<0)throw new InvalidDataException("Invalid source time");
-        bool reset;
-        lock(gate)reset=queue.Count>=Capacity||anchored&&Math.Abs((Now-hostAnchor)-(source-sourceAnchor))>.25;
-        if(reset)Reset();
+        ResetCause? reset;
+        lock(gate)reset=queue.Count>=Capacity?ResetCause.Capacity:anchored&&Math.Abs((Now-hostAnchor)-(source-sourceAnchor))>.25?ResetCause.SourceDrift:null;
+        if(reset.HasValue)ResetCore(reset.Value);
         lock(gate)
         {
             double now=Now;
@@ -129,7 +145,15 @@ public sealed class NetworkPlayout : IDisposable
                 bool valid;lock(gate)valid=selected.Generation==generation;
                 bool observe=CaptureDiagnostics&&!selected.Audio,delivered=false;double commitAt=observe?Now:0;double? commitPlayhead=!selected.Audio?audioPlayhead():null;
                 try{
-                if(!valid||!selected.Audio&&needsAudio()&&!commitPlayhead.HasValue||selected.Audio&&error>.1||!selected.Audio&&commitPlayhead.HasValue&&Math.Abs(commitPlayhead.Value-selected.Source)>=MaximumVideoDistanceSeconds){Dropped++;}
+                // Preserve the original short-circuit decision order. Reasons are
+                // disjoint: one rejected item increments exactly one reason and Total.
+                bool reject=true;
+                if(!valid)invalidGenerationDrops++;
+                else if(!selected.Audio&&needsAudio()&&!commitPlayhead.HasValue)missingAudioClockDrops++;
+                else if(selected.Audio&&error>.1)lateAudioDrops++;
+                else if(!selected.Audio&&commitPlayhead.HasValue&&Math.Abs(commitPlayhead.Value-selected.Source)>=MaximumVideoDistanceSeconds)distantVideoDrops++;
+                else reject=false;
+                if(reject){Dropped++;}
                 else
                 {
                     try
@@ -145,7 +169,7 @@ public sealed class NetworkPlayout : IDisposable
                             if(completed.HasValue)MaximumSoftwareAvErrorSeconds=Math.Max(MaximumSoftwareAvErrorSeconds,Math.Abs(completed.Value-selected.Source));
                         }
                     }
-                    catch(Exception e){Fault=e.ToString();Failed?.Invoke(Fault);Dropped++;Reset();}
+                    catch(Exception e){Fault=e.ToString();Failed?.Invoke(Fault);Dropped++;deliveryFailureDrops++;ResetCore(ResetCause.Failure);}
                     finally{current=null;}
                 }
                 }finally{if(observe){double? completedPlayhead=audioPlayhead();var observation=new Observation(++observationSequence,selected.Generation,selected.Source,selected.Arrival,selectedDue,sampleAt,commitAt,Now,playhead,commitPlayhead,completedPlayhead,delivered,valid,error);if(observations.Count==4096)observations.Dequeue();observations.Enqueue(observation);}}
@@ -154,7 +178,7 @@ public sealed class NetworkPlayout : IDisposable
 
         return selected!=null;
     }
-    public void Dispose(){stop.Cancel();if(IsCurrent)return;task.GetAwaiter().GetResult();Reset();stop.Dispose();}
+    public void Dispose(){stop.Cancel();if(IsCurrent)return;task.GetAwaiter().GetResult();ResetCore(ResetCause.Shutdown);stop.Dispose();}
 }
 
 /// <summary>UI reads and epoch publication share one short commit lock. Old callbacks cannot republish after invalidation.</summary>

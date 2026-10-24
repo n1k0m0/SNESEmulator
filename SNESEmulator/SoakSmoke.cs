@@ -42,6 +42,9 @@ internal static class SoakSmoke
         NetworkPlayout? observed=null;Process? manager=null;Task managerOut=Task.CompletedTask,managerErr=Task.CompletedTask;
         NetworkPlayout.Observation? coldMaximumRow=null,steadyMaximumRow=null;
         double closingMaximum=0,measurementEnd=double.PositiveInfinity;long closingDropped=0;
+        var quality=new SoakQualityTracker();
+        NetworkPlayout.DropCounters? readyDropReasons=null,closingDropReasons=null;
+        bool actualCatchupFailure=false,counterRegressionFailure=false,dropAccountingFailure=false;
         void ObservePending()
         {
             if(observed==null)return;
@@ -76,6 +79,18 @@ internal static class SoakSmoke
             }
         };
         object? endMetrics=null;long endMaster=0,endFields=0;bool completed=false;
+        void ObserveQuality(double now,SNESEmulator.Runtime.WorkerStatus status)
+        {
+            // The owner marks CatchingUp before advancing its next deadline.
+            // Status reports the updated deadline, so it cannot replace actual
+            // output counters; a ten-second sample also misses short episodes.
+            var presentationCounters=window.PresentationCountersForProbe;
+            var currentDropReasons=observed?.ReadDropCounters();
+            quality.Observe(now,presentationCounters,currentDropReasons?.Total??0,status.Field,window.ProbeOutput?.CatchingUp??false,status.PacingLateSeconds);
+            if(quality.SteadyActualCatchupFields>0&&!actualCatchupFailure){actualCatchupFailure=true;Error("Actual post-readiness owner catchup fields muted local audio");}
+            if(quality.CounterRegressions>0&&!counterRegressionFailure){counterRegressionFailure=true;Error("Cumulative presentation/drop counters regressed");}
+            if(currentDropReasons is {} dropReasons&&dropReasons.Total!=dropReasons.ClassifiedTotal&&!dropAccountingFailure){dropAccountingFailure=true;Error("Remote drop reasons do not sum to cumulative drops");}
+        }
         Row(new{Kind="identity",StartedUtc=began,DurationSeconds=seconds,Region=region,Rom=Path.GetFullPath(rom),RomSha256=Convert.ToHexStringLower(SHA256.HashData(romBytes)),CoreSha256=HashFile(typeof(SnesSystem).Assembly.Location),AppSha256=HashFile(typeof(SoakSmoke).Assembly.Location),Process=Environment.ProcessId,Meaning="Actual SNESEmulator native window, normal pacing, synthetic application input, actual localhost TLS/WinMM and WPF Manager; zero audio gain; no physical DAC/display or hardware-console claim"});
         window.RenderFrame+=frameEvent=>{
             double now=timer.Elapsed.TotalSeconds;var status=window.RuntimeStatus;
@@ -102,9 +117,10 @@ internal static class SoakSmoke
                 if(!remote.IsConnected&&!remoteFailure&&now<seconds-.1){remoteFailure=true;Error("Remote disconnected during soak");}
                 if(observed.Fault!=null&&!remoteFailure){remoteFailure=true;Error("Playout: "+observed.Fault);}
                 maxPending=Math.Max(maxPending,observed.Pending);
-                if(readyAt<0&&status.PacingLateSeconds<.05&&remote.TimelineIdentity is {Muted:false}&&observed.DriverComparedVideo>=5&&observed.PresentedAudio>=5){if(stableSince<0)stableSince=now;if(now-stableSince>=.5){readyAt=now;coldDrops=observed.Dropped;}}
+                if(readyAt<0&&status.PacingLateSeconds<.05&&remote.TimelineIdentity is {Muted:false}&&observed.DriverComparedVideo>=5&&observed.PresentedAudio>=5){if(stableSince<0)stableSince=now;if(now-stableSince>=.5){readyAt=now;readyDropReasons=observed.ReadDropCounters();coldDrops=readyDropReasons.Value.Total;quality.MarkReady(now,window.PresentationCountersForProbe,coldDrops);}}
                 else if(readyAt<0)stableSince=-1;
             }
+            ObserveQuality(now,status);
             if(readyAt<0&&now>=30&&!readinessFailure){readinessFailure=true;Error("30-second stable unmuted driver readiness failed; run continues to preserve actual duration");}
             if(manager==null&&window.ManagerPipe!=null){
                 var start=new ProcessStartInfo(Path.GetFullPath(managerExe)){UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden,RedirectStandardOutput=true,RedirectStandardError=true};
@@ -122,7 +138,12 @@ internal static class SoakSmoke
                 ObservePending();
                 Row(new{Kind="sample",WallSeconds=now,Metrics=window.RuntimeMetrics,Managed=GC.GetTotalMemory(false),WorkingSet=Environment.WorkingSet,PeakManaged=peakManaged,scans,checkpoints,SourceFields=sourceCount,RemoteFields=remoteCount,Matched=matched,Unmatched=unmatched,Mismatches=mismatches,PcmPairs=pairs,ReadySeconds=readyAt,DriverCompared=observed?.DriverComparedVideo,RemoteAudio=observed?.PresentedAudio,RemoteVideo=observed?.PresentedVideo,RemoteDropped=observed?.Dropped,MaximumSoftwareAv=observed?.MaximumSoftwareAvErrorSeconds,RemotePending=observed?.Pending,observationGaps});
             }
-            if(now>=seconds){endMetrics=window.RuntimeMetrics;endMaster=status.MasterClock;endFields=status.Field;RuntimeSmoke.Screenshot(window,Path.Combine(directory,"native-end.png"));closingMaximum=observed?.MaximumSoftwareAvErrorSeconds??0;closingDropped=observed?.Dropped??0;measurementEnd=Stopwatch.GetTimestamp()/(double)Stopwatch.Frequency;ObservePending();completed=true;window.Close();}
+            if(now>=seconds){RuntimeSmoke.Screenshot(window,Path.Combine(directory,"native-end.png"));
+                // Screenshot work can span several presentation outputs. Observe
+                // once more at the measurement cutoff, before close/cleanup, so
+                // a last-window catchup cannot disappear behind the final render.
+                var finalStatus=window.RuntimeStatus;ObserveQuality(timer.Elapsed.TotalSeconds,finalStatus);
+                endMetrics=window.RuntimeMetrics;endMaster=finalStatus.MasterClock;endFields=finalStatus.Field;closingMaximum=observed?.MaximumSoftwareAvErrorSeconds??0;closingDropReasons=observed?.ReadDropCounters();closingDropped=closingDropReasons?.Total??0;measurementEnd=Stopwatch.GetTimestamp()/(double)Stopwatch.Frequency;ObservePending();completed=true;window.Close();}
         };
         try{window.Run();}
         finally{
@@ -138,12 +159,14 @@ internal static class SoakSmoke
         if(window.RuntimeStatus.DroppedPresentation!=0)Error("Owner presentation queue discarded native fields");
         if(peakManaged>=256*1024*1024||maxPending>NetworkPlayout.Capacity||mismatches!=0||observationGaps!=0)Error("Memory/queue/native-output/observation bound violated");
         File.WriteAllText(Path.Combine(directory,"max-observations.json"),JsonSerializer.Serialize(new{Cold=coldMaximumRow,Steady=steadyMaximumRow,Last128=observed?.DiagnosticSnapshot().TakeLast(128).ToArray(),ColdBoundary=readyAt<0?(double?)null:beganStopwatch+readyAt,Meaning="Bounded actual-run software evidence; cumulative metric is not reset or clamped"},new JsonSerializerOptions{WriteIndented=true}));
-        Row(new{Kind="quality",steadyCatchupSamples,noMediaSamples,ManagerStatusRequests=managerStatusRequests,NoPollSamples=noPollSamples,ProducerDropped=window.RuntimeStatus.DroppedPresentation,MaximumAllowedSoftwareAvSeconds=.04,ExistingCatchupMuteBoundarySeconds=.1,Meaning="Counts cover actual observations; no relaxed Core sustained-window acceptance"});
+        Row(new{Kind="quality",steadyCatchupSamples,ActualPostReadyMutedFields=quality.SteadyActualCatchupFields,CounterRegressions=quality.CounterRegressions,OmittedCounterEvents=quality.OmittedChangeEvents,noMediaSamples,ManagerStatusRequests=managerStatusRequests,NoPollSamples=noPollSamples,ProducerDropped=window.RuntimeStatus.DroppedPresentation,MaximumAllowedSoftwareAvSeconds=.04,ExistingCatchupMuteBoundarySeconds=.1,Meaning="Ten-second PacingLate samples are not continuous; actual cumulative muted fields are checked at every RenderFrame. Remote freshness/reset discards are classified, not required to be zero. No relaxed Core sustained-window acceptance"});
         var result=new{
             Success=errorCount==0,Errors=errors,ErrorCount=errorCount,StartedUtc=began,EndedUtc=DateTimeOffset.UtcNow,
             ActualWallSeconds=timer.Elapsed.TotalSeconds,RequestedWallSeconds=seconds,Fields=endFields,MasterClocks=endMaster,
             HardwareSeconds=endMaster*window.RuntimeProfileDenominator/(double)window.RuntimeProfileNumerator,ReadySeconds=readyAt,
             ColdMaximum=coldMaximum,SteadyMaximum=steadyMaximum,CumulativeMaximum=closingMaximum,
+            PresentationObservation=new{quality.ReadySeconds,quality.ReadyCounters,quality.LastCounters,quality.SteadyActualCatchupFields,quality.SteadyRemoteDropped,quality.CounterRegressions,quality.OmittedChangeEvents,quality.Events,Limits="Each cumulative presentation counter covers every dequeued owner output; separate Interlocked reads are not a joint atomic field-boundary snapshot. Latest output/late-time and event times are render observations, not exact owner mutation timestamps. Detail overflow is explicit; cumulative counts remain complete."},
+            RemoteDropReasons=new{Ready=readyDropReasons,MeasurementEnd=closingDropReasons,AfterCleanup=observed?.ReadDropCounters(),Meaning="Disjoint causes sum to Total; phase snapshots preserve original readiness/end/cleanup boundaries. Normal freshness/reset/shutdown discards are not producer loss."},
             ColdDropped=coldDrops,MeasurementDropped=observed==null?(long?)null:closingDropped-coldDrops,
             ShutdownDropped=observed==null?(long?)null:observed.Dropped-closingDropped,
             PeakManaged=peakManaged,MaximumRemotePending=maxPending,ObservationGaps=observationGaps,

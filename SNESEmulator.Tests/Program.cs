@@ -24,8 +24,14 @@ void Test(string name,Action test)
     try { test(); passed++; report.Add(name,"pass",seconds:timer.Elapsed.TotalSeconds); Console.WriteLine("PASS "+name); }
     catch(Exception e) { failed++; report.Add(name,"fail",e.ToString(),timer.Elapsed.TotalSeconds); Console.WriteLine("FAIL "+name+": "+e); }
 }
+if(args.Contains("--soak-observation-only"))
+{
+    SoakObservationTests.Run(Test);
+    report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/soak-observation");return failed==0?0:1;
+}
 if(args.Contains("--network-only"))
 {
+    SoakObservationTests.Run(Test);
     report.Metadata["dataDirectory"]=testRoot;
     NetworkTests.Run((name,body)=>{var filter=args.FirstOrDefault(a=>a.StartsWith("--filter="))?[9..];if(filter==null||name.Contains(filter,StringComparison.OrdinalIgnoreCase))Test(name,body);},testRoot);report.Metadata["limits"]="Own real localhost TLS/Relay sockets; software driver boundaries; no physical input/DAC/console or external relay";
     report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9d-network-windows");return failed==0?0:1;

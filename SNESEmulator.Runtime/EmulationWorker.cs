@@ -121,14 +121,21 @@ public sealed class EmulationWorker : IDisposable
         if(!keepFrame)Volatile.Write(ref latest,null);pacer.Rebase(clock.Timestamp);
         PublishStatus();
     }
-    private FieldOutput Emulate(FieldInput value,long inputSequence)
+    private FieldOutput Emulate(FieldInput value,long inputSequence,bool paced=false)
     {
         machine.Bus.Controllers.Buttons[0]=value.Port1;machine.Bus.Controllers.Buttons[1]=value.Port2;
         long inputClock=machine.Clock.Now;machine.RunFrame();
         // CompleteField already allocates its own three planes. They are never
         // reused or written by PPU; handing these readonly planes across is safe.
         var frame=machine.Bus.Ppu.CompletedFrame??throw new InvalidOperationException("No completed raw field");
-        var result=new FieldOutput(epoch,frame,machine.Bus.Apu.Dsp.DrainSamples(),inputSequence,inputClock,value,turbo,!paused&&(clock.Timestamp-deadline)/(double)clock.Frequency>.1);
+        var samples=machine.Bus.Apu.Dsp.DrainSamples();
+        // deadline previously described this field's scheduled START. Comparing
+        // completion against it also counted an ordinary field duration as lag.
+        // Advance the same rational pacer exactly once, then classify lateness
+        // against this field's scheduled END. Paused deterministic Step does not
+        // advance the host pacer; hardware clocks and source timestamps are untouched.
+        if(paced)deadline=pacer.Add(machine.Clock.Now-inputClock,machine.Profile,clock.Frequency,turbo?4:1);
+        var result=new FieldOutput(epoch,frame,samples,inputSequence,inputClock,value,turbo,!paused&&(clock.Timestamp-deadline)/(double)clock.Frequency>.1);
         Volatile.Write(ref latest,result);
         lock(gate){if(outputs.Count==OutputCapacity){dropped+=outputs.Count;outputs.Clear();}outputs.Enqueue(result);}
         return result;
@@ -157,8 +164,7 @@ public sealed class EmulationWorker : IDisposable
                 if(paused||fault!=null||machine.Bus.Cartridge==null){changed.WaitOne(50);continue;}
                 if(clock.Timestamp<deadline){clock.WaitUntil(deadline,changed,stopping.Token);continue;}
                 FieldInput next;lock(gate){next=input;appliedSequence=sequence;}
-                long before=machine.Clock.Now;
-                try{Emulate(next,appliedSequence);deadline=pacer.Add(machine.Clock.Now-before,machine.Profile,clock.Frequency,turbo?4:1);}
+                try{Emulate(next,appliedSequence,paced:true);}
                 catch(Exception e){fault=e.ToString();paused=true;Discontinuity();}
                 PublishStatus();
             }

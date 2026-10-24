@@ -1,0 +1,285 @@
+{
+  "schema": "snes-r2-local-evidence-v1",
+  "meaning": "Local actual-run provenance, not golden expected data or independent hardware/remote-CI evidence. Referenced ignored artifacts are intentionally preserved locally, not committed as large freezes.",
+  "builtSource": {
+    "baselineGitCommit": "97a05a7c5da7061437de193516b1cea4616eb530",
+    "workingTreeStatus": " M SNESEmulator.Core.Tests/RuntimeTests.cs\n M SNESEmulator.Runtime/EmulationWorker.cs\n M SNESEmulator.Tests/Program.cs\n M SNESEmulator/Frontend/HostPresentation.cs\n M SNESEmulator/Frontend/SnesWindow.Diagnostics.cs\n M SNESEmulator/Network/NetworkTimeline.cs\n M SNESEmulator/SoakSmoke.cs\n?? SNESEmulator.Tests/SoakObservationTests.cs\n?? SNESEmulator/SoakQualityTracker.cs\n",
+    "frozenCSharpFiles": 124,
+    "allCurrentCSharpBytesMatchBoundedBuild": true,
+    "hardwareCoreSourceFilesUnchangedFromClean97a": 34,
+    "fieldPacerSourceSha256": "e811127e6e5e55e541608b54072fca53ba1d636b61e2a6d32d3e2468fe1f3533",
+    "implementationSourceSha256": {
+      "SNESEmulator.Runtime/EmulationWorker.cs": "dd2aa08a144087be50a8bdb59e569b8eef0a038176611ab51949bd2354bdf361",
+      "SNESEmulator.Core.Tests/RuntimeTests.cs": "5bfcce7133fe8e5aeee861eb9d54e08b6411d37154798fc9a5933d2da1571609",
+      "SNESEmulator/Frontend/HostPresentation.cs": "257d5d6c444a30314e4d7c088bf19dc2f54914de613560fbc8ca4f87034fa92a",
+      "SNESEmulator/Frontend/SnesWindow.Diagnostics.cs": "19e9ffb4f4ffcb6bf81e53608b63671998b0bf01cc5e85e7596a398873452b13",
+      "SNESEmulator/Network/NetworkTimeline.cs": "bc892e9568eca3bae5754142dcf40af965741b3c5d9a44bfdb49f87f7f9e99a9",
+      "SNESEmulator/SoakSmoke.cs": "8ada74a04765b70908017246cd7e7f3ba84bd0e331869228899a13fbbf34df8a",
+      "SNESEmulator/SoakQualityTracker.cs": "2e0d5d450a8256b8dc7ea6518b41b7b651ede0ac3818a3cabb80b97f7eff4a53",
+      "SNESEmulator.Tests/Program.cs": "3360b9d2de90e8c4261ed34e2e6f8267bd3694b8851f7e3c59f1e113b54486bf",
+      "SNESEmulator.Tests/SoakObservationTests.cs": "3655c055cab01cf6d17408c93f51084e59c2c1a5dd96503c3d2dbd214c4ae7c2"
+    },
+    "note": "Documentation and this manifest are added after the bounded tests; no implementation bytes changed. No clean future-commit binary or CI claim is inferred."
+  },
+  "actualWindowsBoundedModules": {
+    "SNESEmulator.Core.dll": "d220631ada9dcf90c1475c2b3ea57a508108f14fd539491fc5150f75ddee7199",
+    "SNESEmulator.Runtime.dll": "e785cee5d26d935ddc140fd0a7201cc059591ca117ec6a28dd0a8802ee0d102e",
+    "SNESEmulator.dll": "56aaa72944b8a5e50d83dc296bb0fa72e2c5f47a006befddc5bbac54fb05876f",
+    "coreclr.dll": "18eed8c40d05fc455be95d12cc77eacf379265063b15ca84bd7a11cf29078a22",
+    "clrjit.dll": "2a2332c3c0cb023e71deb356b5fb85ce9045fb8434734dcfe9a7529e427dc858"
+  },
+  "acceptance": {
+    "coreSustained": {
+      "source": "97a05a7",
+      "ntscCompleteWindows": 61,
+      "ntscMinimumRealtime": 1.0066815491423602,
+      "palCompleteWindows": 51,
+      "palMinimumRealtime": 1.182353816752711,
+      "limit": "NTSC reserve only 0.668%; exact hardware-core source and Windows Core DLL unchanged by the later host fix."
+    },
+    "historicalNativeHours": {
+      "ntscActualWallSeconds": 3600.9282195,
+      "palActualWallSeconds": 3600.389249,
+      "strictContinuousAcceptance": false,
+      "minimumProvenPostReadyMutedFields": [
+        19,
+        68
+      ],
+      "measurementRemoteDrops": [
+        11,
+        22
+      ]
+    },
+    "correctedRuntimeBoundedOnly": {
+      "ntscActualWallSeconds": 360.279807,
+      "palActualWallSeconds": 360.2677891,
+      "actualPostReadyMutedFields": [
+        0,
+        0
+      ],
+      "measurementRemoteDrops": [
+        0,
+        0
+      ],
+      "sourcePcmNonzeroPairs": [
+        0,
+        0
+      ],
+      "limit": "No audible amplitude/music proof; observed software driver/ARGB evidence is not all fields or physical hardware."
+    },
+    "finalReleaseGate": {
+      "status": "OPEN",
+      "when": "After subsequent accuracy/documentation/enhancement-chip phases, against actual final binaries",
+      "required": [
+        "Actual 3600 wall seconds NTSC with strict cumulative counters",
+        "Actual 3600 wall seconds PAL with strict cumulative counters",
+        "Both fully executed even after a quality failure",
+        "Unchanged 30-second readiness and cumulative 40-ms Cold+Steady postcallback A/V",
+        "Actual final source/binary/runtime identities, bounded heap/queues, no producer output loss",
+        "PCM amplitude and observed-versus-unobserved ARGB scope reported honestly"
+      ]
+    },
+    "remoteCiForCurrentR2Changes": "Not claimed; root coordinates final exact-source CI/push.",
+    "hardwareAccuracy": "Not established; existing M8 accuracy inventory remains red and 7000 raw SPC cases retain approved separate adjudication."
+  },
+  "reports": [
+    {
+      "path": "artifacts/r2-performance-soak/97a-full-gate-process.json",
+      "bytes": 1081,
+      "sha256": "5695da6d9d5947930cb1ee4165d24ead1d1a1106e3ef6e2d4700709a80b341cf",
+      "scope": "Full Windows gate for clean 97a, exit0; explicit nine-Updater-output build delta remains separate."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-source-identities.json",
+      "bytes": 495896,
+      "sha256": "cf7ea262a0f8a7a8b1ef3707e290df51d304b546ace5a8bad1963c071452430c",
+      "scope": "Full physical clean 97a source boundary."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-postfull-binary-identities.json",
+      "bytes": 407921,
+      "sha256": "167117d8ab6c222f277c2ef6319f93c4a4cc71365272644b89dc2667a9e37863",
+      "scope": "All 1770 actual clean 97a postgate outputs."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-updater-build-identity-delta.json",
+      "bytes": 6463,
+      "sha256": "accdc3170203ecd3d83a920d6ab38ec4a5663e096f4d84ff2aa56242e0dc4e0e",
+      "scope": "Explicit before/after stale Updater output provenance, not binary equivalence."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-windows-full-report-inventory.json",
+      "bytes": 22399,
+      "sha256": "b82c36168eb33e303b3757cfba61f3b67586bf26fff637cba481c0dbf9817138",
+      "scope": "SHA inventory of104 preserved Windows reports, including mixed-SPC paths."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/linux-97a/result.json",
+      "bytes": 22869,
+      "sha256": "719dd791e6637865ffb6b68855dad5a48ebd8c1037f5526a19bfcbb5f5416d60",
+      "scope": "Actual targeted Ubuntu 97a: guards, entry lifecycle,256000 mixed SPC,18952 resumes,128 horizons,14 consoles."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/linux-97a/identity.json",
+      "bytes": 2501,
+      "sha256": "8b83c9a619ad03b784240b318feb2b5053976303d9d213210b427738f85f3047",
+      "scope": "Private Linux runtime/modules and actual source identity for targeted97a."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/hot-entry-abba-result.json",
+      "bytes": 50184,
+      "sha256": "a1e427ad266ff0ba51af35c40035708885b3e973c65d6cbc08aab0948ce21f92",
+      "scope": "Isolated candidate/control balanced ABBA; first control outlier retained."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/hot-entry-baab-result.json",
+      "bytes": 49610,
+      "sha256": "dafb5756b9250588c719b3fb6f12f08df56abaeda8c03e166320b26a8cd2ad01",
+      "scope": "Mirror BAAB independent repetition."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/hot-entry-balanced-decision.json",
+      "bytes": 712,
+      "sha256": "8ea5c97f8fe37324f1cd2a15fffc7e355008b2db72d96d8f9b094f38c918793d",
+      "scope": "All eight digital/control signatures and 9.72% bounded gain; not sustained acceptance."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-sustained-results.json",
+      "bytes": 35095,
+      "sha256": "d1ef589388436c5b19a50e0d381def2de53e5b14260dc7fe66d02c734d6e02a2",
+      "scope": "Actual NTSC37000/PAL31000, every complete600-field window, queues, heap and modules."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-sustained-postrun-audit.json",
+      "bytes": 13979,
+      "sha256": "c945b2841097a966419b426be2d7558e7ba1c2ac3c46f9626ccf03733010c556",
+      "scope": "Compatible historical inputs and exact historical own-core video/PCM/raw-state outputs; not hardware oracle."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-hours-processes.json",
+      "bytes": 1204324,
+      "sha256": "f950186ec2ae26de8d4c8e64c28035705f1ba737a789ff2a95bb0f1e9b912b45",
+      "scope": "Actual two historical3600s sessions; original sampled guard missed steady mute."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-hours-final-identity-audit.json",
+      "bytes": 1329,
+      "sha256": "6fc53d19e74eb3a7ab361e5943f1884c4d1ee3eecf581010d9c9cc66bcb0160a",
+      "scope": "All 1770 hashes, private App/Manager CLR/JIT first/last, clean source and four owned PIDs ended."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-hours-readback.json",
+      "bytes": 20989,
+      "sha256": "df4e020b6b149ae24451d1135dbc252bcbd1b55673a3c8b3714b071aa9cab704",
+      "scope": "Complete historical counter timelines, cold/steady/cleanup and lower-bound postready increments."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-hours-ntsc/result.json",
+      "bytes": 2794,
+      "sha256": "896b8c2df23a098bd3313681c562af5c1b10f809d3fd2af4e3e16ff4986363ed",
+      "scope": "Historical actual NTSC hour, scoped original criteria only."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/97a-hours-pal/result.json",
+      "bytes": 2792,
+      "sha256": "a447cfc810e654a4a6e5f2769bc3c60d8d7929f01737086001b456a0987c78c2",
+      "scope": "Historical actual PAL hour, scoped original criteria only."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/observation-fix-source-identities.json",
+      "bytes": 496544,
+      "sha256": "6e5f2256ed731aaca2d835eb94430865981e746d1197bef3c45e9ab3e3e068ee",
+      "scope": "Explicit dirty observer-only source snapshot before host deadline correction."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/observation-fix-native-processes.json",
+      "bytes": 1556018,
+      "sha256": "8e4bd64af16748d0c2b8e7db47838fe09db90719da76af7331ed918c0c7c046a",
+      "scope": "Two actual 360-second diagnostics; NTSC genuine new-counter fail, late module WinError299 retained."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/observation-fix-native-ntsc/result.json",
+      "bytes": 170156,
+      "sha256": "97c3ac89aea6af01108050f1eae49d2232046c2e6f238e41123f4085bbf0e3fd",
+      "scope": "Observer proves four postready muted fields; first-only details overflow explicitly."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/observation-fix-native-pal/result.json",
+      "bytes": 144118,
+      "sha256": "363cc381b98abd0007a9791867ef82e27092e10ff3f556542446a617b6cf9872",
+      "scope": "Observer-only PAL bounded result; not hour acceptance."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-before-identities.json",
+      "bytes": 970,
+      "sha256": "bed327b0d25d93a302c7f5ca8a8f08d4281e8532b3c7e3902604e8f38fec80cc",
+      "scope": "Original Worker/Pacer/Core/Test source+module identities before deadline change."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-before.json",
+      "bytes": 8614,
+      "sha256": "0b676360e87819acd5dd90d6d786aa731634a1f51945c1ae97ce83299560f675",
+      "scope": "Real worker/fake-clock: 20 pass, 4 fail; 90 ms and 100 ms misclassified in both regions."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-after.json",
+      "bytes": 5637,
+      "sha256": "b0aee99512b0fd5b986539d4241035fc091ae33007977d128a7ff9aec0b4f73a",
+      "scope": "Same boundary/runtime suite: 24 pass, 0 fail after exact field-end classification."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-targeted-regression.json",
+      "bytes": 2779,
+      "sha256": "6a06801c3e893e37e20d0d3c9c3ce9e32f0b4c3e258c2f5ffc6cc27638ea59de",
+      "scope": "Serial portable network, native runtime/151-stage interaction/persistence, Windows integration and 23 network groups."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/linux-end-deadline/result.json",
+      "bytes": 15801,
+      "sha256": "4f1681cde559bf78e42333ce54a8d0d4508fb6c84febb12b8caa47a41de0aca5",
+      "scope": "Actual Ubuntu/private10.0.13 current 24 runtime groups; exact explicit dirty source overlay."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/linux-end-deadline/identity.json",
+      "bytes": 491470,
+      "sha256": "f79f096d07e9b16af83b445e4c9387df6a154441cd189ab49919b6e1af8fce64",
+      "scope": "All 2618 overlay source bytes plus private actual Linux runtime identities."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-source-identities.json",
+      "bytes": 496632,
+      "sha256": "7c6ac4a72d86ddf65d94fbcb64519dd67f954ce5af40bd8cc5b16316288dd960",
+      "scope": "Explicit frozen dirty product/test source used for corrected-runtime bounded probes; subsequent docs-only changes are separate."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-binary-identities.json",
+      "bytes": 408292,
+      "sha256": "7b60745fb8c5986c69e6c1bbfa25b57f0a6af7023f9ea17985ebd69fa3fbc313",
+      "scope": "All 1770 exact corrected-runtime bounded-probe outputs."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-native-processes.json",
+      "bytes": 1571243,
+      "sha256": "20b09c33aef60d0e57186931f04afd1de0c336bd1f78a5a86e92cd5276fb7683",
+      "scope": "Actual sequential 360-second per-region current counter probes, not hours."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-native-readback.json",
+      "bytes": 11030,
+      "sha256": "62e8e8b9227526276c7522c9263ea0f3354c6505dee9e139dc1fdaf0fda30410",
+      "scope": "Complete corrected bounded counters/reasons, strict zero actual postready mute, PCM silence and closed owned processes."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-native-ntsc/result.json",
+      "bytes": 170292,
+      "sha256": "297374a608495f76671fb1e2093fc1974ddf73f6e95b787e3716294449bbc6b2",
+      "scope": "Actual 360.280-second NTSC; zero source-PCM nonzero pairs in this scoped run."
+    },
+    {
+      "path": "artifacts/r2-performance-soak/end-deadline-native-pal/result.json",
+      "bytes": 157754,
+      "sha256": "7f58849d64c6e4808ce169d752e1e146425c619f0dec961dfc1b5477d651c1dc",
+      "scope": "Actual 360.268-second PAL; zero source-PCM nonzero pairs in this scoped run."
+    }
+  ]
+}

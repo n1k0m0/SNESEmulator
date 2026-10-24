@@ -80,6 +80,31 @@ static class RuntimeTests
                 pacer.Rebase(19);Check(pacer.Add(123,p,10000000,4)==19+(long)((Int128)123*p.MasterHzDenominator*10000000/(p.MasterHzNumerator*(Int128)4)),"turbo rational epoch");
             }
         });
+        foreach(var profile in new[]{HardwareProfile.Ntsc,HardwareProfile.PalProfile})
+        foreach(long endLatenessTicks in new long[]{0,90000,100000,100001})
+        test($"R2 actual worker end-deadline catchup {profile.Id} late={endLatenessTicks}us",()=>{
+            // The clock stays fixed while hardware runs. The first WaitUntil is
+            // a real owner boundary; advancing it then models a delayed second
+            // field without sleeping or changing any host scheduling settings.
+            var c=new ControlledClock();using var w=new EmulationWorker(profile,c);
+            byte[] rom=DiagnosticRom.Create();var direct=new SnesSystem(profile);direct.Insert(new Cartridge(rom));
+            direct.Bus.Controllers.Buttons[0]=0;direct.Bus.Controllers.Buttons[1]=0;
+            Await(w.InsertAsync(rom));Await(w.SetModeAsync(false,false));
+            Until(()=>w.Status.Field==1&&c.Waiting,"first rational boundary");
+            Check(w.TryDequeue(out var first),"first owner output");direct.RunFrame();Compare(direct,first!,"initial paced field");
+            var calibration=new SnesSystem(profile);calibration.Insert(new Cartridge(rom));calibration.RunFrame();calibration.RunFrame();
+            long secondEndClock=calibration.Clock.Now;
+            long secondEndDeadline=(long)((System.Numerics.BigInteger)secondEndClock*profile.MasterHzDenominator*c.Frequency/profile.MasterHzNumerator);
+            long completion=secondEndDeadline+endLatenessTicks;c.Advance(completion);
+            Until(()=>w.Status.Field>=2&&c.Waiting,"delayed field reaches held boundary");
+            var outputs=new List<FieldOutput>();while(w.TryDequeue(out var output))outputs.Add(output!);
+            Check(outputs.Count>0&&w.Status.DroppedPresentation==0,"controlled output must stay bounded and complete");
+            var second=outputs[0];
+            Check(second.Video.Geometry.EndClock==secondEndClock,"absolute second-field end differs from direct hardware");
+            foreach(var output in outputs){direct.RunFrame();Compare(direct,output,"late field preserves hardware/video/PCM");}
+            Check(Await(w.CaptureAsync()).SequenceEqual(StateSerializer.Capture(direct)),"late pacing preserves exact state");
+            Check(second.CatchingUp==(endLatenessTicks>100000),$"End lateness {endLatenessTicks}us at completion {completion}, end deadline {secondEndDeadline}, actual CatchingUp={second.CatchingUp}; policy is strictly >100ms AFTER field end");
+        });
         test("M9b controlled clock pause resume queue pressure and shutdown cancellation",()=>{
             var c=new ControlledClock();using var w=new EmulationWorker(clock:c);Await(w.InsertAsync(DiagnosticRom.Create()));Await(w.SetModeAsync(false,false));
             Until(()=>w.Status.Field==1&&c.Waiting,"first field independent of UI");Thread.Sleep(30);Check(w.Status.Field==1,"clock holds hardware");

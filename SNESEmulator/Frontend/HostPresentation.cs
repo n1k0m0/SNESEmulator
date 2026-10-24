@@ -14,6 +14,11 @@ internal sealed class HostPresentation : IDisposable
     private long frames,samplePairs,discontinuities,deviceOverflows,mutedCatchupFields;
     private int bufferedBytes;
     private long previousEpoch=-1,previousEnd=-1;
+    // These counters cover every dequeued owner output, including catchup fields
+    // that a later UI/status sample can no longer see. No hardware time is changed.
+    internal readonly record struct Counters(long Frames,long MutedCatchupFields,long Discontinuities,long DeviceOverflows);
+    // Individual Interlocked reads are atomic; the aggregate is not one atomic field boundary.
+    internal Counters ReadCounters()=>new(Interlocked.Read(ref frames),Interlocked.Read(ref mutedCatchupFields),Interlocked.Read(ref discontinuities),Interlocked.Read(ref deviceOverflows));
     public object Metrics=>new{Frames=Interlocked.Read(ref frames),SamplePairs=Interlocked.Read(ref samplePairs),Discontinuities=Interlocked.Read(ref discontinuities),DeviceOverflows=Interlocked.Read(ref deviceOverflows),MutedCatchupFields=Interlocked.Read(ref mutedCatchupFields),BufferedBytes=Volatile.Read(ref bufferedBytes),CapacityBytes=32000};
     public float Volume {get=>Volatile.Read(ref volume);set=>Volatile.Write(ref volume,value);}
     public HostPresentation(EmulationWorker worker,SnesNetServer server,Action<string> message)

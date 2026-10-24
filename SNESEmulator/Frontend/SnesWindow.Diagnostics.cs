@@ -21,6 +21,7 @@ public sealed partial class SnesWindow
     private double maximumUiInterval;
     private int updates;
     internal WorkerStatus RuntimeStatus=>worker.Status;
+    internal HostPresentation.Counters PresentationCountersForProbe=>presentation.ReadCounters();
     internal SNESEmulator.Network.SnesNetServer ProbeServer=>server;
     internal FieldOutput? ProbeOutput=>worker.Latest;
     internal Task<byte[]> CaptureStateForProbe()=>worker.CaptureAsync();
