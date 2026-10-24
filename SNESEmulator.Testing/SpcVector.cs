@@ -76,7 +76,7 @@ public static class SpcVector
             if(actual[i].Address!=a||actual[i].Direction!=row[2].GetString()||v!=null&&actual[i].Value!=v)return $"adjudicated indirect-Y cycle {i}: expected raw row {order[i]}, actual {actual[i]}";}
         return null;
     }
-    public static int Run(string[] args,bool full)
+    public static int Run(string[] args,bool full,bool continuation=false)
     {
         string prefix=args.ElementAtOrDefault(0)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/spc-conformance";
         string directory=args.ElementAtOrDefault(1)??(full?"testdata/spc700-full":"testdata/spc700-sample");string? filter=args.ElementAtOrDefault(2);
@@ -85,6 +85,10 @@ public static class SpcVector
         if(!File.Exists(manifest)){report.Add("fixtures","skipped","Pinned SPC manifest missing");report.Save(prefix);return report.ExitCode;}
         using var metadata=JsonDocument.Parse(File.ReadAllBytes(manifest));
         var bus=new SpcFlatBus();var cpu=new Spc700(bus);List<SpcCycle> trace=[];cpu.CycleObserved=trace.Add;
+        long hotCases=0,legacyCases=0;
+        var hotCounter=typeof(Spc700).GetProperty("HotInstructionsCompleted",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+        var legacyCounter=typeof(Spc700).GetProperty("ReplayRunsCompleted",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!;
+        long ReadCounter(System.Reflection.PropertyInfo property)=>(long)property.GetValue(cpu)!;
         foreach(var item in metadata.RootElement.GetProperty("files").EnumerateArray()){
             string file=item.GetProperty("file").GetString()!;if(filter!=null&&file[..2]!=filter)continue;
             string path=Path.Combine(directory,file);if(!File.Exists(path)){report.Add(file,"skipped","Missing pinned file");continue;}
@@ -93,7 +97,10 @@ public static class SpcVector
             files++;using var doc=JsonDocument.Parse(data);int count=0,bad=0,rawBad=0;string? first=null;object? evidence=null,rawEvidence=null;
             foreach(var v in doc.RootElement.EnumerateArray()){
                 count++;executed++;trace.Clear();Load(cpu,bus,v.GetProperty("initial"));
-                try{cpu.Step();cycles+=trace.Count;string? raw=CycleDifference(trace,v.GetProperty("cycles"));if(raw!=null){rawMismatches++;rawBad++;rawEvidence??=new {difference=raw,vector=v.Clone(),actualCycles=trace.ToArray()};}string? stateDiff=StateDifference(cpu,bus,v.GetProperty("final")),busDiff=ApprovedCycleDifference(trace,v);if(stateDiff!=null)semanticFailures++;if(busDiff!=null)busFailures++;if(raw!=null&&busDiff==null)adjudicated++;string? diff=stateDiff??busDiff;
+                try{
+                    if(continuation){long beforeHot=ReadCounter(hotCounter),beforeLegacy=ReadCounter(legacyCounter);while(!cpu.RunInstruction()){}hotCases+=ReadCounter(hotCounter)-beforeHot;legacyCases+=ReadCounter(legacyCounter)-beforeLegacy;}
+                    else cpu.Step();
+                    cycles+=trace.Count;string? raw=CycleDifference(trace,v.GetProperty("cycles"));if(raw!=null){rawMismatches++;rawBad++;rawEvidence??=new {difference=raw,vector=v.Clone(),actualCycles=trace.ToArray()};}string? stateDiff=StateDifference(cpu,bus,v.GetProperty("final")),busDiff=ApprovedCycleDifference(trace,v);if(stateDiff!=null)semanticFailures++;if(busDiff!=null)busFailures++;if(raw!=null&&busDiff==null)adjudicated++;string? diff=stateDiff??busDiff;
                     if(diff!=null){bad++;first??=v.GetProperty("name").GetString()+": "+diff;evidence??=new {vector=v.Clone(),actual=cpu.Capture(),actualCycles=trace.ToArray()};}}
                 catch(Exception e){bad++;first??=v.GetProperty("name").GetString()+": "+e.Message;}
             }
@@ -101,6 +108,8 @@ public static class SpcVector
             report.Add(file,bad==0?"pass":"fail",first,evidence:new {approvedFailures=evidence,rawBusMismatches=rawBad,firstRawMismatch=rawEvidence});Console.WriteLine($"SPC {file}: {count-bad} pass / {bad} fail");
             if(!full)report.Add(file+"/unsampled","skipped","Only four sample vectors; full corpus required for acceptance");
         }
+        report.Metadata["executionPath"]=continuation?"RunInstruction:23 hot forms, remaining forms explicitly replay decoder":"original Step decoder";
+        report.Metadata["hotCases"]=hotCases;report.Metadata["legacyCases"]=legacyCases;
         report.Metadata["executedCases"]=executed;report.Metadata["failedCases"]=failed;report.Metadata["busCyclesCompared"]=cycles;report.Metadata["fixturesVerified"]=files;report.Metadata["revision"]=metadata.RootElement.GetProperty("revision").GetString();
         report.Metadata["rawBusPassed"]=executed-rawMismatches;report.Metadata["rawBusMismatches"]=rawMismatches;report.Metadata["sourceAdjudicatedCases"]=adjudicated;report.Metadata["semanticPassed"]=executed-semanticFailures;report.Metadata["semanticFailures"]=semanticFailures;report.Metadata["approvedBusPassed"]=executed-busFailures;report.Metadata["approvedBusFailures"]=busFailures;report.Metadata["adjudicationRule"]="spc-indirect-y-2017-v1: only17/37/57/77/97/B7/F7 order[0,1,3,4,2,5]; hardware researcher discussion https://forums.nesdev.org/viewtopic.php?t=16140";
         report.Save(prefix);return report.ExitCode;

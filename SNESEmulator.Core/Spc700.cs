@@ -6,7 +6,7 @@ public sealed record SpcRegisters(ushort PC,byte A,byte X,byte Y,byte SP,byte PS
 public sealed record SpcContinuation(SpcRegisters Entry,SpcCycle[] Completed);
 
 /// <summary>Own SPC700 decoder. Flat electrical cycles are separate from S-SMP MMIO and crystal timing.</summary>
-public sealed class Spc700(ISpcBus bus)
+public sealed partial class Spc700(ISpcBus bus)
 {
     public ushort PC {get;set;}
     public byte A {get;set;} public byte X {get;set;} public byte Y {get;set;}
@@ -20,7 +20,15 @@ public sealed class Spc700(ISpcBus bus)
     private bool cooperative;
     internal Func<SpcCycle,bool>? EffectCompleted {get;set;}
     private SpcRegisters? entry;
-    private readonly List<SpcCycle> completed=[];
+    // The private journal stores values. Public continuation snapshots still own
+    // immutable SpcCycle records and retain the existing State9 representation.
+    private readonly record struct JournalCycle(ushort? Address,byte? Value,string Direction) {
+        public static implicit operator JournalCycle(SpcCycle c)=>new(c.Address,c.Value,c.Direction);
+        public SpcCycle Public()=>new(Address,Value,Direction);
+    }
+    internal Func<ushort?,string,bool>? PrepareBusCycle {get;set;}
+    internal Func<ushort?,byte?,string,bool>? CompleteBusCycle {get;set;}
+    private readonly List<JournalCycle> completed=[];
     private int cursor;
     private bool single;
     private int limit;
@@ -29,9 +37,31 @@ public sealed class Spc700(ISpcBus bus)
     public bool AtInstructionBoundary=>entry==null;
     public SpcRegisters Capture()=>new(PC,A,X,Y,SP,PSW,Sleeping,Stopped,Instructions);
     public void Restore(SpcRegisters r) {PC=r.PC;A=r.A;X=r.X;Y=r.Y;SP=r.SP;PSW=r.PSW;Sleeping=r.Sleeping;Stopped=r.Stopped;Instructions=r.Instructions;}
-    public SpcContinuation? CaptureContinuation()=>entry==null?null:new(entry,completed.ToArray());
-    public void RestoreContinuation(SpcContinuation? c) {entry=c?.Entry;completed.Clear();if(c!=null){if(c.Completed.Length>16||c.Entry.Instructions<0||c.Completed.Any(row=>row.Direction=="wait"?row.Address!=null||row.Value!=null:row.Direction is not ("read" or "write")||row.Address==null||row.Value==null))throw new InvalidDataException("Invalid SPC continuation");completed.AddRange(c.Completed);}}
-    public void Reset() {Restore(new(0xffc0,0,0,0,0xef,2,false,false,0));entry=null;completed.Clear();}
+    public SpcContinuation? CaptureContinuation() => entry == null ? null :
+        new(entry, completed.Select(c => c.Public()).ToArray());
+
+    public void RestoreContinuation(SpcContinuation? continuation)
+    {
+        InvalidateHotContinuation();
+        entry = continuation?.Entry;
+        completed.Clear();
+        if (continuation == null) return;
+        if (continuation.Completed.Length > 16 || continuation.Entry.Instructions < 0 ||
+            continuation.Completed.Any(row => row.Direction == "wait"
+                ? row.Address != null || row.Value != null
+                : row.Direction is not ("read" or "write") || row.Address == null || row.Value == null))
+            throw new InvalidDataException("Invalid SPC continuation");
+        completed.AddRange(continuation.Completed.Select(row => (JournalCycle)row));
+    }
+
+    public void Reset()
+    {
+        InvalidateHotContinuation();
+        Restore(new(0xffc0, 0, 0, 0, 0xef, 2, false, false, 0));
+        entry = null;
+        completed.Clear();
+    }
+
     // A completed cycle is appended before observation, so snapshots never repeat an MMIO effect.
     private byte Cycle(ushort? address,byte? value,string direction)
     {
@@ -39,7 +69,9 @@ public sealed class Spc700(ISpcBus bus)
         if(entry!=null&&cursor<completed.Count){var c=completed[cursor++];if(c.Address!=address||c.Direction!=direction||(direction=="write"&&c.Value!=value))throw new InvalidDataException("SPC replay diverged");return c.Value??0;}
         if(single&&cursor>=limit)throw yielded;
         var next=new SpcCycle(address,value,direction);
-        if(PrepareCycle!=null&&!PrepareCycle(next)){
+        // A legacy veto must precede electrical admission: otherwise an APU
+        // endpoint could advance without a committed bus cycle in the journal.
+        if((PrepareCycle!=null&&!PrepareCycle(next))||(PrepareBusCycle!=null&&!PrepareBusCycle(address,direction))){
             // Keep exactly the register point formerly exposed by budget throw.
             // Remaining decoder operations are private speculation: all bus and
             // observer calls are suppressed, then every architectural field is
@@ -50,7 +82,11 @@ public sealed class Spc700(ISpcBus bus)
         if(direction=="read")value=bus.Read(address!.Value);
         if(direction=="write")bus.Write(address!.Value,value!.Value);
         next=next with {Value=value};if(entry!=null)completed.Add(next);cursor++;
-        if(EffectCompleted!=null&&!EffectCompleted(next)){return Suspend();}
+        // Both callbacks observe this committed effect, including when either
+        // requests suspension. Short-circuiting here would lose a notification.
+        bool fastCompleted = CompleteBusCycle?.Invoke(address, value, direction) ?? true;
+        bool legacyCompleted = EffectCompleted?.Invoke(next) ?? true;
+        if(!fastCompleted||!legacyCompleted){return Suspend();}
         CycleObserved?.Invoke(next);return value??0;
     }
     private byte Suspend(){if(!cooperative)throw yielded;suspended=Capture();return 0;}
@@ -85,11 +121,11 @@ public sealed class Spc700(ISpcBus bus)
     public int Step(){if(entry!=null)throw new InvalidOperationException("SPC instruction in progress");cursor=0;Execute();return cursor;}
     public bool AdvanceCycle()
     {
-        single=true;entry??=Capture();limit=completed.Count+1;Restore(entry);cursor=0;
+        InvalidateHotContinuation();single=true;entry??=Capture();limit=completed.Count+1;Restore(entry);cursor=0;
         try{Execute();entry=null;completed.Clear();return false;}catch(Yield){return true;}finally{single=false;}
     }
     // Returns false at a cooperative timing boundary. Completed reads/writes are replayed only from data.
-    public bool RunInstruction()
+    private bool RunInstructionLegacy()
     {
         entry??=Capture();Restore(entry);cursor=0;suspended=null;cooperative=true;
         try {

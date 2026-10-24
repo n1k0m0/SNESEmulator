@@ -50,7 +50,7 @@ public sealed class Apu : ISpcBus
         firmware=(ipl??OwnIpl.Bytes).ToArray();if(firmware.Length!=64)throw new InvalidDataException("SPC IPL must contain64 bytes");
         FirmwareHash=Convert.ToHexStringLower(SHA256.HashData(firmware));ExternallySuppliedFirmware=ipl!=null;
         OriginalFirmware=FirmwareHash=="c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f";
-        Dsp=new(Ram,DspRegisters);Cpu=new(this);Cpu.PrepareCycle=BeforeCycle;Cpu.EffectCompleted=AfterCycle;Reset();
+        Dsp=new(Ram,DspRegisters);Cpu=new(this);Cpu.PrepareBusCycle=BeforeBusCycle;Cpu.CompleteBusCycle=AfterBusCycle;Reset();
     }
     public static byte[]? ResolveLocalFirmware()
     {
@@ -114,11 +114,13 @@ public sealed class Apu : ISpcBus
         for(int i=0;i<3;i++){var t=timers[i];int half=i==2?16:128;t.Divider+=inputClocks;
             while(t.Divider>=half){t.Divider-=half;t.Level=!t.Level;SyncLine(t);}}
     }
-    private int Selector(SpcCycle c)=>c.Address==null||c.Address is >=0xf0 and <=0xff||c.Address>=0xffc0&&(Control&128)!=0?Test>>6:(Test>>4)&3;
-    private bool BeforeCycle(SpcCycle c)
+    // The internal electrical hooks admit/complete a bus cycle using its value
+    // fields; allocate public records only for a retained port hold or observer.
+    private int Selector(ushort? address)=>address==null||address is >=0xf0 and <=0xff||address>=0xffc0&&(Control&128)!=0?Test>>6:(Test>>4)&3;
+    private bool BeforeBusCycle(ushort? address,string direction)
     {
         if(!FinishHold())return false;
-        if(!cycleActive){int s=Selector(c);cycleLength=(s switch {0=>2,1=>4,2=>10,_=>20})*12;timerLength=2<<s;hold=c.Direction=="read"&&c.Address is >=0xf4 and <=0xf7?cycleLength/2:0;nextEffect=Crystal+cycleLength-hold;cycleActive=true;}
+        if(!cycleActive){int s=Selector(address);cycleLength=(s switch {0=>2,1=>4,2=>10,_=>20})*12;timerLength=2<<s;hold=direction=="read"&&address is >=0xf4 and <=0xf7?cycleLength/2:0;nextEffect=Crystal+cycleLength-hold;cycleActive=true;}
         if(nextEffect>budget){AdvanceCrystal(budget,false);return false;}
         AdvanceSegment(nextEffect,hold>0?timerLength/2:timerLength);cycleActive=false;return true;
     }
@@ -126,11 +128,11 @@ public sealed class Apu : ISpcBus
     {
         if(end>budget){AdvanceCrystal(budget,false);return false;}AdvanceCrystal(end,true);AdvanceTimers(timersAtEnd);return true;
     }
-    private bool AfterCycle(SpcCycle c)
+    private bool AfterBusCycle(ushort? address,byte? value,string direction)
     {
-        Cycles++;holding=hold>0;if(holding){nextEffect=Crystal+hold;heldCycle=c;}
+        Cycles++;holding=hold>0;if(holding){nextEffect=Crystal+hold;heldCycle=new(address,value,direction);}
         FlushDsp();
-        PhaseObserved?.Invoke(new(c.Direction=="read"?"read-latch":c.Direction=="write"?"write-latch":"internal-complete",Crystal,c));
+        PhaseObserved?.Invoke(new(direction=="read"?"read-latch":direction=="write"?"write-latch":"internal-complete",Crystal,new(address,value,direction)));
         return FinishHold();
     }
     private bool FinishHold()

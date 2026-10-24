@@ -19,6 +19,10 @@ static class SuspendProof
         using var reference=args.Length>1?new StreamReader(new GZipStream(File.OpenRead(args[1]),CompressionMode.Decompress)):null;
         using var output=new StreamWriter(new GZipStream(File.Create(prefix+".jsonl.gz"),CompressionLevel.SmallestSize));
         var run=typeof(Spc700).GetMethod("RunInstruction")!;
+        var hotCounter=typeof(Spc700).GetProperty("HotInstructionsCompleted",BindingFlags.Instance|BindingFlags.NonPublic)!;
+        var legacyCounter=typeof(Spc700).GetProperty("ReplayRunsCompleted",BindingFlags.Instance|BindingFlags.NonPublic)!;
+        long hotCompletions=0,legacyCompletions=0;
+        object? Invoke(Spc700 cpu){long hot=(long)hotCounter.GetValue(cpu)!,legacy=(long)legacyCounter.GetValue(cpu)!;var result=run.Invoke(cpu,null);hotCompletions+=(long)hotCounter.GetValue(cpu)!-hot;legacyCompletions+=(long)legacyCounter.GetValue(cpu)!-legacy;return result;}
         var prepare=typeof(Spc700).GetProperty("PrepareCycle",BindingFlags.Instance|BindingFlags.NonPublic)!;
         var complete=typeof(Spc700).GetProperty("EffectCompleted",BindingFlags.Instance|BindingFlags.NonPublic)!;
         bool cooperative=prepare.PropertyType==typeof(Func<SpcCycle,bool>);long cases=0;
@@ -33,16 +37,16 @@ static class SuspendProof
                 bool After(SpcCycle c){if(after&&index++==stop){if(!cooperative)throw new Stop();return false;}return true;}
                 prepare.SetValue(m.Cpu,cooperative?(Delegate)(Func<SpcCycle,bool>)Before:(Action<SpcCycle>)(c=>Before(c)));
                 complete.SetValue(m.Cpu,cooperative?(Delegate)(Func<SpcCycle,bool>)After:(Action<SpcCycle>)(c=>After(c)));
-                try{run.Invoke(m.Cpu,null);}catch(TargetInvocationException e)when(e.InnerException is Stop){}
+                try{Invoke(m.Cpu);}catch(TargetInvocationException e)when(e.InnerException is Stop){}
                 string row=JsonSerializer.Serialize(new{seed,op,stop,after,registers=m.Cpu.Capture(),continuation=m.Cpu.CaptureContinuation(),memorySha256=Hash(m.Bus.Memory),bus=m.Bus.Trace,observations});
                 output.WriteLine(row);if(reference!=null&&reference.ReadLine()!=row)throw new Exception($"Frozen suspension mismatch op{op:X2} seed{seed} {(after?"after":"before")} cycle{stop}");
-                var restored=new Spc700(new Bus{Memory=m.Bus.Memory.ToArray()});restored.Restore(m.Cpu.Capture());restored.RestoreContinuation(m.Cpu.CaptureContinuation());run.Invoke(restored,null);
+                var restored=new Spc700(new Bus{Memory=m.Bus.Memory.ToArray()});restored.Restore(m.Cpu.Capture());restored.RestoreContinuation(m.Cpu.CaptureContinuation());Invoke(restored);
                 if(JsonSerializer.Serialize(restored.Capture())!=JsonSerializer.Serialize(whole.Cpu.Capture()))throw new Exception("SPC restored continuation mismatch");
-                prepare.SetValue(m.Cpu,null);complete.SetValue(m.Cpu,null);run.Invoke(m.Cpu,null);
+                prepare.SetValue(m.Cpu,null);complete.SetValue(m.Cpu,null);Invoke(m.Cpu);
                 if(JsonSerializer.Serialize(m.Cpu.Capture())!=JsonSerializer.Serialize(whole.Cpu.Capture())||!m.Bus.Memory.SequenceEqual(whole.Bus.Memory)||!m.Bus.Trace.SequenceEqual(whole.Bus.Trace))throw new Exception($"SPC resumed state/effects mismatch {op:X2}/{seed}/{stop}/{after}");cases++;
             }
         }
         if(reference?.ReadLine()!=null)throw new Exception("Extra frozen suspension rows");
-        File.WriteAllText(prefix+".json",JsonSerializer.Serialize(new{cases,cooperative,reference=args.ElementAtOrDefault(1),accuracy="Old10164c7 exception semantics regression; external SPC oracle remains separate"},new JsonSerializerOptions{WriteIndented=true}));Console.WriteLine($"SPC suspension: {cases} exact cases, cooperative={cooperative}");return 0;
+        File.WriteAllText(prefix+".json",JsonSerializer.Serialize(new{cases,cooperative,hotCompletions,legacyCompletions,reference=args.ElementAtOrDefault(1),accuracy="Old10164c7 exception semantics regression; external SPC oracle remains separate"},new JsonSerializerOptions{WriteIndented=true}));Console.WriteLine($"SPC suspension: {cases} exact cases, cooperative={cooperative}");return 0;
     }
 }
