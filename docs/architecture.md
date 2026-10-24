@@ -1,201 +1,241 @@
-# Architektur und Entwicklungsstand
+# Architecture and development status
 
-## Entsprechung zum C64Emulator
+## Relationship to C64Emulator
 
-Ausgangspunkt ist der lokale C64Emulator, Commit
-`f01750e17a2c3f4cabfd57dc0c470dac93a91a23`. Die im C64-Arbeitsverzeichnis
-unversionierten Manager-/IPC-Arbeiten wurden nicht kopiert.
+The starting point is the local C64Emulator at commit
+`f01750e17a2c3f4cabfd57dc0c470dac93a91a23`. The unversioned Manager/IPC work in
+the C64 working directory was not copied.
 
 | C64 | SNES |
 |---|---|
 | `C64System` / `SystemBus` | `SnesSystem` / `SystemBus` |
-| 6510 | eigener `Cpu65816` |
-| VIC-II / C64-Framebuffer | eigener `Ppu`, native256/512×224/239-Rohfelder |
-| SID | eigene `Spc700`/`Apu`/`SnesDsp`; native32kHz-Stereoausgabe |
-| CIA-Joysticks | `ControllerPorts`, serielle und automatische Abfrage |
-| PRG/D64/EasyFlash | `Cartridge`, LoROM/HiROM und Battery-SRAM |
-| C64Window | `SnesWindow`, auf mehrere Frontend-Dateien aufgeteilt |
-| C64Net | `SnesNet`, TLS/Relay übernommen, Controller und Videocodec angepasst |
-| StateSerializer | eigener versionierter SNES-Serializer mit ROM-Hash |
-| SharpPixels | dieselbe Renderingbibliothek als lokale, eigenständige Kopie |
+| 6510 | Independently developed `Cpu65816` |
+| VIC-II / C64 framebuffer | Independently developed `Ppu`, native 256/512×224/239 raw fields |
+| SID | Independently developed `Spc700`/`Apu`/`SnesDsp`; native 32 kHz stereo output |
+| CIA joysticks | `ControllerPorts`, serial and automatic polling |
+| PRG/D64/EasyFlash | `Cartridge`, LoROM/HiROM and battery-backed SRAM |
+| C64Window | `SnesWindow`, split across several frontend files |
+| C64Net | `SnesNet`, reused TLS/relay transport, adapted controllers and video codec |
+| StateSerializer | Independently developed, versioned SNES serializer with ROM hash |
+| SharpPixels | The same rendering library as a local, standalone copy |
 
-Die Hardware hängt weder von OpenTK noch von NAudio oder Windows ab.
-`SNESEmulator.Runtime` besitzt die aktive Konsole auf genau einem Worker. UI und
-Transport erhalten abgeschlossene eigene Rohfelder/Sampleblöcke; begrenzte
-Befehle und feldgebundene Eingaben ersetzen direkte UI-Kernzugriffe. Rationale
-monotone Deadlines erhalten jeden Hardwaretick unabhängig von UI/Vsync. Der
-[M9b-Vertrag](m9-worker-contract.md) definiert Epochen, Ownership, Audio- und
-Fehlerregeln sowie noch offene Abnahmen.
+The hardware depends on neither OpenTK, NAudio nor Windows.
+`SNESEmulator.Runtime` owns the active console on exactly one worker. The UI and
+transport receive completed raw fields/sample blocks with independent ownership;
+bounded commands and field-bound input replace direct UI access to the core.
+Rational monotonic deadlines preserve every hardware tick independently of
+UI/VSync. The [M9b contract](m9-worker-contract.md) defines epochs, ownership,
+audio and error rules, and outstanding acceptance work.
 
-## Hardwarebasis
+## Hardware foundation
 
-`Cpu65816` ist ein eigener C#-Kern mit getrennten Read/Write/Internal-Zyklen,
-Emulations-/Native-Modus und einer serialisierbaren Fortsetzung. Abgeschlossene
-MMIO-Effekte werden beim Fortsetzen nicht wiederholt. Alle 5.080.400 gepinnten
-externen Semantikfälle und 26.184.846 generische elektrische Buszeilen bestehen.
-Diese Softwarevektoren sind keine Messung eines echten 5A22.
+`Cpu65816` is an independently developed C# core with separate Read/Write/Internal
+cycles, emulation/native mode and serializable continuation. Completed MMIO
+effects are not repeated when execution resumes. All 5,080,400 pinned external
+semantic cases and 26,184,846 generic electrical bus rows pass. These software
+vectors are not measurements of a physical 5A22.
 
-`MasterClock` besitzt die ganzzahlige Zeit, Rasterzähler und stabile typisierte
-Ereignisse. `RunUntil(t)` endet exakt bei t, auch in CPU-Read-Hold, DMA, HDMA und
-Refresh. CPU-Lesezugriffe latchen nach Zugriffszeit minus vier Clocks; vier
-Clocks Hold folgen. Das externe CPU-MDR übernimmt den Wert erst danach.
-Interne CPU-Leseports 4000–43FF erhalten MDR. MEMSEL steuert nur die belegten
-FastROM-Adressbereiche. Hardwareprofile behalten explizite manuelle Auswahl vor
-der Headerregion bei. Der Epoch H0/V0 bleibt ein deterministischer Komfortreset,
-keine gemessene physische Resetfreigabe.
+`MasterClock` owns integer time, raster counters and stable typed events.
+`RunUntil(t)` stops exactly at t, including during CPU read hold, DMA, HDMA and
+refresh. CPU reads latch after the access duration minus four clocks, followed
+by four hold clocks. The external CPU MDR adopts the value only afterward.
+Internal CPU read ports 4000–43FF receive MDR. MEMSEL controls only the documented
+FastROM address ranges. Explicit manual hardware-profile selection continues to
+take precedence over the header region. The H0/V0 epoch remains a deterministic
+convenience reset, not a measured physical reset release.
 
-`SystemBus` verbindet 128 KiB WRAM, normale LoROM/HiROM/ExLoROM/ExHiROM-Mappings,
-rekursive Chipspiegelung, SRAM, PPU-/APU-Ports und 5A22-I/O. `CpuIo` enthält
-ALU-Zwischenzustände, Timer-IRQ/NMI-Holds, Zählerlatches und serielle/automatische
-JOY-Abfrage. `DmaController` übernimmt den Bus mit eigenen gespeicherten Phasen:
-A/B-Read nach vier Clocks, Write nach weiteren vier, Priorität, Start-/End-Sync,
-HDMA-Tabellen und Präemption. Savestate v8 speichert diese Zwischenzustände und
-bindet den Mapper zusätzlich zum ROM-Hash. Siehe [M3-Vertrag](m3-io-contract.md)
-für genaue Grenzen und Quellen. PowerOn definiert RAM-Testseeds; Reset erhält
-CPU-WRAM und SRAM, ist aber kein vollständiges Modell aller Reset-Pins der PPU.
+`SystemBus` connects 128 KiB WRAM, standard LoROM/HiROM/ExLoROM/ExHiROM mappings,
+recursive chip mirroring, SRAM, PPU/APU ports and 5A22 I/O. `CpuIo` contains ALU
+intermediate states, timer IRQ/NMI holds, counter latches and serial/automatic
+JOY polling. `DmaController` takes over the bus with its own saved phases:
+A/B read after four clocks, write after another four, priority, start/end sync,
+HDMA tables and preemption. Savestate v8 stores these intermediate states and
+binds the mapper as well as the ROM hash. See the [M3 contract](m3-io-contract.md)
+for precise limits and sources. PowerOn defines RAM test seeds; Reset preserves
+CPU WRAM and SRAM, but does not fully model all PPU reset pins.
 
-`Ppu` führt eigene Mode0–7-Hintergründe und alle128 OBJ über Fetch-/Pixelphasen
-im Masterclock-Scheduler aus. Individuelle VRAM/CGRAM/OAM- und Scroll-Latches,
-getrennte PPU1/PPU2-MDRs (PPU2 gemeinsam mit Zählerports), Fenster, Main/Sub,
-Farbmathematik und Mosaic sind serialisiert. Native RGB555 und Helligkeitsphase
-werden vor ARGB ausgegeben; das Lab vergleicht native Pixel mit erstem X/Y/Zeile
-und Register-/Buskontext. PPU-Observers laufen nach vollständigem Timestamp-
-Commit. M7 liefert variable native Rohfeldgeometrie bis512×239, Feldparität, getrennte Display-/Timing-Interlace-Flags und rationale Zeitdomänen bis GUI, Preview, Lab und Netzwerk. Breite Hardware-Evidenz bleibt offen.
-Absolute PPU-Phasen sind ein quelleninformiertes analytisches Modell, kein neuer
-Konsolenmessnachweis. Siehe [M5-Vertrag](m5-ppu-contract.md).
+`Ppu` executes independently developed Mode 0–7 backgrounds and all 128 OBJ
+through fetch/pixel phases in the master-clock scheduler. Individual
+VRAM/CGRAM/OAM and scroll latches, separate PPU1/PPU2 MDRs (PPU2 shared with
+counter ports), windows, main/subscreen, color math and mosaic are serialized.
+Native RGB555 and brightness phase are output before ARGB; the lab compares
+native pixels with the first X/Y/line difference and register/bus context. PPU
+observers run after the complete timestamp commit. M7 carries variable native
+raw-field geometry up to 512×239, field parity, separate display/timing interlace
+flags and rational time domains through to the GUI, preview, lab and network.
+Broad hardware evidence remains outstanding. Absolute PPU phases are an
+analytical model informed by sources, not new console measurement evidence.
+See the [M5 contract](m5-ppu-contract.md).
 
-`Apu` führt eine eigene vollständige `Spc700` mit64KiB RAM, Timern,
-CONTROL/TEST, DSP-Registerschnittstelle und getrennten CPU/APU-Portlatches aus.
-Die native24.576MHz-Zeitbasis koppelt sich rational an die Masterclock;
-SPC-Portreads haben eine getrennte Latch-/Holdphase. Zwischenzyklen sind
-serialisierbar. Eine eigene offene64Byte-Bootroutine führt den IPL-Uploaddialog
-als SPC-Code aus. Optionales lokales Original-IPL bleibt unverteilt und durch
-seinen Hash an Spielstände gebunden. Ein echtes65816-ROM testet Uploads bis
-1048Bytes, Seiten-/Indexwraps und ausgeführte SPC-Antworten. M6 ergänzt einen eigenen DSP mit32 Mikrophasen pro Stereopaar, acht BRR-Voices,
-Gauss, Hüllkurven, Noise und Echo im gemeinsamen RAM. Der
-[M4-Vertrag](m4-apu-contract.md) trennt256000 Semantik-/freigegebene Busfälle
-von249000 rohen Buspässen und7000 quellengestützten Zyklusadjudikationen.
+`Apu` executes an independently developed, complete `Spc700` with 64 KiB RAM,
+timers, CONTROL/TEST, a DSP register interface and separate CPU/APU port latches.
+The native 24.576 MHz timebase is rationally coupled to the master clock; SPC
+port reads have separate latch/hold phases. Intermediate cycles are serializable.
+An independently developed open 64-byte boot routine executes the IPL upload
+dialogue as SPC code. An optional local original IPL remains undistributed and
+is bound to savestates by its hash. A real 65816 ROM tests uploads of up to
+1,048 bytes, page/index wrapping and executed SPC responses. M6 adds an
+independently developed DSP with 32 microphases per stereo pair, eight BRR voices,
+Gaussian interpolation, envelopes, noise and echo in shared RAM. The
+[M4 contract](m4-apu-contract.md) distinguishes 256,000 semantic/approved bus cases
+from 249,000 raw bus passes and 7,000 source-supported cycle adjudications.
 
-`DiagnosticRom` erzeugt ein originales LoROM: Native-Mode-Setup, DMA eines
-2-bpp-Tiles, CGRAM-Farben, Mode-0-Hintergrund, NMI-Handler und animiertes
-Scrollregister. Tests prüfen, dass CPU-Code ausgeführt, DMA kopiert und NMI
-bedient wurde; das Bild entsteht nicht als Frontend-Demoanimation.
+`DiagnosticRom` generates an original LoROM: native-mode setup, DMA of a 2-bpp
+tile, CGRAM colors, a Mode 0 background, an NMI handler and an animated scroll
+register. Tests verify that CPU code executed, DMA copied data and NMI was
+serviced; the image is not a frontend demo animation.
 
-## Weiterentwicklung
+## Further development
 
-Die verbindliche Arbeitsreihenfolge und die geplanten Abnahmekriterien stehen
-im [Entwicklungsplan](development-plan.md). Dieser beschreibt künftige Arbeit;
-er ändert den oben dokumentierten Implementierungsstand nicht.
+The required work sequence and planned acceptance criteria are in the
+[development plan](development-plan.md). It describes future work and does not
+change the implementation status documented above.
 
-Testlabor, unabhängige CPU-Prüfungen und Masterclock sind M0–M2; M3 ergänzt
-DMA/HDMA und I/O. M4 ist unabhängig abgenommen; M5 implementiert die getaktete
-Mode0/1-PPU. M5 wurde unabhängig auf2dc8cf abgenommen (Root-Vollgate Exit0). M6 implementiert
-den eigenen S-DSP; M6 wurde unabhängig auf `e4645770cea052885808ca5b27a45d60de470157` abgenommen: `python tools/test-lab.py --windows --full`, Exit0, `artifacts/root-m6-validation.log`; unveränderte Berichte unter `artifacts/root-m6-evidence/`.
-PAL/NTSC, Hardwareabgleich, Produktreife und Zusatzchips folgen mit jeweils
-eigenen Nachweisen. Savestates, Frontend- und Netzwerkregressionen begleiten
-die Hardwareentwicklung von Beginn an.
+The test laboratory, independent CPU checks and master clock are M0–M2; M3 adds
+DMA/HDMA and I/O. M4 has independent acceptance; M5 implements the clocked
+Mode 0/1 PPU. M5 was independently accepted on 2dc8cf (Root full gate exit 0).
+M6 implements the independently developed S-DSP; M6 was independently accepted
+on `e4645770cea052885808ca5b27a45d60de470157`:
+`python tools/test-lab.py --windows --full`, exit 0,
+`artifacts/root-m6-validation.log`; unchanged reports are under
+`artifacts/root-m6-evidence/`. PAL/NTSC, hardware comparisons, product readiness
+and enhancement chips follow with their own evidence. Savestate, frontend and
+network regressions accompany hardware development from the start.
 
-## Referenzen
+## References
 
-- [WDC W65C816S-Datenblatt](https://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf)
-- [SNESdev-Hardwaredokumentation](https://snes.nesdev.org/wiki/SNESdev_Wiki)
-- [SNES-PPU-Register](https://snes.nesdev.org/wiki/PPU_registers)
+- [WDC W65C816S datasheet](https://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf)
+- [SNESdev hardware documentation](https://snes.nesdev.org/wiki/SNESdev_Wiki)
+- [SNES PPU registers](https://snes.nesdev.org/wiki/PPU_registers)
 
-Die Referenzen dienen dem Ausbau und der unabhängigen Überprüfung. Die bisherige
-Smoke-Suite ersetzt keine vollständige Hardwarevalidierung.
-
-
-M5 local performance observation:21.62 diagnostic fields/s with the own SPC700
-and clocked PPU active,7.72million master clocks/s. This is below NTSC realtime;
-M9 optimization must preserve the digital accuracy path. Full counts, group times,
-clean report identities and evidence limits: [M5 baseline](baselines/m5.json).
-
-
-M6 trennt native digitale DSP-Ausgabe (Sampleindex/Crystaltimestamp) von einer
-begrenzten Präsentationsqueue, Stereo-Geräteresampling/Lautstärke und Netzwerk.
-Format7 serialisiert sämtliche DSP-Zwischenlatches und Echo-History; physisches
-Echo-RAM ist Teil des APU-RAM. Das Netzwerkformat0x534E0002 überträgt verlustfreie
-Stereo-PCM16-Blöcke mit32000Hz, Sequenz und nativer Zeit; Clients verwerfen alte
-Sequenzen und leeren ihre Präsentation bei Lücken/Reset. Menüs, ROMwechsel und
-Load löschen auch Resampler-Prefetch/Filterhistory. Die originale Audiodiagnose
-führt65816→IPL→SPC→DSP aus. Headless-ROMs liefern zusätzlich natives Stereo-PCM
-und DSP-Phasentraces. Quellen, unabhängiger digitaler Oracle und Grenzen:
-[M6-Vertrag](m6-dsp-contract.md). Audiohardware-/ROM-Hardwaremessungen fehlen
-weiterhin; veröffentlichte Forschung ersetzt keine eigene Konsolenaufnahme.
+The references support further development and independent verification. The
+existing smoke suite does not replace full hardware validation.
 
 
-M6 clean full gate passed on feb978b with147 portable/8 Windows groups and all
-external corpora. Comparable full PPU/APU/DSP performance is18.33 fields/s,
-versus21.62 at M5; the separate two-BRR-voice forced-blank case is19.40. Both
+M5 local performance observation: 21.62 diagnostic fields/s with the independently
+developed SPC700 and clocked PPU active, 7.72 million master clocks/s. This is
+below NTSC realtime; M9 optimization must preserve the digital accuracy path.
+Full counts, group times, clean report identities and evidence limits:
+[M5 baseline](baselines/m5.json).
+
+
+M6 separates native digital DSP output (sample index/crystal timestamp) from a
+bounded presentation queue, stereo device resampling/volume and networking.
+Format 7 serializes all DSP intermediate latches and echo history; physical
+echo RAM is part of APU RAM. Network format 0x534E0002 carries lossless stereo
+PCM16 blocks at 32,000 Hz with sequence and native time; clients discard old
+sequences and clear their presentation on gaps/reset. Menus, ROM changes and
+Load also clear resampler prefetch/filter history. The original audio diagnostic
+executes 65816→IPL→SPC→DSP. Headless ROMs additionally provide native stereo PCM
+and DSP phase traces. Sources, independent digital oracle and limits:
+[M6 contract](m6-dsp-contract.md). Audio-device/ROM hardware measurements are
+still absent; published research does not replace our own console recording.
+
+
+M6 clean full gate passed on feb978b with 147 portable/8 Windows groups and all
+external corpora. Comparable full PPU/APU/DSP performance is 18.33 fields/s,
+versus 21.62 at M5; the separate two-BRR-voice forced-blank case is 19.40. Both
 remain below realtime. [M6 baseline](baselines/m6.json) records exact measurements;
-M9 must retain digital results while profiling. Independent M6 acceptance passed on e464577; see root-m6-validation.log.
+M9 must retain digital results while profiling. Independent M6 acceptance passed
+on e464577; see root-m6-validation.log.
 
 
-M7 ergänzt eigene8bpp-/OPT-/Hires-Fetchpläne, integeraffines Mode7, EXTBG und DirectColor. Ein fortlaufender Cursor konsumiert native Pixel an getrennten BELOW-/ABOVE-Phasen; Hostweave ist kein Hardwarezustand. CompletedFrame bewahrt das fertige Rohfeld vor dem nächsten Feldstart. Format8 speichert Geometrie/Arraylängen und sämtliche zusätzlichen Latches. VID3 überträgt vollständiges verlustfreies ARGB samt Feld-/Zeitmetadaten, AUD2-Stereo bleibt erhalten.
+M7 adds independently developed 8-bpp/OPT/hires fetch schedules, integer-affine
+Mode 7, EXTBG and DirectColor. A continuous cursor consumes native pixels at
+separate BELOW/ABOVE phases; host weaving is not hardware state. CompletedFrame
+preserves the completed raw field before the next field starts. Format 8 stores
+geometry/array lengths and all additional latches. VID3 carries complete lossless
+ARGB with field/time metadata; AUD2 stereo is preserved.
 
-Der Vollgate auf7cf7cc1 bestand mit182 portablen und10 Windowsgruppen. Die späteren reinen Fehlertext-/Lab-Adapterkorrekturen aufadef880 wurden gezielt geprüft. Vergleichbarer vollständiger Diagnostic-PPU/APU/DSP-Workload:23.64Felder/s; separater Zwei-BRR-Workload mit ForcedBlank:24.29. Das bleibt unter Echtzeit und ist eine einzelne Hostmessung. M9 muss ohne Genauigkeitsverlust profilieren. Präziser Vertrag, Feldgrenzen und Hardwareunsicherheiten: [M7](m7-video-contract.md), [Messdaten](baselines/m7.json). M7 independently accepted on `439a655199647f325bef6b6b3074e67948a105dc`, full Windows gate exit0, `artifacts/root-m7-validation.log`; unchanged evidence in `artifacts/root-m7-evidence/`.
-
-
-## M8 unabhängige Konsolenvergleiche
-
-[M8-Vertrag](m8-compatibility-contract.md) und [Titelmatrix](m8-title-matrix.md) trennen veröffentlichte Hardwaremessungen, eigene Parameterprüfungen und ausgeführte bsnes-/ares-Vergleiche. Die externen Kerne sind ausschließlich isolierte Laborwerkzeuge, keine Produktabhängigkeit. CI verwendet lizenzierte Offline-Fixtures und unser eigenes IPL; der lokale Vollgate prüft zusätzlich das Original-IPL.
-
-WAI führt fortlaufende6-Master-Idlezyklen aus. CPU-/DMA-MMIO-Effekte liegen bei gleichem Timestamp vor der betreffenden PPU-Phase; auch H0-Latches und Feldallokation folgen diesem Commit. V128 übernimmt den am V0 erfassten Display-Interlacewert. Format9 weist alte Formate1–8 wegen nicht eindeutig rekonstruierbarer WAI-/H0-Zustände ab. Neue Beobachter-Saves werden gegen ungeladene durchgehende Referenzläufe geprüft. VID3 und AUD2 bleiben unverändert.
-
-Die Produktprofile bleiben analytische separate-chip2/1/3-Ziele. Veröffentlichte Forced-Blank-Korruption, Early-read/DMA-Errata und analoge Transienten sind weiterhin nicht nachgebildet. Gemessene SMP-Frequenzen liefern zusätzliche Parameterfälle, keine neue Board-Zertifizierung. Standard32000 und das ausdrücklich erzwungene32040-Referenzprofil sind getrennt. M9 ergänzt Worker/UI, Persistenz, Netzwerk, Manager und Distribution; Dauerleistung und Soak bleiben offen.
-
-
-Der saubere M8-Vollgate auf `47f91cb` bestand mit 209 portablen und
-10 Windows-Gruppen. Die zusätzlich gemessenen Referenz-Threadwerte sind von
-nominalen Systemfrequenzen getrennt: bsnes kürzt den NTSC-CPU-Wert, ares rundet
-ihn und verwendet eigene ganzzahlige CPU/SMP/DSP-Scalars. Die ausgeführten
-Parametervergleiche erklären die erste Audioabweichung damit nicht. Diese
-Diagnose verändert keine Produktzeitbasis und kein erworbenes Sollbild.
-[Baseline M8](baselines/m8.json) verweist auf den unveränderten Evidenzfreeze;
-die unabhängige Abnahme bleibt ein eigener Schritt.
+The full gate on 7cf7cc1 passed with 182 portable and 10 Windows groups. Later
+changes limited to error text and the lab adapter on adef880 received targeted
+checks. Comparable full diagnostic PPU/APU/DSP workload: 23.64 fields/s; separate
+two-BRR workload with ForcedBlank: 24.29. This remains below realtime and is a
+single-host measurement. M9 must profile without losing accuracy. Precise
+contract, field boundaries and hardware uncertainties: [M7](m7-video-contract.md),
+[measurements](baselines/m7.json). M7 was independently accepted on
+`439a655199647f325bef6b6b3074e67948a105dc`, full Windows gate exit 0,
+`artifacts/root-m7-validation.log`; unchanged evidence is in
+`artifacts/root-m7-evidence/`.
 
 
-M9a preserves format9 and all digital output while reducing scheduler suspension
-and observation allocation costs; see [performance contract](m9-performance-contract.md).
-M9b now runs the live console on a portable controlled worker; remaining
-persistence/network/distribution work and sustained realtime acceptance stay open. M8 was independently accepted on10164c7.
+## M8 independent console comparisons
+
+The [M8 contract](m8-compatibility-contract.md) and
+[title matrix](m8-title-matrix.md) distinguish published hardware measurements,
+our own parameter checks and executed bsnes/ares comparisons. The external cores
+are isolated laboratory tools only, not product dependencies. CI uses licensed
+offline fixtures and our own IPL; the local full gate also checks the original IPL.
+
+WAI executes continuous six-master-clock idle cycles. At the same timestamp,
+CPU/DMA MMIO effects precede the relevant PPU phase; H0 latches and field
+allocation also follow this commit. V128 adopts the display-interlace value
+captured at V0. Format 9 rejects old formats 1–8 because their WAI/H0 states
+cannot be reconstructed unambiguously. New observer saves are checked against
+uninterrupted reference runs without loading. VID3 and AUD2 are unchanged.
+
+Product profiles remain analytical separate-chip 2/1/3 targets. Published
+forced-blank corruption, early-read/DMA errata and analog transients are still
+not modeled. Measured SMP frequencies provide additional parameter cases, not
+new board certification. The default 32000 profile and the explicitly forced
+32040 reference profile are separate. M9 adds worker/UI, persistence, networking,
+Manager and distribution; sustained performance and soak testing remain open.
 
 
-M9b Worker/UI wurde unabhängig auf1074c36 abgenommen; die dokumentierten
-Hardware-/Eingabe-/Soak- und Dauerleistungsgrenzen bleiben bestehen. M9c ergänzt
-begrenzte, atomar geflushte Persistenz mit validierten Backups, sichtbarer Recovery,
-30s-Dirty-SRAM-Snapshots und transaktionalen ROM-Session-Leases. State-Dekodierung
-läuft an einer abgetrennten Maschine außerhalb des Hardwareowners und installiert
-nur bei unveränderter Epoche. Format9/VID3/AUD2 bleiben erhalten. Der volle Gate
-auf `ed62a20` besteht; M9c wurde unabhängig auf `cfe4ed2` abgenommen. Siehe
-[Persistenzvertrag](m9-persistence-contract.md) und [Baseline](baselines/m9c.json).
-M9a-Dauerleistung, Netzwerk, aktuelle Distribution und M9/Release bleiben offen.
+The clean M8 full gate on `47f91cb` passed with 209 portable and 10 Windows
+groups. The additionally measured reference-thread values are separate from
+nominal system frequencies: bsnes truncates the NTSC CPU value; ares rounds it
+and uses its own integer CPU/SMP/DSP scalars. The executed parameter comparisons
+therefore do not explain the first audio difference. This diagnosis changes
+neither a product timebase nor an acquired expected image.
+[M8 baseline](baselines/m8.json) links to the unchanged evidence freeze;
+independent acceptance remains a separate step.
 
-M9d ergänzt Protokoll4 mit unveränderten VID3/AUD2-Codecbytes in expliziten
-Konsolen-/Streamepochen, atomaren Rechte-/Neutralgrenzen, begrenzten Transport-
-und Handshake-Ressourcen, drainbaren Tasks und atomarer Pin-/Zertifikatspersistenz.
-A/V wird an einer ausdrücklich begrenzten Software-/Drivergrenze gemessen;
-physischer DAC und Displaytransport bleiben ungemessen. Hardware-/Inputgenerationen
-sind Worker-Metadaten außerhalb von Format9. Siehe [Netzwerkvertrag](m9-network-contract.md).
-M9d wurde unabhängig auf `2a5ae39` abgenommen; Distribution und M9/Release bleiben offen.
+
+M9a preserves format 9 and all digital output while reducing scheduler suspension
+and observation allocation costs; see the
+[performance contract](m9-performance-contract.md). M9b now runs the live console
+on a portable controlled worker; remaining persistence/network/distribution work
+and sustained realtime acceptance stay open. M8 was independently accepted on
+10164c7.
+
+
+M9b Worker/UI was independently accepted on 1074c36; the documented hardware,
+input, soak and sustained-performance limits remain. M9c adds bounded, atomically
+flushed persistence with validated backups, visible recovery, 30-second dirty-SRAM
+snapshots and transactional ROM-session leases. State decoding runs on a detached
+machine outside the hardware owner and installs only if the epoch is unchanged.
+Format 9/VID3/AUD2 are preserved. The full gate on `ed62a20` passes; M9c was
+independently accepted on `cfe4ed2`. See the
+[persistence contract](m9-persistence-contract.md) and
+[baseline](baselines/m9c.json). M9a sustained performance, networking, current
+distribution and M9/release remain open.
+
+M9d adds protocol 4 with unchanged VID3/AUD2 codec bytes in explicit console/stream
+epochs, atomic permission/neutralization boundaries, bounded transport and
+handshake resources, drainable tasks and atomic pin/certificate persistence.
+A/V is measured at an explicitly limited software/driver boundary; the physical
+DAC and display transport remain unmeasured. Hardware/input generations are
+worker metadata outside format 9. See the [network contract](m9-network-contract.md).
+M9d was independently accepted on `2a5ae39`; distribution and M9/release remain open.
 
 ### M9d clean implementation gate and frozen handoff
 
 Implementation `b432a976e3315ecf45f55a7c5db2ba35dc54eaf2` passed
-`python tools/test-lab.py --windows --full` with exit0 on a clean checkout:
-256 portable groups (previous239 +14 network +3 relay) and23 Windows groups
-(previous10 +13 real socket/TLS/relay/driver groups). Full CPU semantics and bus
-each executed5,080,400 cases;26,184,846 bus cycles and256,000 SPC cases passed
+`python tools/test-lab.py --windows --full` with exit 0 on a clean checkout:
+256 portable groups (previous 239 +14 network +3 relay) and 23 Windows groups
+(previous 10 +13 real socket/TLS/relay/driver groups). Full CPU semantics and bus
+each executed 5,080,400 cases; 26,184,846 bus cycles and 256,000 SPC cases passed
 their existing gates. Native runtime and all four persistence modes passed;
-the same28 DLL/EXE/deps/runtimeconfig identities bracket every final native start.
+the same 28 DLL/EXE/deps/runtimeconfig identities bracket every final native start.
 
-The real A/V run retained2.3852309s cold readiness separately, then observed
-5.0086057s with297 video,301 audio and297 actual driver/video comparisons;
-maximum software A/V distance33.308853ms,23 presentation drops, no provider fault.
-Maximum queue residence265.064900ms and scheduling error173.170717ms include
+The real A/V run retained 2.3852309 s cold readiness separately, then observed
+5.0086057 s with 297 video, 301 audio and 297 actual driver/video comparisons;
+maximum software A/V distance 33.308853 ms, 23 presentation drops, no provider fault.
+Maximum queue residence 265.064900 ms and scheduling error 173.170717 ms include
 late rejected/cold work; they are not physical device-latency claims.
 
-The three frozen archives contain8,771 entries /5,745,970,051 decompressed bytes.
+The three frozen archives contain 8,771 entries / 5,745,970,051 decompressed bytes.
 Every archive and entry has SHA256/CRC32/length identities; every entry was read
 back and compared to both staged and live originals. No nested ZIP or active log
 is included. The separate developmental archive retains available failed-run
@@ -206,19 +246,25 @@ Three prepared Root helper scripts are ancillary copies in the report archive;
 they were not run as implementation evidence.
 
 See [M9d baseline](baselines/m9d.json) for exact hashes, counts and raw paths.
-M9d was independently accepted on `2a5ae39` (Root full gate exit0,256 portable/23 Windows groups). M9a sustained performance, M8 audio
-reds, source-adjudicated raw SPC differences, distribution/Manager/CI, prolonged
-soak and M10 remained open at this M9d snapshot; publish was then PRE-M0. No physical SNES/input/DAC,
-OS-focus or clean-VM claim is added.
+M9d was independently accepted on `2a5ae39` (Root full gate exit 0,
+256 portable/23 Windows groups). M9a sustained performance, M8 audio failures,
+source-adjudicated raw SPC differences, distribution/Manager/CI, prolonged soak
+and M10 remained open at this M9d snapshot; publish was then PRE-M0. No physical
+SNES/input/DAC, OS-focus or clean-VM claim is added.
 
 
-M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. Independent Root acceptance passed on `2534dba`,267 portable/31 Windows groups; see the separate implementation and Root evidence in baseline m9e.json. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.
+M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library
+metadata and State9 management. Independent Root acceptance passed on `2534dba`,
+267 portable/31 Windows groups; see the separate implementation and Root evidence
+in baseline m9e.json. See the [Manager contract](m9-manager-contract.md);
+distribution/CI, sustained performance and prolonged soak remain open.
 
-M9f freezes selfcontained Windows packages for emulator/relative Manager/Updater,
-an explicit bounded update workflow, isolated preservation-first installer tests
-and actual Linux portability. Package defaults remain immutable; operator policy
-lives in user data and is edited through F10 SETTINGS UPDATE SOURCE. The current
-publish is verified; its complete PRE-M0 predecessor is retained. Full Windows
-276/31 belongs to9db; test-only lifecycle hardening905 has targeted11/8 Windows
-Manager evidence, all real package probes and a complete276-group Linux gate.
-Independent Root acceptance passed on `0f8aadc`; see [M9f baseline](baselines/m9f.json). M9 and release acceptance remain incomplete.
+M9f freezes self-contained Windows packages for the emulator/relative
+Manager/Updater, an explicit bounded update workflow, isolated preservation-first
+installer tests and actual Linux portability. Package defaults remain immutable;
+operator policy lives in user data and is edited through F10 SETTINGS UPDATE
+SOURCE. The current publish is verified; its complete PRE-M0 predecessor is
+retained. Full Windows 276/31 belongs to 9db; test-only lifecycle hardening 905
+has targeted 11/8 Windows Manager evidence, all real package probes and a complete
+276-group Linux gate. Independent Root acceptance passed on `0f8aadc`; see the
+[M9f baseline](baselines/m9f.json). M9 and release acceptance remain incomplete.

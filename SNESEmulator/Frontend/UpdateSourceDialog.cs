@@ -11,14 +11,14 @@ internal static class UpdateSourceDialog
 
     internal static bool ShowEditor()
     {
-        using var form = new Forms.Form { Text = "SNESEmulator – Updatequelle", ClientSize = new Size(560, 220), FormBorderStyle = Forms.FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, StartPosition = Forms.FormStartPosition.CenterScreen };
-        var explanation = new Forms.Label { Text = "Updates sind standardmäßig deaktiviert. Es wird nur die von dir konfigurierte Quelle geprüft.", AutoSize = false, Location = new Point(18, 16), Size = new Size(524, 36) };
-        var enabled = new Forms.CheckBox { Text = "Updates dieser Quelle aktivieren", AutoSize = true, Location = new Point(18, 62), Enabled = false };
-        var label = new Forms.Label { Text = "Manifest-URL (HTTPS)", AutoSize = true, Location = new Point(18, 92) };
+        using var form = new Forms.Form { Text = "SNESEmulator – Update source", ClientSize = new Size(560, 220), FormBorderStyle = Forms.FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, StartPosition = Forms.FormStartPosition.CenterScreen };
+        var explanation = new Forms.Label { Text = "Updates are disabled by default. Only the source you configure will be checked.", AutoSize = false, Location = new Point(18, 16), Size = new Size(524, 36) };
+        var enabled = new Forms.CheckBox { Text = "Enable updates from this source", AutoSize = true, Location = new Point(18, 62), Enabled = false };
+        var label = new Forms.Label { Text = "Manifest URL (HTTPS)", AutoSize = true, Location = new Point(18, 92) };
         var url = new Forms.TextBox { Location = new Point(18, 113), Size = new Size(524, 24), MaxLength = 2048, Enabled = false };
         var notice = new Forms.Label { Location = new Point(18, 145), Size = new Size(524, 28), ForeColor = Color.DarkRed };
-        var save = new Forms.Button { Text = "Speichern", Location = new Point(350, 180), Size = new Size(92, 28), Enabled = false };
-        var cancel = new Forms.Button { Text = "Abbrechen", Location = new Point(450, 180), Size = new Size(92, 28), DialogResult = Forms.DialogResult.Cancel };
+        var save = new Forms.Button { Text = "Save", Location = new Point(350, 180), Size = new Size(92, 28), Enabled = false };
+        var cancel = new Forms.Button { Text = "Cancel", Location = new Point(450, 180), Size = new Size(92, 28), DialogResult = Forms.DialogResult.Cancel };
         form.Controls.AddRange([explanation, enabled, label, url, notice, save, cancel]);
         form.CancelButton = cancel;
         Exception? probeFailure = null;
@@ -47,7 +47,7 @@ internal static class UpdateSourceDialog
             catch (Exception error)
             {
                 saving = false;
-                notice.Text = "Speichern fehlgeschlagen: " + error.Message;
+                notice.Text = "Save failed: " + error.Message;
                 save.Enabled = true;
                 cancel.Enabled = true;
                 if (probe != null) { probeFailure = error; form.DialogResult = Forms.DialogResult.Abort; form.Close(); }
@@ -76,7 +76,7 @@ internal static class UpdateSourceDialog
                     if (probe.Phase == "close-save") form.Close();
                 }
             }
-            catch (Exception error) { if (closed || form.IsDisposed || form.Disposing) { abandonedLoad = true; return; } notice.Text = "Konfiguration unlesbar. Quelle neu eingeben: " + error.Message; enabled.Enabled = url.Enabled = save.Enabled = true; }
+            catch (Exception error) { if (closed || form.IsDisposed || form.Disposing) { abandonedLoad = true; return; } notice.Text = "Cannot read configuration. Enter the source again: " + error.Message; enabled.Enabled = url.Enabled = save.Enabled = true; }
             finally { loadFinished.TrySetResult(); }
         };
         bool result = form.ShowDialog() == Forms.DialogResult.OK;

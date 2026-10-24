@@ -1,246 +1,276 @@
 # SNESEmulator
 
-Eigenständiger SNES-Emulator in C#, aufgebaut nach dem Bedien- und
-Architekturkonzept von [C64Emulator](https://github.com/n1k0m0/C64Emulator).
-Der SNES-Kern wird hier selbst entwickelt; es wird kein Snes9x-, bsnes- oder
-Libretro-Kern eingebunden.
+An independently developed SNES emulator in C#, following the interface and
+architecture of [C64Emulator](https://github.com/n1k0m0/C64Emulator).
+The SNES hardware core is developed in this repository; it does not embed a
+Snes9x, bsnes, or Libretro core.
 
-**Stand: 0.1.0-preview – eigener Entwicklungskern, noch keine allgemeine
-Spielekompatibilität.** M0–M8 sowie M9b Worker/UI und M9c Persistenz sind unabhängig geprüft. Die getaktete
-Mode0–7-PPU bietet Sprites, Fenster, Farbmathematik, OPT, Hires und Mode7.
-M9d Netzwerk und M9e Manager sind unabhängig abgenommen (`2a5ae39`/`2534dba`).
-M9f Distribution/CI ist unabhängig auf `0f8aadc` abgenommen. M9g erweitert
-konfigurierbare Eingaben, Anzeige und Resetbedienung; der unabhängige
-Root-Vollgate ist wegen eines Software-A/V-Abstands rot. Die getrennte
-Beschriftungskorrektur ist geprüft ([Nachweise](docs/m9g-followup.md)). M9a-Dauerleistung
-und M9/Release bleiben offen. 20 unveränderte
-lizenzierte Testprogramme und ein externes Techdemo laufen über den eigenen
-Kern und zwei separat gebaute Referenzen. Bekannte Audioabweichungen und
-veröffentlichte Hardwarefehler bleiben ausdrücklich offen. Der eigene S-DSP
-liefert phasengetaktetes natives Stereo. Alle5.080.400 externen CPU-Semantik- und
-Busfälle bestehen. Die SPC-Suite umfasst256.000 Semantik-/freigegebene Busfälle:
-249.000 passen roh,7.000 haben eine quellengestützte indirekt-Y-Adjudikation.
-Es gibt keine eigene Konsolenmessung. Native Rohfelder haben256/512×224/239Pixel;453.726 native
-Stereo-Paare bestehen den unabhängigen digitalen DSP-Referenzvergleich.
-Siehe [Testlabor](docs/test-laboratory.md), [M4](docs/m4-apu-contract.md)
-[M5-PPU-Vertrag](docs/m5-ppu-contract.md), [M6-DSP-Vertrag](docs/m6-dsp-contract.md), [M7-Videovertrag](docs/m7-video-contract.md), [M8-Vertrag](docs/m8-compatibility-contract.md)
-und [Titelmatrix](docs/m8-title-matrix.md).
+**Status: 0.1.0-preview — an experimental hardware core, without general
+game compatibility.** M0–M8, M9b worker/UI isolation, and M9c persistence have
+been independently reviewed. The clocked Mode 0–7 PPU supports sprites, windows,
+color math, offset-per-tile, high resolution, and Mode 7. M9d networking and M9e
+Manager were independently accepted on `2a5ae39`/`2534dba`; M9f distribution/CI
+was independently accepted on `0f8aadc`, subject to the documented CI limits.
 
-## Starten
+M9g adds configurable input, display options, and reset controls. Its independent
+full acceptance run failed the software A/V limit; the separate label correction
+was verified ([evidence](docs/m9g-followup.md)). M9h contains a targeted software
+A/V correction, but sustained performance and M9/release acceptance remain open
+([performance and A/V follow-up](docs/m9h-performance-av.md)). Current persistence
+and cross-platform CI evidence is recorded in the
+[R1 follow-up](docs/r1-persistence-ci.md).
 
-`Start-SNESEmulator.cmd` doppelklicken. Das geprüfte `publish/` enthält den
-aktuellen Emulator sowie `Manager/` und `Updater/` mit eigener Windows-x64-
-Runtime10.0.13; zum Start ist kein SDK nötig. Argumente mit Leerzeichen werden
-weitergereicht. Das frühere PRE-M0-Verzeichnis bleibt vollständig unter
-`publish-pre-m9f-9058878/` erhalten. Die separate lokale Spielverknüpfung und
-ihre spielbare Kopie bleiben unverändert.
+Twenty unchanged licensed test programs and an external tech demo run through
+the custom core and two separately built references. Known audio differences
+and published hardware limitations remain open. The custom S-DSP produces
+phase-clocked native stereo. All 5,080,400 external CPU semantic and bus cases
+pass. The SPC suite covers 256,000 semantic/adjudicated bus cases: 249,000 match
+the raw expectations, while 7,000 require a source-supported indirect-Y
+adjudication. No original-console measurements have been made by this project.
+Native raw fields are 256/512 × 224/239 pixels; 453,726 native stereo pairs pass
+the independent digital DSP reference comparison.
 
-Zum Entwickeln ist das exakt gepinnte SDK10.0.402 nötig. Der folgende Build
-setzt dieses SDK auf PATH voraus; die lokale private Toolchain und genaue
-Prüfpfade stehen in [M9f](docs/baselines/m9f.json).
+See the [test laboratory](docs/test-laboratory.md),
+[M4 APU contract](docs/m4-apu-contract.md),
+[M5 PPU contract](docs/m5-ppu-contract.md),
+[M6 DSP contract](docs/m6-dsp-contract.md),
+[M7 video contract](docs/m7-video-contract.md),
+[M8 compatibility contract](docs/m8-compatibility-contract.md), and
+[title matrix](docs/m8-title-matrix.md).
 
-Updates sind standardmäßig deaktiviert. Eine eigene Quelle wird unter
-F10 → SETTINGS → UPDATE SOURCE gespeichert; die Prüfung erfolgt ausdrücklich
-über UPDATES im Hauptmenü. Es gibt keine erfundene oder automatisch konfigurierte
-öffentliche Releasequelle.
+## Getting started
+
+Double-click `Start-SNESEmulator.cmd`. In a standalone package, it starts the
+included emulator. In a source checkout, it uses a `publish/` package with a
+package manifest when available, otherwise it runs the development project. Quoted arguments
+containing spaces are forwarded to the application.
+
+A self-contained Windows x64 package includes the emulator, `Manager/`, and
+`Updater/`, each with .NET runtime **10.0.13**; no SDK is needed to run it.
+Local published packages and test artifacts are not part of a fresh checkout.
+No public release is currently published.
+
+Development requires the exact SDK version **10.0.402**, pinned in `global.json`.
+The following commands assume that SDK is on `PATH`. The local private
+toolchain and verification paths are recorded in the
+[M9f baseline](docs/baselines/m9f.json).
 
 ```powershell
 dotnet build SNESEmulator.sln -c Release
 dotnet run --project SNESEmulator -c Release
-# Optional direkt mit einem eigenen ROM:
+# Optionally, start with your own ROM:
 dotnet run --project SNESEmulator -c Release -- "C:\Games\example.sfc"
 ```
 
-Mit `F6` startet das selbst erzeugte Diagnose-ROM: ein farbiges, scrollendes
-Kachelmuster, tatsächlich durch den C#-Hardwarekern ausgeführt. Es benötigt
-keine externen ROM-Dateien. Links/rechts auf Controller-Port 1 ändern die
-Scrollrichtung und Geschwindigkeit. `.sfc` und `.smc` lassen sich über MEDIA, per
-Drag-and-drop oder als Programmargument öffnen. Ein 512-Byte-Copierheader wird
-erkannt und entfernt. Der Kern implementiert LoROM/HiROM bis 4 MiB und ExLoROM/ExHiROM bis 8 MiB
-mit rekursiver ROM-Spiegelung und SRAM. M3 prüft diese Mappings synthetisch;
-externe M8-Programme belegen bisher nur LoROM und HiROM. Zusatzchips und
-andere Cartridge-Hardware sind nicht unterstützt.
+Press `F6` to start the generated diagnostic ROM: a colorful scrolling tile
+pattern executed by the C# hardware core. It requires no external ROM files.
+Left/right on controller port 1 changes the scroll direction and speed.
+Open `.sfc` and `.smc` files through MEDIA, drag and drop, or a command-line
+argument. A 512-byte copier header is detected and removed.
 
-## Bedienung wie im C64-Projekt
+The core implements LoROM/HiROM up to 4 MiB and ExLoROM/ExHiROM up to 8 MiB,
+with recursive ROM mirroring and SRAM. M3 checks these mappings synthetically;
+external M8 programs currently provide evidence only for LoROM and HiROM.
+Expansion chips and other cartridge hardware are unsupported.
 
-| Taste | Funktion |
+Updates are disabled by default. Configure your own source under
+F10 → SETTINGS → UPDATE SOURCE, then explicitly check through UPDATES in the
+main menu. No public release source is configured automatically.
+
+## Controls
+
+The interface follows the C64 project.
+
+| Key | Action |
 |---|---|
-| F10 | MAIN MENU mit SETTINGS, NETWORK, MEDIA, RESET, MANAGER und UPDATES |
-| F11 | Vollbild umschalten |
-| F12 | Savestates mit Screenshot-Vorschau, Speichern/Laden/Löschen |
-| F9 | Turbo mit vierfacher Zielgeschwindigkeit |
-| F6 | Eigenes SNES-Diagnose-ROM starten |
-| Pfeile / Enter / Esc | Menü auswählen / aktivieren / zurück |
-| S oder F5 im F12-Menü | Spielstand speichern |
-| Enter oder L im F12-Menü | Ausgewählten Spielstand laden |
-| Entf im F12-Menü | Löschen mit expliziter Ja/Nein-Auswahl |
-| Bild auf/ab im Browser | Zehn Einträge springen |
-| Buchstabe im Browser | Nächsten passenden Dateinamen auswählen |
+| F10 | Open MAIN MENU with SETTINGS, NETWORK, MEDIA, RESET, MANAGER, and UPDATES |
+| F11 | Toggle fullscreen |
+| F12 | Open savestates with screenshot previews and save/load/delete actions |
+| F9 | Toggle turbo with a four-times-speed target |
+| F6 | Start the custom SNES diagnostic ROM |
+| Arrow keys / Enter / Esc | Select / activate / go back in menus |
+| S or F5 in the F12 menu | Save a state |
+| Enter or L in the F12 menu | Load the selected state |
+| Delete in the F12 menu | Delete with an explicit yes/no confirmation |
+| Page Up / Page Down in the browser | Move by ten entries |
+| Letter in the browser | Select the next matching filename |
 
-Die lokale Emulation pausiert in Menüs; Clients erhalten den Menüstatus des
-Hosts. SETTINGS enthält SHARP/CRT/TV, GPU-Upscaling, Vollbild, Gamepad-Aktivierung,
-Controller-Port, Lautstärke, ein eigenes CPU→SPC→DSP-Audiodiagnose-ROM
-und eine Belegung für die acht SNES-Aktionstasten. Gamepads
-bedienen auch die Menüs: Start+Select öffnet F10, A bestätigt, B geht zurück,
-X speichert im F12-Menü. L+R+Select öffnet F12. Richtungen kommen von Steuerkreuz oder linkem Stick.
-Die Standard-Buttonnummern hängen vom Controller ab und sind anpassbar.
+Local emulation pauses in menus; clients receive the host's menu status.
+SETTINGS includes SHARP/CRT/TV filters, GPU upscaling, fullscreen, gamepad
+enablement, controller port, volume, a custom CPU → SPC → DSP audio diagnostic
+ROM, and bindings for the eight SNES action buttons. Gamepads also control the
+menus: Start+Select opens F10, A confirms, B goes back, and X saves in the F12
+menu. L+R+Select opens F12. Use the D-pad or left stick for directions.
+Default button numbers depend on the controller and can be customized.
 
-| SNES-Controller | Tastatur |
+| SNES controller | Keyboard |
 |---|---|
-| Steuerkreuz | Pfeiltasten |
+| D-pad | Arrow keys |
 | B / A | Z / X |
 | Y / X | A / S |
 | L / R | Q / W |
-| Start / Select | Enter / rechte Umschalttaste |
+| Start / Select | Enter / Right Shift |
 
-## Netzwerk
+## Networking
 
-Das Host-/Client-Prinzip und die TLS-/Relay-Implementierung stammen aus dem
-C64-Projekt. Nur der Host führt die Hardware aus; Clients erhalten Bilddaten
-und senden Eingaben. Der Host weist den verbundenen Clients Rechte für Port 1,
-Port 2 oder beide Ports zu und kann Clients entfernen. Auch als PLAYER tritt ein
-Client zunächst ohne Controller-Rechte bei. OBSERVER ist ebenfalls verfügbar.
-Eine separate C64-Tastaturfreigabe ist für das SNES nicht im Menü enthalten.
+The host/client model and TLS/relay implementation come from the C64 project.
+Only the host executes the hardware; clients receive video and send input.
+The host assigns connected clients access to port 1, port 2, or both ports,
+and can remove clients. Even a PLAYER initially joins without controller
+permissions. An OBSERVER role is also available. The C64-specific keyboard
+sharing option is not included in the SNES menu.
 
-- LAN: TLS/TCP auf Port **1991**; Sitzungspasswort optional.
-- RELAY: eigener Python-Relay auf Port **1992**, Connection-ID und optionales
-  Relay-Passwort; die Sitzung bleibt zusätzlich Ende-zu-Ende verschlüsselt.
-- Zertifikate werden beim ersten Kontakt gepinnt. Geänderte Zertifikate werden
-  abgewiesen; die CERTIFICATE-Zeile zeigt einen Dialog mit altem und neuem
-  Fingerabdruck und erlaubt ausdrücklich bestätigtes Ersetzen.
-- Controllerdaten verwenden 16 Bit mit allen zwölf SNES-Tasten.
-- VID3 verwendet verlustfreie Deflate-Kompression vollständiger ARGB-Bilder
-  mit nativer 256/512×224/239-Geometrie, Feldparität und rationalen Zeitdaten.
-  Es gibt keine Reduktion auf die C64-Farbpalette. Unveränderte Bilder werden
-  ausgelassen; langsame Clients halten nur das neueste wartende Bild.
-- Filter und Upscaling bleiben lokal. Sitzungs- und Relay-Passwörter bleiben
-  nur im Arbeitsspeicher.
-- Der Sitzungs-Handshake ist `0x534E0003`; Audiopakete verwenden AUD2.
-  Sie übertragen natives verlustfreies Stereo-PCM mit 32000 Hz im Standardprofil,
-  Sampleindex, Crystalzeit und Sequenz. Begrenzte Queues und ein getrenntes
-  Geräte-Resampling halten Hardwarezeit und Präsentation auseinander.
+- LAN: TLS/TCP on port **1991**, with an optional session password.
+- RELAY: a separately hosted Python relay on port **1992**, with a connection ID
+  and optional relay password. The session also remains end-to-end encrypted.
+- Certificates are pinned on first contact. Changed certificates are rejected.
+  The CERTIFICATE row opens a dialog showing the old and new fingerprints and
+  allows replacement after explicit confirmation.
+- Controller input uses 16 bits covering all twelve SNES buttons.
+- VID3 uses lossless Deflate compression of complete ARGB frames, with native
+  256/512 × 224/239 geometry, field parity, and rational timing information.
+  Colors are not reduced to the C64 palette. Unchanged frames are omitted;
+  slow clients retain only the newest pending frame.
+- Filters and upscaling are local. Session and relay passwords stay in memory.
+- The session handshake is `0x534E0003`; audio packets use AUD2. They carry native
+  lossless stereo PCM at 32,000 Hz in the default profile, together with sample
+  indices, crystal time, and sequence numbers. Bounded queues and separate device
+  resampling keep hardware time independent of presentation.
 
-Im NETWORK-Menü Text direkt eintippen, mit Backspace bearbeiten oder mit Entf
-leeren. SERVER PORT ist momentan der gemeinsame LAN-Port für Host und Client.
-Für abweichende Ports kann auch `settings.json` bearbeitet werden.
-Der Relay wird separat betrieben; siehe [relay_server/README.md](relay_server/README.md).
-Wire-Version, Relay-Magic und Standardports sind vom C64 getrennt. Die beiden
-Emulatoren können nicht gegenseitig als Client dienen.
+Type directly into fields in the NETWORK menu, edit with Backspace, or clear
+with Delete. SERVER PORT currently sets the shared LAN port for host and client.
+You can also edit `settings.json` to configure different ports.
+Run the relay separately; see the [relay documentation](relay_server/README.md).
+Wire versions, relay magic, and default ports are separate from the C64 project.
+The two emulators cannot act as clients for each other.
 
-## Architektur
+## Architecture
 
-| Hauptmenü | Eigenes Diagnose-ROM | Spielstand-Vorschau |
+| Main menu | Custom diagnostic ROM | Savestate preview |
 |---|---|---|
-| ![Hauptmenü](docs/screenshots/ui-main.png) | ![Diagnose-ROM](docs/screenshots/ui-demo.png) | ![Spielstände](docs/screenshots/ui-saves.png) |
+| ![Main menu](docs/screenshots/ui-main.png) | ![Diagnostic ROM](docs/screenshots/ui-demo.png) | ![Savestates](docs/screenshots/ui-saves.png) |
 
-| Projekt / Verzeichnis | Verantwortung |
+| Project / directory | Responsibility |
 |---|---|
-| `SNESEmulator.Core` | Plattformunabhängiger C#-Kern: CPU, Bus, Cartridge, PPU, Controller, DMA, SPC700/APU, S-DSP und Savestates |
-| `SNESEmulator/Frontend` | SharpPixels-Fenster, Pixelmenüs, Eingaben und Präsentation |
-| `SNESEmulator/Network` | TLS, Host/Client, Frame-/Input-Protokoll, Relay und E2E-Verschlüsselung |
-| `SNESEmulator/Audio` | Stereo-Geräteausgabe, Lautstärke und Resampling für lokalen/Netzwerkton |
-| `SharpPixels` | Aus dem C64-Projekt übernommene OpenTK-Renderbibliothek mit GPU-Filtern |
-| `SNESEmulator.Tests` | Ausführbare Hardware- und Netzwerk-Regressionstests |
-| `relay_server` | Separater Python-TLS-Relay, einschließlich Linux-Service-Skripten |
-| `scripts` | Build, Tests und eigenständig startfähiger Windows-x64-Publish |
+| `SNESEmulator.Core` | Platform-independent C# core: CPU, bus, cartridge, PPU, controllers, DMA, SPC700/APU, S-DSP, and savestates |
+| `SNESEmulator.Runtime` | Emulation worker, bounded UI handoff, input, pacing, and persistence coordination |
+| `SNESEmulator/Frontend` | SharpPixels window, pixel menus, input, and presentation |
+| `SNESEmulator/Network` | TLS, host/client, frame/input protocol, relay, and end-to-end encryption |
+| `SNESEmulator/Audio` | Stereo device output, volume, and resampling for local/network audio |
+| `SNESEmulator.Management` / `SNESEmulatorManager` | Game library, savestate management, settings, and standalone WPF Manager |
+| `SNESEmulator.Contracts` | Shared Manager/emulator IPC contracts |
+| `SNESEmulator.Updater` | Package verification and explicit update installation |
+| `SharpPixels` | OpenTK rendering library with GPU filters, reused from the C64 project |
+| `SNESEmulator.Core.Tests` | Portable hardware and runtime regression suites |
+| `SNESEmulator.Tests` | Windows frontend and network integration tests |
+| `relay_server` | Separate Python TLS relay, including Linux service scripts |
+| `scripts` | Build, test, and self-contained Windows x64 publishing scripts |
 
-Weitere Details und nächste Entwicklungsschritte:
-[docs/architecture.md](docs/architecture.md).
+See [architecture](docs/architecture.md) for implementation details.
+The [development plan](docs/development-plan.md) describes the path toward an
+accurate base console, the component sequence, and concrete tests and acceptance
+criteria for each milestone.
 
-Der ausführliche [Entwicklungsplan](docs/development-plan.md) beschreibt den
-Weg zur hardwaregetreuen Basiskonsole, die Reihenfolge der Komponenten und
-konkrete Tests und Abnahmekriterien für jeden Meilenstein.
+Run the Manager from F10 → MANAGER in the development build, or start
+`SNESEmulatorManager/bin/Release/net10.0-windows/SNESEmulatorManager.exe` directly.
+See the [Manager/IPC contract](docs/m9-manager-contract.md).
 
-## Daten und Spielstände
+## Data and savestates
 
-Einstellungen, Zertifikate, Battery-SRAM und Spielstände liegen getrennt vom C64
-unter `%APPDATA%\SNESEmulator`. Standard-ROM-Verzeichnis:
+Settings, certificates, battery-backed SRAM, and savestates are stored separately
+from the C64 project under `%APPDATA%\SNESEmulator`. The default ROM directory is
 `%USERPROFILE%\Documents\SNESEmulator`.
 
-Savestates enthalten den gesamten **bisher implementierten** Hardwarezustand
-und das Vorschaubild. Sie sind versioniert und an den SHA-256-Hash des geladenen
-ROMs gebunden. Format 9 bewahrt vollständige Restphasen; Formate 1–8 werden
-wegen nicht eindeutig migrierbarer Timingzustände abgelehnt. Zum Laden zuerst
-dasselbe ROM einlegen. Fehlerhafte oder fremde
-Spielstände ersetzen die laufende Maschine nicht. Battery-SRAM wird beim
-Cartridgewechsel und regulären Beenden atomar gespeichert.
+Savestates contain the complete **currently implemented** hardware state and a
+preview image. They are versioned and bound to the loaded ROM's SHA-256 hash.
+Format 9 preserves complete residual phases; formats 1–8 are rejected because
+their timing states cannot be migrated unambiguously. Load the same ROM before
+loading a state. Invalid states or states from another ROM do not replace the
+running machine. Battery-backed SRAM is saved atomically when changing cartridges
+and during normal shutdown.
 
-Für isolierte Testdaten kann `SNESEMULATOR_DATA_DIR` gesetzt werden.
-Die Tests schreiben in ein eigenes temporäres Verzeichnis.
+Set `SNESEMULATOR_DATA_DIR` to isolate test data. Tests use their own temporary
+directories.
 
-## Tests und Veröffentlichung eines lokalen Builds
+## Testing and publishing a local build
 
 ```powershell
 .\scripts\build.ps1 -Test
-# Alternativ:
+# Portable laboratory checks:
+python tools/test-lab.py
+# Windows frontend and network integration tests:
 dotnet run --project SNESEmulator.Tests -c Release
-# Eigenständig startfähiger Build ohne installierte .NET-Laufzeit:
+# Self-contained build that does not require an installed .NET runtime:
 .\scripts\publish-win-x64.ps1
 ```
 
-Die Hardwaretests prüfen Mapping, SRAM, CPU-Moduswechsel und ausgewählte
-Rechen-/Stackbefehle, Controller, DMA, das Diagnose-ROM sowie deterministisches
-Fortsetzen von Savestates. Integrationstests prüfen Farberhalt und sämtliche
-Controllerbits sowie echte TLS- und Relay-Verbindungen mit Eingaben und Video.
-Der Relay-Test benötigt `python` im PATH und erzeugt sein Testzertifikat mit
-.NET; OpenSSL ist für den Test nicht erforderlich.
+Hardware tests cover mapping, SRAM, CPU mode changes, selected arithmetic/stack
+instructions, controllers, DMA, the diagnostic ROM, and deterministic savestate
+continuation. Integration tests check color preservation, every controller bit,
+and real TLS and relay connections carrying input and video. The relay test
+requires `python` on `PATH` and creates its test certificate using .NET; OpenSSL
+is not required.
 
-Headless-Ausgabe und visueller Smoke-Test:
+Headless output and a visual smoke test:
 
 ```powershell
 $app = '.\SNESEmulator\bin\Release\net10.0-windows\SNESEmulator.exe'
 & $app --write-diagnostic-rom diagnostic.sfc
 & $app --headless diagnostic.sfc 120 frame.ppm result.txt
 & $app --ui-smoke screenshot.png main
-# Weitere Ansichten: demo, settings, network, saves
+# Other views: demo, settings, network, saves
 ```
 
-Ein Updater, Windows-Installer und Spielebibliotheks-Manager sind noch nicht
-eingerichtet. Insbesondere zeigt kein Update-Endpunkt auf C64-Releases.
-Es wurde kein Remote-Repository angelegt und nichts hochgeladen.
+The repository includes an updater, an Inno Setup installer definition, and a
+game-library Manager. Update checks are disabled until a source is explicitly
+configured; no update endpoint points to C64 releases. Packaging and installer
+verification limits are documented in the
+[distribution contract](docs/m9-distribution-contract.md).
 
-## Lizenz und Herkunft
+## License and attribution
 
-Apache-2.0, siehe [LICENSE](LICENSE) und [NOTICE](NOTICE). Wiederverwendet wurden
-SharpPixels, die Bitmap-Menüschrift, der PCM-Ausgang und die Netzwerk-/Relay-
-Infrastruktur des C64Emulators. Der C64-Hardwarekern wurde nicht kopiert und das
-Originalrepository nicht verändert. Es sind keine kommerziellen Spiel-ROMs
-oder Nintendo-Firmware enthalten.
+Apache-2.0; see [LICENSE](LICENSE) and [NOTICE](NOTICE). SharpPixels, the bitmap
+menu font, PCM output, and network/relay infrastructure are reused from
+C64Emulator. The C64 hardware core was not copied and the original repository
+was not modified. No commercial game ROMs or Nintendo firmware are included.
 
-## Testlabor
+## Test laboratory and historical evidence
 
-`python tools/test-lab.py --windows --full` prüft portable Kernregressionen,
-zehn Windows-/Netzwerkgruppen und die vollständigen, festgeschriebenen externen
-CPU-Semantik- und Busdaten getrennt. Ohne `--full` bleiben die nicht ausgeführten
-Daten ausdrücklich sichtbar. M8 ergänzt 27 Zustandsgruppen und feste Offline-
-Konsolenvergleiche mit unserem frei verteilbaren IPL. Der lokale Vollgate prüft
-zusätzlich das Original-IPL; dieses wird nicht verteilt. Ein grüner
-Regressionsvertrag macht bekannte rote Genauigkeitszeilen nicht zu bestandenen
-Fällen. Details: [Testlabor](docs/test-laboratory.md).
+`python tools/test-lab.py --windows --full` checks portable core regressions,
+Windows/network suites, and the complete pinned external CPU semantic and bus
+datasets separately. Without `--full`, unexecuted cases remain explicitly
+reported. M8 adds 27 state groups and fixed offline console-reference comparisons
+using the freely distributable custom IPL. The local full gate also checks the
+original IPL, which is not distributed. A passing regression contract does not
+turn known failing accuracy comparisons into passes. See the
+[test laboratory](docs/test-laboratory.md) for current suite counts and limits.
 
-Die Standard-APU startet eine eigene offene 64-Byte-Bootroutine und führt
-SPC-Programme tatsächlich aus. Originale Nintendo-IPL-Firmware wird nicht
-verteilt. Eine lokale 64-Byte-Datei kann über `SNESEMULATOR_IPL` konfiguriert
-werden; Spielstände sind an ihren Hash gebunden. Der vollständige M4-Lauf
-benötigt die lokale Original-IPL-Testeingabe; ohne sie bleibt dieser Nachweis
-ausdrücklich unausgeführt. MIT-SPC-Testdaten beziehen:
-`python tools/fetch-spc700.py --full`. Herkunft und Reproduktion:
-[M4-Vertrag](docs/m4-apu-contract.md).
+The default APU starts a custom open 64-byte boot routine and executes SPC
+programs. Original Nintendo IPL firmware is not distributed. Configure a local
+64-byte file through `SNESEMULATOR_IPL`; savestates are bound to its hash.
+The complete M4 run requires the local original-IPL test input; without it, that
+evidence remains explicitly unexecuted. Fetch the MIT-licensed SPC test data
+with `python tools/fetch-spc700.py --full`. Provenance and reproduction are
+documented in the [M4 contract](docs/m4-apu-contract.md).
 
+The historical M6 full gate on clean commit `feb978b` passed 147 portable groups
+(129 existing, 17 DSP, and 1 A/V), 8 Windows groups, all external CPU/SPC vectors,
+and original-IPL checks. [Measurements](docs/baselines/m6.json) remain separate
+from correctness oracles. The active PPU/APU/DSP diagnostic achieved 18.33 fields/s
+locally; the separate two-voice forced-blank audio diagnostic achieved 19.40.
+Both were below real time. At that milestone the local `publish/` directory
+still contained the pre-M0 build; package renewal followed in M9f.
 
-M6-Vollgate auf sauberem `feb978b`:147 portable Gruppen (129 bisherige,
-17 DSP,1 AV),8 Windowsgruppen, sämtliche externen CPU/SPC-Vollvektoren und
-Original-IPL-Prüfungen bestehen. [Messdaten](docs/baselines/m6.json) bleiben
-von Korrektheitsorakeln getrennt. Die aktive PPU+APU+DSP-Diagnose erreicht lokal
-18,33 Felder/s; die gesonderte Zwei-Voice-Audiodiagnose mit Forced Blank19,40.
-Dies ist unter Echtzeit und bleibt eine M9-Optimierungsaufgabe. Der vorhandene
-`publish/`-Ordner ist noch der alte Vor-M0-Stand; für diesen Entwicklungsstand
-mit dem SDK aus den aktuellen Quellen starten. Es wurde kein Release erstellt.
+The historical M7 full gate on clean commit `7cf7cc1` passed 182 portable and
+10 Windows groups. Later error-message and laboratory-adapter corrections on
+`adef880` were verified separately with targeted checks. Format 8 stored complete
+native raw fields and pipeline states and rejected earlier formats with an
+explanation; the current format is 9. VID3 transmits geometry, field parity,
+and rational time domains losslessly, while AUD2 retains stereo audio. The GUI
+and savestate previews use actual image dimensions with 4:3 presentation.
 
-
-M7:182 portable und10 Windowsgruppen bestehen im sauberen Vollgate auf7cf7cc1; nachfolgende Fehlertext-/Lab-Adapterkorrekturen aufadef880 sind separat gezielt geprüft. Format8 speichert vollständige native Rohfelder und Pipelinezustände; frühere Formate werden mit verständlicher Erklärung abgewiesen. VID3 überträgt Geometrie, Feldparität und rationale Zeitdomänen verlustfrei, AUD2-Stereo bleibt erhalten. GUI und Savepreview nutzen echte Bildmaße mit4:3-Präsentation.
-
-Lokaler vollständiger PPU/APU/DSP-Diagnoseworkload:23.64Felder/s; separater Zwei-BRR-ForcedBlank-Workload:24.29. Beide liegen unter Echtzeit. Quellen-/Hardwaregrenzen, frühere rote Befunde und unveränderte Evidenz: [M7-Baseline](docs/baselines/m7.json). Die vorhandene `publish/`-Distribution bleibt vor M0; Releaseerneuerung folgt in M9.
-
-Manager: `SNESEmulatorManager/bin/Release/net10.0-windows/SNESEmulatorManager.exe`
-or F10 MANAGER in the current development build. [Manager/IPC contract](docs/m9-manager-contract.md).
+The M7 PPU/APU/DSP diagnostic workload achieved 23.64 fields/s locally; the
+separate two-BRR forced-blank workload achieved 24.29. Both were below real time.
+Source/hardware limits, earlier failing findings, and unchanged evidence are
+recorded in the [M7 baseline](docs/baselines/m7.json). These historical results
+do not establish current sustained-performance or release acceptance.

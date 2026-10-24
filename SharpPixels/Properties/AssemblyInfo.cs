@@ -18,9 +18,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-// Allgemeine Informationen über eine Assembly werden über die folgenden
-// Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
-// die einer Assembly zugeordnet sind.
+// General information about an assembly is controlled through the following
+// attributes. Change these attribute values to modify the information
+// associated with an assembly.
 [assembly: AssemblyTitle("SharpPixels")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
@@ -30,23 +30,23 @@ using System.Runtime.Versioning;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
-// Durch Festlegen von ComVisible auf FALSE werden die Typen in dieser Assembly
-// für COM-Komponenten unsichtbar.  Wenn Sie auf einen Typ in dieser Assembly von
-// COM aus zugreifen müssen, sollten Sie das ComVisible-Attribut für diesen Typ auf "True" festlegen.
+// Setting ComVisible to false hides the types in this assembly from COM
+// components. To access a type in this assembly from COM, set that type's
+// ComVisible attribute to true.
 [assembly: ComVisible(false)]
 
-// Die folgende GUID bestimmt die ID der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
+// The following GUID identifies the type library if this project is exposed to COM.
 [assembly: Guid("6e1717bd-5415-4847-9333-fe47b6d1a6ca")]
 
-// Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
+// Assembly version information consists of the following four values:
 //
-//      Hauptversion
-//      Nebenversion
-//      Buildnummer
+//      Major version
+//      Minor version
+//      Build number
 //      Revision
 //
-// Sie können alle Werte angeben oder Standardwerte für die Build- und Revisionsnummern verwenden,
-// indem Sie "*" wie unten gezeigt eingeben:
+// Specify all values or use default build and revision numbers
+// by entering "*" as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]

@@ -15,6 +15,9 @@ Document hardware limitations honestly. A diagnostic ROM is not a compatibility
 test for commercial games. Do not distribute commercial ROMs or C64 firmware.
 Preserve the Apache license and attribution for reused C64 frontend/transport.
 
+Write repository documentation, code comments, user-facing text, and GitHub
+descriptions in English.
+
 ## Temporary Windows Codex browser crash workaround (2026-10-13)
 
 Use external Chrome/Edge for browser automation. Never call `tab.close()` on an

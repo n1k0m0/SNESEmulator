@@ -1,531 +1,541 @@
-# Entwicklungsplan: möglichst originalgetreuer SNES-Emulator
+# Development plan: a highly faithful SNES emulator
 
-Stand: 23.10.2026. Ausgangspunkt: Commit `7145184`.
-Status: M0–M8 unabhängig abgenommen. M9a: Genauigkeitsgate auf `2dbeb5f` bestanden, Dauerleistungsziel rot (38/62 NTSC-Fenster); M9 bleibt unvollständig. M9b Worker/UI, M9c Persistenz, M9d Netzwerk und M9e Manager sind unabhängig abgenommen. M9f Distribution/CI ist auf `0f8aadc` unabhängig abgenommen. M9g Bedienungsabgleich ist auf `2ab409d` implementiert und gezielt abschließend geprüft; unabhängiger Root-Vollgate auf `8daf478` ist am Software-A/V-Gate rot; die Beschriftungskorrektur ist geprüft. Dauerleistung, PAL-Messung, mehrstündiger Soak, Genauigkeitstriage und M10 bleiben offen.
+As of October 23, 2026. Starting point: commit `7145184`.
+Status: M0–M8 independently accepted. M9a: accuracy gate passed on `2dbeb5f`, sustained-performance target failing (38/62 NTSC windows); M9 remains incomplete. M9b Worker/UI, M9c persistence, M9d networking and M9e Manager are independently accepted. M9f distribution/CI is independently accepted on `0f8aadc`. M9g interaction parity is implemented on `2ab409d` and has received final targeted checks; the independent Root full gate on `8daf478` fails at the software A/V gate; the label correction is verified. Sustained performance, PAL measurement, a multi-hour soak, accuracy triage and M10 remain open.
 
-## Ziel und Nachweis
+## Goal and evidence
 
-Wir entwickeln den gesamten SNES-Hardwarekern in C#. Die Bedienung bleibt am
-C64Emulator orientiert. Ziel ist ein deterministischer, hardwaregetreuer Kern
-mit vollständiger Basiskonsole, PAL und NTSC sowie schrittweise ergänzten
-Cartridge-Chips und Peripheriegeräten.
+We are developing the entire SNES hardware core in C#. The user interface remains
+modeled on C64Emulator. The goal is a deterministic, hardware-faithful core with a
+complete base console, PAL and NTSC, and gradually added cartridge chips and
+peripherals.
 
-Genauigkeit wird pro Hardwarefunktion und Konsolenprofil ausgewiesen. Ein
-korrektes Titelbild oder ein bestandener Opcode-Test belegt noch keine korrekte
-Gesamtkonsole. Als Ziel gilt das beobachtbare digitale Verhalten einschließlich
-Buszugriffen, Timing, Grafik und Audio. Analoge Unterschiede von Fernsehern,
-Capture-Geräten und einzelnen Konsolen werden getrennt behandelt.
+Accuracy is reported per hardware function and console profile. A correct title
+screen or a passing opcode test does not establish correct behavior of the entire
+console. The target is observable digital behavior, including bus accesses,
+timing, graphics and audio. Analog differences between TVs, capture devices and
+individual consoles are handled separately.
 
-Für ungeklärte Effekte führen wir einen Evidenzeintrag: beobachtetes Verhalten,
-Quelle, Hardwaremodell/Revision, Test-ROM-Hash, Ergebnis und offene Fragen.
-Vergleiche mit anderen Emulatoren helfen bei der Fehlersuche. Ein als auf
-Originalhardware bestätigt ausgewiesener Befund braucht tatsächliche Messdaten
-oder nachvollziehbar veröffentlichte Hardwaretests. Wo diese fehlen, bleibt
-die Kennzeichnung ausdrücklich offen.
+For unresolved effects, we keep an evidence record: observed behavior, source,
+hardware model/revision, test-ROM hash, result and open questions. Comparisons with
+other emulators help with debugging. A finding labeled as confirmed on original
+hardware requires actual measurements or reproducibly published hardware tests.
+Where those are absent, the status remains explicitly unresolved.
 
-## Ausgangslage
+## Starting point
 
-Die bestehende Suite wurde am 22.10.2026 erneut ausgeführt: **17 bestanden,
-0 fehlgeschlagen**, einschließlich lokalem Python-Relay.
+The existing suite was rerun on October 22, 2026: **17 passed, 0 failed**,
+including the local Python relay.
 
-Vorhanden sind ein eigener CPU-Dekoder, Cartridge-Mapping, WRAM, DMA-Grundlagen,
-Mode-0/1-Hintergründe, ein originales Diagnose-ROM, Menüs, Savestates und
-TLS-/Relay-Transport. Die 17 Tests sichern diese Grundlage ab; sie sind kein
-Beleg für allgemeine SNES-Kompatibilität.
+An independently developed CPU decoder, cartridge mapping, WRAM, DMA foundations,
+Mode 0/1 backgrounds, an original diagnostic ROM, menus, savestates and TLS/relay
+transport are present. The 17 tests protect this foundation; they are not evidence
+of general SNES compatibility.
 
-Historische Lücken des Ausgangsstands (durch die nachfolgenden Meilensteine
-schrittweise ersetzt; kein aktueller M5-Status):
+Historical gaps in the starting point (gradually replaced by the milestones
+below; this is not the current M5 status):
 
-- `Cpu65816.Step()` verwendet überwiegend pauschale Befehlstakte.
-- `SnesSystem.RunFrame()` multipliziert diese pauschal mit sechs und rendert
-  nach CPU-Ausführung jeweils eine ganze Zeile. Zugriffe innerhalb einer
-  Rasterzeile sind damit noch nicht zeitlich korrekt sichtbar.
-- Historischer Ausgangsstand: DMA kopierte sofort; M3 ersetzt dies durch serialisierbare Busphasen.
-- M3 ergänzt ALU-Flanken, automatische Controllerabfrage und Timer-IRQ.
-  PPU-Leseports und physischer Hardwareabgleich bleiben offen.
-- M4 implementiert SPC700 und reale Boot-/Portabläufe; M6 ergänzt S-DSP und Stereo.
-- PPU-Leseports, Sprites, weitere Grafikmodi und viele Details fehlen.
-- Das Frontend verwendet rationale Feldzeiten; M6 versioniert Netzwerk-Audio als verlustfreies natives Stereo.
+- `Cpu65816.Step()` mainly uses fixed instruction cycle counts.
+- `SnesSystem.RunFrame()` multiplies these by six and renders an entire line
+  after CPU execution. Accesses within a raster line are therefore not yet
+  visible at their correct time.
+- Historical starting point: DMA copied immediately; M3 replaces this with serializable bus phases.
+- M3 adds ALU edges, automatic controller polling and timer IRQ.
+  PPU read ports and physical hardware comparisons remain open.
+- M4 implements SPC700 and real boot/port sequences; M6 adds S-DSP and stereo.
+- PPU read ports, sprites, additional graphics modes and many details are missing.
+- The frontend uses rational field times; M6 versions network audio as lossless native stereo.
 
-Diese Punkte werden systematisch ersetzt. Titelabhängige Abkürzungen werden
-nicht zur Standardimplementierung.
+These foundations are being systematically replaced. Title-specific shortcuts
+will not become the standard implementation.
 
-## Architekturentscheidungen
+## Architectural decisions
 
-1. **Eine deterministische Emulationszeit.** CPU, PPU und DMA verwenden präzise
-   Masterclock-Zeitstempel. Die APU bekommt ihre eigene Taktquelle, gekoppelt
-   über einen ganzzahligen/rationalen Zeitakkumulator ohne Float-Drift.
-2. **Zeitfortschritt bei jedem relevanten Ereignis.** Bus-Lese-/Schreibzyklen,
-   interne CPU-Zyklen, DMA, Interruptflanken, PPU-Latches und DSP-Schritte müssen
-   an der richtigen Stelle stattfinden. Kein pauschales `Step() * 6` im Zielkern.
-3. **Semantik und Busablauf trennen.** Der Befehlstester darf weiterhin genau
-   eine Instruktion ausführen. Intern muss sich die CPU für DMA und Interrupt-
-   Randbedingungen jedoch an passenden Zyklusgrenzen fortschalten lassen.
-4. **Hardwareprofile statt verstreuter Sonderfälle.** Region, CPU-/PPU-Revision,
-   Taktverhältnisse und belegte Errata gehören in ein explizites Profil.
-   Zunächst ein dokumentiertes NTSC-Zweichip-PPU-Profil, anschließend PAL;
-   konkrete Revisions-IDs werden in M0 an Quellen und Testbelegen festgemacht.
-5. **Präsentation nach der Emulation.** Der Kern liefert rohe SNES-Pixel und
-   native Stereo-Samples. GPU-Filter, Upscaling, Bildschirmfrequenz und
-   Host-Audio-Resampling verändern den Hardwarezustand nicht.
-6. **Ein Kern für lokal und Netzwerk.** Der Host führt dieselbe Maschine aus.
-   Clients empfangen Bild/Ton und liefern Eingaben. Netzwerkwartezeiten und
-   langsame Clients dürfen die emulierte Zeit nicht verfälschen.
-7. **Vollständige Zustände.** Jede neue Komponente ergänzt von Beginn an
-   Reset, Tracing, Serialisierung und deterministische Fortsetzung.
+1. **One deterministic emulation timeline.** CPU, PPU and DMA use precise
+   master-clock timestamps. The APU has its own clock source, coupled through an
+   integer/rational time accumulator without floating-point drift.
+2. **Advance time at every relevant event.** Bus read/write cycles, internal CPU
+   cycles, DMA, interrupt edges, PPU latches and DSP steps must occur at the correct
+   point. No blanket `Step() * 6` in the target core.
+3. **Separate semantics from bus sequencing.** The instruction tester may still
+   execute exactly one instruction. Internally, however, the CPU must be able to
+   advance at appropriate cycle boundaries for DMA and interrupt edge cases.
+4. **Hardware profiles instead of scattered special cases.** Region, CPU/PPU
+   revision, clock ratios and documented errata belong in an explicit profile.
+   Start with a documented NTSC two-chip PPU profile, then PAL; specific revision
+   IDs are tied to sources and test evidence in M0.
+5. **Presentation follows emulation.** The core supplies raw SNES pixels and
+   native stereo samples. GPU filters, upscaling, display refresh rate and host
+   audio resampling do not change hardware state.
+6. **One core for local and network use.** The host executes the same machine.
+   Clients receive video/audio and supply input. Network waits and slow clients
+   must not distort emulated time.
+7. **Complete states.** Every new component includes reset, tracing,
+   serialization and deterministic continuation from the start.
 
-## Meilensteine
+## Milestones
 
-Die Reihenfolge folgt technischen Abhängigkeiten. Die Größenangaben sind
-relative Komplexität, keine Kalenderzusagen. Besonders PPU-Timing, DSP und
-Zusatzchips werden jeweils in mehrere überprüfbare Änderungen aufgeteilt.
+The sequence follows technical dependencies. Sizes indicate relative complexity,
+not calendar commitments. PPU timing, DSP and enhancement chips in particular
+will each be split into several verifiable changes.
 
-| Phase | Ergebnis | Voraussetzung | Größe |
+| Phase | Result | Prerequisite | Size |
 |---|---|---|---|
-| M0 | Testlabor und belastbare Ausgangsmessung | aktueller Stand | mittel |
-| M1 | CPU-Semantik unabhängig geprüft | M0 | groß |
-| M2 | Masterclock, Buszyklen, Rasterzähler | M1 | sehr groß |
-| M3 | 5A22-I/O, DMA/HDMA, IRQ und Controller | M2 | groß |
-| M4 | Eigene SPC700 mit realem Boot-/Portablauf | M2 | groß |
-| M5 | Sprites und vollständige grundlegende PPU | M2, M3 | sehr groß |
-| M6 | Eigener S-DSP mit Stereo-Audio | M4 | sehr groß |
-| M7 | Alle Basiskonsolen-Grafikmodi und PAL/NTSC-Details | M3, M5 | sehr groß |
-| M8 | Hardwareabgleich und breite Spiele-Regression | M3–M7 | fortlaufend |
-| M9 | Produktreife Oberfläche, Netzwerk und Distribution | fortlaufend; Abschluss nach M8 | groß |
-| M10 | Zusatzchips, weitere Revisionen und Peripherie | stabile Basiskonsole | mehrere große Projekte |
+| M0 | Test laboratory and reliable baseline measurements | Current state | Medium |
+| M1 | Independently checked CPU semantics | M0 | Large |
+| M2 | Master clock, bus cycles, raster counters | M1 | Very large |
+| M3 | 5A22 I/O, DMA/HDMA, IRQ and controllers | M2 | Large |
+| M4 | Independently developed SPC700 with real boot/port sequences | M2 | Large |
+| M5 | Sprites and complete basic PPU | M2, M3 | Very large |
+| M6 | Independently developed S-DSP with stereo audio | M4 | Very large |
+| M7 | All base-console graphics modes and PAL/NTSC details | M3, M5 | Very large |
+| M8 | Hardware comparisons and broad game regression | M3–M7 | Ongoing |
+| M9 | Production-ready interface, networking and distribution | Ongoing; completion after M8 | Large |
+| M10 | Enhancement chips, further revisions and peripherals | Stable base console | Several large projects |
 
-### M0 – Testlabor und Nachweisführung
+### M0 – Test laboratory and evidence tracking
 
-Arbeit:
+Work:
 
-- Die bestehende Suite als schnelle Regression erhalten und in getrennte
-  Hardware-, Konformitäts-, ROM-, Audio- und Netzwerk-Testläufe aufteilen.
-  Standardisierte Testergebnisse, z. B. TRX/JUnit plus maschinenlesbares JSON.
-- Kernprüfungen unabhängig von GUI/Audiohardware ausführen können.
-- Headless-Runner um Frame-/Masterclock-Limit, Exitcode, Watchdog, Input-Replay,
-  Speicherabzüge sowie CPU-/Bus-/Raster-Traces erweitern.
-- Testdaten-Manifest mit Quelle, Lizenz, Commit/Version, SHA-256, Profil,
-  Startbedingungen, Seed, Erfolgssignal und Timeout anlegen.
-- Externe Daten lokal per festem Stand beziehen. Ein fehlender Datensatz ist
-  `nicht ausgeführt`, niemals ein grüner Test. Kleine erlaubte Fixtures für
-  Offline-Prüfungen getrennt bereitstellen.
-- Referenzbilder, rohe Samples und Traces mit Herkunft speichern. Erwartete
-  Ergebnisse werden unabhängig beschafft; eigene aktuelle Ausgaben dürfen
-  nicht automatisch zu Sollwerten erklärt werden.
-- Einen lokalen vollständigen Prüfskriptlauf und CI-Konfiguration vorbereiten.
-  Eine Remote-CI wird erst bei vorhandenem Remote tatsächlich aktiviert.
+- Preserve the existing suite as a fast regression and split it into separate
+  hardware, conformance, ROM, audio and network test runs. Use standardized test
+  results, such as TRX/JUnit plus machine-readable JSON.
+- Allow core checks to run independently of the GUI/audio hardware.
+- Extend the headless runner with frame/master-clock limits, exit codes, watchdog,
+  input replay, memory dumps and CPU/bus/raster traces.
+- Create a test-data manifest with source, license, commit/version, SHA-256,
+  profile, starting conditions, seed, success signal and timeout.
+- Obtain external data locally at pinned versions. A missing dataset is
+  `not run`, never a passing test. Provide small permitted fixtures separately
+  for offline checks.
+- Store reference images, raw samples and traces with their provenance. Obtain
+  expected results independently; current output from our own implementation
+  must not automatically become the expected values.
+- Prepare a full local validation-script run and CI configuration. Activate
+  remote CI only once a remote actually exists.
 
-Abnahme:
+Acceptance:
 
-- Ein gezielt falscher Registerwert und ein absichtlich falscher Frame werden
-  zuverlässig erkannt, mit erster Abweichung und reproduzierbarem Aufruf.
-- Timeout, Crash, übersprungener Test und fachlicher Fehler sind unterscheidbar.
-- Die bisherigen 17 Fälle bleiben grün. Neue Genauigkeitstests dürfen zunächst
-  rot sein, erscheinen aber sichtbar in einer gesonderten Bestandsaufnahme.
+- A deliberately wrong register value and a deliberately wrong frame are
+  reliably detected, with the first difference and a reproducible command.
+- Timeout, crash, skipped test and behavioral failure can be distinguished.
+- The existing 17 cases remain green. New accuracy tests may initially fail,
+  but must appear visibly in a separate inventory.
 
-### M1 – 65C816-Semantik vollständig prüfen
+### M1 – Fully verify 65C816 semantics
 
-Arbeit:
+Work:
 
-- Adapter für die [SingleStepTests/65816](https://github.com/SingleStepTests/65816)
-  erstellen: Anfangszustand laden, genau eine Instruktion ausführen, Register,
-  Status und relevante Speicheränderungen vergleichen. Der Datensatz enthält
-  auch Busaktivität; deren genaue Abnahme folgt mit M2.
-- Alle 256 Opcodes und verfügbaren Native-/Emulation-Fälle abdecken.
-- Eigene gezielte Fälle für E/M/X-Wechsel, verdecktes Akku-Highbyte, BCD,
-  Bank-/Seitengrenzen, Direct Page, Stack-Wrapping, Long-Zugriffe, RMW,
-  MVN/MVP, WAI/STP sowie Reset/IRQ/NMI/BRK/COP ergänzen.
-- Generische 65C816-Erwartungen von SNES-spezifischem 5A22-Verhalten trennen.
-  Streitige Testvektoren mit Quelle und Begründung festhalten.
+- Create an adapter for [SingleStepTests/65816](https://github.com/SingleStepTests/65816):
+  load the initial state, execute exactly one instruction, and compare registers,
+  status and relevant memory changes. The dataset also contains bus activity;
+  precise acceptance of that activity follows in M2.
+- Cover all 256 opcodes and available native/emulation cases.
+- Add targeted cases for E/M/X changes, the hidden accumulator high byte, BCD,
+  bank/page boundaries, Direct Page, stack wrapping, long accesses, RMW,
+  MVN/MVP, WAI/STP and Reset/IRQ/NMI/BRK/COP.
+- Separate generic 65C816 expectations from SNES-specific 5A22 behavior.
+  Record disputed test vectors with their source and rationale.
 
-Abnahme:
+Acceptance:
 
-- Alle freigegebenen Semantikvektoren des festgeschriebenen Datensatzes bestehen.
-- Kein Opcode ist ungeprüft. Belegte Ausnahmen erscheinen einzeln mit Grund,
-  nicht als pauschales Ignorieren einer Opcodegruppe.
-- Fehlerberichte enthalten Opcode, E/M/X, Initialzustand und ersten Unterschied.
-- Randomisierte Ergänzungen verwenden gespeicherte Seeds; gefundene Fehler
-  werden auf kleine, dauerhaft eingecheckte Regressionen reduziert.
+- All approved semantic vectors from the pinned dataset pass.
+- No opcode is untested. Documented exceptions appear individually with reasons,
+  rather than ignoring an entire opcode group.
+- Failure reports include opcode, E/M/X, initial state and first difference.
+- Randomized additions use saved seeds; discovered bugs are reduced to small,
+  permanently checked-in regressions.
 
-### M2 – Zeitbasis und Busablauf
+### M2 – Timebase and bus sequencing
 
-Arbeit:
+Work:
 
-- `MasterClock`, `HardwareProfile`, Rasterzähler und deterministischen Scheduler
-  einführen. Taktverhältnisse, Zeilen-/Feldsonderfälle und Resetphase explizit
-  modellieren.
-- CPU in Read/Write/Internal-Cycle-Abläufe überführen; gültige Dummy-Zugriffe,
-  Seitenwechsel, FastROM/SlowROM, Speicherzugriffszeiten und WRAM-Refresh prüfen.
-- PPU-, APU- und I/O-Ereignisse vor/nach einem Zugriff definiert auslösen.
-  Der Ursprung eines Zugriffs, etwa CPU oder DMA, bleibt nachvollziehbar.
-- IRQ/NMI-Flanken, Latching, Maskierung, Polling und WAI-Aufwachen korrekt
-  an den CPU-Ablauf anschließen; keine IRQ-Simulation nur am Frame-Ende.
-- Den Windows-Timer aus dem Hardwarekern heraushalten. Ein Frame endet nach
-  emulierten Hardwareereignissen, nicht nach einem gerundeten 1/60-Sekunden-Timer.
+- Introduce `MasterClock`, `HardwareProfile`, raster counters and a deterministic
+  scheduler. Explicitly model clock ratios, line/field special cases and reset phase.
+- Convert the CPU to Read/Write/Internal-Cycle sequences; check valid dummy
+  accesses, page crossings, FastROM/SlowROM, memory-access times and WRAM refresh.
+- Trigger PPU, APU and I/O events at defined points before/after an access.
+  Keep the origin of each access, such as CPU or DMA, traceable.
+- Correctly connect IRQ/NMI edges, latching, masking, polling and WAI wakeup to
+  CPU sequencing; do not simulate IRQ only at the end of a frame.
+- Keep the Windows timer out of the hardware core. A frame ends according to
+  emulated hardware events, not a rounded 1/60-second timer.
 
-Abnahme:
+Acceptance:
 
-- Freigegebene CPU-Bustraces stimmen in Adresse, Richtung, Wert und Reihenfolge
-  überein; SNES-Zugriffszeiten werden zusätzlich mit Profiltests geprüft.
-- Exakte erwartete Clock-/Rasterereignisse für das gewählte Profil, einschließlich
-  Frame-/Feldübergängen und Zugriffen unmittelbar an Ereignisgrenzen.
-- Ein langer Headless-Lauf erreicht den aus dem Profil berechneten Zeitstand
-  ohne Akkumulatordrift. Die Simulation wartet dafür nicht in Echtzeit.
-- Unterschiedliche Ausführungsblöcke, z. B. ein Zugriff gegenüber einer ganzen
-  Frame-Anforderung, erzeugen denselben Zustand an derselben Hardwarezeit.
+- Approved CPU bus traces match in address, direction, value and order;
+  SNES access times are checked additionally with profile tests.
+- Exact expected clock/raster events for the selected profile, including
+  frame/field transitions and accesses immediately at event boundaries.
+- A long headless run reaches the time calculated from the profile without
+  accumulator drift. The simulation does not wait in realtime to do so.
+- Different execution blocks, such as one access versus a full-frame request,
+  produce the same state at the same hardware time.
 
-### M3 – Bus, DMA/HDMA, Interrupts und Eingaben
+### M3 – Bus, DMA/HDMA, interrupts and input
 
-Unabhängig abgenommen durch den Root-Fullgate auf `56fb6d4`, Exit0,
-`artifacts/root-m3-validation.log`. Vertrag und Hardware-Evidenzgrenzen:
-[m3-io-contract.md](m3-io-contract.md). Die folgenden Arbeiten beschreiben den
-M3-Sollumfang; sie behaupten keine Originalkonsolenmessung.
+Independently accepted by the Root full gate on `56fb6d4`, exit 0,
+`artifacts/root-m3-validation.log`. Contract and hardware-evidence limits:
+[m3-io-contract.md](m3-io-contract.md). The work below describes the intended M3
+scope; it does not claim measurements from an original console.
 
-Arbeit:
+Work:
 
-- Speicherabbild, ROM-/SRAM-Spiegelungen, nicht potenzzweigroße ROMs,
-  MEMSEL, MDR/Open Bus und Register-Leseseiteneffekte vervollständigen.
-- Multiply/Divide mit tatsächlicher Latenz und Zwischenzuständen ergänzen.
-- DMA als zeitlich laufende Maschine mit Kanalpriorität, Anlauf-/Endphasen,
-  Transfersperren, Adress-Wraps und CPU-Stalls umsetzen.
-- HDMA-Initialisierung, Zeilenzähler, Repeat-Verhalten, direkte/indirekte
-  Tabellen und Überschneidungen mit DMA/Refresh implementieren.
-- H-/V-/HV-IRQ, NMI-Randfälle, H/V-Latches, serielle Controller und zeitlich
-  laufende automatische Abfrage einschließlich Busy-Status prüfen.
-- Cartridge-Erkennung um nachvollziehbare Metadaten und manuelle Profilwahl
-  für mehrdeutige Header ergänzen; ein Header allein ist kein Hardwarebeweis.
+- Complete the memory map, ROM/SRAM mirroring, non-power-of-two ROMs, MEMSEL,
+  MDR/open bus and register-read side effects.
+- Add multiply/divide with actual latency and intermediate states.
+- Implement DMA as a timed state machine with channel priority, start/end phases,
+  transfer restrictions, address wrapping and CPU stalls.
+- Implement HDMA initialization, line counters, repeat behavior, direct/indirect
+  tables and overlaps with DMA/refresh.
+- Check H/V/HV IRQ, NMI edge cases, H/V latches, serial controllers and timed
+  automatic polling, including busy status.
+- Extend cartridge detection with traceable metadata and manual profile selection
+  for ambiguous headers; a header alone is not hardware evidence.
 
-Abnahme:
+Acceptance:
 
-- Kleine ROMs testen jeden DMA-Modus und kritische Startpositionen rund um
-  HBlank/VBlank, IRQ und Refresh. Erfolg über Speicher/Protokoll auslesen,
-  damit ein noch unvollständiger Renderer Fehler nicht verdeckt.
-- Busreihenfolge und Clocks stimmen mit den freigegebenen Referenzen überein.
-- Input-Replay reproduziert dieselben JOY-Ergebnisse zu denselben Zeitpunkten.
-- Cartridge-/SRAM-Tests prüfen Spiegelungen, Bankgrenzen und Reset/Persistenz.
+- Small ROMs test each DMA mode and critical start positions around HBlank/VBlank,
+  IRQ and refresh. Read success from memory/logs so an incomplete renderer cannot
+  conceal failures.
+- Bus order and clocks match the approved references.
+- Input replay reproduces the same JOY results at the same times.
+- Cartridge/SRAM tests check mirroring, bank boundaries and reset/persistence.
 
-### M4 – SPC700 und APU-Kommunikation
+### M4 – SPC700 and APU communication
 
-Unabhängig abgenommen auf `0b1139436727c835c4fdbf944c74e3d0067c3944`, Exit0,
-`artifacts/root-m4-validation.log`. [Vertrag](m4-apu-contract.md)
-mit Trennung roher/adjudizierter SPC-Busfälle, eigener Bootroutine und lokaler
-Original-IPL-Eingabe. S-DSP-Audio bleibt M6.
+Independently accepted on `0b1139436727c835c4fdbf944c74e3d0067c3944`, exit 0,
+`artifacts/root-m4-validation.log`. The [contract](m4-apu-contract.md) separates
+raw/adjudicated SPC bus cases, our own boot routine and local original-IPL input.
+S-DSP audio remains M6.
 
-Arbeit:
+Work:
 
-- Eigene SPC700 mit sämtlichen Opcodes, Flags, Adressierungen und Buszyklen.
-- 64-KiB-APU-RAM, Timer, Control-/Testregister, DSP-Registerzugriff,
-  IPL-Einblendung und die beiden Richtungen der Kommunikationsports.
-- IPL-Boot und Programmupload tatsächlich ausführen; Firmwarequelle und Hash
-  getrennt dokumentieren. Verteilung von Firmware erst nach geklärten Rechten.
-- Eigenständige APU-Zeitbasis korrekt mit CPU und späterem DSP synchronisieren.
-- [SingleStepTests/spc700](https://github.com/SingleStepTests/spc700) mit eigenen
-  Timer-/Port-/Boot-ROMs kombinieren; Herkunft der Testdaten berücksichtigen.
+- Independently develop SPC700 with all opcodes, flags, addressing modes and bus cycles.
+- Add 64 KiB APU RAM, timers, control/test registers, DSP register access,
+  IPL mapping and both directions of the communication ports.
+- Actually execute IPL boot and program upload; document firmware source and
+  hash separately. Distribute firmware only once rights have been clarified.
+- Correctly synchronize the independent APU timebase with the CPU and later DSP.
+- Combine [SingleStepTests/spc700](https://github.com/SingleStepTests/spc700) with
+  our own timer/port/boot ROMs; account for the provenance of test data.
 
-Abnahme:
+Acceptance:
 
-- Alle freigegebenen SPC700-Instruktionsfälle bestehen, einschließlich Busablauf.
-- Ein kleines SNES-ROM lädt ein SPC-Programm hoch, das ausgeführt wird und
-  nachweisbar RAM und Rückgabeports verändert. Keine nachgestellten Antworten.
-- Port-Pingpong, Timerüberläufe, Read-to-clear und Clock-Verhältnisse sind
-  zeitlich reproduzierbar getestet.
+- All approved SPC700 instruction cases pass, including bus sequencing.
+- A small SNES ROM uploads an SPC program that executes and demonstrably changes
+  RAM and return ports. No simulated responses.
+- Port ping-pong, timer overflows, read-to-clear and clock ratios have reproducible
+  timing tests.
 
-### M5 – Grundlegende PPU vollständig
+### M5 – Complete basic PPU
 
-Implementiert und unabhängig auf `2dc8cf021ef7394f38df1db9932b443a23543b30` abgenommen. [PPU-Vertrag](m5-ppu-contract.md)
-trennt quelleninformierte Fetch-/MMIO-Phasen, native Sollbilder und Grenzen
-der Hardware-Evidenz. Kein eigener Konsolenmessnachweis. Modi2–7 bleiben M7.
+Implemented and independently accepted on `2dc8cf021ef7394f38df1db9932b443a23543b30`.
+The [PPU contract](m5-ppu-contract.md) separates source-informed fetch/MMIO phases,
+native expected images and hardware-evidence limits. No console measurements of
+our own. Modes 2–7 remain M7.
 
-Sauberer Implementierungsgate auf `9e5a7817af00428915e36f1171d748577e28953e`, Exit0,
-`artifacts/m5-full-validation.log`:129 portable/5 Windows-Gruppen,42 neue PPU-
-Gruppen,114 originale ROM-Varianten,334 Everyclock-Fortsetzungen; vollständige
-CPU-/SPC-/lokale Original-IPL-Nachweise erhalten. [Baseline](baselines/m5.json).
+Clean implementation gate on `9e5a7817af00428915e36f1171d748577e28953e`, exit 0,
+`artifacts/m5-full-validation.log`: 129 portable/5 Windows groups, 42 new PPU
+groups, 114 original ROM variants, 334 every-clock continuations; full
+CPU/SPC/local original-IPL evidence preserved. [Baseline](baselines/m5.json).
 
-Arbeit:
+Work:
 
-- PPU-Register und ihre individuellen Latches, VRAM-Lesepuffer, CGRAM/OAM-
-  Zugriffe, Zählerlatches sowie Zugriffsregeln in aktiver Anzeige/Blanking.
-- Mode 0/1, 8×8-/16×16-Tiles, Scroll-/Tilemap-Wrapping und Prioritäten präzisieren.
-- OBJ/Sprites mit Größen, Namensauswahl, Spiegelung, Priorität, Rotation,
-  Zeilen-/Tilelimits sowie belegten Range-/Time-over-Effekten implementieren.
-- Main/Subscreen, Fenster, Fixed Color, Add/Subtract/Half und Mosaic.
-- Rastereffekte an den belegten Fetch-/Latch-Zeitpunkten sichtbar machen.
-  Wo eine reine Scanline-Ausgabe nicht reicht, auf entsprechende Dot-/Fetch-
-  Schritte umstellen. Ein einziger Register-Snapshot pro Zeile reicht nicht.
+- PPU registers and their individual latches, VRAM read buffer, CGRAM/OAM
+  accesses, counter latches and access rules during active display/blanking.
+- Refine Mode 0/1, 8×8/16×16 tiles, scroll/tilemap wrapping and priorities.
+- Implement OBJ/sprites with sizes, name selection, mirroring, priority, rotation,
+  line/tile limits and documented range-over/time-over effects.
+- Main/subscreen, windows, fixed color, add/subtract/half and mosaic.
+- Make raster effects visible at the documented fetch/latch times. Where
+  scanline-only output is insufficient, switch to corresponding dot/fetch steps.
+  A single register snapshot per line is insufficient.
 
-Abnahme:
+Acceptance:
 
-- Isolierte ROMs pro Registerfunktion, Spritefall, Priorität und Farboperation.
-- Digitale Ausgabe zuerst als native Farbwerte vergleichen; Host-Farbprofil,
-  CRT-Filter und Screenshots bleiben zusätzliche Präsentationstests.
-- Bildvergleiche melden ersten falschen Pixel und betroffene Zeile; ein
-  zugehöriger Register-/Bustrace erklärt den Entstehungszeitpunkt.
-- Mid-scanline-Schreibtests bestehen für die als fertig markierten Funktionen.
+- Isolated ROMs for each register function, sprite case, priority and color operation.
+- Compare digital output as native color values first; host color profiles,
+  CRT filters and screenshots remain additional presentation tests.
+- Image comparisons report the first wrong pixel and affected line; an associated
+  register/bus trace explains when the difference originated.
+- Mid-scanline write tests pass for functions marked complete.
 
-M5 wurde unabhängig auf `2dc8cf021ef7394f38df1db9932b443a23543b30`
-abgenommen: `python tools/test-lab.py --windows --full`, Exit0,
-`artifacts/root-m5-validation.log`; unveränderte Root-Berichte unter
+M5 was independently accepted on `2dc8cf021ef7394f38df1db9932b443a23543b30`:
+`python tools/test-lab.py --windows --full`, exit 0,
+`artifacts/root-m5-validation.log`; unchanged Root reports are under
 `artifacts/root-m5-evidence/`.
 
-### M6 – S-DSP und vollständiger Soundpfad
+### M6 – S-DSP and complete audio path
 
-M6 implementiert den eigenen phasengetakteten DSP und Stereo bis zum Gerät und
-TLS/Relay. Vertrag, Quellenkonflikte und digitale Evidenzgrenzen:
-[m6-dsp-contract.md](m6-dsp-contract.md). M6 wurde unabhängig auf `e4645770cea052885808ca5b27a45d60de470157` abgenommen: `python tools/test-lab.py --windows --full`, Exit0, `artifacts/root-m6-validation.log`; unveränderte Berichte unter `artifacts/root-m6-evidence/`. Der vollständige Gate bestand auf sauberem
-`feb978b` mit Exit0 (147 portable und8 Windowsgruppen);
-[Messdaten](baselines/m6.json). Er läuft zusätzlich zu den
-unveränderten129 M0–M5-Gruppen in getrennt beaufsichtigten DSP-/AV-Suiten.
+M6 implements the independently developed phase-clocked DSP and stereo through to
+the device and TLS/relay. Contract, source conflicts and digital-evidence limits:
+[m6-dsp-contract.md](m6-dsp-contract.md). M6 was independently accepted on
+`e4645770cea052885808ca5b27a45d60de470157`:
+`python tools/test-lab.py --windows --full`, exit 0,
+`artifacts/root-m6-validation.log`; unchanged reports are under
+`artifacts/root-m6-evidence/`. The full gate passed on clean `feb978b` with exit 0
+(147 portable and 8 Windows groups); [measurements](baselines/m6.json).
+It runs in separately supervised DSP/AV suites in addition to the unchanged
+129 M0–M5 groups.
 
-Arbeit:
+Work:
 
-- Eigenen DSP mit Stimmen, BRR-Decodierung, Schleifen, Pitch, Interpolation,
-  ADSR/GAIN, Key-on/off, Noise, Pitch Modulation und Echo/FIR entwickeln.
-- Arithmetik, Sättigung, Rundung, Registerzeitpunkte, RAM-Zugriffe und
-  gemeinsame SMP-/DSP-Zeitschritte anhand isolierter Fälle prüfen.
-- Stereo-Ausgabe im nativen Raster des DSP erzeugen. Geräteabhängiges
-  Resampling und Lautstärke erst im Frontend anwenden.
-- Netzwerkformat versionieren: Stereo, Samplerate, Sampleanzahl, Zeitstempel,
-  Paketverlust-/Überlaufverhalten. Verlustfreie Referenzübertragung anbieten;
-  verlustbehaftete Kompression separat prüfen.
+- Independently develop a DSP with voices, BRR decoding, looping, pitch,
+  interpolation, ADSR/GAIN, key-on/off, noise, pitch modulation and echo/FIR.
+- Check arithmetic, saturation, rounding, register timing, RAM accesses and
+  shared SMP/DSP time steps with isolated cases.
+- Generate stereo output at the DSP's native timing. Apply device-specific
+  resampling and volume only in the frontend.
+- Version the network format: stereo, sample rate, sample count, timestamp and
+  packet-loss/overflow behavior. Offer lossless reference transmission;
+  check lossy compression separately.
 
-Abnahme:
+Acceptance:
 
-- BRR-/Hüllkurven-/Filter-/Mixfälle mit unabhängigen digitalen Sollwerten.
-- Samplegenauer Vergleich roher DSP-Ausgabe vor dem Host-Resampler; Timing und
-  Phase müssen übereinstimmen, nicht nur ein großzügiger Klangähnlichkeitswert.
-- Audio-ROMs und geeignete SPC-Snapshots prüfen; Snapshots ersetzen nicht den
-  gemeinsamen CPU↔APU-Test einer laufenden Konsole.
-- Längerer A/V-Lauf, Reset, Pause und Savestate ohne emulierten Zeitverlust;
-  keine dauerhafte Drift zwischen Bild und Ton.
+- BRR/envelope/filter/mixing cases with independent digital expected values.
+- Sample-exact comparison of raw DSP output before the host resampler; timing
+  and phase must match, not just a generous audio-similarity score.
+- Check audio ROMs and suitable SPC snapshots; snapshots do not replace a
+  combined CPU↔APU test of a running console.
+- An extended A/V run, reset, pause and savestate without loss of emulated time;
+  no lasting drift between video and audio.
 
-### M7 – Grafikmodi, Regionen und Hardwaredetails
+### M7 – Graphics modes, regions and hardware details
 
-M7 ist implementiert und unabhängig auf `439a655199647f325bef6b6b3074e67948a105dc` angenommen (Root-Fullgate Exit0). Der saubere Vollgate auf `7cf7cc1` bestand mit182 portablen und10 Windowsgruppen. Anschließend wurden nur der Format8-Fehlertext und der Lab-Optionsadapter korrigiert und gezielt geprüft; finaler Produkt-/Toolstand `adef880`. Native Rohfelder, getrennte Display-/Timing-Interlace-Metadaten, Quellenunsicherheiten und Messumfang: [M7-Vertrag](m7-video-contract.md), [Baseline](baselines/m7.json). Kein neuer Hardwaremessnachweis und kein Echtzeitclaim.
+M7 is implemented and independently accepted on `439a655199647f325bef6b6b3074e67948a105dc`
+(Root full gate exit 0). The clean full gate on `7cf7cc1` passed with 182 portable
+and 10 Windows groups. Only the format 8 error text and lab-options adapter were
+subsequently corrected and received targeted checks; final product/tool revision
+`adef880`. Native raw fields, separate display/timing interlace metadata, source
+uncertainties and measurement scope: [M7 contract](m7-video-contract.md),
+[baseline](baselines/m7.json). No new hardware-measurement evidence or realtime claim.
 
-Arbeit:
+Work:
 
-- Modi 2–6 mit Offset-per-tile, Hires und Direct Color; Mode 7 mit Transformation,
-  Wiederholung/Outside-Verhalten und EXTBG vervollständigen.
-- Interlace, Pseudo-Hires, Overscan, Feldwechsel und PAL-/NTSC-Unterschiede.
-- Variable Bildgeometrie aus dem Kern bis zur GUI, zum Vorschaubild und zum
-  Netzwerk transportieren; feste 256×224-Annahmen entfernen.
-- Dokumentierte Unterschiede und Errata der unterstützten Revisionen als
-  Profilverhalten ergänzen. Nicht belegte Power-on-Werte als definierte
-  Testinitialisierung behandeln; echte undefinierte Zustände nicht als sichere
-  Nullinitialisierung deklarieren.
+- Complete Modes 2–6 with offset-per-tile, hires and direct color; Mode 7 with
+  transformation, repeat/outside behavior and EXTBG.
+- Interlace, pseudo-hires, overscan, field alternation and PAL/NTSC differences.
+- Carry variable image geometry from the core to the GUI, preview and network;
+  remove fixed 256×224 assumptions.
+- Add documented differences and errata of supported revisions as profile
+  behavior. Treat unsupported power-on values as defined test initialization;
+  do not describe genuinely undefined states as guaranteed zero initialization.
 
-Abnahme:
+Acceptance:
 
-- Pro Modus und Region eine Funktions- und Timingmatrix mit gezielten ROMs.
-- Interlace-/Hires-Tests vergleichen native Pixel und Feldabfolge ohne
-  verlustbehaftete Skalierung.
-- Dieselben Eingaben und dasselbe Hardwareprofil liefern reproduzierbare
-  Clock-, Bild- und Samplefolgen, auch nach Savestate-Wiederherstellung.
+- A functionality and timing matrix with targeted ROMs for each mode and region.
+- Interlace/hires tests compare native pixels and field order without lossy scaling.
+- The same inputs and hardware profile produce reproducible clock, image and
+  sample sequences, including after savestate restoration.
 
-### M8 – Originalhardware und Spielekompatibilität
+### M8 – Original hardware and game compatibility
 
-Arbeit:
+Work:
 
-- Geeignete Tests aus
-  [undisbeliever/snes-test-roms](https://github.com/undisbeliever/snes-test-roms)
-  inventarisieren, nach Voraussetzungen zuordnen und versioniert integrieren.
-- Für eigene strittige Effekte minimale ROMs mit maschinenlesbarem Ergebnis
-  bauen. Diese auf dokumentierter Originalhardware ausführen lassen, sobald
-  entsprechende Hardware/Messdaten verfügbar sind.
-- bsnes und ares mit festgeschriebenen Versionen/Konfigurationen für
-  Differenzvergleiche verwenden. Gemeinsamkeiten ihrer Ergebnisse allein
-  zählen nicht als unabhängiger Hardwarebeweis.
-- Eine lokale Titelmatrix pflegen: ROM-Hash/Region, benötigte Chips, Boot,
-  Menü, Spielszene, Audio, Eingaben, SRAM, Savestate und längerer Spielabschnitt.
-  Kommerzielle ROMs bleiben lokale Testeingaben.
-- Testfälle per Input-Aufzeichnung reproduzieren. Mindestens pro unterstützter
-  Hardwarefamilie passende Titel auswählen, bevor Kompatibilität behauptet wird.
+- Inventory suitable tests from
+  [undisbeliever/snes-test-roms](https://github.com/undisbeliever/snes-test-roms),
+  classify their prerequisites and integrate pinned versions.
+- Build minimal ROMs with machine-readable results for disputed effects in our
+  implementation. Have them run on documented original hardware once suitable
+  hardware/measurements are available.
+- Use bsnes and ares at pinned versions/configurations for differential comparisons.
+  Agreement between their results alone does not count as independent hardware evidence.
+- Maintain a local title matrix: ROM hash/region, required chips, boot, menu,
+  gameplay scene, audio, input, SRAM, savestate and an extended gameplay section.
+  Commercial ROMs remain local test inputs.
+- Reproduce test cases with recorded input. Select suitable titles for at least
+  every supported hardware family before claiming compatibility.
 
-Abnahme:
+Acceptance:
 
-- Jede bekannte Abweichung hat ein reproduzierbares Testpaket und einen Status.
-- Keine stillschweigend deaktivierten Genauigkeitstests, keine automatischen
-  Updates von Sollbildern, keine Titel-Sonderbehandlung im Standardprofil.
-- Hardwaregeprüft, referenzverglichen und nur intern getestet bleiben getrennte
-  Kennzeichnungen. Fehlende Messmöglichkeiten werden sichtbar aufgeführt.
+- Every known difference has a reproducible test package and a status.
+- No silently disabled accuracy tests, automatic updates of expected images or
+  title-specific handling in the standard profile.
+- Hardware-verified, reference-compared and internally tested only remain separate
+  labels. Missing measurement capabilities are listed visibly.
 
-### M9 – Bedienung, Savestates, Netzwerk und Distribution
+### M9 – Interaction, savestates, networking and distribution
 
-Diese Arbeiten begleiten die Kernphasen; die abschließende Freigabe setzt die
-Basiskonsolen-Regression voraus.
+This work accompanies the core phases; final approval requires the base-console
+regression to pass.
 
-Arbeit:
+Work:
 
-- Emulation auf einen eigenen, kontrollierten Thread verschieben. GUI und
-  Transport erhalten unveränderliche Frames/Sampleblöcke; Eingaben werden an
-  definierten Hardwarezeitpunkten übernommen.
-- M5-Benchmark: aktive APU und getaktete PPU erreichen lokal21.62 Diagnosefelder/s;
-  nach M6 inklusive DSP18.33. Der separate Zwei-Voice/Forced-Blank-Test misst19.40
-  und ist kein direkter Vergleich. M9 muss
-  Budget-/Zyklusfortsetzung profilieren und bei identischer digitaler Ausgabe
-  auf Echtzeit bringen. Dies ist kein60fps-Kompatibilitätsnachweis.
-- Hardwaregenaue Geschwindigkeit von Renderlimit, VSync, Turbo, Netzwerklatenz
-  und Audiogerät entkoppeln. Optimierungen erst nach Profiling und mit identischer
-  digitaler Ausgabe auf dem Genauigkeitspfad.
-- C64-Bedienung systematisch abgleichen: F10/F11/F12/F9, Menü-Rückwege,
-  Tastaturwiederholung, Gamepad-Menüaktionen, vollständige konfigurierbare
-  Belegung, Fokusverlust, Gerätewechsel, Browser, Drag-and-drop, Fehlermeldungen.
-- Savestates um Scheduler, Zwischenzyklen, DMA/HDMA, PPU-Latches/Feldphase,
-  SPC700, DSP, Echo-RAM und später Zusatzchips erweitern. Klare Versionierung
-  und gezielte Migration oder verständliche Ablehnung älterer Formate.
-- Battery-Saves auch während längerer Sitzungen robust sichern; atomare Dateien,
-  Recovery/Backups und klare Trennung von Reset, Power Cycle und SRAM-Löschen.
-- Netzwerk mit Stereo, dynamischer Geometrie, Zeitstempeln, begrenzten Queues,
-  Rechtewechseln, Beobachtern und sichtbarem Host-Pausenstatus vervollständigen.
-- Windows-x64-Publish, Installer, Deinstallation und einen auf SNES-Releases
-  gerichteten, überprüfbaren Updatepfad ergänzen. Bibliotheks-Manager erst auf
-  stabilen Cartridge-/IPC-Verträgen aufbauen; kein C64-Katalog als SNES-Angebot.
+- Move emulation to its own controlled thread. The GUI and transport receive
+  immutable frames/sample blocks; input is adopted at defined hardware times.
+- M5 benchmark: active APU and clocked PPU reach 21.62 diagnostic fields/s locally;
+  after M6, including DSP, 18.33. The separate two-voice/forced-blank test measures
+  19.40 and is not a direct comparison. M9 must profile budget/cycle continuation
+  and achieve realtime with identical digital output. This is not evidence of
+  60 fps compatibility.
+- Decouple hardware-accurate speed from the rendering limit, VSync, turbo, network
+  latency and audio device. Optimize only after profiling and with identical
+  digital output on the accuracy path.
+- Systematically compare C64 interaction behavior: F10/F11/F12/F9, menu return
+  paths, key repeat, gamepad menu actions, complete configurable bindings, focus
+  loss, device changes, browser, drag-and-drop and error messages.
+- Extend savestates with scheduler, intermediate cycles, DMA/HDMA, PPU latches/field
+  phase, SPC700, DSP, echo RAM and later enhancement chips. Use clear versioning
+  and targeted migration or understandable rejection of older formats.
+- Save battery-backed data robustly during extended sessions too; atomic files,
+  recovery/backups and a clear distinction between reset, power cycle and SRAM erase.
+- Complete networking with stereo, dynamic geometry, timestamps, bounded queues,
+  permission changes, spectators and visible host-pause status.
+- Add Windows x64 publishing, installer, uninstallation and a verifiable update
+  path targeting SNES releases. Build the library Manager only on stable
+  cartridge/IPC contracts; do not offer a C64 catalog as SNES content.
 
-Abnahme:
+Acceptance:
 
-- Save→weiterlaufen und Load→dieselben Eingaben liefern identische zukünftige
-  Kernzustände, Rohbilder und rohe Stereo-Samples; auch während DMA, HDMA,
-  Interrupt-/Zeilengrenzen und DSP-Echo. Ausgabepuffer sind separat definiert.
-- UI-Smoke-Tests für Menüpfade, Vollbild, Gamepad und reale Fensterstarts.
-- LAN und Relay mit mindestens zwei Clients: Rechteentzug neutralisiert gehaltene
-  Tasten, Disconnect/Fokusverlust erzeugen keine klemmenden Eingaben.
-- Netzwerkprüfungen für Zertifikatswechsel, falsche Passwörter, Kick, langsame
-  Clients, begrenzten Speicher, ungültige Pakete, Formatwechsel und A/V-Sync.
-- Gezielte Persistenzfehler/abgebrochene Schreibvorgänge beschädigen keine
-  zuvor gültigen SRAM-/Spielstanddateien.
-- Release-Paket startet auf einem sauberen Windows-Testsystem ohne SDK.
-  Versionswechsel und Uninstall erhalten die vorgesehenen Benutzerdaten.
+- Save→continue and Load→same input produce identical future core states, raw
+  images and raw stereo samples, including during DMA, HDMA, interrupt/line
+  boundaries and DSP echo. Output buffers are defined separately.
+- UI smoke tests for menu paths, fullscreen, gamepad and real window launches.
+- LAN and relay with at least two clients: permission revocation neutralizes held
+  buttons; disconnect/focus loss does not leave inputs stuck.
+- Network checks for certificate changes, wrong passwords, kick, slow clients,
+  bounded memory, invalid packets, format changes and A/V sync.
+- Targeted persistence failures/interrupted writes do not corrupt previously
+  valid SRAM/savestate files.
+- The release package starts on a clean Windows test system without an SDK.
+  Version changes and uninstall preserve the intended user data.
 
-### M10 – Zusatzchips, Peripherie und weitere Konsolenrevisionen
+### M10 – Enhancement chips, peripherals and further console revisions
 
-Nach stabiler Basiskonsole jede Chipfamilie als eigenes Paket mit eigener
-Zeitbasis, Speicherabbild, Zuständen und Tests entwickeln. Priorisierung nach
-nachweisbaren Tests und gewünschter Spieleabdeckung; zunächst DSP-1 und Super FX,
-anschließend SA-1, danach die übrigen Familien.
+After the base console is stable, develop each chip family as its own package
+with its own timebase, memory map, states and tests. Prioritize by available
+verifiable tests and desired game coverage: DSP-1 and Super FX first, then SA-1,
+followed by the remaining families.
 
-Das vollständige Langzeit-Backlog umfasst DSP-1/2/3/4, Super FX/GSU, SA-1, CX4,
-S-DD1, SPC7110 mit RTC, S-RTC, OBC1 und ST010/011/018 sowie die zugehörigen
-Cartridge-Mappings und benötigten Firmwaredaten. Unterschiedliche Varianten
-werden explizit erfasst, nicht unter einem pauschalen Häkchen zusammengefasst.
+The full long-term backlog includes DSP-1/2/3/4, Super FX/GSU, SA-1, CX4, S-DD1,
+SPC7110 with RTC, S-RTC, OBC1 and ST010/011/018, plus associated cartridge mappings
+and required firmware data. Different variants are recorded explicitly, rather
+than grouped under a blanket check mark.
 
-Multitap, Maus und Super Scope folgen mit eigenen Eingabetests. Satellaview,
-Sufami Turbo und Super Game Boy sind gesonderte Erweiterungsprojekte; insbesondere
-Super Game Boy benötigt zusätzlich eine Game-Boy-Emulation. Sie verhindern keine
-Freigabe der vollständig geprüften Basiskonsole, bleiben aber im Umfang sichtbar.
+Multitap, mouse and Super Scope follow with their own input tests. Satellaview,
+Sufami Turbo and Super Game Boy are separate extension projects; Super Game Boy
+in particular also requires Game Boy emulation. They do not prevent approval of
+the fully tested base console, but remain visible in the scope.
 
-Abnahme pro Erweiterung:
+Acceptance per extension:
 
-- Funktions-/Bus-/Timingtests sowie mindestens passende Integrations-ROMs.
-- Save/Load-Determinismus und Regression der normalen Basiskonsole.
-- Kein pauschales „unterstützt“, solange nur ein Titelbild funktioniert.
+- Function/bus/timing tests and at least suitable integration ROMs.
+- Save/load determinism and regression of the standard base console.
+- No blanket “supported” label while only a title screen works.
 
-## Testbetrieb und Freigaberegeln
+## Test operation and release rules
 
-| Lauf | Inhalt | Wann |
+| Run | Content | When |
 |---|---|---|
-| Schnell | gezielte Komponententests, kleine feste CPU/SPC-Auswahl, Diagnose-ROM, Savestate-Regression | bei jeder relevanten Änderung |
-| Vollständig | alle freigegebenen Opcodevektoren, Hardware-ROMs, Profile, digitale Bild-/Audioreferenzen | vor Meilensteinfreigabe und lokal/CI regelmäßig |
-| Integration | LAN/Relay, GUI, Persistenzfehler, dynamische Video-/Audioformate | bei betroffenen Änderungen und vor Releases |
-| Langlauf | mehrere emulierte Stunden, A/V-Drift, Speicherverbrauch, Replay und Performance | nach Timing-/Audio-/Threading-Änderungen und vor Releases |
-| Hardware | festgeschriebene ROMs auf dokumentierter echter Konsole | bei neuen/strittigen Timingbefunden und verfügbaren Messmöglichkeiten |
+| Fast | Targeted component tests, small fixed CPU/SPC selection, diagnostic ROM, savestate regression | Every relevant change |
+| Full | All approved opcode vectors, hardware ROMs, profiles, digital image/audio references | Before milestone approval and regularly locally/in CI |
+| Integration | LAN/relay, GUI, persistence failures, dynamic video/audio formats | Affected changes and before releases |
+| Extended | Several emulated hours, A/V drift, memory usage, replay and performance | After timing/audio/threading changes and before releases |
+| Hardware | Pinned ROMs on a documented physical console | New/disputed timing findings and available measurement opportunities |
 
-Jeder Lauf speichert Commit, Profil, Testdatenstand, ausgeführte/übersprungene
-Fälle und Artefakte. Ein bestehender bekannter Fehler kann als erwarteter Fehler
-erfasst werden, bleibt im Genauigkeitsbericht aber ein Fehler. Ein Meilenstein
-gilt erst nach seinen eigenen Abnahmekriterien als abgeschlossen.
+Every run records commit, profile, test-data revision, executed/skipped cases and
+artifacts. An existing known failure may be recorded as expected, but remains a
+failure in the accuracy report. A milestone is complete only after meeting its
+own acceptance criteria.
 
-Code-Coverage ist ein Hilfsmittel zur Lückensuche. Die Freigabe beruht auf
-beobachtbarem Verhalten: richtige Daten, Busreihenfolge, Zeitpunkte, native Pixel,
-native Samples und reproduzierbare Zustände. Performance-Budgets werden auf
-einem benannten Testrechner festgelegt; der Genauigkeitskern soll dort die
-gewählten Profile in Echtzeit ohne wachsende Warteschlangen ausführen.
+Code coverage helps find gaps. Approval is based on observable behavior: correct
+data, bus order, timing, native pixels, native samples and reproducible states.
+Performance budgets are set on a named test machine; the accuracy core should
+execute the selected profiles there in realtime without growing queues.
 
-## Erste konkrete Arbeitspakete
+## First concrete work packages
 
-- [x] Testdaten-/Referenzmanifest und Ergebnisformat definieren (M0).
-- [x] Vorgeschlagene Hardwareprofile mit Region und offenen/unverifizierten Revisionen dokumentieren (M0; Hardwarebeleg offen).
-- [x] CPU-Testadapter mit beliebigem Initialzustand und logischem Trace-Bus erstellen (M0; Zyklusabnahme erst M2).
-- [x] Festgeschriebenen 65816-Sampledatensatz einlesen und einen Fehlerbericht pro
-      Opcode/Modus erzeugen; zunächst keine Genauigkeitsquote erfinden.
-- [x] Erste unabhängige CPU-Fehler beheben und kleine Regressionen hinzufügen (M1).
-- [x] Den Vertrag für Masterclock, Buszugriff und Ereignisreihenfolge anhand
-      kleiner Timingtests implementierbar spezifizieren.
+- [x] Define the test-data/reference manifest and result format (M0).
+- [x] Document proposed hardware profiles with region and open/unverified revisions (M0; hardware evidence outstanding).
+- [x] Create the CPU test adapter with arbitrary initial state and logical trace bus (M0; cycle acceptance follows in M2).
+- [x] Read the pinned 65816 sample dataset and generate a failure report per
+      opcode/mode; initially do not invent an accuracy percentage.
+- [x] Fix the first independent CPU failures and add small regressions (M1).
+- [x] Specify an implementable contract for master clock, bus access and event
+      order using small timing tests.
 
-Erst danach beginnen der vollständige Scheduler-Umbau und die weiteren
-Hardwarekomponenten. Für das Gesamtprojekt ist vor diesen Messungen keine
-belastbare Dauerabschätzung möglich. Nach M0/M1 werden Aufwand und Risiken
-anhand realer Fehler und Laufzeiten neu bewertet.
+Only then do the complete scheduler redesign and further hardware components
+begin. No reliable duration estimate for the whole project is possible before
+these measurements. After M0/M1, reassess effort and risks using actual failures
+and execution times.
 
-## Quellenbasis
+## Source foundation
 
-- [WDC W65C816S-Datenblatt](https://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf): CPU-Grundlage; SNES-spezifische Unterschiede separat prüfen.
-- [SingleStepTests/65816](https://github.com/SingleStepTests/65816): externe Zustands- und Busvektoren für einzelne Instruktionen.
-- [SingleStepTests/spc700](https://github.com/SingleStepTests/spc700): externe SPC700-Vektoren.
-- [undisbeliever/snes-test-roms](https://github.com/undisbeliever/snes-test-roms): quelloffene ROMs als Kandidaten für Hardware- und Grafikprüfungen; konkrete Auswahl in M0.
-- [SNESdev: Revisionsunterschiede](https://snes.nesdev.org/wiki/Version_differences): Ausgangspunkt für Profile und revisionabhängige Befunde.
-- [bsnes CPU-Timing](https://github.com/bsnes-emu/bsnes/blob/master/bsnes/sfc/cpu/timing.cpp): Vergleichsimplementierung für Synchronisation, Refresh und DMA/Controller-Ereignisse.
-- [ares SMP-Timing](https://github.com/ares-emulator/ares/blob/master/ares/sfc/smp/timing.cpp): Vergleichsimplementierung für APU-Zeitbasis und Timer.
-- [blargg snes_spc](https://github.com/blarggs-audio-libraries/snes_spc): ergänzende Audio-Referenz für isolierte Differenzprüfungen.
+- [WDC W65C816S datasheet](https://www.westerndesigncenter.com/wdc/documentation/w65c816s.pdf): CPU foundation; check SNES-specific differences separately.
+- [SingleStepTests/65816](https://github.com/SingleStepTests/65816): external state and bus vectors for individual instructions.
+- [SingleStepTests/spc700](https://github.com/SingleStepTests/spc700): external SPC700 vectors.
+- [undisbeliever/snes-test-roms](https://github.com/undisbeliever/snes-test-roms): open-source ROMs as candidates for hardware and graphics checks; specific selection in M0.
+- [SNESdev: Version differences](https://snes.nesdev.org/wiki/Version_differences): starting point for profiles and revision-dependent findings.
+- [bsnes CPU timing](https://github.com/bsnes-emu/bsnes/blob/master/bsnes/sfc/cpu/timing.cpp): comparison implementation for synchronization, refresh and DMA/controller events.
+- [ares SMP timing](https://github.com/ares-emulator/ares/blob/master/ares/sfc/smp/timing.cpp): comparison implementation for APU timebase and timers.
+- [blargg snes_spc](https://github.com/blarggs-audio-libraries/snes_spc): additional audio reference for isolated differential checks.
 
-Referenzquellcode dient der Analyse und dem unabhängigen Vergleich. Eine
-Übernahme von fremdem Code ist kein Bestandteil dieses Plans; der eigene
-C#-Kern und die vorhandenen Lizenzgrenzen bleiben erhalten.
-
-
-M8-Implementierungsvollgate: sauberer Commit `47f91cb`,
-`python tools/test-lab.py --windows --full` mit Exit 0, 209 portable und
-10 Windows-Gruppen. Die unabhängige Root-Abnahme auf `10164c7` bestand mit Exit0 (`artifacts/root-m8-validation.log`). Genauigkeitsfehler
-bleiben in den gesonderten Berichten rot; [Baseline M8](baselines/m8.json) und
-[M8-Vertrag](m8-compatibility-contract.md) halten Repros und Nachweisgrenzen fest.
-M9a ist unvollständig: Das volle Genauigkeitsgate auf `2dbeb5f` besteht; das Dauerleistungsziel scheitert in 38/62 NTSC-Fenstern. Historisch folgte hier Worker/UI, inzwischen als M9b abgenommen; vor M9-/Releaseabnahme müssen NTSC/PAL-Dauerleistung und die übrigen M9-Produktphasen abgeschlossen werden.
-
-M9b implementiert den kontrollierten Worker, feldgebundene Eingaben und getrennte
-Video-/Audioübergabe; [Vertrag und Nachweisgrenzen](m9-worker-contract.md).
-Saubere Implementierung43c566d: voller Windows-Gate Exit0,209 bisherige portable,
-16 getrennte Runtime- und10 Windows-Gruppen plus nativer App-Probe.
-[Drei60-s-App-Messungen und unveränderte Grenzen](m9-worker-contract.md) sowie
-[Baseline](baselines/m9b.json) dokumentieren die unabhängige Root-Abnahme auf `1074c36`. NTSC/PAL-Dauerleistung, mehrstündiger A/V-/Threading-
-Soak und die weiteren Produkt-/Distributionsphasen bleiben vor M9-/Releasefreigabe offen.
+Reference source code supports analysis and independent comparison. Importing
+third-party code is not part of this plan; the independently developed C# core
+and existing license boundaries remain intact.
 
 
-M9c implementiert atomar geflushte, validierte State-/SRAM-/Settings-Generationen,
-sichtbare Recovery, begrenzte periodische Dirty-SRAM-Snapshots, transaktionale
-ROM-Session-Leases und begrenzte State-Reader. [Persistenzvertrag](m9-persistence-contract.md)
-und [Baseline](baselines/m9c.json) nennen Commit, Dateien, Hashes und Grenzen.
-Saubere Implementierung `ed62a20`: voller Windows-Gate Exit0,209 bisherige portable,
-16 Runtime-,14 Persistenz- und10 Windows-Gruppen; tatsächliche native Periodik,
-Preview/Recovery/Close plus negative SRAM-/Settings-/Log-Fehlerfälle bestanden.
-Zusätzliche native Wiederholungen prüften je28 unmittelbar zuvor/danach erfasste
-Buildidentitäten. Drei Archive/7744 Dateien (5.613.078.150 dekomprimierte Bytes)
-wurden gegen CRC/Länge/SHA256 und alle Diskoriginale erneut geprüft. Unabhängige
-M9c-Rootabnahme auf `cfe4ed2` bestanden (239 portable/10 Windows-Gruppen,
-beide nativen Probearten, 122368 Pixel/5 Checks und unveränderte Stereo-SHA). Das schließt weder M9a-Dauerleistung noch Netzwerk,
-Distribution/Manager, mehrstündigen Soak oder M9/Release insgesamt ab.
+M8 implementation full gate: clean commit `47f91cb`,
+`python tools/test-lab.py --windows --full` with exit 0, 209 portable and
+10 Windows groups. Independent Root acceptance on `10164c7` passed with exit 0
+(`artifacts/root-m8-validation.log`). Accuracy failures remain red in separate
+reports; [M8 baseline](baselines/m8.json) and the
+[M8 contract](m8-compatibility-contract.md) record reproductions and evidence limits.
+M9a is incomplete: the full accuracy gate on `2dbeb5f` passes; the sustained-performance
+target fails in 38/62 NTSC windows. Historically, worker/UI followed here; it has
+since been accepted as M9b. NTSC/PAL sustained performance and the remaining M9
+product phases must be completed before M9/release acceptance.
 
-M9d implementiert den versionierten LAN/TLS-/Relaybetrieb mit neutralem Rechtewechsel,
-begrenzten Queues/Ressourcen, drainbarem Shutdown, Trust-Recovery und gemessener
-Software-A/V-Zeitachse; [Netzwerkvertrag](m9-network-contract.md). Unabhängige
-M9d-Abnahme auf `2a5ae39` bestanden. Neue Gruppen wurden zusätzlich ausgewiesen; die bisherigen
-239 portablen und10 Windows-Gruppen sowie externe Vollkorpora bleiben erhalten.
-M9a-Dauerleistung, Distribution/Manager/CI, mehrstündiger Soak und M10 bleiben offen.
+M9b implements the controlled worker, field-bound input and separate video/audio
+handoff; [contract and evidence limits](m9-worker-contract.md). Clean
+implementation 43c566d: full Windows gate exit 0, 209 existing portable,
+16 separate runtime and 10 Windows groups plus a native app probe.
+[Three 60-second app measurements and unchanged limits](m9-worker-contract.md)
+and [baseline](baselines/m9b.json) document independent Root acceptance on
+`1074c36`. NTSC/PAL sustained performance, a multi-hour A/V/threading soak and
+further product/distribution phases remain open before M9/release approval.
+
+
+M9c implements atomically flushed, validated state/SRAM/settings generations,
+visible recovery, bounded periodic dirty-SRAM snapshots, transactional ROM-session
+leases and bounded state readers. The [persistence contract](m9-persistence-contract.md)
+and [baseline](baselines/m9c.json) list commit, files, hashes and limits.
+Clean implementation `ed62a20`: full Windows gate exit 0, 209 existing portable,
+16 runtime, 14 persistence and 10 Windows groups; actual native periodic operation,
+preview/recovery/close and negative SRAM/settings/log failure cases passed.
+Additional native repetitions checked 28 build identities each, captured immediately
+before/after. Three archives/7,744 files (5,613,078,150 decompressed bytes) were
+rechecked against CRC/length/SHA256 and all disk originals. Independent M9c Root
+acceptance on `cfe4ed2` passed (239 portable/10 Windows groups, both native probe
+types, 122,368 pixels/5 checks and unchanged stereo SHA). This completes neither
+M9a sustained performance nor networking, distribution/Manager, multi-hour soak
+or M9/release as a whole.
+
+M9d implements versioned LAN/TLS/relay operation with neutral permission changes,
+bounded queues/resources, drainable shutdown, trust recovery and a measured
+software A/V timeline; [network contract](m9-network-contract.md). Independent
+M9d acceptance on `2a5ae39` passed. New groups were reported separately; the
+existing 239 portable and 10 Windows groups and complete external corpora remain.
+M9a sustained performance, distribution/Manager/CI, multi-hour soak and M10 remain open.
 
 ### M9d clean implementation gate and frozen handoff
 
 Implementation `b432a976e3315ecf45f55a7c5db2ba35dc54eaf2` passed
-`python tools/test-lab.py --windows --full` with exit0 on a clean checkout:
-256 portable groups (previous239 +14 network +3 relay) and23 Windows groups
-(previous10 +13 real socket/TLS/relay/driver groups). Full CPU semantics and bus
-each executed5,080,400 cases;26,184,846 bus cycles and256,000 SPC cases passed
+`python tools/test-lab.py --windows --full` with exit 0 on a clean checkout:
+256 portable groups (previous 239 +14 network +3 relay) and 23 Windows groups
+(previous 10 +13 real socket/TLS/relay/driver groups). Full CPU semantics and bus
+each executed 5,080,400 cases; 26,184,846 bus cycles and 256,000 SPC cases passed
 their existing gates. Native runtime and all four persistence modes passed;
-the same28 DLL/EXE/deps/runtimeconfig identities bracket every final native start.
+the same 28 DLL/EXE/deps/runtimeconfig identities bracket every final native start.
 
-The real A/V run retained2.3852309s cold readiness separately, then observed
-5.0086057s with297 video,301 audio and297 actual driver/video comparisons;
-maximum software A/V distance33.308853ms,23 presentation drops, no provider fault.
-Maximum queue residence265.064900ms and scheduling error173.170717ms include
+The real A/V run retained 2.3852309 s cold readiness separately, then observed
+5.0086057 s with 297 video, 301 audio and 297 actual driver/video comparisons;
+maximum software A/V distance 33.308853 ms, 23 presentation drops, no provider fault.
+Maximum queue residence 265.064900 ms and scheduling error 173.170717 ms include
 late rejected/cold work; they are not physical device-latency claims.
 
-The three frozen archives contain8,771 entries /5,745,970,051 decompressed bytes.
+The three frozen archives contain 8,771 entries / 5,745,970,051 decompressed bytes.
 Every archive and entry has SHA256/CRC32/length identities; every entry was read
 back and compared to both staged and live originals. No nested ZIP or active log
 is included. The separate developmental archive retains available failed-run
@@ -536,16 +546,51 @@ Three prepared Root helper scripts are ancillary copies in the report archive;
 they were not run as implementation evidence.
 
 See [M9d baseline](baselines/m9d.json) for exact hashes, counts and raw paths.
-M9d was independently accepted on `2a5ae39` (Root full gate exit0,256 portable/23 Windows groups). M9a sustained performance, M8 audio
-reds, source-adjudicated raw SPC differences, distribution/Manager/CI, prolonged
-soak and M10 remained open at this M9d snapshot; publish was then PRE-M0. No physical SNES/input/DAC,
-OS-focus or clean-VM claim is added.
+M9d was independently accepted on `2a5ae39` (Root full gate exit 0,
+256 portable/23 Windows groups). M9a sustained performance, M8 audio failures,
+source-adjudicated raw SPC differences, distribution/Manager/CI, prolonged soak
+and M10 remained open at this M9d snapshot; publish was then PRE-M0. No physical
+SNES/input/DAC, OS-focus or clean-VM claim is added.
 
 
-M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library metadata and State9 management. Independent Root acceptance passed on `2534dba` (267 portable/31 Windows groups); implementation `a397fca` and frozen evidence remain separately identified. See [Manager contract](m9-manager-contract.md); distribution/CI, sustained performance and prolonged soak remain open.
+M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite library
+metadata and State9 management. Independent Root acceptance passed on `2534dba`
+(267 portable/31 Windows groups); implementation `a397fca` and frozen evidence
+remain separately identified. See the [Manager contract](m9-manager-contract.md);
+distribution/CI, sustained performance and prolonged soak remain open.
 
-M9f implementiert selbständige Windowspakete beider Apps, Paketmanifest/Notices/Locks, einen explizit konfigurierten Updatepfad, isolierte Inno-Install/Repair/Uninstall-Prüfungen sowie echte Linux-Portabilitätsprüfung. [Distributionsvertrag](m9-distribution-contract.md). Vollständiger Windowsgate auf sauberem `9db1edd`:276 portable/31 Windowsgruppen; nach ausschließlich Testharness-/Dokumentationshärtung auf `9058878` gezielt11 portable/8 native Managergruppen und alle Paketproben. Vollständiger Linuxgate auf sauberem `9058878`:276 portable Gruppen und alle Vollkorpora. Root hat anschließend auf `0f8aadc` den vollständigen Windowsgate unabhängig mit276 portablen/31 Windowsgruppen und unveränderten1194 nativen Buildidentitäten bestanden.
+M9f implements self-contained Windows packages for both apps, package
+manifest/notices/locks, an explicitly configured update path, isolated Inno
+install/repair/uninstall checks and actual Linux portability checks.
+[Distribution contract](m9-distribution-contract.md). Full Windows gate on clean
+`9db1edd`: 276 portable/31 Windows groups; after changes limited to test-harness
+and documentation hardening on `9058878`, targeted 11 portable/8 native Manager
+groups and all package probes passed. Full Linux gate on clean `9058878`:
+276 portable groups and all complete corpora. Root subsequently independently
+passed the full Windows gate on `0f8aadc` with 276 portable/31 Windows groups and
+1,194 unchanged native build identities.
 
-`publish/` enthält jetzt das verifizierte aktuelle Paket; das komplette PRE-M0-Verzeichnis bleibt als `publish-pre-m9f-9058878/` erhalten. Der allgemeine CMD-Starter bestand einen weiteren20s-Nativlauf mit dem lokalen Spiel. Dessen separate Verknüpfung, alle412 Dateien der bisherigen spielbaren Kopie und Original-ROM bleiben unverändert. Evidenz:4.581 eindeutige Objekte/4.987.831.365 Bytes,66.951 Originalverweise/29.513.259.971 Bytes; Archiv und alle Originale vollständig nachgelesen. [Exakte Baseline](baselines/m9f.json). Die unabhängige M9f-Abnahme einschließlich Paket-/Update-/isolierten Installerproben ist bestanden; Dauerleistung/Soak, Bedienungsabgleich, offene Genauigkeitsfragen und M10 bleiben ausstehend. M9/Release sind unvollständig.
+`publish/` now contains the verified current package; the complete PRE-M0
+directory is retained as `publish-pre-m9f-9058878/`. The general CMD launcher
+passed another 20-second native run with the local game. Its separate shortcut,
+all 412 files of the previous playable copy and the original ROM remain
+unchanged. Evidence: 4,581 unique objects/4,987,831,365 bytes,
+66,951 original references/29,513,259,971 bytes; the archive and all originals
+were read back in full. [Exact baseline](baselines/m9f.json). Independent M9f
+acceptance, including package/update/isolated installer probes, passed;
+sustained performance/soak, interaction parity, open accuracy questions and M10
+remain outstanding. M9/release are incomplete.
 
-M9g gleicht die anwendbaren C64-Interaktionen konkret ab: [Featurematrix und Eingabevertrag](m9-interaction-contract.md). Die Implementierung erweitert Keyboard-/Frontendbelegung, direkte Aufnahme, Kontextprioritaet, Ereignisreihenfolge, Anzeigeoptionen und vorhandene Warm-/Poweroperationen. Vollgate vor dem letzten reinen WPF-Fix: `7effa47`,285 portable/31 Windowsgruppen. Final `2ab409d`: Manager12 portable,32 native Windowsgruppen und151 zusätzliche Interaktionsstufen mit1194 identischen Buildidentitäten; Linux59 sind gezielte Portabilität. [M9g-Baseline](baselines/m9g.json). Der unabhängige vollständige Root-Gate auf8daf478 ist wegen49.942ms Software-A/V-Abstand rot. [Getrennter Followup](m9g-followup.md): Beschriftung korrigiert, zwei Cold-Readinessfehler und Root-A/V-Ursache offen, ein neuer13-Gruppenlauf ist kein Fixnachweis; Dauerleistung/Soak, offene Linux-Persistenzbefunde, Genauigkeit und M10 bleiben offen.
+M9g implements parity for applicable C64 interactions:
+[feature matrix and input contract](m9-interaction-contract.md). The implementation
+extends keyboard/frontend bindings, direct capture, context priority, event
+order, display options and existing warm-reset/power operations. Full gate
+before the final WPF-only fix: `7effa47`, 285 portable/31 Windows groups.
+Final `2ab409d`: Manager 12 portable, 32 native Windows groups and 151 additional
+interaction stages with 1,194 identical build identities; Linux 59 is targeted
+portability coverage. [M9g baseline](baselines/m9g.json). The independent full
+Root gate on 8daf478 fails because of a 49.942 ms software A/V distance.
+[Separate follow-up](m9g-followup.md): label corrected, two cold-readiness failures
+and the Root A/V cause remain open; a new 13-group run is not evidence of a fix.
+Sustained performance/soak, open Linux persistence findings, accuracy and M10
+remain open.

@@ -1,191 +1,195 @@
-# M9h: Performance und Software-A/V
+# M9h: performance and software A/V
 
-In Arbeit. Keine Gesamtfreigabe für M9 oder Release.
+Work in progress. No overall acceptance for M9 or the release.
 
-Ausgangspunkt ist `2c6b3567095636594fcf5e5f92686631465f775c` mit
-SDK10.0.402/Runtime10.0.13 auf NILSPC1. Eigene neue Belege liegen unter
-`artifacts/m9h`; bestehende Root- und Meilenstein-Freezes bleiben unverändert.
+The starting point is `2c6b3567095636594fcf5e5f92686631465f775c` with
+SDK 10.0.402/Runtime 10.0.13 on NILSPC1. New evidence is under
+`artifacts/m9h`; existing Root and milestone evidence freezes are unchanged.
 
-Die unabhängige M9g-Abnahme verfehlte die unveränderte kumulative40-ms-Grenze
-mit49,9420215ms. Zwei isolierte Folgeversuche verfehlten die30-s-Readiness.
-Ein grüner originalgeordneter13-Gruppenlauf erklärt diese historischen Fehler
-nicht. Beide Befunde bleiben ausdrücklich offen; Details stehen in
-[M9g-Followup](m9g-followup.md).
+Independent M9g acceptance exceeded the unchanged cumulative 40 ms limit with
+49.9420215 ms. Two isolated followup attempts missed the 30 s readiness budget.
+A passing 13-group run in the original order does not explain these historical
+failures. Both findings explicitly remain open; details are in
+[M9g followup](m9g-followup.md).
 
-## Gezielte Arbeitsschritte
+## Targeted work
 
-1. Frische begrenzte Beobachtungen für geladenen Slow-Scene-Zustand,
-   Allocation-/CPU-/GC-Profil und tatsächliche Driver-A/V-Grenzen sichern.
-2. Deterministisch belegte Auswahl-/Commitfehler beheben. Cold bleibt Teil
-   kumulativer Metrics; verworfene Bilder und Messphase werden getrennt
-   berichtet. Ein langsamer Callback darf weiterhin sichtbar durchfallen.
-3. Jeden Corekandidaten isoliert mit vollständigen Console-Kontrollläufen und
-   exakten Video-/PCM-/State-Ausgaben prüfen. Frühere erfolglose Kandidaten
-   werden nicht übernommen. Allokationsgewinn allein reicht nicht.
-4. Für jede übernommene Coreänderung alle unveränderten Genauigkeitsregressionen
-   ausführen. Beide >10 emulierte Minuten langen NTSC-/PAL-Läufe werden auch
-   dann auf dem verbleibenden Produktstand ausgeführt und ehrlich berichtet,
-   wenn kein Kandidat übernommen wird. Unverändertes Abnahmekriterium:
-   allen600-Feld-Fenstern>=1x, managed<256MiB und0 Core-Ausgabeverlusten.
-5. Tatsächlicher mehrstündiger normal gepaceter App-/Netzwerk-/Manager-Soak
-   mit begrenzten Hashes, Checkpoints und Fehlerpuffern; keine stundenlangen
-   Volltraces. Emulierte Dauer und reale Wallzeit separat berichten.
+1. Capture fresh bounded observations of the loaded slow-scene state, the
+   allocation/CPU/GC profile and actual driver A/V limits.
+2. Fix selection/commit errors demonstrated deterministically. The cold phase
+   remains part of cumulative metrics; discarded frames and the measurement
+   phase are reported separately. A slow callback must still visibly fail.
+3. Check each core candidate in isolation against complete console control runs
+   and exact video/PCM/state outputs. Earlier unsuccessful candidates are not
+   adopted. Allocation improvements alone are insufficient.
+4. Run all unchanged accuracy regressions for each adopted core change. Both
+   NTSC/PAL runs lasting >10 emulated minutes are performed and reported honestly
+   on the resulting product version even if no candidate is adopted. The
+   acceptance criteria remain unchanged: every 600-field window >=1x, managed
+   memory <256 MiB and 0 lost core outputs.
+5. Run an actual hours-long app/network/Manager soak with normal pacing and
+   bounded hashes, checkpoints and error buffers, without hours of full traces.
+   Report emulated duration and real wall-clock time separately.
 
-Das alte M9a-Ergebnis bleibt rot:38/62 NTSC-Fenster unter1x, PAL ungemessen.
-Die18 bekannten vollständigen Audiovergleichszeilen, Warm-PPU-Retention und
-weitere Hardwaregrenzen bleiben getrennte Genauigkeitsarbeit. Physische
-DAC-/Displaylatenz wird hier nicht behauptet.
+The earlier M9a result remains failing: 38/62 NTSC windows below 1x, PAL
+unmeasured. The 18 known full audio comparison rows, warm PPU retention and other
+hardware limits remain separate accuracy work. No physical DAC/display latency
+measurement is claimed here.
 
-## Bisherige konkrete A/V-Korrektur
+## Concrete A/V correction so far
 
-Die alte Policy erlaubte bis100ms Videoabstand und benutzte nach dem Callback
-noch die Driverprobe vor Auswahl und Commit. Der bereits vorhandene injizierte
-Fall lieferte deshalb ein bei Commit50ms altes Bild und meldete0ms.
+The earlier policy allowed video distances of up to 100 ms and, after the
+callback, still used the driver sample from before selection and commit. The
+existing injected case therefore delivered a frame that was 50 ms old at
+commit while reporting 0 ms.
 
-Die neue Commitprüfung liest den Driver nach Erlangen des Commitlocks erneut
-und verwirft Bilder ab40ms Abstand. Die kumulative Metric nimmt sowohl diese
-frische Probe als auch die tatsächliche Nach-Callback-Probe auf. Sie wird weder
-gekappt noch bei Messbeginn zurückgesetzt. Ein injizierter60-ms-Callback bleibt
-als60-ms-Verletzung sichtbar. Underflow zwischen Auswahl und Commit verwirft
-das Bild, wenn Audio gebraucht wird. Cold und spätere Bilder zählen weiterhin
-in dieselbe kumulative Metric. Das ist eine kausal begründete Policykorrektur,
-kein rückwirkender Ursachenbeweis für den Rootlauf.
+The new commit check rereads the driver after acquiring the commit lock and
+discards frames at distances of 40 ms or more. The cumulative metric includes
+both this fresh sample and the actual post-callback sample. It is neither
+capped nor reset when measurement begins. An injected 60 ms callback remains
+visible as a 60 ms violation. Underflow between selection and commit discards
+the frame when audio is required. Cold-phase and later frames still count
+toward the same cumulative metric. This is a policy correction supported by a
+causal test, not retrospective proof of the cause of the Root failure.
 
-Erste gezielte Prüfung:16 portable Netzwerkgruppen und die tatsächlichen13
-Windowsgruppen bestanden. Cold2,1889347s, Messphase5,0132814s,294 Video-/301
-Audio-/294 Driververgleiche, kumulativ16,6702374ms,25 Drops einschließlich Cold,
-Faultnull. Die anschließende Berichtserweiterung trennt Cold-/Messphasen-Drops;
-die Readiness- und40-ms-Grenzen bleiben unverändert.
+Initial targeted check: 16 portable network groups and the 13 actual Windows
+groups passed. Cold phase 2.1889347 s, measurement phase 5.0132814 s, 294 video/
+301 audio/294 driver comparisons, cumulative 16.6702374 ms, 25 drops including
+the cold phase, Fault null. The subsequent reporting extension separates cold-
+phase and measurement-phase drops; readiness and 40 ms limits are unchanged.
 
-## Begrenzte Coreversuche: nichts übernommen
+## Bounded core experiments: none adopted
 
-Alle folgenden2400-Feld-Versuche laden denselben vorhandenen Zustand bei
-Feld6600 und enden bei9000. Die jeweilige tatsächlich geladene Coreassembly
-wird im Prozess gehasht. Native Video-/PCM-Streaminghashes und vollständige
-komprimierte Endstates stimmen zwischen Kontrolle und Kandidaten exakt überein;
-alle behalten0 Präsentationsverluste. Diese Identität ist eine Regression gegen
-den eigenen Ausgangskern, keine unabhängige Hardwaremessung.
+All following 2400-field experiments load the same existing state at field
+6600 and finish at 9000. The core assembly actually loaded is hashed in the
+process. Native video/PCM streaming hashes and complete compressed end states
+match exactly between control and candidates; all retain 0 presentation losses.
+This identity is a regression against the existing core, not an independent
+hardware measurement.
 
-| Neuer isolierter Kandidat | Kandidat A | Originalkontrolle B | Kandidat C | Entscheidung |
+| New isolated candidate | Candidate A | Original control B | Candidate C | Decision |
 |---|---:|---:|---:|---|
-| Öffentlicher Cycle-Werttyp |0,9570x|1,0271x|1,0833x|Keine verlässliche Beschleunigung; nicht übernommen|
-| Cycle-Datensatz erst nach Timingzulassung |1,4270x|1,1720x|0,9649x|Früher Gewinn nicht wiederholt; nicht übernommen|
-| Privat gepackter Suspendpunkt |1,1376x|1,0781x|1,0424x|Kein stabiler Gewinn; nicht übernommen|
-| Direkter Journal-Resume einfacher Branch-/MOV-Formen |0,9434x|0,8980x|0,9292x|Weiter rote Fenster; nicht übernommen|
-| Privat gepackter Entry-/Suspendpunkt plus spätem Cycle-Datensatz |0,9586x|0,9428x|0,9663x|~60% weniger Allokation, nur~1,7–2,5% Gesamtgewinn innerhalb beobachteter Streuung; nicht übernommen|
+| Public cycle value type |0.9570x|1.0271x|1.0833x|No reliable speedup; not adopted|
+| Create the cycle record only after timing admission |1.4270x|1.1720x|0.9649x|Early improvement did not repeat; not adopted|
+| Privately packed suspension point |1.1376x|1.0781x|1.0424x|No stable improvement; not adopted|
+| Direct journal resume for simple branch/MOV forms |0.9434x|0.8980x|0.9292x|Performance windows still fail; not adopted|
+| Privately packed entry/suspension point plus late cycle record |0.9586x|0.9428x|0.9663x|~60% fewer allocations, only ~1.7–2.5% overall improvement within observed variation; not adopted|
 
-Für Journal-Resume bestanden die18.952 eingefrorenen Suspendfälle. Der letzte
-Kandidat bestand separat dieselben18.952 Legacyfälle und18.952 Fälle über seine
-neue schnelle Timingzulassung sowie die explizite Fast-/Legacy-/Observer-/
-Postlatch-Komposition. Diese Testquellen und Binärobjekte bleiben ausschließlich
-unter den eigenen Artefakten; Produktcore und unveränderliche Originalharnesses
-wurden nicht geändert. Frühere M9a-Kandidaten bleiben verworfen.
+For journal resume, the 18,952 frozen suspension cases passed. The final
+candidate separately passed the same 18,952 legacy cases and 18,952 cases
+through its new fast timing admission, plus the explicit fast/legacy/observer/
+post-latch composition. These test sources and binary objects remain exclusively
+under the experiment artifacts; the product core and immutable original
+harnesses were not changed. Earlier M9a candidates remain rejected.
 
-Ein früher Quotingfehler in einem Vorbereitungshilfsskript startete versehentlich
-Originalkopien unter Kandidatennamen. Die drei Läufe sind erhalten und in
-`artifacts/m9h/experiment01-disposition.json` ausdrücklich als ungültige
-Kandidatenevidenz gekennzeichnet. Kein Ergebnis daraus entscheidet die Auswahl.
+An early quoting error in a preparation helper script accidentally launched
+original copies under candidate names. The three runs are retained and explicitly
+marked as invalid candidate evidence in
+`artifacts/m9h/experiment01-disposition.json`. No result from them determines
+candidate selection.
 
-## Frisches Profil und nächste technische Entscheidung
+## Fresh profile and next technical decision
 
-Der zusätzliche3600-Feld-Lauf6600→10200 auf dem unveränderten Originalcore
-ergab sechs grüne Fenster mit1,0795/1,0154/1,0384/1,0115/1,0097/1,0079x.
-Er reproduziert die roten Vorgängerfenster ausdrücklich nicht. Die tatsächliche
-Ausführungsthread-CPUzeit beträgt in diesen Fenstern96–98% der Wallzeit;
-separate rote Kontrollfenster liegen nahe99–100%. Das ist eine Messung dieser
-Fenster und kein Beweis für eine allgemeine Host- oder Schedulingursache.
+The additional 3600-field run from 6600→10200 on the unchanged original core
+produced six passing windows at 1.0795/1.0154/1.0384/1.0115/1.0097/1.0079x.
+It explicitly does not reproduce the earlier failing windows. Actual execution-
+thread CPU time in these windows is 96–98% of wall-clock time; separate failing
+control windows are close to 99–100%. This measures these windows and does not
+prove a general host or scheduling cause.
 
-Die begrenzte EventPipe-Aufzeichnung signalisiert auf dem Hauptthread vor allem
-SPC-Cycle-/Capture-Residency (rund42%/23% der zugeordneten Stackzeit). Das sind
-keine Hardware-CPU-Prozente.1,791s GC-Suspension in59,806s und frühe Tier1-
-Ladungen werden separat berichtet; Korrelation allein erklärt das Defizit nicht.
-Ein erster Traceprofil-Entwurf enthielt keine Sample-/Allocationevents und blieb
-erhalten; die folgenden expliziten Provideraufzeichnungen liefern diese Daten.
+The bounded EventPipe recording mainly indicates SPC cycle/capture residency on
+the main thread (around 42%/23% of attributed stack time). These are not hardware
+CPU percentages. GC suspension of 1.791 s in 59.806 s and early Tier1 loads are
+reported separately; correlation alone does not explain the shortfall. An
+initial trace profile contained no sample/allocation events and was retained;
+the subsequent explicit provider recordings supply these data.
 
-Nach der begrenzten Variantenserie folgt keine weitere Auswahl günstiger Läufe.
-Die nächste strukturelle Coreentscheidung müsste den konsumierenden SPC-
-Replay-/Capturepfad verändern, dabei sämtliche öffentlichen Suspendpunkte,
-Journale, MMIO-/Observer-/Guardreihenfolgen und State9 exakt erhalten und einen
-stabilen vollständigen Consolegewinn nachweisen. Die bisherigen Allokations-
-und einfachen Resumeänderungen liefern diesen Nachweis nicht.
+No further selection of favorable runs follows the bounded series of variants.
+The next structural core change would need to modify the consuming SPC
+replay/capture path while preserving all public suspension points, journals,
+MMIO/observer/guard ordering and State9 exactly, and demonstrate a stable
+whole-console improvement. The allocation and simple resume changes tried so
+far do not provide that evidence.
 
-## Tatsächliche Dauerläufe
+## Actual sustained runs
 
-NTSC37000 gemessene Felder ist ausgeführt:615,652749 emulierte Sekunden,
-678,052 Core-Wallsekunden,0,90797x.54 von61 vollständigen600-Feld-Fenstern sind
-rot; einschließlich Restfenster sind es55 von62.
-Minimum0,858353x bei Feld17410. Der Gesamtprozess einschließlich Hashing,
-Checkpoints und anderer Arbeit dauerte687,5728643 reale Sekunden. Managed-Maximum
-52.607.072B,0 verlorene DSP-Ausgaben. Die Leistungsabnahme bleibt rot.
+The NTSC run of 37000 measured fields completed: 615.652749 emulated seconds,
+678.052 core wall-clock seconds, 0.90797x. 54 of 61 complete 600-field windows
+fail; including the partial window, 55 of 62 fail.
+The minimum is 0.858353x at field 17410. The whole process, including hashing,
+checkpoints and other work, took 687.5728643 real seconds. Maximum managed memory
+52,607,072 B, 0 lost DSP outputs. Performance acceptance still fails.
 
-PAL31000 wurde unabhängig anschließend vollständig ausgeführt:619,913473
-emulierte Sekunden,586,7127 Core-Wallsekunden,1,05659x gesamt. Trotzdem sind
-17 von51 vollständigen600-Feld-Fenstern rot, einschließlich Restfenster18 von52.
-Minimum0,917209x bei Feld25810. Reale Prozesswall594,3624915s, Managed-Maximum
-49.230.888B,0 verlorene DSP-Ausgaben. Beide Regionen verfehlen die unveränderte
-Leistungsabnahme; ein grüner Gesamtmittelwert ersetzt keine Fensterprüfung.
+The PAL run of 31000 fields was subsequently completed independently:
+619.913473 emulated seconds, 586.7127 core wall-clock seconds, 1.05659x overall.
+Nevertheless, 17 of 51 complete 600-field windows fail, or 18 of 52 including
+the partial window. The minimum is 0.917209x at field 25810. Real process
+wall-clock time 594.3624915 s, maximum managed memory 49,230,888 B, 0 lost DSP
+outputs. Both regions miss the unchanged performance acceptance criteria; a
+passing overall average does not replace checking each window.
 
-## Vorbereiteter nativer Dauertest
+## Prepared native soak test
 
-Der explizite `--ui-soak`-Modus verwendet die tatsächliche native Anwendung mit
-normalem Pacing, synthetischen Anwendungseingaben, localhost TLS, tatsächlichem
-WinMM-Provider und eigenem WPF Manager. Dessen Statusrequests werden beobachtet;
-kleine gemeinsame SQLite-Scans und validierte State9-Checkpoints laufen begrenzt
-mit. Es bleiben höchstens zwei rotierende Statepfade mit ihren Backups,
-64 Feldhash-Vergleichseinträge,4096 Software-A/V-Diagnosezeilen und16 Fehlertexte.
-Progress wird alle10s geschrieben; es gibt keinen mehrstündigen Rohbild-/CPUtrace.
-Audio-Gain0 erhält PCM-Erzeugung, Provider und Gerätebetrieb.
+The explicit `--ui-soak` mode uses the actual native application with normal
+pacing, synthetic application inputs, localhost TLS, the actual WinMM provider
+and its own WPF Manager. Manager status requests are observed; small shared
+SQLite scans and validated State9 checkpoints run within limits alongside them.
+At most two rotating state paths with their backups, 64 field-hash comparison
+entries, 4096 software A/V diagnostic rows and 16 error messages are retained.
+Progress is written every 10 s; there is no hours-long raw-frame/CPU trace.
+Audio gain 0 retains PCM generation, the provider and device operation.
 
-Die Testdauer wird auch nach einem30-s-Readinessfehler vollständig ausgeführt.
-Cold bleibt in der kumulativen40-ms-Metric. Nach Bereitschaft sind die bestehende
-100-ms-Catchup-/Mutegrenze, ausbleibende Audio-/Driverfortschritte und ausbleibende
-Managerrequests sichtbar. Tatsächliche Wallzeit und Hardwarezeit werden getrennt
-berichtet. Render-Polling hasht nur beobachtete Quellfelder; es wird keine
-vollständige Quellfeldabdeckung oder unabhängige Hardware-Genauigkeit behauptet.
-Zugeordnete Remote-ARGB-Felder werden gegen ihre tatsächlichen Quellhashes
-verglichen; unbekannte Zuordnungen werden gesondert gezählt.
+The full test duration runs even after a 30 s readiness failure. The cold phase
+remains in the cumulative 40 ms metric. After readiness, the existing 100 ms
+catchup/mute boundary, lack of audio/driver progress and missing Manager requests
+remain visible. Actual wall-clock time and hardware time are reported
+separately. Render polling hashes only observed source fields; no complete
+source-field coverage or independent hardware accuracy is claimed. Mapped
+remote ARGB fields are compared against their actual source hashes; unknown
+mappings are counted separately.
 
-Geplant sind je3600 tatsächliche Sekunden NTSC und PAL, zusammen mindestens
-zwei reale Stunden. Der PAL-Appfall verwendet eine ausdrücklich dokumentierte
-Region-Byte-Ableitung des gepinnten freien Techdemos; das Original bleibt
-unverändert. Das ist ein PAL-Arbeitslastfall, keine Originalhardwaremessung.
-Die zwei überarbeiteten35-s-Kurzproben nach Ende beider Coredauerläufe bestanden
-einschließlich eines tatsächlichen validierten Checkpoints pro Region, gemeinsamem
-SQLite-Scan und echten WPF-Statusrequests. NTSC:36,232s Prozesslauf einschließlich
-Cleanup,34,427 Hardwaresekunden, Ready7,172s, kumulativ33,297ms; PAL:35,201s,
-34,415 Hardwaresekunden, Ready6,856s, kumulativ20,005ms.1809/1518 zugeordnete
-ARGB-Felder sind exakt,0 Ownerdrops,0 Beobachtungsgaps; beobachtete Managed-Maxima
-44,0/25,1MB. Dies ist ausdrücklich noch kein Stundenbeweis.
+The plan is 3600 actual seconds each for NTSC and PAL, totaling at least two
+real hours. The PAL application case uses an explicitly documented region-byte
+derivative of the pinned freely distributable tech demo; the original is
+unchanged. This is a PAL workload case, not an original-hardware measurement.
+Both revised 35 s short probes after completion of the two sustained core runs
+passed, including an actual validated checkpoint per region, a shared SQLite
+scan and real WPF status requests. NTSC: 36.232 s process duration including
+cleanup, 34.427 hardware seconds, ready at 7.172 s, cumulative 33.297 ms; PAL:
+35.201 s, 34.415 hardware seconds, ready at 6.856 s, cumulative 20.005 ms.
+1809/1518 mapped ARGB fields match exactly, with 0 owner drops and 0 observation
+gaps; observed managed-memory maxima were 44.0/25.1 MB. This explicitly does
+not yet establish hours-long operation.
 
-Die erste Entwicklungsprobe hatte normale Queue-Verwerfungen beim Disconnect
-noch in den als Messphase beschrifteten Dropzähler einbezogen. Ihre Originale
-bleiben erhalten. Die überarbeitete Probe friert die A/V-Zähler vor Close ein
-und trennt Shutdown-Verwerfungen: beide Messphasen0, Shutdown21/17. Sie leert
-zum Ende auch den letzten angebrochenen Diagnoseabschnitt, sichert die jeweils
-maximalen Cold-/Steady-Observations und höchstens128 letzte Zeilen. Keine Metrik
-wird zurückgesetzt oder gekappt. Die gelieferte NTSC-Kurzphasen-PCM ist stumm;
-PAL enthält wenige nichtnull Stereo-Samples. Amplituden werden ehrlich gezählt,
-nicht als gehörtes oder physisch verifiziertes Audio ausgegeben.
+The first development probe included normal queue discards during disconnect
+in the drop counter labeled as the measurement phase. Its originals are
+retained. The revised probe freezes A/V counters before close and separates
+shutdown discards: both measurement phases 0, shutdown 21/17. It also flushes
+the final partial diagnostic segment, saves the maximum cold/steady
+observations and at most the last 128 rows. No metric is reset or capped. The
+delivered NTSC short-phase PCM is silent; PAL contains a few nonzero stereo
+samples. Amplitudes are counted honestly and are not presented as audio that
+was heard or physically verified.
 
-Der Dauertest beginnt erst auf dem geprüften sauberen Implementierungsstand.
+The soak test starts only on the verified clean implementation version.
 
-## Fehler im älteren Runtime-Smoke
+## Failures in the earlier runtime smoke test
 
-Der vollständige Lauf auf c470d7c bestand die Core-, CPU-, Bus- und SPC-Korpora,
-brach jedoch beim ersten nativen Runtime-Smoke mit `mapping menu path` ab.
-Dieser Gesamtlauf bleibt fehlgeschlagen; die folgenden Windows-Gruppen wurden
-dabei noch nicht erreicht. Der Smoke sendete F11 und unmittelbar danach weitere
-synthetische Tasten, während HandleKey den tatsächlichen Desktopfokus prüfte.
-Ein Fokuswechsel ist bei einem nativen Fullscreenwechsel möglich; der damalige
-Fokus wurde nicht gespeichert, deshalb ist dies kein bewiesener historischer
-Ursachenbefund. Der Test pinnt nun ausdrücklich seinen synthetischen Fokus und
-neutrale Eingaben, wie bereits InteractionSmoke. Echte Fokusverlustlogik wird
-weiter separat dort geprüft; die Produktlogik bleibt unverändert. Fehlerberichte
-enthalten künftig Menü, Selection und Runtime. Nur die noch fehlenden nativen
-Stufen werden hierfür erneut ausgeführt, keine unveränderten CPU-Vollkorpora.
-Die folgende Persistenzprobe auf f982ae9 verließ ihr natives Fenster nach rund
-36s vor dem erwarteten Abschluss. Die damalige Abschlussstufe war nicht
-protokolliert; eine externe Schließaktion oder Produktursache ist nicht bewiesen.
-Auch dieser Fehllauf bleibt erhalten. Die Persistenzprobe verwendet nun ebenfalls
-synthetisch neutralen Fokus und schreibt bei Assertionfehlern Stage, Laufzeit,
-Menü und gesammelte Metrics. Das ändert weder Speicherpolitik noch Zeitbudgets.
+The full run on c470d7c passed the core, CPU, bus and SPC corpora but aborted
+at the first native runtime smoke test with `mapping menu path`. This overall
+run remains failed; it did not reach the subsequent Windows groups. The smoke
+test sent F11 and immediately followed it with more synthetic keys while
+HandleKey checked actual desktop focus. Focus can change during a native
+fullscreen transition; focus at the time was not recorded, so this is not a
+proven historical cause. The test now explicitly pins its synthetic focus and
+neutral inputs, as InteractionSmoke already does. Actual focus-loss logic is
+still tested separately there; product logic is unchanged. Failure reports
+will include menu, selection and runtime. Only the missing native stages are
+rerun for this purpose, without rerunning unchanged full CPU corpora.
+
+The subsequent persistence probe on f982ae9 exited its native window after
+around 36 s, before the expected completion. Its completion stage at the time
+was not logged; neither an external close action nor a product cause is proven.
+This failed run is also retained. The persistence probe now also uses synthetic
+neutral focus and records stage, elapsed time, menu and collected metrics on
+assertion failures. This changes neither persistence policy nor time budgets.

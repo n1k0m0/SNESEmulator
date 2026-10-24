@@ -29,7 +29,7 @@ public sealed class MainWindow : Window
     };
     private readonly TextBlock banner = new()
     {
-        Text = "Emulatorinstanz wählen",
+        Text = "Select an emulator instance",
         FontSize = 16,
         Margin = new(12)
     }, notice = new()
@@ -70,7 +70,7 @@ public sealed class MainWindow : Window
     };
     private readonly CheckBox favorite = new()
     {
-        Content = "Favorit"
+        Content = "Favorite"
     };
     private readonly ListBox states = new()
     {
@@ -134,8 +134,8 @@ public sealed class MainWindow : Window
         };
         top.Children.Add(choice);
         choice.Children.Add(instances);
-        choice.Children.Add(Button("Instanzen aktualisieren", () => RefreshAsync(true)));
-        choice.Children.Add(Button("Emulator starten", StartEmulator));
+        choice.Children.Add(Button("Refresh instances", () => RefreshAsync(true)));
+        choice.Children.Add(Button("Start emulator", StartEmulator));
         DockPanel.SetDock(notice, Dock.Bottom);
         root.Children.Add(notice);
         root.Children.Add(tabs);
@@ -144,7 +144,7 @@ public sealed class MainWindow : Window
         home.Children.Add(dashboard);
         var homeActions = new WrapPanel();
         home.Children.Add(homeActions);
-        home.Children.Add(new TextBlock { Text = "Zuletzt gestartet", Margin = new(18, 12, 18, 0), FontSize = 16 });
+        home.Children.Add(new TextBlock { Text = "Recently played", Margin = new(18, 12, 18, 0), FontSize = 16 });
         home.Children.Add(recent);
         recent.MouseDoubleClick += (_, _) =>
         {
@@ -154,31 +154,31 @@ public sealed class MainWindow : Window
                 Run(Play);
             }
         };
-        homeActions.Children.Add(Button("Fortsetzen", () => SetMode(false, false)));
+        homeActions.Children.Add(Button("Resume", () => SetMode(false, false)));
         homeActions.Children.Add(Button("Pause", () => SetMode(true, false)));
         homeActions.Children.Add(Button("Turbo", () => SetMode(false, true)));
-        homeActions.Children.Add(Button("Reset (gewählter Modus; SRAM bleibt)", () => Send("Reset")));
+        homeActions.Children.Add(Button("Reset (selected mode; preserve SRAM)", () => Send("Reset")));
         AddTab("Dashboard", home);
         var lib = new DockPanel();
         var tools = new WrapPanel();
         DockPanel.SetDock(tools, Dock.Top);
         lib.Children.Add(tools);
         tools.Children.Add(search);
-        tools.Children.Add(Button("Suchen", ReloadLibrary));
-        tools.Children.Add(Button("Ordner scannen", Scan));
-        tools.Children.Add(Button("Scan abbrechen", () =>
+        tools.Children.Add(Button("Search", ReloadLibrary));
+        tools.Children.Add(Button("Scan folder", Scan));
+        tools.Children.Add(Button("Cancel scan", () =>
         {
             scanCancellation?.Cancel();
             return Task.CompletedTask;
         }, false));
-        tools.Children.Add(Button("Datenbank wiederherstellen", RecoverDatabase));
+        tools.Children.Add(Button("Recover database", RecoverDatabase));
         foreach (var(header, binding, width)in new[]
         {
-            ("Spiel", "Title", 220d),
-            ("Datei", "Path", 380d),
-            ("Vorhanden", "Exists", 80d),
-            ("Favorit", "Favorite", 65d),
-            ("Zuletzt gestartet", "LastPlayed", 170d)
+            ("Game", "Title", 220d),
+            ("File", "Path", 380d),
+            ("Available", "Exists", 80d),
+            ("Favorite", "Favorite", 65d),
+            ("Recently played", "LastPlayed", 170d)
         }
 
         )
@@ -194,9 +194,9 @@ public sealed class MainWindow : Window
         detail.Children.Add(notes);
         var actions = new WrapPanel();
         detail.Children.Add(actions);
-        actions.Children.Add(Button("Spielen", Play));
-        actions.Children.Add(Button("Notizen / Favorit speichern", SaveGame));
-        actions.Children.Add(Button("Fehlende Datei neu zuordnen", Relink));
+        actions.Children.Add(Button("Play", Play));
+        actions.Children.Add(Button("Save notes / favorite", SaveGame));
+        actions.Children.Add(Button("Relink missing file", Relink));
         games.SelectionChanged += (_, _) =>
         {
             if (games.SelectedItem is GameItem g)
@@ -205,18 +205,18 @@ public sealed class MainWindow : Window
                 notes.Text = g.Notes;
             }
         };
-        AddTab("Bibliothek", lib);
+        AddTab("Library", lib);
         var saves = new DockPanel();
         var stateActions = new WrapPanel();
         DockPanel.SetDock(stateActions, Dock.Top);
         saves.Children.Add(stateActions);
-        stateActions.Children.Add(Button("Aktualisieren", ReloadStates));
-        stateActions.Children.Add(Button("Neu speichern", CreateState));
-        stateActions.Children.Add(Button("Laden", LoadState));
-        stateActions.Children.Add(Button("Recovery prüfen / anwenden", RecoverState));
-        stateActions.Children.Add(Button("Importieren", ImportState));
-        stateActions.Children.Add(Button("Exportieren", ExportState));
-        stateActions.Children.Add(Button("Logisch löschen", DeleteState));
+        stateActions.Children.Add(Button("Refresh", ReloadStates));
+        stateActions.Children.Add(Button("Save new state", CreateState));
+        stateActions.Children.Add(Button("Load", LoadState));
+        stateActions.Children.Add(Button("Check / apply recovery", RecoverState));
+        stateActions.Children.Add(Button("Import", ImportState));
+        stateActions.Children.Add(Button("Export", ExportState));
+        stateActions.Children.Add(Button("Delete state and backup", DeleteState));
         var stateDetails = new StackPanel
         {
             Width = 390,
@@ -226,11 +226,11 @@ public sealed class MainWindow : Window
         saves.Children.Add(stateDetails);
         stateDetails.Children.Add(preview);
         stateDetails.Children.Add(stateInfo);
-        stateDetails.Children.Add(new TextBlock { Text = "Anzeigename (nur Manager-Metadaten)" });
+        stateDetails.Children.Add(new TextBlock { Text = "Display name (manager metadata only)" });
         stateDetails.Children.Add(stateName);
-        stateDetails.Children.Add(new TextBlock { Text = "Manuelle Spielzuordnung (Metadaten)" });
+        stateDetails.Children.Add(new TextBlock { Text = "Manual game assignment (metadata)" });
         stateDetails.Children.Add(stateGame);
-        stateDetails.Children.Add(Button("Metadaten speichern", SaveMetadata));
+        stateDetails.Children.Add(Button("Save metadata", SaveMetadata));
         saves.Children.Add(states);
         var stateHeader = new FrameworkElementFactory(typeof(TextBlock));
         stateHeader.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding("Name") { Converter = new GameGroupConverter(() => model.Games) });
@@ -242,19 +242,19 @@ public sealed class MainWindow : Window
         var settingsTools = new WrapPanel();
         DockPanel.SetDock(settingsTools, Dock.Top);
         settings.Children.Add(settingsTools);
-        settingsTools.Children.Add(Button("Aktuelle Einstellungen laden", LoadSettings));
-        settingsTools.Children.Add(Button("Validieren und anwenden", ApplySettings));
+        settingsTools.Children.Add(Button("Load current settings", LoadSettings));
+        settingsTools.Children.Add(Button("Validate and apply", ApplySettings));
         DockPanel.SetDock(settingsNotice, Dock.Top);
         settings.Children.Add(settingsNotice);
         settings.Children.Add(new ScrollViewer { Content = settingRows, VerticalScrollBarVisibility = ScrollBarVisibility.Auto });
-        AddTab("Einstellungen", settings);
-        AddTab("Katalog", new TextBlock { Text = "Kein freigegebener SNES-Provider eingerichtet. Der Katalog bleibt deaktiviert. Eigene .sfc/.smc-Dateien können lokal importiert werden.", Margin = new(24), TextWrapping = TextWrapping.Wrap, FontSize = 17 });
+        AddTab("Settings", settings);
+        AddTab("Catalog", new TextBlock { Text = "No approved SNES provider is configured. The catalog is disabled. You can import your own .sfc/.smc files locally.", Margin = new(24), TextWrapping = TextWrapping.Wrap, FontSize = 17 });
         instances.SelectionChanged += (_, _) =>
         {
             if (refreshingSelection)
                 return;
             var next = instances.SelectedItem as InstanceInfo;
-            if (model.SettingsDirty && next != model.Selected && MessageBox.Show(this, "Nicht angewendeten Einstellungsentwurf verwerfen?", "Instanz wechseln", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+            if (model.SettingsDirty && next != model.Selected && MessageBox.Show(this, "Discard the unapplied settings draft?", "Switch instance", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
             {
                 refreshingSelection = true;
                 instances.SelectedItem = model.Selected;
@@ -314,7 +314,7 @@ public sealed class MainWindow : Window
     {
         if (operation)
         {
-            notice.Text = "Ein Vorgang läuft bereits.";
+            notice.Text = "An operation is already in progress.";
             return;
         }
 
@@ -328,7 +328,7 @@ public sealed class MainWindow : Window
         }
         catch (OperationCanceledException)
         {
-            notice.Text = "Vorgang abgebrochen; bereits bestätigte Transaktionen bleiben erhalten.";
+            notice.Text = "Operation canceled; committed transactions are preserved.";
         }
         catch (Exception e)
         {
@@ -378,7 +378,7 @@ public sealed class MainWindow : Window
         if (args.Length > 16 || args.Any(x => x.Length > 1024))
             throw new ArgumentException("Argument budget");
         if (argumentQueue.Count >= 8)
-            throw new InvalidOperationException("Aktivierungsqueue voll; bitte erneut versuchen.");
+            throw new InvalidOperationException("Activation queue is full; please try again.");
         argumentQueue.Enqueue(args.ToArray());
         if (IsLoaded && !operation)
             Run(DrainArguments);
@@ -401,7 +401,7 @@ public sealed class MainWindow : Window
         if (int.TryParse(Argument(args, "--connect"), out int pid))
         {
             if (model.SettingsDirty && model.Selected?.ProcessId != pid)
-                throw new InvalidOperationException("Nicht angewendeter Einstellungsentwurf: Instanzwechsel zuerst bestätigen.");
+                throw new InvalidOperationException("Settings draft has unapplied changes: confirm the instance switch first.");
             requestedPid = pid;
         }
 
@@ -445,8 +445,8 @@ public sealed class MainWindow : Window
 
             if (model.Selected == null)
             {
-                banner.Text = requestedPid.HasValue ? $"Instanz {requestedPid} nicht verbunden" : "Emulatorinstanz ausdrücklich wählen";
-                dashboard.Text = "Manager bereit. Bibliothek und Savestates sind auch ohne laufenden Emulator verfügbar.";
+                banner.Text = requestedPid.HasValue ? $"Instance {requestedPid} is not connected" : "Select an emulator instance explicitly";
+                dashboard.Text = "Manager ready. The library and savestates are available even when the emulator is not running.";
                 return;
             }
 
@@ -454,8 +454,8 @@ public sealed class MainWindow : Window
             if (!response.Success)
                 throw new IOException(response.Code + ": " + response.Message);
             var s = response.Value<StatusInfo>();
-            banner.Text = $"Verbunden mit PID{s.ProcessId} · {s.Network}";
-            dashboard.Text = $"{s.Title}\n{s.CartridgeHash}\nFeld{s.Field} · Epoche{s.Epoch} · {(s.Paused ? "Pause" : "LÃ¤uft")} · Turbo{s.Turbo} · Menü{s.MenuOpen}\n{s.RomPath}\n{s.Fault}";
+            banner.Text = $"Connected to PID {s.ProcessId} · {s.Network}";
+            dashboard.Text = $"{s.Title}\n{s.CartridgeHash}\nField {s.Field} · Epoch {s.Epoch} · {(s.Paused ? "Paused" : "Running")} · Turbo {s.Turbo} · Menu {s.MenuOpen}\n{s.RomPath}\n{s.Fault}";
         }
         catch (Exception e)when (e is IOException or OperationCanceledException)
         {
@@ -471,11 +471,11 @@ public sealed class MainWindow : Window
     private async Task<Response> Send(string command, object? payload = null)
     {
         if (model.Selected == null)
-            throw new InvalidOperationException("Zuerst eine konkrete Emulatorinstanz wählen.");
+            throw new InvalidOperationException("Select a specific emulator instance first.");
         var response = await new IpcClient(model.Selected).SendAsync(Request.Create(command, payload), lifetime.Token);
         if (!response.Success)
             throw new IOException(response.Code + ": " + response.Message);
-        notice.Text = "Bestätigt: " + command;
+        notice.Text = "Acknowledged: " + command;
         return response;
     }
 
@@ -529,7 +529,7 @@ public sealed class MainWindow : Window
     {
         var dialog = new OpenFolderDialog
         {
-            Title = "Lokale SNES-Bibliothek"
+            Title = "Local SNES library"
         };
         if (dialog.ShowDialog(this) != true)
             return;
@@ -538,7 +538,7 @@ public sealed class MainWindow : Window
         try
         {
             int n = await library.ScanAsync(dialog.FolderName, cancel.Token);
-            notice.Text = $"{n} gültige Dateien erfasst.";
+            notice.Text = $"Indexed {n} valid files.";
             await ReloadLibrary();
         }
         finally
@@ -547,7 +547,7 @@ public sealed class MainWindow : Window
         }
     }
 
-    private GameItem Game() => games.SelectedItem as GameItem ?? throw new InvalidOperationException("Ein Spiel in der Bibliothek wählen.");
+    private GameItem Game() => games.SelectedItem as GameItem ?? throw new InvalidOperationException("Select a game in the library.");
     private async Task SaveGame()
     {
         var g = Game();
@@ -559,7 +559,7 @@ public sealed class MainWindow : Window
     {
         var g = Game();
         if (!File.Exists(g.Path))
-            throw new FileNotFoundException("Datei fehlt. Neu zuordnen.", g.Path);
+            throw new FileNotFoundException("File is missing. Relink it.", g.Path);
         await EnsureInstance();
         if (model.Selected == null)
             return;
@@ -587,11 +587,11 @@ public sealed class MainWindow : Window
     {
         if (library.Notice == null)
         {
-            notice.Text = "Datenbank ist gültig.";
+            notice.Text = "Database is valid.";
             return;
         }
 
-        if (MessageBox.Show(this, "Beschädigte Datenbank unverändert aufbewahren und eine neue Metadatenbank anlegen? ROMs und Savestates bleiben erhalten.", "Explizite Datenbank-Recovery", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+        if (MessageBox.Show(this, "Preserve the damaged database unchanged and create a new metadata database? ROMs and savestates will be retained.", "Database recovery", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
             return;
         await Task.Run(() => library.RecoverAsync(lifetime.Token));
         await ReloadLibrary();
@@ -599,7 +599,7 @@ public sealed class MainWindow : Window
 
     private async Task LoadSettings()
     {
-        if (model.SettingsDirty && MessageBox.Show(this, "Nicht angewendete Änderungen verwerfen?", "Einstellungen", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+        if (model.SettingsDirty && MessageBox.Show(this, "Discard unapplied changes?", "Settings", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
             return;
         var target = model.Selected;
         if (target != null)
@@ -610,7 +610,7 @@ public sealed class MainWindow : Window
             {
                 settingsReadThread = Environment.CurrentManagedThreadId;
                 if (Discovery.List().Count > 0)
-                    throw new InvalidOperationException("Laufende Instanz wählen, bevor Einstellungen bearbeitet werden.");
+                    throw new InvalidOperationException("Select a running instance before editing settings.");
                 var value = EmulatorSettings.Load();
                 SNESEmulator.Core.InputBindings.Ensure(value);
                 return new SettingsInfo(0, JsonSerializer.SerializeToElement(value), typeof(EmulatorSettings).GetProperties().Where(p => p.CanWrite&&p.Name!="AdditionalSettings").ToDictionary(p => p.Name, p => "NEXT EMULATOR START"), value.PersistenceNotice);
@@ -690,7 +690,7 @@ public sealed class MainWindow : Window
             }
             else if (property.Name is "Filter" or "Upscale" or "ControllerPort")
             {
-                string[] choices = property.Name == "Filter" ? ["Scharf", "CRT", "TV"] : property.Name == "Upscale" ? ["Aus", "Scale2x", "Scale3x", "HQ2x", "HQ3x", "HQ4x"] : ["Controller1", "Controller2"];
+                string[] choices = property.Name == "Filter" ? ["Sharp", "CRT", "TV"] : property.Name == "Upscale" ? ["Off", "Scale2x", "Scale3x", "HQ2x", "HQ3x", "HQ4x"] : ["Controller1", "Controller2"];
                 int offset = property.Name == "ControllerPort" ? 1 : 0;
                 var combo = new ComboBox
                 {
@@ -726,31 +726,31 @@ public sealed class MainWindow : Window
 
     private static readonly Dictionary<string, string> SettingLabels = new()
     {
-        ["AudioVolume"] = "Lautstärke0–100%",
-        ["Filter"] = "Bildfilter",
-        ["Upscale"] = "Bildskalierung",
-        ["Fullscreen"] = "Vollbild",
-        ["Gamepad"] = "Gamepad aktiv",
-        ["ControllerPort"] = "Lokaler Controller",
-        ["GamepadDevice"] = "Gamepadgerät (-1=erstes;0–255)",
-        ["GamepadControls"] = "12 SNES-Tasten (; = alternativ, & = gleichzeitig)",
-        ["GamepadActions"] = "Gamepad-Menüaktionen (; alternativ, & gleichzeitig)",
-        ["KeyboardControls"] = "Tastatur/Hotkeys (; alternativ, & gleichzeitig)",
-        ["RenderFrameLimit"] = "Darstellungsrate (0=unbegrenzt,60,120 Hz)",
-        ["PresentationVSync"] = "Darstellung mit VSync",
-        ["VideoZoom"] = "Bildrand um10% beschneiden",
-        ["VideoStretch"] = "Bild auf gesamte Fensterbreite strecken",
+        ["AudioVolume"] = "Volume (0–100%)",
+        ["Filter"] = "Video filter",
+        ["Upscale"] = "Video scaling",
+        ["Fullscreen"] = "Fullscreen",
+        ["Gamepad"] = "Enable gamepad",
+        ["ControllerPort"] = "Local controller",
+        ["GamepadDevice"] = "Gamepad device (-1=first; 0–255)",
+        ["GamepadControls"] = "12 SNES buttons (; = alternatives, & = together)",
+        ["GamepadActions"] = "Gamepad menu actions (; alternatives, & together)",
+        ["KeyboardControls"] = "Keyboard / hotkeys (; alternatives, & together)",
+        ["RenderFrameLimit"] = "Presentation rate (0=unlimited, 60, 120 Hz)",
+        ["PresentationVSync"] = "Present with VSync",
+        ["VideoZoom"] = "Crop image border by 10%",
+        ["VideoStretch"] = "Stretch image to full window width",
         ["TurboMode"] = "Turbo (Host)",
-        ["ResetMode"] = "Resetmodus (Warm/Power; SRAM bleibt)",
-        ["MediaDirectory"] = "Medienordner",
-        ["Host"] = "LAN-Server",
-        ["Port"] = "LAN-Port1–65535",
-        ["RelayHost"] = "Relay-Server",
-        ["RelayPort"] = "Relay-Port1–65535",
-        ["ConnectionId"] = "Relay-Sitzung",
-        ["PlayerName"] = "Spielername",
-        ["Relay"] = "Relay statt LAN",
-        ["Observer"] = "Als Zuschauer verbinden"
+        ["ResetMode"] = "Reset mode (Warm/Power; preserve SRAM)",
+        ["MediaDirectory"] = "Media folder",
+        ["Host"] = "LAN server",
+        ["Port"] = "LAN port (1–65535)",
+        ["RelayHost"] = "Relay server",
+        ["RelayPort"] = "Relay port (1–65535)",
+        ["ConnectionId"] = "Relay session",
+        ["PlayerName"] = "Player name",
+        ["Relay"] = "Use relay instead of LAN",
+        ["Observer"] = "Connect as observer"
     };
     private static readonly string[] BindingChoices = new[]
     {
@@ -759,9 +759,9 @@ public sealed class MainWindow : Window
     private async Task ApplySettings()
     {
         if (model.LoadedSettings == null)
-            throw new InvalidOperationException("Zuerst aktuelle Einstellungen laden.");
+            throw new InvalidOperationException("Load the current settings first.");
         if (model.SettingsInstance != model.Selected)
-            throw new InvalidOperationException("Einstellungsentwurf gehört zu einer anderen Instanz. Neu laden.");
+            throw new InvalidOperationException("The settings draft belongs to another instance. Reload it.");
         var values = new Dictionary<string, JsonElement>();
         foreach (var p in model.LoadedSettings.Settings.EnumerateObject())
         {
@@ -779,20 +779,20 @@ public sealed class MainWindow : Window
         string before = JsonSerializer.Serialize(candidate);
         candidate.Validate();
         if (before != JsonSerializer.Serialize(candidate))
-            throw new InvalidDataException("Ungültige Werte oder Bindings; nichts angewendet.");
+            throw new InvalidDataException("Invalid values or bindings; no changes applied.");
         if (model.Selected == null)
         {
             if (await Task.Run(() => Discovery.List().Count > 0, lifetime.Token))
-                throw new InvalidOperationException("Instanz wurde gestartet. Verbinden und Einstellungen erneut laden.");
+                throw new InvalidOperationException("An instance has started. Connect and reload the settings.");
             await Task.Run(() => SNESEmulator.Runtime.SettingsPersistence.WriteOrdered(candidate.Serialize()), lifetime.Token);
-            notice.Text = "Gespeichert für nächsten Emulatorstart.";
+            notice.Text = "Saved for the next emulator start.";
         }
         else
         {
             var ack = (await Send("ApplySettings", new ApplySettings(model.Revision, json))).Value<SettingsInfo>();
             model.Revision = ack.Revision;
             model.LoadedSettings = ack;
-            notice.Text = "Vom Emulator bestätigt und angewendet. NEXT CONNECTION gilt erst bei neuer Verbindung.";
+            notice.Text = "Acknowledged and applied by the emulator. NEXT CONNECTION takes effect when a new connection is established.";
         }
 
         model.SettingsDirty = false;
@@ -868,7 +868,7 @@ public sealed class MainWindow : Window
         states.ItemsSource = view;
     }
 
-    private StateInfo State() => states.SelectedItem as StateInfo ?? throw new InvalidOperationException("Savestate wählen.");
+    private StateInfo State() => states.SelectedItem as StateInfo ?? throw new InvalidOperationException("Select a savestate.");
     private async Task<Cartridge> MatchingCart(StateInfo state)
     {
         string? hash;
@@ -883,7 +883,7 @@ public sealed class MainWindow : Window
 
         var g = model.Games.FirstOrDefault(g => g.Hash == hash && File.Exists(g.Path)) ?? (games.SelectedItem as GameItem);
         if (g == null)
-            throw new InvalidOperationException("Passendes Spiel in Bibliothek wählen.");
+            throw new InvalidOperationException("Select the matching game in the library.");
         return await Task.Run(() => new Cartridge(AtomicFile.ReadBytes(g.Path, 8 * 1024 * 1024 + 512), g.Path), lifetime.Token);
     }
 
@@ -919,7 +919,7 @@ public sealed class MainWindow : Window
         }
 
         if (data.Error != null && data.RecoveryAvailable)
-            stateInfo.Text += "\nValidierte Backup-Recovery kann ausdrücklich geprüft werden.";
+            stateInfo.Text += "\nRecovery from a validated backup is available for explicit review.";
     }
 
     private async Task CreateState()
@@ -927,7 +927,7 @@ public sealed class MainWindow : Window
         await EnsureInstance();
         var s = (await Send("Status")).Value<StatusInfo>();
         if (s.CartridgeHash.Length == 0)
-            throw new InvalidOperationException("Cartridge laden.");
+            throw new InvalidOperationException("Load a cartridge.");
         string folder = Path.Combine(UserDataPaths.GetSaveDirectory(), s.CartridgeHash);
         string path = Path.Combine(folder, DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-fff") + ".snessav");
         await Send("SaveState", new PathCommand(path, s.Epoch));
@@ -944,7 +944,7 @@ public sealed class MainWindow : Window
         var status = (await Send("Status")).Value<StatusInfo>();
         if (status.CartridgeHash != hash)
         {
-            var matching = model.Games.FirstOrDefault(g => g.Hash == hash && File.Exists(g.Path)) ?? throw new InvalidOperationException("Passendes ROM fehlt in der Bibliothek. Datei scannen oder neu zuordnen.");
+            var matching = model.Games.FirstOrDefault(g => g.Hash == hash && File.Exists(g.Path)) ?? throw new InvalidOperationException("The matching ROM is missing from the library. Scan or relink the file.");
             // Validate a complete owned state before changing the selected cartridge.
             byte[] prepared=await Task.Run(()=>{
                 var cartridge=new Cartridge(AtomicFile.ReadBytes(matching.Path,8*1024*1024+512),matching.Path);
@@ -975,7 +975,7 @@ public sealed class MainWindow : Window
         var recovered = await Task.Run(() => StateCatalog.Preview(state.Path, cart, true), lifetime.Token);
         if (recovered.Error != null)
             throw new InvalidDataException(recovered.Error);
-        if (!confirmed && MessageBox.Show(this, "Validiertes Backup als neue Primärdatei wiederherstellen? Beschädigte Datei wird aufbewahrt.", "State-Recovery", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+        if (!confirmed && MessageBox.Show(this, "Restore the validated backup as the new primary file? The damaged file will be retained.", "State recovery", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
             return;
         await Task.Run(() => StateCatalog.Recover(state.Path, cart), lifetime.Token);
         await PreviewState();
@@ -1008,13 +1008,13 @@ public sealed class MainWindow : Window
         if (pick.ShowDialog(this) != true)
             return;
         await Task.Run(() => StateCatalog.Import(state.Path, pick.FileName, cart), lifetime.Token);
-        notice.Text = "Validierte unveränderte Statebytes exportiert.";
+        notice.Text = "Exported validated, unchanged state bytes.";
     }
 
     private async Task DeleteState()
     {
         var state = State();
-        if (MessageBox.Show(this, "Primärdatei und Backup logisch löschen? Aufbewahrte beschädigte Generationen bleiben erhalten.", "Savestate löschen", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+        if (MessageBox.Show(this, "Delete the primary file and backup? Retained damaged generations will be preserved.", "Delete savestate", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
             return;
         await Task.Run(() => AtomicFile.DeleteLogical(state.Path), lifetime.Token);
         await ReloadStates();

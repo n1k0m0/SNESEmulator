@@ -1,73 +1,74 @@
-# M9g followup: Beschriftung und offene Software-A/V-Abnahme
+# M9g followup: labels and outstanding software A/V acceptance
 
-Die unabhängige Root-Abnahme auf `8daf478` ist **fehlgeschlagen**:285 portable
-und31 von32 Windowsgruppen sowie151 Interaktionsstufen bestanden; die
-Software-A/V-Gruppe überschritt40ms. Ein späterer grüner Einzellauf behebt
-diesen Befund nicht. M9 und Release bleiben unvollständig.
+Independent Root acceptance on `8daf478` **failed**: 285 portable groups,
+31 of 32 Windows groups and 151 interaction stages passed; the software A/V
+group exceeded 40 ms. A later passing individual run does not resolve this
+finding. M9 and the release remain incomplete.
 
-## Beschriftung
+## Labels
 
-`4a35520` setzt ausschließlich `BindingEditor`-Hilfe `UseMnemonic=false`.
-WinForms zeigt damit das wörtliche `&` als Chordtrenner. Die vorhandene echte
-151-Stufenprobe bestand; Implementierungsagent und Root prüften das korrigierte
-Bild `artifacts/m9g-followup label interaction/manual-binding-editor.png`.
-Weitere Beschriftungstests wurden nicht verlangt oder ausgeführt.
+`4a35520` only sets `UseMnemonic=false` on the `BindingEditor` help text.
+WinForms therefore displays the literal `&` as the chord separator. The existing
+151-stage probe using real windows passed; the implementation agent and Root
+checked the corrected image
+`artifacts/m9g-followup label interaction/manual-binding-editor.png`.
+No further label tests were requested or performed.
 
-## Getrennte Beobachtungen
+## Separate observations
 
-| Lauf | Ergebnis und tatsächlicher Umfang |
+| Run | Result and actual scope |
 |---|---|
-| Root-Vollgate auf8daf478 | Rot: kumulatives Software-A/V-Maximum49.9420215ms; Cold2.4943818s, anschließend5.0049301s,294 Video/301 Audio/294 Driververgleiche,22 kumulative Drops,Faultnull. Cold/steady-Zuordnung des Maximums unbekannt. |
-| Eigener isolierter Beobachtungslauf01 | Unverändertes30s-Readinessbudget verfehlt, kein gültiger Driververgleich. Früher Entwurf exportierte vor diesem Abbruch noch keine detaillierten Zeilen; Rohlog/Report erhalten. |
-| Eigener isolierter Beobachtungslauf02 | Dasselbe Readinessbudget verfehlt;1757 Videoauswahlen gespeichert, keine gültige Driverprobe. Kein Repro des Root49.942ms-Befundes. |
-| Eigener instrumentierter13-Gruppenlauf aufa6c6c91 |13/13 bestanden. Cold2.833526s, anschließend5.0089651s,288 Video/301 Audio/288 Driververgleiche,24 kumulative Drops,Faultnull.414 Videoauswahlen gespeichert, davon321 mit gültiger Auswahlprobe. |
+| Full Root gate on 8daf478 | Failed: cumulative software A/V maximum 49.9420215 ms; cold phase 2.4943818 s, then 5.0049301 s, 294 video/301 audio/294 driver comparisons, 22 cumulative drops, Fault null. Whether the maximum occurred during the cold or steady phase is unknown. |
+| Separate isolated observation run 01 | Missed the unchanged 30 s readiness budget, with no valid driver comparison. The early implementation did not export detailed rows before this abort; the raw log/report are retained. |
+| Separate isolated observation run 02 | Missed the same readiness budget; 1757 video selections recorded, with no valid driver sample. Did not reproduce Root's 49.942 ms finding. |
+| Separate instrumented 13-group run on a6c6c91 | 13/13 passed. Cold phase 2.833526 s, then 5.0089651 s, 288 video/301 audio/288 driver comparisons, 24 cumulative drops, Fault null. 414 video selections recorded, including 321 with a valid selection sample. |
 
-Nur der letzte neue Lauf erlaubt eine Zuordnung: Sein kumulatives Maximum
-16.6594747ms entstand **vor** Messbeginn, bei Source1.996711619s und
-Playhead2.013371094s. Während der Messphase betrugen die Maxima7.9438285ms
-bei Auswahl,7.8813285ms vor Commit und7.7782493ms nach dem Callback.
-Die größte beobachtete Auswahl→Commit-Zeit betrug10µs, der längste Callback
-1.0234ms. Diese Daten rekonstruieren den ursprünglichen Rootlauf nicht.
+Only the final new run allows the maximum to be assigned to a phase: its
+cumulative maximum of 16.6594747 ms occurred **before** measurement began, at
+Source 1.996711619 s and Playhead 2.013371094 s. During measurement, the maxima
+were 7.9438285 ms at selection, 7.8813285 ms before commit and 7.7782493 ms after
+the callback. The longest observed selection→commit interval was 10 µs, and the
+longest callback was 1.0234 ms. These data do not reconstruct the original Root run.
 
-## Beobachtungswerkzeug und Grenzen
+## Observation tooling and limits
 
-`52fbbcc`/`a6c6c91` ergänzen ausschließlich opt-in Diagnose und ihren Test.
-`SNESEMULATOR_AV_OBSERVE=1` aktiviert im tatsächlichen Netzwerk-Test eine auf4096
-Videozeilen begrenzte Aufzeichnung: Source, Ankunft, Fälligkeit, Generation,
-Auswahl-/Commit-/Nach-Callbackzeit sowie jeweilige Driverplayheads und Ergebnis.
-Der Export erfolgt auch bei Readinessfehlern. Der erfasste Playout-Owner bleibt
-für den Export nach einem erfolgreichen Disconnect erhalten.
+`52fbbcc`/`a6c6c91` add only opt-in diagnostics and their test.
+`SNESEMULATOR_AV_OBSERVE=1` enables recording in the actual network test, limited
+to 4096 video rows: source, arrival, due time, generation, selection/commit/
+post-callback times, and the corresponding driver playheads and result.
+Export also runs after readiness failures. The captured playout owner is
+retained for export after a successful disconnect.
 
-Eine neue portable Gruppe zeigt mit injizierter Zeit, dass die bisherige
-kumulative Metric die bei Auswahl erfasste Probe auch nach dem Callback nutzt.
-Die15 portablen Netzwerkgruppen bestanden **unter Windows** auf sauberem52fbbcc;
-die folgende a6c6c91-Änderung betrifft nur den Windows-Testexport. Keine neue
-Linuxprobe wurde ausgeführt; Linux59 auf7effa47 bleibt ein früherer gezielter
-Portabilitätsnachweis.
+A new portable group uses injected time to show that the existing cumulative
+metric continues using the sample captured at selection after the callback.
+The 15 portable network groups passed **on Windows** on clean 52fbbcc; the
+subsequent a6c6c91 change affects only Windows test export. No new Linux probe
+was run; Linux 59 on 7effa47 remains an earlier targeted portability check.
 
-Die Auswahl- und Messpolicy bleibt unverändert, ebenso das kumulative40ms-Gate:
-Audio prüft separat100ms Wall-Lateness (`error > .1`); Video prüft100ms
-Source/Playhead-Abstand (`Abs(playhead-source) > .1`). Der erlaubte Videobereich
-zwischen40 und100ms ist ein konkreter Prüfpunkt für die nächste A/V-Phase,
-kein rückwirkender Ursachenbeweis für den Rootlauf. Cold wurde nicht aus der
-Metric entfernt. Keine Prioritäts-, Affinity-, Power-, Core- oder DSPänderung,
-kein Stop fremder Prozesse und keine weitere Produktausführung nach dem
-abschließenden13-Gruppenlauf.
+The selection and measurement policies are unchanged, as is the cumulative
+40 ms gate: audio separately checks 100 ms wall-clock lateness (`error > .1`);
+video checks a 100 ms source/playhead distance (`Abs(playhead-source) > .1`).
+The permitted video range between 40 and 100 ms is a concrete item to investigate
+in the next A/V phase, not retrospective proof of the cause of the Root failure.
+The cold phase was not removed from the metric. There were no priority,
+affinity, power, core or DSP changes, no unrelated processes were stopped, and
+the product was not run again after the final 13-group run.
 
-## Übergabe an die Performance-/A/V-Phase
+## Handoff to the performance/A/V phase
 
-Root49.942ms und beide Cold-Readinessfehler bleiben offen. Der Folgeauftrag soll
-die Mess-/Commitreihenfolge und den zulässigen alten Videoabstand mit diesen
-begrenzten Beobachtungen gezielt reproduzieren, Cold und Messphase erhalten und
-erst anhand eines konkreten Nachweises Änderungen prüfen. Unbelegte Hostursachen
-oder blinde Wiederholungen bis zu einem grünen Gate ersetzen diese Arbeit nicht.
-Dauerleistung38/62 rote NTSC-Fenster, PAL, Stunden-Soak,18 Audiovergleichszeilen,
-Warm-PPU-Retention, Basiskonsolenaudit und M10 bleiben unverändert offen.
+Root's 49.942 ms result and both cold-start readiness failures remain open.
+Followup work should use these bounded observations to reproduce the
+measurement/commit ordering and the permitted age of selected video, retain
+both cold and measurement phases, and assess changes only after obtaining
+concrete evidence. Unsupported claims about host causes or blind reruns until
+a gate passes do not replace this work. Sustained performance with 38/62 failing
+NTSC windows, PAL, the hours-long soak, 18 audio comparison rows, warm PPU
+retention, the base console audit and M10 remain open.
 
-Die Root-Originale unter `artifacts/root-m9g-*` wurden nur gelesen und sind nicht
-Teil der eigenen Sammlung. Der bisherige M9g-Freeze ist unverändert. Der kleine
-Folgefreeze unter `artifacts/m9g-followup-evidence` enthält nur eigene Folgebelege,
-unveränderliche Commitquellen, ein inkrementelles Sourcebundle und benötigte
-neue Binärobjekte; alte Objekte werden per Hash referenziert. Alle ausgewählten
-Objekte und Diskoriginale wurden nach Prozessende vollständig nachgelesen.
-Exakte Hashes und Grenzen stehen in [der Baseline](baselines/m9g.json).
+The Root originals under `artifacts/root-m9g-*` were only read and are not part
+of the followup collection. The existing M9g evidence freeze is unchanged. The
+small followup freeze under `artifacts/m9g-followup-evidence` contains only new
+followup evidence, immutable commit sources, an incremental source bundle and
+required new binary objects; earlier objects are referenced by hash. All
+selected objects and on-disk originals were fully reread after process exit.
+Exact hashes and limits are in [the baseline](baselines/m9g.json).

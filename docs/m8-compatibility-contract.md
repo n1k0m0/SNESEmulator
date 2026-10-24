@@ -54,8 +54,8 @@ uses visible SNES line1 and the selected parity, without image search or shifts:
 | Source | Native extraction |
 |---|---|
 | Own | RGB555 before brightness plus separate4-bit presentation plane |
-| bsnes | 512Ã—480 uint16, row `2*(y+1+(overscan?0:7))+interlaceParity`; lores XÃ—2; swap outer5-bit channel groups, then compare with own digital brightness projection |
-| ares | 564-wide uint32 RGB555 plus brightness in bits15â€“18; row `(y+1+(overscan?0:8)+(PAL?20:0))*yScale+interlaceParity`; X border26 NTSC/22 PAL, lores XÃ—2 |
+| bsnes | 512×480 uint16, row `2*(y+1+(overscan?0:7))+interlaceParity`; lores X×2; swap outer5-bit channel groups, then compare with own digital brightness projection |
+| ares | 564-wide uint32 RGB555 plus brightness in bits15–18; row `(y+1+(overscan?0:8)+(PAL?20:0))*yScale+interlaceParity`; X border26 NTSC/22 PAL, lores X×2 |
 
 Asymmetric red, blue and mixed-color controls prevent a channel-order mistake
 from passing. Ares retains its brightness register during forced blank; own
@@ -109,7 +109,7 @@ sources explicitly return that latch. An own minimal program changes SETINI at
 V64; actual independent field edges are NTSC357368/714736 and PAL425568/851140.
 Old M7 first-field constants358732/716100 and426932/852504 were incorrect.
 
-Savestate format9 rejects formats1â€“8. Older WAI saves did not contain the skipped
+Savestate format9 rejects formats1–8. Older WAI saves did not contain the skipped
 idle remainder, and the previous H0/interlace meanings cannot be migrated
 unambiguously. New format9 retains complete execution, DMA/HDMA, SPC/DSP, native
 field planes and pipeline state. VID3/AUD2 transport stays unchanged.
