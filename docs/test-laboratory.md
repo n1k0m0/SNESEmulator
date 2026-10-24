@@ -2,7 +2,7 @@
 
 ## Current status (M10c, October 24, 2026)
 
-The current source keeps **format 9 for normal carts and format10 for DSP1/SuperFX/SA-1 carts**.
+The current source keeps **format 9 for normal carts and format 10 for DSP1/SuperFX/SA-1 carts**.
 [M10a DSP1](m10a-dsp1.md) adds an own C# uPD7725, explicit local firmware/board
 configuration, rational chip time, isolated state and Manager integration. Raw
 software comparison retains 49 source disagreements; no general game/hardware
@@ -634,3 +634,15 @@ See [M10b SuperFX](m10b-superfx.md) for explicit board configuration, tests and
 retained manufacturer/software/source-author disagreements. Its functional gate
 is separate from the red raw accuracy inventory. SA-1 physical accuracy and final integrated long
 performance/native-hour gates remain pending stages.
+
+
+M10c clean implementation acceptance: SA-1 functional 32, SuperFX 34, DSP1 30,
+worker 27, Manager 16, compatibility-state 27, persistence 15 and existing Core
+129 groups pass on Windows and actual Ubuntu. Four authored CC1/CC2 regional
+ROMs exercise dual CPU math, real IRQ/NMI vector handlers and DMA to PPU pixels;
+arbitrary pending CPU/DMA/conversion states replay. Both platforms retain 14
+normal console outputs, 18,952 SPC resumes and 128 horizons exactly. The original
+author benchmark completes all four pages, but seven of twelve photographed
+first-page rates still differ. See [M10c SA-1](m10c-sa1.md) and its
+[evidence manifest](m10c-evidence-manifest.json). Final integrated long/native-hour,
+package and remote-CI gates remain a separate final-source acceptance stage.

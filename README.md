@@ -9,7 +9,7 @@ Snes9x, bsnes, or Libretro core.
 commercial-game or original-hardware certification.** The independently developed
 C# core supports clocked Mode 0–7 graphics, SPC700/S-DSP stereo, DMA/HDMA, standard
 cartridge mappings, normal format 9 savestates and explicitly configured DSP1
-cartridges, explicit SuperFX boards and SA-1 boards with versioned format10 state. Worker/UI, persistence, networking,
+cartridges, explicit SuperFX boards and SA-1 boards with versioned format 10 state. Worker/UI, persistence, networking,
 Manager and distribution have independent historical acceptance.
 
 Current follow-ups: [R1 persistence and remote CI](docs/r1-persistence-ci.md),

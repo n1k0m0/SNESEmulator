@@ -500,7 +500,7 @@ public sealed class Sa1CartridgeHardware : ICartridgeHardware, ICpuBus
         if (a == 0x100 && !sa1)
             return (byte)(cpuFlags | (io[9] & 0x5f));
         if (!sa1)
-            return hostBus; // Version register230E is not physically implemented in published research.
+            return hostBus; // Selected S-CPU model: SpeedTest observes open bus at $230E on SHVC-1L8B-10; other variants are unverified.
         if (a == 0x101)
             return (byte)(sa1Flags | (io[0] & 15));
         if (a == 0x102)

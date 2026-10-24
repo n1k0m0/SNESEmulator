@@ -1,0 +1,4191 @@
+{
+  "schema": "snes-m10c-evidence-v1",
+  "testedImplementationCommit": "0944634ab9f94c57e2c6f0db62723168f44c693d",
+  "successorScope": "One C# comment qualification and documentation only; executable tokens equal. Accepted DLL identities belong to the tested commit; no source/binary byte identity with a future rebuild is claimed.",
+  "sourceHashDomains": "SHA256 of actual checkout bytes and separately git show TESTED:path bytes. Text line endings may differ. Four authored binary ROMs compare byte-for-byte.",
+  "localEvidenceScope": "Reports and original-author inputs remain in ignored local artifacts; this manifest pins their retained identities, not a redistribution of those inputs. Historical red reports are preserved.",
+  "platforms": [
+    {
+      "platform": "Windows",
+      "cleanTestedCommit": "0944634ab9f94c57e2c6f0db62723168f44c693d",
+      "functionalPassingCounts": {
+        "functional": 32,
+        "superfx-functional": 34,
+        "dsp1-functional": 30,
+        "runtime": 27,
+        "manager": 16,
+        "compatibility-state": 27,
+        "persistence": 15,
+        "core": 129
+      },
+      "frozenCounts": {
+        "exactOutputs": 14,
+        "spcResumes": 18952,
+        "horizons": 128
+      },
+      "publishedObservation": {
+        "executionPages": 4,
+        "passingTests": 9,
+        "failingTimingObservations": [
+          {
+            "Name": "Published1L8B10 first-page timing row2",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 5.18978,
+              "photographedMHz": 5.04284,
+              "toleranceMHz": 0.02,
+              "rawRow": "|   ROM    |   ROM   | 05.18978|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row3",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 10.73835,
+              "photographedMHz": 9.73835,
+              "toleranceMHz": 0.02,
+              "rawRow": "|   WRAM   |  I-RAM  | 10.73835|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row7",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 3.80061,
+              "photographedMHz": 3.72218,
+              "toleranceMHz": 0.02,
+              "rawRow": "|  I-RAM   |  I-RAM  | 03.80061|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row8",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 2.76842,
+              "photographedMHz": 2.68999,
+              "toleranceMHz": 0.02,
+              "rawRow": "|  BW-RAM  |  BW-RAM | 02.76842|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row9",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 8.65054,
+              "photographedMHz": 8.55048,
+              "toleranceMHz": 0.02,
+              "rawRow": "| HDMA ROM |   ROM   | 08.65054|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row10",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 10.06766,
+              "photographedMHz": 10.73413,
+              "toleranceMHz": 0.02,
+              "rawRow": "| HDMA WRAM|   ROM   | 10.06766|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row11",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 5.23936,
+              "photographedMHz": 5.10229,
+              "toleranceMHz": 0.02,
+              "rawRow": "| DMA ROM  |   ROM   |~05.23936|"
+            }
+          }
+        ],
+        "photoToleranceMHz": 0.02,
+        "scope": "One published SHVC-1L8B-10 observation; seven deviations preserved, not hardware certification."
+      }
+    },
+    {
+      "platform": "Ubuntu",
+      "cleanTestedCommit": "0944634ab9f94c57e2c6f0db62723168f44c693d",
+      "functionalPassingCounts": {
+        "functional": 32,
+        "superfx-functional": 34,
+        "dsp1-functional": 30,
+        "runtime": 27,
+        "manager": 16,
+        "compatibility-state": 27,
+        "persistence": 15,
+        "core": 129
+      },
+      "frozenCounts": {
+        "exactOutputs": 14,
+        "spcResumes": 18952,
+        "horizons": 128
+      },
+      "publishedObservation": {
+        "executionPages": 4,
+        "passingTests": 9,
+        "failingTimingObservations": [
+          {
+            "Name": "Published1L8B10 first-page timing row2",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 5.18978,
+              "photographedMHz": 5.04284,
+              "toleranceMHz": 0.02,
+              "rawRow": "|   ROM    |   ROM   | 05.18978|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row3",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 10.73835,
+              "photographedMHz": 9.73835,
+              "toleranceMHz": 0.02,
+              "rawRow": "|   WRAM   |  I-RAM  | 10.73835|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row7",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 3.80061,
+              "photographedMHz": 3.72218,
+              "toleranceMHz": 0.02,
+              "rawRow": "|  I-RAM   |  I-RAM  | 03.80061|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row8",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 2.76842,
+              "photographedMHz": 2.68999,
+              "toleranceMHz": 0.02,
+              "rawRow": "|  BW-RAM  |  BW-RAM | 02.76842|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row9",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 8.65054,
+              "photographedMHz": 8.55048,
+              "toleranceMHz": 0.02,
+              "rawRow": "| HDMA ROM |   ROM   | 08.65054|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row10",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 10.06766,
+              "photographedMHz": 10.73413,
+              "toleranceMHz": 0.02,
+              "rawRow": "| HDMA WRAM|   ROM   | 10.06766|"
+            }
+          },
+          {
+            "Name": "Published1L8B10 first-page timing row11",
+            "Status": "fail",
+            "Detail": "Comparison with one photographed NTSC board, tolerance0.02MHz for this observation only. No frequency calibration, broad compatibility or physical certification.",
+            "Seconds": 0,
+            "Evidence": {
+              "actualMHz": 5.23936,
+              "photographedMHz": 5.10229,
+              "toleranceMHz": 0.02,
+              "rawRow": "| DMA ROM  |   ROM   |~05.23936|"
+            }
+          }
+        ],
+        "photoToleranceMHz": 0.02,
+        "scope": "One published SHVC-1L8B-10 observation; seven deviations preserved, not hardware certification."
+      }
+    }
+  ],
+  "actualProducerDependencies": [
+    {
+      "platform": "Windows",
+      "labSiblingCore": "SNESEmulator.Lab\\bin\\Release\\net10.0\\SNESEmulator.Core.dll",
+      "projectCore": "SNESEmulator.Core\\bin\\Release\\net10.0\\SNESEmulator.Core.dll",
+      "actualCoreSha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+      "projectCopyEqualsLoadedLabSibling": true,
+      "matchingProducerReports": [
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\devices\\audio-ntsc-devices.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "93dc8383789bb111b3d7c55ed2a20aed227ec26572a34a597021f50b7d1ef6ed"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\devices\\diagnostic-ntsc-devices.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "af4d607c221a18b201a348673f64d3bcac2da853a9408c8e544fadbcaa9df27b"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\traced\\audio-ntsc-traced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "d7f67f7c5fb320949727f5ab71e90756ee63c9cdd1e939448c6c8e54d93a82c8"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\traced\\diagnostic-ntsc-traced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "6a87d3a5529ed0eb8a498ca601ccd010df736567d960b9959b7f9034cad14eae"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\traced\\game-ntsc-traced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "1e145c131cd6664dcef1e22b989d2feb1c891ff8e89f4e3c3f13a037485c4bd7"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\traced\\game-pal-traced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "60ad962ac1f59ba4550a5908099bca2f92df265e764e763b8e36c9586ff7b669"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\traced\\geometry-ntsc-traced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "e7889169ae572343e17229d50791d9fdafbe6bfd955b7116d07339ce26d0596e"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\traced\\geometry-pal-traced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "a88078d03ae9f556577f92de8fe76f35b1a7ff10d4c7a1e6dc3d9e3bf56f28c8"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\untraced\\audio-ntsc-untraced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "cfaca046d36ac3762ae69fdad97b26c6bde2dd374c46f7c21d9df11f2d2f44d3"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\untraced\\diagnostic-ntsc-untraced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "5a406ce9e2063a0699ceb637233f0ad1c804c8fc6f086e81a2cb65cc92e230c7"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\untraced\\game-ntsc-untraced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "3e5e383f15c656d9467995c3e4ad3be1b3f75c71a85f288cb95f52c39a697451"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\untraced\\game-pal-untraced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "2a0a55fe011ffe10fe740eb37efdb51edc4b28c0df771294af74bf86e0a4d916"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\untraced\\geometry-ntsc-untraced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "9ca6c3af41be40ee3813e05173b8b13b1687997cd898cf9a5572d5e6089b6b44"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\normal-frozen-regression\\untraced\\geometry-pal-untraced.json",
+          "producerCoreAssemblySha256": "c4839db06b61ea9091f84ab4b30014959254a42fa9a705703b1c42fb19fb76af",
+          "reportSha256": "4e574f38b6760e2285c21283ee1ca5f006fd0d85b4499d7e26d3dd8393bc2990"
+        }
+      ],
+      "producerCount": 14,
+      "driverProvenanceMatches": true,
+      "sa1ProducerMatches": true,
+      "scope": "Producer hashes came from typeof(SnesSystem).Assembly.Location. This independently verifies the dependency file selected by each Lab run; CLR/JIT mappings are separately observed in an owned retained-handle probe."
+    },
+    {
+      "platform": "Ubuntu",
+      "labSiblingCore": "artifacts\\m10c-sa1\\ubuntu\\build\\bin\\SNESEmulator.Lab\\release\\SNESEmulator.Core.dll",
+      "projectCore": "artifacts\\m10c-sa1\\ubuntu\\build\\bin\\SNESEmulator.Core\\release\\SNESEmulator.Core.dll",
+      "actualCoreSha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+      "projectCopyEqualsLoadedLabSibling": true,
+      "matchingProducerReports": [
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\devices\\audio-ntsc-devices.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "fc537f811027b22c32ed708f18cb347033573b8191058a404ea7ab7cef33a042"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\devices\\diagnostic-ntsc-devices.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "ca0082c0e27debd1bed54bbf1cc513c7cd0cb26fcb317ae5ad905b12a11dfdc1"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\traced\\audio-ntsc-traced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "2995de2c33a78d065888be946e604aefec70147f75497640503b24fc45e25ab8"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\traced\\diagnostic-ntsc-traced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "5917e1c8a0da0d631fd107f54440c1dea7a6dae40ea2488a72c98df996d2c0c3"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\traced\\game-ntsc-traced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "99e4414b15c7c69e677c4a87e2ab1d0ad58e562621b094e3ff850b441ce7ac85"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\traced\\game-pal-traced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "44685e683b3c6059ed36b83ed97e76dec5aa6fa590e9b58f59e0183c72b8e66c"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\traced\\geometry-ntsc-traced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "4be59247447d63f46662bc3357a4deefe669db2d1bb1edc165bd1548b59e4785"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\traced\\geometry-pal-traced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "a06d09a5d1ef7ad85ad5613f19a8e5b00ee98f1a309a396196752ffebe07d776"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\untraced\\audio-ntsc-untraced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "f3f77edf032f4ea9c7114e9ada148d1a0d3f4fef5a2824e444f301d73c0073e6"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\untraced\\diagnostic-ntsc-untraced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "258c11bba62d7b2534c8b6599f6b22cf90cc034efd64d35bf5fb061dc7d3b911"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\untraced\\game-ntsc-untraced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "a054399838b5b839e88c42ea5ef127d8626e4a097bed2b02ab3aa46e5a22eb35"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\untraced\\game-pal-untraced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "4da3dffabdb68848b41b5dd910ad5a7f15d6fe3af7daaedd791ab412fdd13034"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\untraced\\geometry-ntsc-untraced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "ad0de4c017ce3dded7af1a8d09f8c7bec203ab15064de02b9373b740e9ee11a0"
+        },
+        {
+          "path": "artifacts\\m10c-sa1\\ubuntu\\normal-frozen-regression\\untraced\\geometry-pal-untraced.json",
+          "producerCoreAssemblySha256": "ad562e8da4ada58937b9e2205fa4bf2167e3cda3c67a0dd26409f4d8de66bf7e",
+          "reportSha256": "f479501fce78298a140908b79a357601dc1400435d090140362284d221777f79"
+        }
+      ],
+      "producerCount": 14,
+      "driverProvenanceMatches": true,
+      "sa1ProducerMatches": true,
+      "scope": "Producer hashes came from typeof(SnesSystem).Assembly.Location. This independently verifies the dependency file selected by each Lab run; CLR/JIT mappings are separately observed in an owned retained-handle probe."
+    }
+  ],
+  "runtimeProbeScope": "Actual mapped private CLR/JIT paths and SHA256 observed in owned retained-handle Windows/Ubuntu probes; not enumeration of every child. Probe processes ended.",
+  "commentTokenProof": {
+    "testedCommit": "0944634ab9f94c57e2c6f0db62723168f44c693d",
+    "path": "SNESEmulator.Core/Sa1CartridgeHardware.cs",
+    "testedGitBlobSha256": "ac348de1efd77bba775739691b4d8447a17a49e46406a2cbea22d7637f870881",
+    "successorCheckoutSha256": "334b574c5608f67e63f6e949e55a032287e662059b96b2710f222efb6b674647",
+    "tokenCount": 8264,
+    "equal": true,
+    "scope": "Comments/whitespace excluded; accepted binaries remain attributed to tested commit."
+  },
+  "sources": [
+    {
+      "path": ".gitattributes",
+      "bytes": 2452,
+      "sha256": "47432bdd34c7f78cd8859dc9a1903b6ff12901311436933e47a443a075b51754",
+      "testedGitBlobBytes": 2382,
+      "testedGitBlobSha256": "8a8b06c882000a3cd9a603c319a6158270d079808f12baf90c1a1011a7fb0152"
+    },
+    {
+      "path": "SNESEmulator.Contracts/LocalIpc.cs",
+      "bytes": 11495,
+      "sha256": "74a8676f1e3ce7111bae590deb7e6b5ecb39a962a9d28fdaa8eba083c59ea0f5",
+      "testedGitBlobBytes": 11250,
+      "testedGitBlobSha256": "a4e1fcc68a6a175af213e888b25ca06e95adeff775d2259f7cbfc3c752b68fb5"
+    },
+    {
+      "path": "SNESEmulator.Contracts/Protocol.cs",
+      "bytes": 6622,
+      "sha256": "64206f3d73db0eca398e8795d2f09b0680e8c2f244fb6f9b60bacb8255aaaf19",
+      "testedGitBlobBytes": 6496,
+      "testedGitBlobSha256": "1a29ed4ec8e2f8fdf1d734def72c9c34c27f4f3ff7dc0c6c9e8c8691d7f2bf05"
+    },
+    {
+      "path": "SNESEmulator.Contracts/SNESEmulator.Contracts.csproj",
+      "bytes": 182,
+      "sha256": "130befba0cff4f414b147bf251bca57cdc8c95d059d63f15f94ff00a15a3560d",
+      "testedGitBlobBytes": 182,
+      "testedGitBlobSha256": "130befba0cff4f414b147bf251bca57cdc8c95d059d63f15f94ff00a15a3560d"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/ApuTests.cs",
+      "bytes": 19615,
+      "sha256": "b1bb4f9eb52a7a2a9db6ecdd930a37bfc04fe2b147e74b9f8a5467da682076cb",
+      "testedGitBlobBytes": 19464,
+      "testedGitBlobSha256": "a105f6031ef88d591205a64f48d4ae6a0386ddd573ed6c540bd5bb8d4d41d86a"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/CompatibilityTests.cs",
+      "bytes": 13441,
+      "sha256": "2d0ffd452ec0ca899a2887d23d65ed55e50b8ace460623813d641481e0470a08",
+      "testedGitBlobBytes": 13441,
+      "testedGitBlobSha256": "2d0ffd452ec0ca899a2887d23d65ed55e50b8ace460623813d641481e0470a08"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/DspTests.cs",
+      "bytes": 24705,
+      "sha256": "28c654ef3082ebdcaafe63d3291acdc6b4db22996405744f36d04b31f5a59105",
+      "testedGitBlobBytes": 24490,
+      "testedGitBlobSha256": "569fddf36770dba16be3b4668dba661bc497494bb893a8b1bc31814c62b6f8a1"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/InteractionTests.cs",
+      "bytes": 9843,
+      "sha256": "3cc7465665614dc16dbdb2b298ba9e6e00ec6ca1f9566c893a03efda9e429374",
+      "testedGitBlobBytes": 9785,
+      "testedGitBlobSha256": "0d13b8a31b7a29d6600c475f3a8355210c01d222c99ac06b16d5a9e05d3ffe7b"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/IoDmaTests.cs",
+      "bytes": 36592,
+      "sha256": "dddf689d7a9fceb9068dcac1605bc799f8e1231eb1be9e72cb20c88f5b871d43",
+      "testedGitBlobBytes": 36592,
+      "testedGitBlobSha256": "dddf689d7a9fceb9068dcac1605bc799f8e1231eb1be9e72cb20c88f5b871d43"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/NetworkTimelineTests.cs",
+      "bytes": 16396,
+      "sha256": "4c83bc80decc67da926a9b7092204cd4fb2fa738221c40ead8b19293dc1fe166",
+      "testedGitBlobBytes": 16245,
+      "testedGitBlobSha256": "8c8dade0798588f5728671affb1b84a5fda56d9e51182f3fe3a01541994f896b"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/PersistenceTests.cs",
+      "bytes": 29500,
+      "sha256": "3442062d8d73b91fa559a8f0b33281f0b2b0908d4659b4f54e55075753ff77e5",
+      "testedGitBlobBytes": 29238,
+      "testedGitBlobSha256": "1d241c49ecab3cdf405372b7bb0d56c9719d64300cb92650e087e0629fcd4261"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/PpuTests.cs",
+      "bytes": 34489,
+      "sha256": "2940df41b1f99653dc30980d786061bb70bb92bf42cd8d8e90a05cd294dd7ff5",
+      "testedGitBlobBytes": 34489,
+      "testedGitBlobSha256": "2940df41b1f99653dc30980d786061bb70bb92bf42cd8d8e90a05cd294dd7ff5"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/Program.cs",
+      "bytes": 16331,
+      "sha256": "21b0aeaaca4879b4341a091c708a45b7e9a125a5701a95595d94be027fd3f3c5",
+      "testedGitBlobBytes": 16105,
+      "testedGitBlobSha256": "6d4df1b883deaf8e86eeb6ad1dd6689c110a657d62d6804802234aed159bdc3c"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/RuntimeTests.cs",
+      "bytes": 23584,
+      "sha256": "93b68084f9308b9cd90f8c5ab719080f8ccae0fea31f1d4c515ca0791e7ee4e9",
+      "testedGitBlobBytes": 23388,
+      "testedGitBlobSha256": "8a849a0f2a67c98cda81ddf930d8f81a52610bb77e9e0b911a6011f379a643f5"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/SNESEmulator.Core.Tests.csproj",
+      "bytes": 661,
+      "sha256": "d52a3832ad915278ec2894236bf8766739d650405701db8528011f1062eacd51",
+      "testedGitBlobBytes": 660,
+      "testedGitBlobSha256": "c222b50ed7cdfaf1b8a2f7b5d78227130bda275ce80d825d0f5154ea723ca130"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/TimingTests.cs",
+      "bytes": 23900,
+      "sha256": "5762c356c45d01609c3446490b7aa92a9ccf1fe164a38198b010b2f7ea3ad8a6",
+      "testedGitBlobBytes": 23900,
+      "testedGitBlobSha256": "5762c356c45d01609c3446490b7aa92a9ccf1fe164a38198b010b2f7ea3ad8a6"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/VideoTests.cs",
+      "bytes": 28685,
+      "sha256": "28e0c8b429f4cc827a34a2eae74a9507ab838e7f8071ab72a55f3522e95e3254",
+      "testedGitBlobBytes": 28685,
+      "testedGitBlobSha256": "28e0c8b429f4cc827a34a2eae74a9507ab838e7f8071ab72a55f3522e95e3254"
+    },
+    {
+      "path": "SNESEmulator.Core/Apu.cs",
+      "bytes": 13143,
+      "sha256": "c1f7454114b5bce3e3bb6e93757bc38299134f8d2254f5083767c96e0e5447bf",
+      "testedGitBlobBytes": 12973,
+      "testedGitBlobSha256": "1a1bd348e9e696deff90d04404d369ac6dd95b5fb855af4e2173375f2355757b"
+    },
+    {
+      "path": "SNESEmulator.Core/AtomicFile.cs",
+      "bytes": 4842,
+      "sha256": "ca7a9718626b3b719692477607329a5a375cc282d08d907bf95e15964186ef31",
+      "testedGitBlobBytes": 4763,
+      "testedGitBlobSha256": "a33bb6c4a8fe9ac5500eee0c46dc4b5cab21a7645f44804b05edabcda5a53c51"
+    },
+    {
+      "path": "SNESEmulator.Core/AudioDiagnosticRom.cs",
+      "bytes": 1268,
+      "sha256": "77fd761913c02deb72d7a1aa936876ec066ead2e8c0a62f3c5adfbee749b1f1d",
+      "testedGitBlobBytes": 1268,
+      "testedGitBlobSha256": "77fd761913c02deb72d7a1aa936876ec066ead2e8c0a62f3c5adfbee749b1f1d"
+    },
+    {
+      "path": "SNESEmulator.Core/Cartridge.cs",
+      "bytes": 7954,
+      "sha256": "000745745e943e07db054b9314f2e5e430dcb2d5603c5e0b4575be9560b759e2",
+      "testedGitBlobBytes": 7826,
+      "testedGitBlobSha256": "4e755d31e2df4da46e372c2542d37542989d06af1904546349765c22a11f3243"
+    },
+    {
+      "path": "SNESEmulator.Core/ControllerPorts.cs",
+      "bytes": 1499,
+      "sha256": "2c1793f66af6b5f18ba776428b55b42d45839b5ceca05b21471f251b3459a3e5",
+      "testedGitBlobBytes": 1499,
+      "testedGitBlobSha256": "2c1793f66af6b5f18ba776428b55b42d45839b5ceca05b21471f251b3459a3e5"
+    },
+    {
+      "path": "SNESEmulator.Core/Cpu65816.Cycles.cs",
+      "bytes": 10949,
+      "sha256": "0c68f18a8f6024eee05b4fe1be7900329ccfa8deea93d756bb02365b53aebc40",
+      "testedGitBlobBytes": 10949,
+      "testedGitBlobSha256": "0c68f18a8f6024eee05b4fe1be7900329ccfa8deea93d756bb02365b53aebc40"
+    },
+    {
+      "path": "SNESEmulator.Core/Cpu65816.cs",
+      "bytes": 19387,
+      "sha256": "652b8d8e5a029e0b4fc8950cdc0875d83ed559033d9ff9085c4442c3427ec5ba",
+      "testedGitBlobBytes": 19087,
+      "testedGitBlobSha256": "e33fdf26dbf0704e69630ec11a04b5684a00ca40226ac96d31439d4ed6505679"
+    },
+    {
+      "path": "SNESEmulator.Core/CpuCycle.cs",
+      "bytes": 1030,
+      "sha256": "cbb5acf5bc59f8c2308d57a7b5691c40336b804a5c40d24822875fbe6f407830",
+      "testedGitBlobBytes": 1030,
+      "testedGitBlobSha256": "cbb5acf5bc59f8c2308d57a7b5691c40336b804a5c40d24822875fbe6f407830"
+    },
+    {
+      "path": "SNESEmulator.Core/CpuIo.cs",
+      "bytes": 8826,
+      "sha256": "249fc000c6e1d02feba48e0dee3265f336e298b972f65193218c11546579edb7",
+      "testedGitBlobBytes": 8634,
+      "testedGitBlobSha256": "bbeef0d2583323e7577da239bd8e4e1bd30008c1b6ac61ba6f878313d5049517"
+    },
+    {
+      "path": "SNESEmulator.Core/DiagnosticRom.cs",
+      "bytes": 2798,
+      "sha256": "d9573272081901d21d53f6ecd762ebf2b945863315593a60fb8e66d13a2a621b",
+      "testedGitBlobBytes": 2798,
+      "testedGitBlobSha256": "d9573272081901d21d53f6ecd762ebf2b945863315593a60fb8e66d13a2a621b"
+    },
+    {
+      "path": "SNESEmulator.Core/DmaController.cs",
+      "bytes": 11755,
+      "sha256": "411e703295d4e36a9a9ae799006d648d02144db6f29f4e23a1219e3fa21c0f4d",
+      "testedGitBlobBytes": 11559,
+      "testedGitBlobSha256": "4fc762cb3bd233b3e91f189bd967a6bd824fef6d3457106baf9675a4de797f49"
+    },
+    {
+      "path": "SNESEmulator.Core/Dsp1CartridgeHardware.cs",
+      "bytes": 9073,
+      "sha256": "84077cfb6328ce64b27dc7f59e6a1a069fb9d2e898bb2335ddb1a7fd93b982c2",
+      "testedGitBlobBytes": 8948,
+      "testedGitBlobSha256": "8c09c4f103e09f7b14e1f493d3b8fadbe2439690c2f5be90e084683567f1bb2f"
+    },
+    {
+      "path": "SNESEmulator.Core/DspGaussian.cs",
+      "bytes": 2663,
+      "sha256": "16ea5ffc8db97fc5a91e2a554285af417a07b62ab8e2299e7a2664e6deb68fde",
+      "testedGitBlobBytes": 2621,
+      "testedGitBlobSha256": "8747164fa65b199c7057c9fb2675ecf70ef90c03ad03b541ede990c720c8b327"
+    },
+    {
+      "path": "SNESEmulator.Core/EmulatorSettings.cs",
+      "bytes": 6567,
+      "sha256": "1ba16636f6b96ba7d613bc57b71b65eacc6fce7a08c3ac34fa8a4c57c7e5633b",
+      "testedGitBlobBytes": 6468,
+      "testedGitBlobSha256": "90c7d42bc5973451c7279666be2bd77bde76ca47442c1272ca92724eb704bc34"
+    },
+    {
+      "path": "SNESEmulator.Core/Gsu.cs",
+      "bytes": 27421,
+      "sha256": "55d448a5e5713550ed3e90f1bd59a5d778dde4abfb966bb6851468de9bd1b0e2",
+      "testedGitBlobBytes": 27033,
+      "testedGitBlobSha256": "aa3bfe3df9d3dd4007b604759f1161cca6a5e3481897fe64062facdca797c752"
+    },
+    {
+      "path": "SNESEmulator.Core/HardwareProfile.cs",
+      "bytes": 2382,
+      "sha256": "fa683ae4e36eef2d6811228a5deb094605b75be68d1b3f59c856bf72d4b9ac07",
+      "testedGitBlobBytes": 2382,
+      "testedGitBlobSha256": "fa683ae4e36eef2d6811228a5deb094605b75be68d1b3f59c856bf72d4b9ac07"
+    },
+    {
+      "path": "SNESEmulator.Core/InputBindings.cs",
+      "bytes": 4364,
+      "sha256": "e2e5cfc2c86b43f7373c281dc4fd002e21305f805ed6c4b0b4977b1dab984eca",
+      "testedGitBlobBytes": 4315,
+      "testedGitBlobSha256": "6a6f72e74cd773f7c19ee4829299555bf3fd42a2345844ed9e66d6c642fa16f6"
+    },
+    {
+      "path": "SNESEmulator.Core/IoDmaDiagnosticRom.cs",
+      "bytes": 2222,
+      "sha256": "1b0eedf498a9e2cc8c27b75de9b9bf26998e5de0bf3d4bc79e22f27d2e533b70",
+      "testedGitBlobBytes": 2222,
+      "testedGitBlobSha256": "1b0eedf498a9e2cc8c27b75de9b9bf26998e5de0bf3d4bc79e22f27d2e533b70"
+    },
+    {
+      "path": "SNESEmulator.Core/MasterClock.cs",
+      "bytes": 8505,
+      "sha256": "5479c7cc9108dabf796fcfdbef62e504bb78a4b9e3a39ea46f315c29f5a7d2e2",
+      "testedGitBlobBytes": 8505,
+      "testedGitBlobSha256": "5479c7cc9108dabf796fcfdbef62e504bb78a4b9e3a39ea46f315c29f5a7d2e2"
+    },
+    {
+      "path": "SNESEmulator.Core/OwnIpl.cs",
+      "bytes": 424,
+      "sha256": "a7bc93883ae294ab53cdf08140395bed6d8a9f89c23228cd89480aa7ea51fb33",
+      "testedGitBlobBytes": 424,
+      "testedGitBlobSha256": "a7bc93883ae294ab53cdf08140395bed6d8a9f89c23228cd89480aa7ea51fb33"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Objects.cs",
+      "bytes": 4760,
+      "sha256": "14a6da48eb9ca57dad40529ae79ee02c48d45c97bc442be80b965da152b9ec84",
+      "testedGitBlobBytes": 4668,
+      "testedGitBlobSha256": "64807894494ee9f29895e9f3488f9a928f1afd0751395c7e9f2884ddf8f0c29b"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Pipeline.cs",
+      "bytes": 16095,
+      "sha256": "9ee407f2c12f820753bfdbfb07f6ef34c0edc73575d427fd6b363ae292b2cb85",
+      "testedGitBlobBytes": 16095,
+      "testedGitBlobSha256": "9ee407f2c12f820753bfdbfb07f6ef34c0edc73575d427fd6b363ae292b2cb85"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.State.cs",
+      "bytes": 7312,
+      "sha256": "56e5b9d64892eb22e84dd2dc5187d070c96eb6fb2e2c28a329567b837cbf2d2b",
+      "testedGitBlobBytes": 7230,
+      "testedGitBlobSha256": "d5a50c24d4f48b647a042d20fd56f63e2d7e9def8b2355fcb71786add85cb134"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Video.cs",
+      "bytes": 4619,
+      "sha256": "373a1a8c95b865a52338dee0961761822d7e36aa82d3f0bccc0a015ddb2c2997",
+      "testedGitBlobBytes": 4543,
+      "testedGitBlobSha256": "c8a0a2671611e39374f3e653d80a4e9e98d878fae4690c140a75c44ac038038d"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.VideoState.cs",
+      "bytes": 2888,
+      "sha256": "33d338992c9b6ec8a1bb1488de120698233149a5c919b8b11fbe365f5c442cc0",
+      "testedGitBlobBytes": 2848,
+      "testedGitBlobSha256": "f8e92631d34bb8115bb16401a4c28169fb524efe30760b174203010da9c9e0e2"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.cs",
+      "bytes": 10130,
+      "sha256": "f0c7f67b6588bfebeb4d8ae0c82c92826743535b63781ab36348d9c30e8fed1a",
+      "testedGitBlobBytes": 10130,
+      "testedGitBlobSha256": "f0c7f67b6588bfebeb4d8ae0c82c92826743535b63781ab36348d9c30e8fed1a"
+    },
+    {
+      "path": "SNESEmulator.Core/PpuDiagnosticRom.cs",
+      "bytes": 2181,
+      "sha256": "a4ddbef10396684987969af14a38b5908bf558c96bf3dfd27b1436f78fbfe72c",
+      "testedGitBlobBytes": 2181,
+      "testedGitBlobSha256": "a4ddbef10396684987969af14a38b5908bf558c96bf3dfd27b1436f78fbfe72c"
+    },
+    {
+      "path": "SNESEmulator.Core/SNESEmulator.Core.csproj",
+      "bytes": 205,
+      "sha256": "3472fccce5613343d3b55f6c2bbc48cbfd3de01f9cf32fd8607b8ac3a7e26395",
+      "testedGitBlobBytes": 205,
+      "testedGitBlobSha256": "3472fccce5613343d3b55f6c2bbc48cbfd3de01f9cf32fd8607b8ac3a7e26395"
+    },
+    {
+      "path": "SNESEmulator.Core/Sa1CartridgeHardware.cs",
+      "bytes": 43279,
+      "sha256": "334b574c5608f67e63f6e949e55a032287e662059b96b2710f222efb6b674647",
+      "testedGitBlobBytes": 43246,
+      "testedGitBlobSha256": "ac348de1efd77bba775739691b4d8447a17a49e46406a2cbea22d7637f870881"
+    },
+    {
+      "path": "SNESEmulator.Core/SaveStates/StateSerializer.cs",
+      "bytes": 14720,
+      "sha256": "c55556a75937730dcfa9a235984cd7cc58e33374b6e2d577405c015ded13bfbb",
+      "testedGitBlobBytes": 14535,
+      "testedGitBlobSha256": "41096ccf4f4d260814218a1fc07b0d5d295cca9c888fc2898adf2603c7c725bd"
+    },
+    {
+      "path": "SNESEmulator.Core/SnesDsp.cs",
+      "bytes": 17180,
+      "sha256": "161bcd78ff162279755c9775918dffbea258691e1ed4dbf9c3a53faea587d2c8",
+      "testedGitBlobBytes": 16925,
+      "testedGitBlobSha256": "93d0205d870aee7c79b7fa71b168f2c20fae7cfd968857429f5a88372c0f55eb"
+    },
+    {
+      "path": "SNESEmulator.Core/SnesSystem.cs",
+      "bytes": 12803,
+      "sha256": "713214ceb35bafe81a9ec8be6ff79ac97eee42d1716630c0422906781593e232",
+      "testedGitBlobBytes": 12593,
+      "testedGitBlobSha256": "4d290076d39f7159f3f1853575edbc9c512a0d8e12605fbb53dda0b2aff08c27"
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.HotPath.cs",
+      "bytes": 6470,
+      "sha256": "39fa2c774c418fe553f0e512df7b4876b662f8f42941bc747f93e009092ebf6a",
+      "testedGitBlobBytes": 6465,
+      "testedGitBlobSha256": "de8a7404e796e4cfb3839c3d9c90cae2af788a77fb1ec2d11f0f6c90a1527d5e"
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.HotPath.g.cs",
+      "bytes": 27133,
+      "sha256": "77348d2c3d955769ff1856838cc39a3050c6e3b3a93d720b6dff8c3bc4109352",
+      "testedGitBlobBytes": 26539,
+      "testedGitBlobSha256": "384a9eee483756457ea196b2d9157a90d1a42f209bac6153b3848f8267f24f23"
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.cs",
+      "bytes": 16572,
+      "sha256": "b9cef89c915848ba7e237665f842a43e48e752de2b8feb4e16c1129e376252f8",
+      "testedGitBlobBytes": 16349,
+      "testedGitBlobSha256": "853b9b903764a3de46f773db7ff3efa24022d49e3ca0e6ce1b025467aa28f461"
+    },
+    {
+      "path": "SNESEmulator.Core/SpcUploadRom.cs",
+      "bytes": 2649,
+      "sha256": "b72fe72fad2b7c82ffadcac65a3ccf9cbf4b047dd13178864066864125d752ae",
+      "testedGitBlobBytes": 2649,
+      "testedGitBlobSha256": "b72fe72fad2b7c82ffadcac65a3ccf9cbf4b047dd13178864066864125d752ae"
+    },
+    {
+      "path": "SNESEmulator.Core/SuperFxCartridgeHardware.cs",
+      "bytes": 8043,
+      "sha256": "41f4a269e71ad21a81f1812dcd5b9e6757a9380222d68878dd0652409755838d",
+      "testedGitBlobBytes": 7944,
+      "testedGitBlobSha256": "e349dd28b1c30430677b7d6060deb9caaa087a62c31fd6a89ff43332f951ac6e"
+    },
+    {
+      "path": "SNESEmulator.Core/SystemBus.cs",
+      "bytes": 7247,
+      "sha256": "b621660c4f214b02cab94d6900b2587572da94c2df23a21f6cea0b710d8791a1",
+      "testedGitBlobBytes": 7131,
+      "testedGitBlobSha256": "3d92f4c11021325b4243caa6985725300284342bb5623771adb4435617f43a0f"
+    },
+    {
+      "path": "SNESEmulator.Core/Upd7725.cs",
+      "bytes": 9359,
+      "sha256": "9de14bb90961e854f864e3825a4eb45114758739a3a5f9a413e4e8331d956b36",
+      "testedGitBlobBytes": 9176,
+      "testedGitBlobSha256": "5a931f64276db14c2d3a502c16088b0a64c6bae69bf000a408488a5d62e73d3f"
+    },
+    {
+      "path": "SNESEmulator.Core/UserDataPaths.cs",
+      "bytes": 669,
+      "sha256": "7217f39589739e7443906709640301e7e2f011390870cfcedc2a06584758fc8d",
+      "testedGitBlobBytes": 669,
+      "testedGitBlobSha256": "7217f39589739e7443906709640301e7e2f011390870cfcedc2a06584758fc8d"
+    },
+    {
+      "path": "SNESEmulator.Distribution.Tests/Program.cs",
+      "bytes": 11267,
+      "sha256": "67e800f4486df51bc0bf32d104adb043875bfd7ec10023147f4a2aa35dbe4eaa",
+      "testedGitBlobBytes": 11184,
+      "testedGitBlobSha256": "16524eca494835466d7735c2d81b66713d2090933199c8d74dc9888fe1665d4b"
+    },
+    {
+      "path": "SNESEmulator.Distribution.Tests/SNESEmulator.Distribution.Tests.csproj",
+      "bytes": 405,
+      "sha256": "becd7b59ab912934801b1c020e7b50f1b500f742aac4619a90d894db207d66d7",
+      "testedGitBlobBytes": 404,
+      "testedGitBlobSha256": "4b8a964d197fe0edda7ab0bc9a87c60b0d53d0c9714cb63303c3e2c0a0ed03d7"
+    },
+    {
+      "path": "SNESEmulator.Lab/AudioEpochProof.cs",
+      "bytes": 7182,
+      "sha256": "62cd8bbfee368a6b1b8bf314e4aea491357e005c9f23ca0538923518da0f1a28",
+      "testedGitBlobBytes": 7182,
+      "testedGitBlobSha256": "62cd8bbfee368a6b1b8bf314e4aea491357e005c9f23ca0538923518da0f1a28"
+    },
+    {
+      "path": "SNESEmulator.Lab/CpuDpAdjudication.cs",
+      "bytes": 2262,
+      "sha256": "10de657bb5fead82f82678a60370991db7eb2196f6b3f81630335cf7724d7f34",
+      "testedGitBlobBytes": 2262,
+      "testedGitBlobSha256": "10de657bb5fead82f82678a60370991db7eb2196f6b3f81630335cf7724d7f34"
+    },
+    {
+      "path": "SNESEmulator.Lab/CpuDpProof.cs",
+      "bytes": 7849,
+      "sha256": "8e7925a13d3dda2d918147f32298e3f5cd2c609e015f628855f2f74e5d4446b8",
+      "testedGitBlobBytes": 7848,
+      "testedGitBlobSha256": "65ead9ba7318e08d85e5e740330468cb3c11f855e32e0a2d3c42a075dd3559d1"
+    },
+    {
+      "path": "SNESEmulator.Lab/Dsp1Proof.cs",
+      "bytes": 27249,
+      "sha256": "d7e0d9d2f552579cb5c7d02f0dd26670d9a601feeebf5cff5af8697938b48c76",
+      "testedGitBlobBytes": 27042,
+      "testedGitBlobSha256": "7fe603cfb1e1abd99aebc3431c9b52e0bcd535baec725b579b19373e2f242b03"
+    },
+    {
+      "path": "SNESEmulator.Lab/DspTimelineReplay.cs",
+      "bytes": 9437,
+      "sha256": "c9a4ee0858dd3910e5d46e78b2b33b2986ed33bc2643cf251caf5b0384ef8ce1",
+      "testedGitBlobBytes": 9437,
+      "testedGitBlobSha256": "c9a4ee0858dd3910e5d46e78b2b33b2986ed33bc2643cf251caf5b0384ef8ce1"
+    },
+    {
+      "path": "SNESEmulator.Lab/FrameProof.cs",
+      "bytes": 5849,
+      "sha256": "126271cdb148cd7971da9f846e3b3c94132453ea62ae4d6b907c30a6c7c7dda3",
+      "testedGitBlobBytes": 5849,
+      "testedGitBlobSha256": "126271cdb148cd7971da9f846e3b3c94132453ea62ae4d6b907c30a6c7c7dda3"
+    },
+    {
+      "path": "SNESEmulator.Lab/Performance.cs",
+      "bytes": 9451,
+      "sha256": "5b9a42b343bfae60eb08bddbc91d4e2edf609a6a09194abcd38498ec1ffa4765",
+      "testedGitBlobBytes": 9451,
+      "testedGitBlobSha256": "5b9a42b343bfae60eb08bddbc91d4e2edf609a6a09194abcd38498ec1ffa4765"
+    },
+    {
+      "path": "SNESEmulator.Lab/Program.cs",
+      "bytes": 36715,
+      "sha256": "6fc75bb2bcffa6b4a3df2c20a59051624bb980a3e2240aae0a4a705ed13cf1dc",
+      "testedGitBlobBytes": 36414,
+      "testedGitBlobSha256": "685d0c1c5529efe8ee41b4927f15f41e0f0908313744469e973784b38bcbc9aa"
+    },
+    {
+      "path": "SNESEmulator.Lab/PublishedCpuRoms.cs",
+      "bytes": 3476,
+      "sha256": "73ebe3fc69424623b5bfe54877e03e7c17611ec879aa711a11c76484d6192f2e",
+      "testedGitBlobBytes": 3475,
+      "testedGitBlobSha256": "94f85c310e628b77106c1ed8993f3e868355f5850fb7b4ca1646a7996d797986"
+    },
+    {
+      "path": "SNESEmulator.Lab/SNESEmulator.Lab.csproj",
+      "bytes": 391,
+      "sha256": "305619ed54184b343077bfcca33ee485c2b3771e6d940acbb9d33f240f451eef",
+      "testedGitBlobBytes": 391,
+      "testedGitBlobSha256": "305619ed54184b343077bfcca33ee485c2b3771e6d940acbb9d33f240f451eef"
+    },
+    {
+      "path": "SNESEmulator.Lab/Sa1Proof.cs",
+      "bytes": 42331,
+      "sha256": "16277672229b8ec3d3159d675591419211b0a3d8d8a21c8fd0565a1a8f0f5aa2",
+      "testedGitBlobBytes": 42331,
+      "testedGitBlobSha256": "16277672229b8ec3d3159d675591419211b0a3d8d8a21c8fd0565a1a8f0f5aa2"
+    },
+    {
+      "path": "SNESEmulator.Lab/Sa1PublishedProof.cs",
+      "bytes": 6922,
+      "sha256": "a338f7a06dea8b37f4e49c23183e6db16853e5ecc2580b692547e3748395f316",
+      "testedGitBlobBytes": 6922,
+      "testedGitBlobSha256": "a338f7a06dea8b37f4e49c23183e6db16853e5ecc2580b692547e3748395f316"
+    },
+    {
+      "path": "SNESEmulator.Lab/SpcContinuationProof.cs",
+      "bytes": 8103,
+      "sha256": "c00e52739fbbb16d2532df4979a54f32fd58d9a0265946042a3fc9046bcebfeb",
+      "testedGitBlobBytes": 8103,
+      "testedGitBlobSha256": "c00e52739fbbb16d2532df4979a54f32fd58d9a0265946042a3fc9046bcebfeb"
+    },
+    {
+      "path": "SNESEmulator.Lab/SpcEntryProof.cs",
+      "bytes": 11883,
+      "sha256": "c86b06bae9a005ff56e1cfe03e1b1d93f8d540eaa4a47c3b8ba4c78591b8394d",
+      "testedGitBlobBytes": 11669,
+      "testedGitBlobSha256": "fbc56a41dab0166ea26f687905e0000fdbd4e79a821369d851e066556317dcc3"
+    },
+    {
+      "path": "SNESEmulator.Lab/SuperFxProof.cs",
+      "bytes": 28594,
+      "sha256": "ed670eb58efbe2a0600e3650c496de61ba963c319c176c65f13221f5a6c5c330",
+      "testedGitBlobBytes": 28357,
+      "testedGitBlobSha256": "b8e00db953005c6cc501353c2eeb83ca5dd0bbf9cca376119b5e75a17214adbc"
+    },
+    {
+      "path": "SNESEmulator.Lab/SuspendProof.cs",
+      "bytes": 8185,
+      "sha256": "c508d2b73d9f2d66954efed9b2b2c2c6880fd65f4cadeea7e37feb36af25ba02",
+      "testedGitBlobBytes": 8033,
+      "testedGitBlobSha256": "dfe6018681411b9d8cd788b82a3c5fddf08e87f203cd66cd8ec608a7749c79da"
+    },
+    {
+      "path": "SNESEmulator.Management/BoundedFiles.cs",
+      "bytes": 2119,
+      "sha256": "01bb6ef93a6c8a4b6b66983693ac9e18a92535668763f537009289da9b370303",
+      "testedGitBlobBytes": 2119,
+      "testedGitBlobSha256": "01bb6ef93a6c8a4b6b66983693ac9e18a92535668763f537009289da9b370303"
+    },
+    {
+      "path": "SNESEmulator.Management/EmulatorLauncher.cs",
+      "bytes": 1992,
+      "sha256": "911b11ed857bc16205af66d303252524df53cf2f287c8bdb53ebf48a20639c17",
+      "testedGitBlobBytes": 1951,
+      "testedGitBlobSha256": "0bc87ab7bf900156a4527a6bcda913eeebc6529885f467834482306f330aac76"
+    },
+    {
+      "path": "SNESEmulator.Management/LibraryStore.cs",
+      "bytes": 11463,
+      "sha256": "26b921e79d291e38c810fc11e4c448caf085f635a2b07cd70222f0f05b198df3",
+      "testedGitBlobBytes": 11168,
+      "testedGitBlobSha256": "8b73176fdb0c94e36129c69b558670e6ddfde281fb4ed5287906750e675f3b9b"
+    },
+    {
+      "path": "SNESEmulator.Management/ReleaseUpdates.cs",
+      "bytes": 14778,
+      "sha256": "b4096032d8b5fc9145460efcc5a9266a01e6d33c0a87c1cd9d899e08fbab4727",
+      "testedGitBlobBytes": 14588,
+      "testedGitBlobSha256": "1565034385baafe441c20c0407d8889c84d70d7e9b09605fdf0e5410efccc819"
+    },
+    {
+      "path": "SNESEmulator.Management/SNESEmulator.Management.csproj",
+      "bytes": 509,
+      "sha256": "755c90758a7ef3424d438ba8f7bb11230d78b95ace33acfdba289c0defda0b6b",
+      "testedGitBlobBytes": 509,
+      "testedGitBlobSha256": "755c90758a7ef3424d438ba8f7bb11230d78b95ace33acfdba289c0defda0b6b"
+    },
+    {
+      "path": "SNESEmulator.Management/StateCatalog.cs",
+      "bytes": 3183,
+      "sha256": "947fab89e27cab38ae6554372844d1807c77c76f91be079d873ab243cf8e3f94",
+      "testedGitBlobBytes": 3129,
+      "testedGitBlobSha256": "c8cdc11d0da77d1fad2edbe25cf00c883ebca3c35e802348679b4e86d046c2e9"
+    },
+    {
+      "path": "SNESEmulator.Manager.Tests/HelloTests.cs",
+      "bytes": 3734,
+      "sha256": "a6f59834eed7716819c8cbdd740020cbb63504d01d672c56e544e004b909d2db",
+      "testedGitBlobBytes": 3648,
+      "testedGitBlobSha256": "eb57b5c0fafd4d2596d51fe214f5f5d1ab6e6e3b1d43caf9481c2878234bf00f"
+    },
+    {
+      "path": "SNESEmulator.Manager.Tests/Program.cs",
+      "bytes": 31446,
+      "sha256": "1ed49c393dcbf54294dd490950485d3ee9ffc125276565479a0b2f6d24346ff3",
+      "testedGitBlobBytes": 30866,
+      "testedGitBlobSha256": "d5fc76e7345ca01329c81bb8436f9edf7867961d113ea2bdd8620b8518cefcb1"
+    },
+    {
+      "path": "SNESEmulator.Manager.Tests/SNESEmulator.Manager.Tests.csproj",
+      "bytes": 482,
+      "sha256": "420e5275d9cf0541e1d0d7d3719766a2a91403f2d2d58a18aab303935114529a",
+      "testedGitBlobBytes": 482,
+      "testedGitBlobSha256": "420e5275d9cf0541e1d0d7d3719766a2a91403f2d2d58a18aab303935114529a"
+    },
+    {
+      "path": "SNESEmulator.Manager.Tests/WindowsTests.cs",
+      "bytes": 30439,
+      "sha256": "77f73d36b81ce4f3f7a7ec31cf4139fc1afef3bf884732627bb1fc3815cbe4c5",
+      "testedGitBlobBytes": 30058,
+      "testedGitBlobSha256": "d0a037f7cd0a7fd4357eafac082c4e726ad5563ea85804dd430b0e97503a153d"
+    },
+    {
+      "path": "SNESEmulator.Runtime/BatteryAutosave.cs",
+      "bytes": 778,
+      "sha256": "7213a79f966992f387a549f56cc24b56498b870017a2c9fdda7cdf9f48365c4e",
+      "testedGitBlobBytes": 777,
+      "testedGitBlobSha256": "c6f8383e664d6885bea12097931d6fc4b3b586580948ac8b62e92122fa404372"
+    },
+    {
+      "path": "SNESEmulator.Runtime/BatteryPersistence.cs",
+      "bytes": 7091,
+      "sha256": "57074836a27b131d092341bd6e8d40d1cfacb1f10f50ee51c6f294b1d9123d2b",
+      "testedGitBlobBytes": 6982,
+      "testedGitBlobSha256": "82496ced1cc4931126578a1583066928b9f29b71e8169ba1b6f784811a9d1be4"
+    },
+    {
+      "path": "SNESEmulator.Runtime/BatteryStorage.cs",
+      "bytes": 957,
+      "sha256": "8da118af912c609e2b1f24d119e678a61499ab841e982a5393bdd1dd4b7ff27f",
+      "testedGitBlobBytes": 938,
+      "testedGitBlobSha256": "831ec52dd673415e024c1c6928e6e4bcfcc22a4612167085846aea5ca9d63d08"
+    },
+    {
+      "path": "SNESEmulator.Runtime/EmulationWorker.cs",
+      "bytes": 12800,
+      "sha256": "78dc3d4ca1a2701f7967c627683c47a19fbb2030dc51de93fcad3e646eb88028",
+      "testedGitBlobBytes": 12615,
+      "testedGitBlobSha256": "eac76a11a7ab5c209bd9a0ec60641b9beab95adc294cb1230f5ad32f3a39d0e4"
+    },
+    {
+      "path": "SNESEmulator.Runtime/FieldPacer.cs",
+      "bytes": 1374,
+      "sha256": "e811127e6e5e55e541608b54072fca53ba1d636b61e2a6d32d3e2468fe1f3533",
+      "testedGitBlobBytes": 1374,
+      "testedGitBlobSha256": "e811127e6e5e55e541608b54072fca53ba1d636b61e2a6d32d3e2468fe1f3533"
+    },
+    {
+      "path": "SNESEmulator.Runtime/FrontendInput.cs",
+      "bytes": 2779,
+      "sha256": "3958c8c221473b38c2b31e3820b57b9b5a8cf46c8d4373068fb958c464bdf148",
+      "testedGitBlobBytes": 2744,
+      "testedGitBlobSha256": "b045b19370d8a388e3fa326042de1bc2f106573b66390dd964587b54f3c81572"
+    },
+    {
+      "path": "SNESEmulator.Runtime/GamepadInput.cs",
+      "bytes": 2331,
+      "sha256": "69a93413bdb4e24ca6163b4beb4758182232e02a1b793095dddc0e4eaa0f1086",
+      "testedGitBlobBytes": 2287,
+      "testedGitBlobSha256": "f320ecb34ad16cca61a5825228ca904d4e3bbd7fab3a0446bce6d75d5ac73c43"
+    },
+    {
+      "path": "SNESEmulator.Runtime/IsolatedNetworkPresentation.cs",
+      "bytes": 718,
+      "sha256": "063cb416687ac87422d7584980aa14465b58e0c5db51202598595120da32219a",
+      "testedGitBlobBytes": 717,
+      "testedGitBlobSha256": "d0c7c2fb3fae544d3a5bb73463f496595d4a5c8c5f34ed976bcb21a656d702dc"
+    },
+    {
+      "path": "SNESEmulator.Runtime/PresentationHandoff.cs",
+      "bytes": 1392,
+      "sha256": "7e719646b6b5f2d862fac59cf454fbce3e4a38666f13251ac7644c9e170839b7",
+      "testedGitBlobBytes": 1392,
+      "testedGitBlobSha256": "7e719646b6b5f2d862fac59cf454fbce3e4a38666f13251ac7644c9e170839b7"
+    },
+    {
+      "path": "SNESEmulator.Runtime/SNESEmulator.Runtime.csproj",
+      "bytes": 289,
+      "sha256": "22d4eab5e42e7ccebbe93d5566b2f33024fd7e0a2593e0743e88a71655fbbffd",
+      "testedGitBlobBytes": 289,
+      "testedGitBlobSha256": "22d4eab5e42e7ccebbe93d5566b2f33024fd7e0a2593e0743e88a71655fbbffd"
+    },
+    {
+      "path": "SNESEmulator.Runtime/SettingsPersistence.cs",
+      "bytes": 2994,
+      "sha256": "c0f1d8ef761c986cf8550d8e093b15bb5a01bdd27898b92ed9aef1c2e57d49a6",
+      "testedGitBlobBytes": 2903,
+      "testedGitBlobSha256": "9c7b01fe8230efe1b2f96560423c8091c1fb7ec94ae7e0b3840679c4187b6e75"
+    },
+    {
+      "path": "SNESEmulator.Runtime/UiMailbox.cs",
+      "bytes": 1190,
+      "sha256": "e9bb458506e9905491eb53a59f19c9d06f08e59c3563e56e63b619f35fed9049",
+      "testedGitBlobBytes": 1165,
+      "testedGitBlobSha256": "32495ef377e8ba1cc5cd5a1eac2437c0212cdc4af07ab3aebfb608ec832c35e7"
+    },
+    {
+      "path": "SNESEmulator.Runtime/VideoPresentationLayout.cs",
+      "bytes": 955,
+      "sha256": "52eb2edb70fb52f905c676ae94a80bda80df274b7e4b9798e0e64fed048a3fa2",
+      "testedGitBlobBytes": 955,
+      "testedGitBlobSha256": "52eb2edb70fb52f905c676ae94a80bda80df274b7e4b9798e0e64fed048a3fa2"
+    },
+    {
+      "path": "SNESEmulator.Testing/CpuVector.cs",
+      "bytes": 5095,
+      "sha256": "b4c80df976ea504021df63bcb9936cd445a75153f8afc321450af06dbfa53491",
+      "testedGitBlobBytes": 5020,
+      "testedGitBlobSha256": "4e842b92282dfc74649c4a4ea086066c50770d4f6a81e3d7e1f74bf7e85f17c9"
+    },
+    {
+      "path": "SNESEmulator.Testing/Dsp1DiagnosticRom.cs",
+      "bytes": 2428,
+      "sha256": "3d1d4a3a24800f7ddc6f453a623e5e07118c706f5812207a2ea450c2db6b15b0",
+      "testedGitBlobBytes": 2399,
+      "testedGitBlobSha256": "c9d2aaab626e70bd214946d4c6be2d2667ec8c6452408926e8d10485fdbfb7d5"
+    },
+    {
+      "path": "SNESEmulator.Testing/NativeFrameOracle.cs",
+      "bytes": 1494,
+      "sha256": "b9f70c1759eb07a2f480da438d765d1501f76e84fcba5c584c56176a5f5148a1",
+      "testedGitBlobBytes": 1493,
+      "testedGitBlobSha256": "21085d63c8580da3b6150d6bd58ca2821ba9c307af13d4c030397287e3191c9a"
+    },
+    {
+      "path": "SNESEmulator.Testing/SNESEmulator.Testing.csproj",
+      "bytes": 281,
+      "sha256": "22b7b28e06f790b5370926bfdcba1ca72fc767fbafeef25dba454cff2d8b98aa",
+      "testedGitBlobBytes": 281,
+      "testedGitBlobSha256": "22b7b28e06f790b5370926bfdcba1ca72fc767fbafeef25dba454cff2d8b98aa"
+    },
+    {
+      "path": "SNESEmulator.Testing/Sa1DiagnosticRom.cs",
+      "bytes": 4270,
+      "sha256": "72a487b499ed3ddf5174cf8dfddcf649237aabe897b1ff80f8062848b72c4d88",
+      "testedGitBlobBytes": 4269,
+      "testedGitBlobSha256": "e27fb8e4495e420d7038d67f9f9e707367cb0aa11bd7ebc87e66bf3245dc5491"
+    },
+    {
+      "path": "SNESEmulator.Testing/SpcVector.cs",
+      "bytes": 12997,
+      "sha256": "a2fa222496436f735dc92ee73b25a251f4a8f867ef3d06c8ed8aaa63fd499183",
+      "testedGitBlobBytes": 12876,
+      "testedGitBlobSha256": "c7e5e827227299c92d22e8a48dc57cf530131e22d1f6392444b829b0f45e35e6"
+    },
+    {
+      "path": "SNESEmulator.Testing/StereoOracle.cs",
+      "bytes": 1071,
+      "sha256": "9601b2b4655d4bec58d35eea912207366ba01f621210d30e67e09258a84bdd04",
+      "testedGitBlobBytes": 1071,
+      "testedGitBlobSha256": "9601b2b4655d4bec58d35eea912207366ba01f621210d30e67e09258a84bdd04"
+    },
+    {
+      "path": "SNESEmulator.Testing/SuperFxDiagnosticRom.cs",
+      "bytes": 2435,
+      "sha256": "ea50b3c02853ba833eb4964d581ec14909bac12a949024cb278e09f18d973b49",
+      "testedGitBlobBytes": 2396,
+      "testedGitBlobSha256": "f53ec23a39e43529762f971587b2a85978d966643fd87267cc33ea522e54f108"
+    },
+    {
+      "path": "SNESEmulator.Testing/TestReport.cs",
+      "bytes": 2906,
+      "sha256": "306b46a291ed0af6a3b2ed5ee548600c73bbbe35855dd74770f7ec93d641797f",
+      "testedGitBlobBytes": 2860,
+      "testedGitBlobSha256": "32b606a8012cda679b0431fe20ec518ac3bd92319602f2e2acb644873b1c3012"
+    },
+    {
+      "path": "SNESEmulator.Tests/NetworkTests.cs",
+      "bytes": 34539,
+      "sha256": "3c4cd285baf00a808438b1ed0200c203f6baa654dcc96a05aba3cdf95a5957e1",
+      "testedGitBlobBytes": 34308,
+      "testedGitBlobSha256": "c020beab0fbcc9094a702322d04c2674edf1646468a7d7153821547d856bffb0"
+    },
+    {
+      "path": "SNESEmulator.Tests/Program.cs",
+      "bytes": 16131,
+      "sha256": "3360b9d2de90e8c4261ed34e2e6f8267bd3694b8851f7e3c59f1e113b54486bf",
+      "testedGitBlobBytes": 15941,
+      "testedGitBlobSha256": "2218855c1ba46fc1e04df8f495a7e4ec9b7df47f8df44d6c32ef6ed40689c301"
+    },
+    {
+      "path": "SNESEmulator.Tests/SNESEmulator.Tests.csproj",
+      "bytes": 471,
+      "sha256": "cbb398a1e984d6d7cf40598933c9047350b4ab9124caa23f4f0879faf869fea5",
+      "testedGitBlobBytes": 461,
+      "testedGitBlobSha256": "6f4ea896e1b65a9e0a9cdfb6a91413a6a23c2e9c31b7357e2c641208074529c7"
+    },
+    {
+      "path": "SNESEmulator.Tests/SoakObservationTests.cs",
+      "bytes": 7875,
+      "sha256": "3655c055cab01cf6d17408c93f51084e59c2c1a5dd96503c3d2dbd214c4ae7c2",
+      "testedGitBlobBytes": 7783,
+      "testedGitBlobSha256": "8c3d1fb23bbe8b343a96811131d5176226518dab24b62cd24956718b975ef7c0"
+    },
+    {
+      "path": "SNESEmulator.Updater/Program.cs",
+      "bytes": 2532,
+      "sha256": "e7604e33f9b270b7e344d78203d66ff1e179553fa5c328b166ef2f6772c07a14",
+      "testedGitBlobBytes": 2490,
+      "testedGitBlobSha256": "7dd8cd8ab4c40d540fd8d1fd8b3ab19506010f5293a4150a9b0d99fb6bb0ce06"
+    },
+    {
+      "path": "SNESEmulator.Updater/SNESEmulator.Updater.csproj",
+      "bytes": 386,
+      "sha256": "d2c500358e53c166eb02a5efc36f2df7af4bde1de8df82c05c3972e0ae34e5fa",
+      "testedGitBlobBytes": 385,
+      "testedGitBlobSha256": "0e4d2eeeaf8a76b8e0cf812eef996944919bae608b18ff347a79132533418d94"
+    },
+    {
+      "path": "global.json",
+      "bytes": 112,
+      "sha256": "70e7217bac916d6ff183ea5ac20ae1155fd8fe0b64debcf940605d5cd44af037",
+      "testedGitBlobBytes": 105,
+      "testedGitBlobSha256": "81ae2087dbfb46027fd94748351fb4b1ab24145fbb52544a2822bf128e2e48f1"
+    },
+    {
+      "path": "testdata/sa1/manifest.json",
+      "bytes": 1431,
+      "sha256": "c8c3252ed34066cb9a3a49d9707b050a7708f8c66026aa93406441485e810e11",
+      "testedGitBlobBytes": 1404,
+      "testedGitBlobSha256": "5d6df6db4ba5b8e544e7348412ba4346aa9a453cc45b3ce3970c6a4fe6ae0373"
+    },
+    {
+      "path": "testdata/sa1/own-ntsc-cc1.sfc",
+      "bytes": 32768,
+      "sha256": "83edef95c86643ca78c24932146388e8189edf504d8508a739a66b37cd9537f9",
+      "testedGitBlobBytes": 32768,
+      "testedGitBlobSha256": "83edef95c86643ca78c24932146388e8189edf504d8508a739a66b37cd9537f9"
+    },
+    {
+      "path": "testdata/sa1/own-ntsc-cc2.sfc",
+      "bytes": 32768,
+      "sha256": "61215d6d8ad427e5ef393a4a30e36d7e3dfc218045260ecfe03fb4e02bfebd28",
+      "testedGitBlobBytes": 32768,
+      "testedGitBlobSha256": "61215d6d8ad427e5ef393a4a30e36d7e3dfc218045260ecfe03fb4e02bfebd28"
+    },
+    {
+      "path": "testdata/sa1/own-pal-cc1.sfc",
+      "bytes": 32768,
+      "sha256": "2c6421c81ce4f137c83c2f311c24cc2e55212b86237cbe9a7493add61a47661d",
+      "testedGitBlobBytes": 32768,
+      "testedGitBlobSha256": "2c6421c81ce4f137c83c2f311c24cc2e55212b86237cbe9a7493add61a47661d"
+    },
+    {
+      "path": "testdata/sa1/own-pal-cc2.sfc",
+      "bytes": 32768,
+      "sha256": "a637732d2ddeb3accc4672e8ccbe1f300cdf811c332ff81ccfdb8c92db3f18e3",
+      "testedGitBlobBytes": 32768,
+      "testedGitBlobSha256": "a637732d2ddeb3accc4672e8ccbe1f300cdf811c332ff81ccfdb8c92db3f18e3"
+    },
+    {
+      "path": "tools/test-lab.py",
+      "bytes": 16483,
+      "sha256": "2c572de1f41abba3244c9d07eebd8c685a472e184821b52fa368ccac5cc0cc50",
+      "testedGitBlobBytes": 16326,
+      "testedGitBlobSha256": "ee0031e94e82fa9f5f3c3bb8fef80700627dcc57329677d7291a40984cdebb41"
+    },
+    {
+      "path": "tools/verify-sa1-testdata.py",
+      "bytes": 2259,
+      "sha256": "eea7e5321cdec4b28850f1af9efb075604b258c4b752f1baf9cf899e0ac5c337",
+      "testedGitBlobBytes": 2219,
+      "testedGitBlobSha256": "424e5678a149abfd14ca4eaf3140ad2bf10572a3a0ff654c38d65a786fc6bc5b"
+    }
+  ],
+  "reports": [
+    {
+      "path": "artifacts/m10c-sa1/acceptance/binary-sha256.json",
+      "bytes": 729,
+      "sha256": "096efa49bfdb969d0af15f8bfdc123c776cc42e1fa09f363776b83bd8078edb8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/build.log",
+      "bytes": 4051,
+      "sha256": "2682a3686012e20878fbaa0c8b242d70804de30c43ac341550f2cc9779801cc7"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/commands.json",
+      "bytes": 13077,
+      "sha256": "8509efc4e9cd22fb355e86afa4c8b36fa9765298f3969a28f43544a388f0f7b8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/compatibility-state-child.json",
+      "bytes": 16948,
+      "sha256": "d19c18a5faa8fe67736b27f5807110181a089f227c17952d111d43137bae99d0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/compatibility-state-child.junit.xml",
+      "bytes": 6096,
+      "sha256": "ecf3caf823caca12df63ad71ff6d59177ae91b0d50566772dc3d4c7374e5faf3"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/compatibility-state.json",
+      "bytes": 880,
+      "sha256": "7bb2d73183ee80825dbaea8ef4b87a089c6062031d2fe70037fecf85d3840dc0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/compatibility-state.junit.xml",
+      "bytes": 365,
+      "sha256": "9950abcdee8c681eb10937d3f3c78f2b914f3a73408cb30351043c202b92ed8f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/compatibility-state.log",
+      "bytes": 1939,
+      "sha256": "bb128a7f477b33b29689fc6b603d3c29569568547baf5c53f3a81203aa86f497"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/compatibility-state.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/compatibility-state.stdout.txt",
+      "bytes": 1785,
+      "sha256": "88b383274cbee9f8d6f5b6ea6f00e14ce1f694aa21c25531a61adfdcc30c3e0f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/core-child.json",
+      "bytes": 34881,
+      "sha256": "82f8cad7f2a8b9022df37723caa5d5d61ae713547b739ae944118bc89c7d9bdd"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/core-child.junit.xml",
+      "bytes": 29689,
+      "sha256": "2bd1976ac529a69be657c660ffc2365251f740ac8ee07a442a67d844a51fdf87"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/core.json",
+      "bytes": 845,
+      "sha256": "124cea87001cae1e8cf56013336fd39663d71c926745f080664b73dcdca5e832"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/core.junit.xml",
+      "bytes": 366,
+      "sha256": "9dd4846688c9c4315b9bcbe655a6f2af79177f68dce3ef8e179114d22bef3fe9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/core.log",
+      "bytes": 9723,
+      "sha256": "c64f7fc86af6fdddb0c62cf34b33fc66f747e0f731405fb557311ec6db21c717"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/core.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/core.stdout.txt",
+      "bytes": 9584,
+      "sha256": "e24823c64692497a37050c0ed968a7014a3f794b8be597931f3c1437bafcd485"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/dotnet-info.log",
+      "bytes": 2072,
+      "sha256": "cba1c77c709e070e8ee76c6ae543a58685d9bcc7c2c9b6a46c8781f4d259ae96"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/dsp1-functional-child.json",
+      "bytes": 7053,
+      "sha256": "9552a222630db7e749a1f7b40e8afd92a5c1b29cd82aaed704ef6c7f73109d14"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/dsp1-functional-child.junit.xml",
+      "bytes": 6645,
+      "sha256": "4d5eb7e5b8b62e0ba69150fa094fadc5fbf0b8f3579d0cd9894213eb8630e406"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/dsp1-functional.json",
+      "bytes": 978,
+      "sha256": "a20da26252687984a07761bb4e6418ba6e5476be70d7a41bc47328fb91029fe9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/dsp1-functional.junit.xml",
+      "bytes": 365,
+      "sha256": "9f10420ac83437bbd51c57d39ee22ddc57e41863c72e771f9e1c192be03e0afe"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/dsp1-functional.log",
+      "bytes": 300,
+      "sha256": "e33a427130a9933add792804a2920dde8006595412c1150dbe651291a61aafba"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/dsp1-functional.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/dsp1-functional.stdout.txt",
+      "bytes": 150,
+      "sha256": "64bec164ad39d3c1819fce7f7ef17f48fe506e56b025fdc7e45b340d4955897e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/fixture-integrity.log",
+      "bytes": 122,
+      "sha256": "bf8fabba2bb5ca469183311d44771bb0c8254638bf1f0703952fe36e8cee906c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/frozen-normal-regression.log",
+      "bytes": 6376,
+      "sha256": "9bf30877e5117a1fdfc02e419085bd6d34d6854524275d2464bdd64a93163ee5"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/functional-child.json",
+      "bytes": 7183,
+      "sha256": "a115f8600cae080f9a1f0eb153342842eb38f9bf784ac87cb4af4207742ea623"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/functional-child.junit.xml",
+      "bytes": 7652,
+      "sha256": "fc84d0d5baf743e6083cd860872c691c2f541a94d20c383c24ce0dee6389abbb"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/functional.json",
+      "bytes": 967,
+      "sha256": "78987a150c6366b2e0feccc83812c5cb8c7189a35a3d62db34dbb72554f79be3"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/functional.junit.xml",
+      "bytes": 365,
+      "sha256": "3ca97de60d7d08707bcca56227d04830a634aa679691271ea3cfcabcb8e4804f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/functional.log",
+      "bytes": 309,
+      "sha256": "45b7d3e906145d8ecc75ceda904aae6e0f6cd3ec396a3c82dd6cfe0bb8ff23ca"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/functional.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/functional.stdout.txt",
+      "bytes": 164,
+      "sha256": "8892bc3be0d9e42fe8ab0a29ab3c7f2458bbcd1dc7facd4ea4197ddd8be28812"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/manager-child.json",
+      "bytes": 5080,
+      "sha256": "8512c4538e0ac387876a185d8d51a65162f4b612e0cbdc44a299880e680a64d4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/manager-child.junit.xml",
+      "bytes": 3913,
+      "sha256": "127c875ef9699db2cb4e9a78d30fbb6801febbd6a2e553d3d37ba12e370f1b96"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/manager.json",
+      "bytes": 853,
+      "sha256": "9f6dd073b2d009325f912cae85d628f5f8a5bc8d22e911bf670a8ae74422b40c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/manager.junit.xml",
+      "bytes": 365,
+      "sha256": "4d15e923d39bccd3ec60b6c7c3e492f8d2d42ebb3c43c83dccc085e536bff1f2"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/manager.log",
+      "bytes": 1460,
+      "sha256": "d4c8792ae7b15769efd25e9a0574ce51f3e1580855d501eeaef29140e75006b8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/manager.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/manager.stdout.txt",
+      "bytes": 1318,
+      "sha256": "2a8629ebf885cfe5fc701bd09dc342f1e612979d547969f87e50296c157f6675"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/optional-published-absence-child.json",
+      "bytes": 593,
+      "sha256": "5b870ee5d8f7a4cfa99c3a8230549b1e9eeef6f4816f0437c0ffd4ee15ccdd13"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/optional-published-absence-child.junit.xml",
+      "bytes": 616,
+      "sha256": "1756c2c6665c90c43ce201702d0fa1b16768b08c54fb415ebfb3a706acc1fe2f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/optional-published-absence.json",
+      "bytes": 1009,
+      "sha256": "3d3f71774408058e48b8056fc701b2090f50e8a95f16aea2def29eefcfa96230"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/optional-published-absence.junit.xml",
+      "bytes": 964,
+      "sha256": "6f29c77e7dda5938ea0a2677a01295c95d764c9972ff9b56f485e73e89fe791e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/optional-published-absence.log",
+      "bytes": 365,
+      "sha256": "2b9c9e6082da34e240ca1aee2a109970c8e5cb835919f6cb869c65da406d6b48"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/optional-published-absence.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/optional-published-absence.stdout.txt",
+      "bytes": 201,
+      "sha256": "c1c6352c7784bd4d998b2b48b914d9df294c519198a31728c48f37c54d7235b0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/persistence-child.json",
+      "bytes": 3492,
+      "sha256": "88c44708da814bdc07a96253fc4c0932f84e317f4c14a0caf62c50660376988c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/persistence-child.junit.xml",
+      "bytes": 3747,
+      "sha256": "4bdbcc9cc0c645ac4463d558687788488c4a53d576a255c44698c9f55513218b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/persistence.json",
+      "bytes": 867,
+      "sha256": "84626aa91e4c491340250c3dc4282c91e40064208d49e12bf99fcf0987de744e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/persistence.junit.xml",
+      "bytes": 363,
+      "sha256": "62f778dc0be7bd67a739ea533d797894b0f8c0b51615a593f821cf8699b30219"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/persistence.log",
+      "bytes": 3304,
+      "sha256": "fee4c12e14a70ceff9741b3e8177aab43f8d77dbe80b7005bbe1b55ecc9be7b2"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/persistence.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/persistence.stdout.txt",
+      "bytes": 3158,
+      "sha256": "d1c608a2d38d9ea595144c65d358fe076b92b7dc926524de36175cff330eb029"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/published-rom-child.json",
+      "bytes": 15457,
+      "sha256": "ad6beb8563f403d0b8d488871c467441f59cc6b475083ce6930ac25139bd72e5"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/published-rom-child.junit.xml",
+      "bytes": 5189,
+      "sha256": "76270802f10e52f77473162d7a5a57fce5a58b41892c982cc257539de46c2b10"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/published-rom.json",
+      "bytes": 1024,
+      "sha256": "207a7cb2eb46f0878525cec9f147517eb318ac6e41fd5d41910e022188743785"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/published-rom.junit.xml",
+      "bytes": 976,
+      "sha256": "2d147a7ee177cfa8759af77f0171a10208146d8fb2a8b97faad69e164e819168"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/published-rom.log",
+      "bytes": 341,
+      "sha256": "55de7bed5fe5bde8aa86cb3bf46958bab30ac9da1606ffa4dc8758d0fa78b2d6"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/published-rom.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/published-rom.stdout.txt",
+      "bytes": 193,
+      "sha256": "b1722f7b3458271c1511c28704af8a70bb7cbbd988050a38f6ec0fe2527a5f88"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/runtime-child.json",
+      "bytes": 5856,
+      "sha256": "e7d78875d00a22f44f0c0cbcbf1d639ac21321690f57b875c87b10cf8c808a91"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/runtime-child.junit.xml",
+      "bytes": 6506,
+      "sha256": "45264cda4ed4da571d0bc6fb9e4aadc88c519402abb642fe2bb61b35fc32b1a4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/runtime.json",
+      "bytes": 862,
+      "sha256": "3fed5a5b01f7a8d44d8a4fef866e7a9614823da72eab8672b822eb79c3cb2af6"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/runtime.junit.xml",
+      "bytes": 365,
+      "sha256": "562c4c8e3e28bca29653946ad3f60d7f134145690857b2e10c24ea7a903e26d8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/runtime.log",
+      "bytes": 2322,
+      "sha256": "1c797667c0c7dc7c972d9f949ff65968f44ed87462ec8646eec30534831cbe9c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/runtime.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/runtime.stdout.txt",
+      "bytes": 2180,
+      "sha256": "4e5286e46af5821fef8c872c4ab1ad5dd892d22ed443bc4c389961b4f0922542"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/sa1-integrity.log",
+      "bytes": 80,
+      "sha256": "e9feea1ef0b156e3ca48efcae85f741cb03a17163699f54322f863c0b1d7fd8a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/superfx-functional-child.json",
+      "bytes": 8037,
+      "sha256": "52a53affaea382ca24aaea3a8be6e933cdb758ec83857cd2526f482389c7645b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/superfx-functional-child.junit.xml",
+      "bytes": 7814,
+      "sha256": "0bf2851b93640e02b3684772addcd39051042c4400f4f52073eb1d0fd5a1d5a8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/superfx-functional.json",
+      "bytes": 985,
+      "sha256": "c1a8d4e563d07dc1f242d312fc24fa4d29eb266dc295bdd9e07d8257e3507ea0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/superfx-functional.junit.xml",
+      "bytes": 364,
+      "sha256": "69ed6b6aa1f673b125778c7c9da16f2f534e509d5062aebebf94456faed0e81e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/superfx-functional.log",
+      "bytes": 309,
+      "sha256": "90d797705d42d3eaf0435c15ec9c1f6f604d9a4306e0c92632b78c81300c44df"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/superfx-functional.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/superfx-functional.stdout.txt",
+      "bytes": 156,
+      "sha256": "b13b157d54843eb142b717d329c58f2fed495ca4a1ad4c1c3da311667a8e95a5"
+    },
+    {
+      "path": "artifacts/m10c-sa1/acceptance/superfx-integrity.log",
+      "bytes": 96,
+      "sha256": "1346ef59f1a1ae5b907ba185954864b6abcc0c918f5cc51cbfbc8ebab6cd11fa"
+    },
+    {
+      "path": "artifacts/m10c-sa1/comment-token-proof.json",
+      "bytes": 454,
+      "sha256": "b4390607d83877cd9455f2ee91a434295b107f8c7f276bc29c297d16ec292e8d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/eighth-functional.json",
+      "bytes": 5349,
+      "sha256": "c19855d94818d651b8e0e8f2b717d7956218e33190adac70fc7001a9b592eeb9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/eighth-functional.junit.xml",
+      "bytes": 5071,
+      "sha256": "7062c5ada5ad35f9a8b5d53cb85e8b537c70248c4d82b20b8d5ad8d695290991"
+    },
+    {
+      "path": "artifacts/m10c-sa1/eleventh-functional.json",
+      "bytes": 9472,
+      "sha256": "511669d931484951eebec9fb92b08253f7c62c1a1d00da855a04d25f02da6884"
+    },
+    {
+      "path": "artifacts/m10c-sa1/eleventh-functional.junit.xml",
+      "bytes": 8409,
+      "sha256": "6c18c5021630bd59d8d2581b2fdb9e67dcedbed5bdff86b9caa376ad49c8390b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/fifteenth-functional.json",
+      "bytes": 7660,
+      "sha256": "08e20b07de1226d9b2770383f0b52333cb7f195bcaa42c5054743755fb65c1ec"
+    },
+    {
+      "path": "artifacts/m10c-sa1/fifteenth-functional.junit.xml",
+      "bytes": 7652,
+      "sha256": "4789d3523128cdcb6fcfa0e7a783d8bb6f05918548758188e69d34e3a3886e33"
+    },
+    {
+      "path": "artifacts/m10c-sa1/fifth-functional.json",
+      "bytes": 2717,
+      "sha256": "634701faabb50ee620cf020c11a348aad0eb2f3e650207bc2df1b599112e4fa0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/fifth-functional.junit.xml",
+      "bytes": 2518,
+      "sha256": "59f09ea6a59e8d8e7b64e247692420cacc635432ed8dc9a5a6b70ee37e94f54f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/format-token-check.json",
+      "bytes": 1168,
+      "sha256": "74ef320703ad1d953d7daa0f2dd4cf0d29a64b199f418934bc56b38262fab351"
+    },
+    {
+      "path": "artifacts/m10c-sa1/fourteenth-functional.json",
+      "bytes": 7233,
+      "sha256": "9a0c4ed13e81dc3cbc5db0dbff833d34401ed3cc4040a0c1ac5a18ba189bc9b6"
+    },
+    {
+      "path": "artifacts/m10c-sa1/fourteenth-functional.junit.xml",
+      "bytes": 7168,
+      "sha256": "09c9b7e09b2ce84a048ad8b892808b05279c208338d1dcab7f713c9bb379fd57"
+    },
+    {
+      "path": "artifacts/m10c-sa1/fourth-functional.json",
+      "bytes": 4097,
+      "sha256": "ebf392d8054a651e532413138be6036849b5f5fbd7f7ac458b5d0ba0fe9ca4ab"
+    },
+    {
+      "path": "artifacts/m10c-sa1/fourth-functional.junit.xml",
+      "bytes": 3884,
+      "sha256": "7cabd47220f40d531b66c0897e79993d82a9f53a3e72e847fcd03e0c9150bd87"
+    },
+    {
+      "path": "artifacts/m10c-sa1/initial-functional.json",
+      "bytes": 6316,
+      "sha256": "f2dfd97ab5de8b42021eb6c22aa10bb4ee754869ed0aa0029f9f555c313bf566"
+    },
+    {
+      "path": "artifacts/m10c-sa1/initial-functional.junit.xml",
+      "bytes": 6126,
+      "sha256": "be8bfa8182ddc11b3a8dc9bb2c7076b43fa0eb21eaa34783a63b0eb53f01b65d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ninth-functional.json",
+      "bytes": 6075,
+      "sha256": "a428fe624d9f0956d6ec6e70f229920ce45e4751c3827a43133cbefc0a220851"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ninth-functional.junit.xml",
+      "bytes": 5776,
+      "sha256": "57a5e9307fa1a91f1b4d26c2f32a0dbfbb457b6238990dcdf2064cef721565cd"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/commands.log",
+      "bytes": 6004,
+      "sha256": "741da65c29eff91005b2bd36a7cb1534d9867a064e7e24163cc56044973baec9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.field0.state",
+      "bytes": 19453,
+      "sha256": "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.field13.state",
+      "bytes": 19506,
+      "sha256": "5f6cb64d8020fad866d56c430963e5bd417cf7e231882e049723049f0af49125"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.field13.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.field9.state",
+      "bytes": 19443,
+      "sha256": "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.json",
+      "bytes": 3102,
+      "sha256": "93dc8383789bb111b3d7c55ed2a20aed227ec26572a34a597021f50b7d1ef6ed"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.pcm.bin",
+      "bytes": 149440,
+      "sha256": "55233dce2e516ce7d3ff721f8a525bdb5fd3c6a0afc3671eb653d85c72907ceb"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.sfc",
+      "bytes": 32768,
+      "sha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.state",
+      "bytes": 19647,
+      "sha256": "b8cef407b6d81e263a76a1bab174def506e0b00be012f29ac4b62f2c1c79755b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/audio-ntsc-devices.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.field0.state",
+      "bytes": 41732,
+      "sha256": "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.field13.state",
+      "bytes": 48776,
+      "sha256": "f00d49227ecb619d84248c861920c4b4067f361518ec4f7699f795b2e2c4dbe8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.field13.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.field9.state",
+      "bytes": 49620,
+      "sha256": "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.json",
+      "bytes": 3130,
+      "sha256": "af4d607c221a18b201a348673f64d3bcac2da853a9408c8e544fadbcaa9df27b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.pcm.bin",
+      "bytes": 149440,
+      "sha256": "644744402e3e2934a74d0e60a43d203395472cefc4202cc4fa65207d31b3ad6c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.sfc",
+      "bytes": 32768,
+      "sha256": "35f3537026357b74d14ec7d1e99c509cc0086ba305431c57d5cc6c5d03d90d00"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.state",
+      "bytes": 49082,
+      "sha256": "d33538e2f5b0b71c6e9816bdc720a2124a48259bf816cfe0bb2df9b3156c7a61"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/devices/diagnostic-ntsc-devices.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/cache-result.json",
+      "bytes": 96,
+      "sha256": "24d667e7e1c50a1a889d03ce976546ab1a63819fe13149e872ae4f1a2eb180db"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/cache.state",
+      "bytes": 41786,
+      "sha256": "3bcec90dea8e4ea8aaee4c02a2b2c11e9a440fea0c7645dc2b5e62e6a62558a1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/cache.state.bak",
+      "bytes": 41786,
+      "sha256": "3bcec90dea8e4ea8aaee4c02a2b2c11e9a440fea0c7645dc2b5e62e6a62558a1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/cache.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/clock-result.json",
+      "bytes": 113,
+      "sha256": "66f2152a105906345c3d72941a52f6ee1dd60f2224e74b51106699ddcde4ff55"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/result.json",
+      "bytes": 41561,
+      "sha256": "abf0e488e539ffd5b16182bed49126d40e96b67092f0fcb99d0e1f727c5c1481"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/scratch.state",
+      "bytes": 20157,
+      "sha256": "6e9b7f394d6819336aa6c6aad1763462eae1a9b263755f6d0172570bb28e0fd4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/scratch.state.bak",
+      "bytes": 20157,
+      "sha256": "6e9b7f394d6819336aa6c6aad1763462eae1a9b263755f6d0172570bb28e0fd4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/scratch.state.corrupt-4e8fddd2536c4f8d98e59b1935b5bdbd",
+      "bytes": 20133,
+      "sha256": "9e41cc02695d103d6ba0ee25b8393f0bbab8a86fa786f3b935e61f0cb74c85b8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/scratch.state.corrupt-8aa3c9ba0ad943498bd2b58e21c1354b",
+      "bytes": 20139,
+      "sha256": "02405ba9a09329fd348fc659a5b9f322fffcd1537ff81d272b82b07bc1d1da09"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/scratch.state.corrupt-b6d76dccbc4f427caad57c6fbf69a823",
+      "bytes": 20148,
+      "sha256": "c1597bcc82e168e816c1cdf52cc45696335b492d009c10a8fdfb854f6c7bf016"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/horizons/scratch.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/provenance.json",
+      "bytes": 8271,
+      "sha256": "2cb0719d0c656601c0bcba693cd7b06024aa688e7f5cccb834d8ad03ac137b4c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/result.json",
+      "bytes": 2294,
+      "sha256": "cd6ad662332b9ed9df2d6cf97ba046f70b00c0fbb8ffa82d0edc8789377c669e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/suspend.json",
+      "bytes": 539,
+      "sha256": "e8db1d2e232645c00b1e9d787b8e50d3ef1cedb83ab5a4198234bd142ad6da48"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/suspend.jsonl.gz",
+      "bytes": 485151,
+      "sha256": "837e898f015a401db0be290794d7938b507a5eb0c95d4b9248d301f54bc3ff84"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.field0.state",
+      "bytes": 19453,
+      "sha256": "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.field25.state",
+      "bytes": 19498,
+      "sha256": "b97419d3ecaaf27ec29a95bde5b010ee7d942d87d79bd4f6ed12486da8baedbf"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.field25.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.field9.state",
+      "bytes": 19443,
+      "sha256": "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.json",
+      "bytes": 4655,
+      "sha256": "d7f67f7c5fb320949727f5ab71e90756ee63c9cdd1e939448c6c8e54d93a82c8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.pcm.bin",
+      "bytes": 277240,
+      "sha256": "623eac03299baff45a7f72ff76e39c83f971baca56330635115d97ea2c71b2e4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.sfc",
+      "bytes": 32768,
+      "sha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.state",
+      "bytes": 19618,
+      "sha256": "ed2a9454de1b8f08e098ef10d5111d6f27a518d15aeba8eedd9c4ed7a50584ce"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/audio-ntsc-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.field0.state",
+      "bytes": 41732,
+      "sha256": "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.field25.state",
+      "bytes": 49490,
+      "sha256": "98e6f3bb17202faeba35a0411111a79438852178fe1246737b0f0ec944d686df"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.field25.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.field9.state",
+      "bytes": 49620,
+      "sha256": "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.json",
+      "bytes": 4678,
+      "sha256": "6a87d3a5529ed0eb8a498ca601ccd010df736567d960b9959b7f9034cad14eae"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.pcm.bin",
+      "bytes": 277240,
+      "sha256": "ce06aa2638b01f2d3f0bdb6eca3c6d98f1051d5bba68935abaefe929541c4a4e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.sfc",
+      "bytes": 32768,
+      "sha256": "35f3537026357b74d14ec7d1e99c509cc0086ba305431c57d5cc6c5d03d90d00"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.state",
+      "bytes": 50717,
+      "sha256": "66ebf79bfd62f557f3141b20c3a200eed8603f5feb1cbf1fac6c24a5c8e0127c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/diagnostic-ntsc-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.field0.state",
+      "bytes": 19297,
+      "sha256": "f9bd5ae1b3b024e97ee858fdb5f63ead3ec0f9373ccfdc0ecc02b70863071e6b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.field329.state",
+      "bytes": 145838,
+      "sha256": "74a32360ebcfd7f4fc7fccbc311141add74da97dbe85f3215912b8c1843ffed4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.field329.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.field9.state",
+      "bytes": 28689,
+      "sha256": "c2fa789c162c346d4c2580bfc05922bfb76ecbe77b2928b5a0c07d96ccac1227"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.json",
+      "bytes": 44665,
+      "sha256": "1e145c131cd6664dcef1e22b989d2feb1c891ff8e89f4e3c3f13a037485c4bd7"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.pcm.bin",
+      "bytes": 3514580,
+      "sha256": "56ef6e8a2722b0388ec9dddf2e8f3211513f0286a707058a9d25170d37a603d9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.sfc",
+      "bytes": 262144,
+      "sha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.sram.bin",
+      "bytes": 4096,
+      "sha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.state",
+      "bytes": 146039,
+      "sha256": "eca8b2fe64f64f86901b90324f835469727663b60ef5e77526c689b2b40c90be"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-ntsc-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.field0.state",
+      "bytes": 19297,
+      "sha256": "16eab4f61ca632b613fa998565e3692592fbeacfdd37f552906fd0182ac721cc"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.field329.state",
+      "bytes": 145106,
+      "sha256": "5c9168356ba209c80a1b8efa3e222a5fc84d473be8bc5407abf0d4d45ef26a4d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.field329.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.field9.state",
+      "bytes": 29403,
+      "sha256": "762e01d15a862696ada5cdd19fcb965ac60bd101b512fd0a2efb49e218404e4f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.json",
+      "bytes": 44640,
+      "sha256": "60ad962ac1f59ba4550a5908099bca2f92df265e764e763b8e36c9586ff7b669"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.pcm.bin",
+      "bytes": 4223780,
+      "sha256": "c1af48b81eee0469c4411fd45cc4397732ca30d6fc2a86516b610adfb85333be"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.sfc",
+      "bytes": 262144,
+      "sha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.sram.bin",
+      "bytes": 4096,
+      "sha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.state",
+      "bytes": 145835,
+      "sha256": "31bb450adbd07c77abe46c97a2653292bc439900024ad9a1c577880129a82ec1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/game-pal-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.field0.state",
+      "bytes": 33444,
+      "sha256": "a6952d68e53767dc5e5b0d1064828167af82505f133ee1c86cea7450cfdc0b53"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.field25.state",
+      "bytes": 33545,
+      "sha256": "0c3761c436669815d03f711dda77f15c056bb2999d06fd32c61b567c70ca2583"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.field25.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.field9.state",
+      "bytes": 33550,
+      "sha256": "4751c827b576bf1fc9c1ccc2264124a035d2343d17e448e379e7f899dcc4707d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.json",
+      "bytes": 4658,
+      "sha256": "e7889169ae572343e17229d50791d9fdafbe6bfd955b7116d07339ce26d0596e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.pcm.bin",
+      "bytes": 277720,
+      "sha256": "474dd6f1f003465ab6e54abd3dd5b4a822408fec9f0c096aff0bc68ce876a75f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.sfc",
+      "bytes": 32768,
+      "sha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.state",
+      "bytes": 33575,
+      "sha256": "399770960834ba37ddd36737e57831895397bd7c2fc6410c18b491a9dcfc7dcf"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-ntsc-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.field0.state",
+      "bytes": 33440,
+      "sha256": "740b3bdbdf5aa3ccd9a185b7c99e7240e15ea1a5b3e4f6d3571533034cde2689"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.field25.state",
+      "bytes": 33484,
+      "sha256": "c5e62f6923dcf64c162073ee108ce2998abb0c92db80d2f6446b340516a2e77f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.field25.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.field9.state",
+      "bytes": 33518,
+      "sha256": "157785fb5b912d74523e60308b34dbd35399a2190c14859ee7fc5c551669e956"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.json",
+      "bytes": 4651,
+      "sha256": "a88078d03ae9f556577f92de8fe76f35b1a7ff10d4c7a1e6dc3d9e3bf56f28c8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.pcm.bin",
+      "bytes": 333620,
+      "sha256": "14bfdc979f6fe11347aedc3435f6cae8f6eaba81bb4f097c5984330ae2af529f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.sfc",
+      "bytes": 32768,
+      "sha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.state",
+      "bytes": 33527,
+      "sha256": "1e5eb6af3509de87c1dc687864992b312823b707d50cce19d113588306e5fc5d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/traced/geometry-pal-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.field0.state",
+      "bytes": 19453,
+      "sha256": "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.field129.state",
+      "bytes": 19549,
+      "sha256": "945e716496f7e5539928de25ea3737469b5ea4dd1f00c5a7a2f506278dec89d0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.field129.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.field9.state",
+      "bytes": 19443,
+      "sha256": "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.json",
+      "bytes": 17865,
+      "sha256": "cfaca046d36ac3762ae69fdad97b26c6bde2dd374c46f7c21d9df11f2d2f44d3"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.pcm.bin",
+      "bytes": 1384740,
+      "sha256": "52bd49062726c47943ded176da349be947985e91a06e7b7fd789049781c03798"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.sfc",
+      "bytes": 32768,
+      "sha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.state",
+      "bytes": 19666,
+      "sha256": "99649671110d72942bb3290322e994fbd254a769ea08a3c0f04fd5eec8c0e5a3"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/audio-ntsc-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field0.state",
+      "bytes": 41732,
+      "sha256": "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field129.state",
+      "bytes": 49259,
+      "sha256": "a33b57a85e2788c0210030674247f77cc408031265e2eadac6411586fca7cf82"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field129.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field9.state",
+      "bytes": 49620,
+      "sha256": "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.json",
+      "bytes": 17996,
+      "sha256": "5a406ce9e2063a0699ceb637233f0ad1c804c8fc6f086e81a2cb65cc92e230c7"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.pcm.bin",
+      "bytes": 1384740,
+      "sha256": "179f6db844c9a1d1b8338a6530589c9f935d9b9e2357423806f082e750427bc1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.sfc",
+      "bytes": 32768,
+      "sha256": "35f3537026357b74d14ec7d1e99c509cc0086ba305431c57d5cc6c5d03d90d00"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.state",
+      "bytes": 50394,
+      "sha256": "963be3c6d93d78b31f88339776f65d8f766fc7f6915dd3fe340b25a6ab88d780"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.field0.state",
+      "bytes": 19297,
+      "sha256": "f9bd5ae1b3b024e97ee858fdb5f63ead3ec0f9373ccfdc0ecc02b70863071e6b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.field329.state",
+      "bytes": 145838,
+      "sha256": "74a32360ebcfd7f4fc7fccbc311141add74da97dbe85f3215912b8c1843ffed4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.field329.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.field9.state",
+      "bytes": 28689,
+      "sha256": "c2fa789c162c346d4c2580bfc05922bfb76ecbe77b2928b5a0c07d96ccac1227"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.json",
+      "bytes": 44091,
+      "sha256": "3e5e383f15c656d9467995c3e4ad3be1b3f75c71a85f288cb95f52c39a697451"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.pcm.bin",
+      "bytes": 3514580,
+      "sha256": "56ef6e8a2722b0388ec9dddf2e8f3211513f0286a707058a9d25170d37a603d9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.sfc",
+      "bytes": 262144,
+      "sha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.sram.bin",
+      "bytes": 4096,
+      "sha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.state",
+      "bytes": 146039,
+      "sha256": "eca8b2fe64f64f86901b90324f835469727663b60ef5e77526c689b2b40c90be"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-ntsc-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.field0.state",
+      "bytes": 19297,
+      "sha256": "16eab4f61ca632b613fa998565e3692592fbeacfdd37f552906fd0182ac721cc"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.field329.state",
+      "bytes": 145106,
+      "sha256": "5c9168356ba209c80a1b8efa3e222a5fc84d473be8bc5407abf0d4d45ef26a4d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.field329.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.field9.state",
+      "bytes": 29403,
+      "sha256": "762e01d15a862696ada5cdd19fcb965ac60bd101b512fd0a2efb49e218404e4f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.json",
+      "bytes": 44110,
+      "sha256": "2a0a55fe011ffe10fe740eb37efdb51edc4b28c0df771294af74bf86e0a4d916"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.pcm.bin",
+      "bytes": 4223780,
+      "sha256": "c1af48b81eee0469c4411fd45cc4397732ca30d6fc2a86516b610adfb85333be"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.sfc",
+      "bytes": 262144,
+      "sha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.sram.bin",
+      "bytes": 4096,
+      "sha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.state",
+      "bytes": 145835,
+      "sha256": "31bb450adbd07c77abe46c97a2653292bc439900024ad9a1c577880129a82ec1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/game-pal-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.field0.state",
+      "bytes": 33444,
+      "sha256": "a6952d68e53767dc5e5b0d1064828167af82505f133ee1c86cea7450cfdc0b53"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.field129.state",
+      "bytes": 33540,
+      "sha256": "2b25d695f45752754b3b412522017287799e473253dcf7e646e3d2e15a1af2f8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.field129.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.field9.state",
+      "bytes": 33550,
+      "sha256": "4751c827b576bf1fc9c1ccc2264124a035d2343d17e448e379e7f899dcc4707d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.json",
+      "bytes": 17995,
+      "sha256": "9ca6c3af41be40ee3813e05173b8b13b1687997cd898cf9a5572d5e6089b6b44"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.pcm.bin",
+      "bytes": 1387360,
+      "sha256": "820bcfbc84985ac2ebfff9bccdecacc5ea10d1fc5da0bf6d61daacd4f74c624f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.sfc",
+      "bytes": 32768,
+      "sha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.state",
+      "bytes": 33518,
+      "sha256": "56d12ad52b42578a4681ea0a872255f9f6ceb193ec81286d8e9ae1415386ad18"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-ntsc-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.field0.state",
+      "bytes": 33440,
+      "sha256": "740b3bdbdf5aa3ccd9a185b7c99e7240e15ea1a5b3e4f6d3571533034cde2689"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.field129.state",
+      "bytes": 33519,
+      "sha256": "dfbc285060be56b317ff0b744394d4ba3f546dbbf78e18bc87ae76aa7b3bbf98"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.field129.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.field9.state",
+      "bytes": 33518,
+      "sha256": "157785fb5b912d74523e60308b34dbd35399a2190c14859ee7fc5c551669e956"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.json",
+      "bytes": 17991,
+      "sha256": "4e574f38b6760e2285c21283ee1ca5f006fd0d85b4499d7e26d3dd8393bc2990"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.pcm.bin",
+      "bytes": 1666760,
+      "sha256": "e780e192c7ecf36b6890589881a045e4c1a3009b5e03088a99637e8d6d1130ba"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.sfc",
+      "bytes": 32768,
+      "sha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.state",
+      "bytes": 33573,
+      "sha256": "9b77dac11f34b3151b0bcd6437eb918b3278df8bf29065360308d46c0a7e459a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/normal-frozen-regression/untraced/geometry-pal-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/precommit-functional.json",
+      "bytes": 7869,
+      "sha256": "3de5067cf879e43e2d90ee3e4afdddab0d25913d2e1c7b8e13fe1382d6c8c62a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/precommit-functional.junit.xml",
+      "bytes": 7652,
+      "sha256": "4cb1386210490e2374fcc126d980ed0a9dab2056d0956ca910189394aee1ee5f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/primary-source-identities.json",
+      "bytes": 1947,
+      "sha256": "5861d79df21edfd5ce36b7be360e4f087def49054e14025c759649a7dc06814e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/producer-core-identities.json",
+      "bytes": 10560,
+      "sha256": "f9f4897b09e0556e526f2d5bc33d5697cba218c703892d378d90ed97bffdfe51"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-grants-supervisor.json",
+      "bytes": 1194,
+      "sha256": "7fe401aa2f2649bb8a347124c7473855309b24e8bea9c9820f5f58e3195d448a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-grants-supervisor.junit.xml",
+      "bytes": 696,
+      "sha256": "314947c1ad646abaf64162919134f03f9427bffaad7e332031789301790fd823"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-grants-supervisor.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-grants-supervisor.stdout.txt",
+      "bytes": 114,
+      "sha256": "f9426c2d32654a7d619701a2f73793b2cf11a8281f3c8a62c5f02dd637745f64"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-grants.json",
+      "bytes": 15934,
+      "sha256": "9ba0f90446c06dee88a91a7015cff070fb84cdce12a80ace8da3d0088559558a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-grants.junit.xml",
+      "bytes": 5189,
+      "sha256": "61140f2ffd3ba65786598f6e58411499d966adf64698b92ce2b967a3f1f1e9e0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-initial-supervisor.json",
+      "bytes": 1196,
+      "sha256": "ab34ef7a55f9d015c8db6763813e1143121459f73f9a835389d12a99765a340a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-initial-supervisor.junit.xml",
+      "bytes": 697,
+      "sha256": "f516538303431ecc76b4bc4dfbb9c5d7485fe8e28816666805a2512807f9490d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-initial-supervisor.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-initial-supervisor.stdout.txt",
+      "bytes": 107,
+      "sha256": "8e53bd48b1d108d43cc6cd8499c72dd68b067774006c76f0cf217867515fbb5e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-initial.json",
+      "bytes": 10484,
+      "sha256": "75c8e6b251cedbd522238b95f6517fa081482eef826c8a8b8f17266b5ac58928"
+    },
+    {
+      "path": "artifacts/m10c-sa1/published-initial.junit.xml",
+      "bytes": 2382,
+      "sha256": "c0cf353883fb9e0ced4e2e1372681f394bf4716606e86d8005ae6014ee038b3d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/second-functional.json",
+      "bytes": 6187,
+      "sha256": "46da55b0cc13c1f2e32d13cbf5961c48f2d014f09a5af44778a6265aa7aafaed"
+    },
+    {
+      "path": "artifacts/m10c-sa1/second-functional.junit.xml",
+      "bytes": 5958,
+      "sha256": "474bb8ee07c06b1a001e3d2c4fb4a889eaaadc755aeb1b2f0442d00a6c2f673f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/seventh-functional.json",
+      "bytes": 5437,
+      "sha256": "252dd0d6b7cdacef3e13c60249e202a76bcd66c8a58e41465bc915c1224f6cfa"
+    },
+    {
+      "path": "artifacts/m10c-sa1/seventh-functional.junit.xml",
+      "bytes": 5516,
+      "sha256": "684ed8c59b0423a2048b947acbce2767737d1c2ad336ef540f54de9a67c20358"
+    },
+    {
+      "path": "artifacts/m10c-sa1/sixth-functional.json",
+      "bytes": 4269,
+      "sha256": "444e9c64f3b3e809a3346cd5b058471f8ade55f49df42352b39fa71333b928a9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/sixth-functional.junit.xml",
+      "bytes": 4352,
+      "sha256": "13bec18bd6207d61afdc55b646baa540ea4042f906b5a217c37cf956d29c2d90"
+    },
+    {
+      "path": "artifacts/m10c-sa1/tenth-functional.json",
+      "bytes": 7084,
+      "sha256": "21d354ce8017339a8caea914b8a61825a9ec2c2e11dc52a0e18b110fcb2f5147"
+    },
+    {
+      "path": "artifacts/m10c-sa1/tenth-functional.junit.xml",
+      "bytes": 6829,
+      "sha256": "2cdf4c2fbd9df54e95cb1ea58035ba53201923e19f381367445e6a3ec7448ba8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/third-functional.json",
+      "bytes": 3967,
+      "sha256": "c0c96f617ed096287169e69474dfc1a70124e643faa088d59b21a57844a4a4d6"
+    },
+    {
+      "path": "artifacts/m10c-sa1/third-functional.junit.xml",
+      "bytes": 3754,
+      "sha256": "cabba85583ee608a77525d8807d5a81248f2bbe6c4cd49ff62f3be72c578a44a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/thirteenth-functional.json",
+      "bytes": 6849,
+      "sha256": "7381239dfd5010fbf668e443bac6b559bdfe54ba441daea18365c26e12540c21"
+    },
+    {
+      "path": "artifacts/m10c-sa1/thirteenth-functional.junit.xml",
+      "bytes": 6694,
+      "sha256": "fc262c7e5f573c06d45bc8e08b184adb4a6550ac69e350d719dd913523821be9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/twelfth-functional.json",
+      "bytes": 6851,
+      "sha256": "12266949c01501ccc64451ccd77e895abc0f59464092c9c5b37fc800125ac86a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/twelfth-functional.junit.xml",
+      "bytes": 6694,
+      "sha256": "8c7ec2630ec4836cebee8dabdeee72b3d3314fbe0d3daac1f6faa52e8cf7bcf1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/binary-sha256.json",
+      "bytes": 822,
+      "sha256": "9db49b3be9c84eeef18fccb5c508a4034b2d9d0581c5e7a69dd8665e2d37f225"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/commands.json",
+      "bytes": 5234,
+      "sha256": "0d19e0c78458eea5a3d5f7e075d774ecd5de2eaa1854ab1cd6e36c1e03f61005"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/compatibility-state-child.json",
+      "bytes": 16414,
+      "sha256": "aa7085e8cebc2f31ed40ef6085f2653c0b4363d01b6d9c28c2ae758a787f5894"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/compatibility-state-child.junit.xml",
+      "bytes": 5958,
+      "sha256": "9bc28f0145fbc7d525e0368af83f7f6739efae76cc2ff07cdfbad9ecf5ab13a2"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/compatibility-state.json",
+      "bytes": 784,
+      "sha256": "342ea9e7d73b888f9b0325b18238f7a5c5961be94aad26b0e49bbe48a8600fb0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/compatibility-state.junit.xml",
+      "bytes": 358,
+      "sha256": "bab1f8f2e19978eea4a49eeec106cee7ccd5d116a0eabc78f269602a98802d64"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/compatibility-state.log",
+      "bytes": 1910,
+      "sha256": "c0c32bb0d4bc8818cef58f289ceb2bfbc3a5af1763ded6b31eefcc68c674140f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/compatibility-state.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/compatibility-state.stdout.txt",
+      "bytes": 1757,
+      "sha256": "35b4ba7690407e40a61087d1df67ceba99750004f0d4eab14b3429a8905c9f7f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/core-build.log",
+      "bytes": 1417,
+      "sha256": "c19a76e1017a939f39744d9fd2a5c3136aafd347bfcdb2ebc886da8e218d3d72"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/core-child.json",
+      "bytes": 33847,
+      "sha256": "44e0d2ef6a1a746e75951f60c9f67a2f68a43f329cf04891f6e830e250cce5e6"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/core-child.junit.xml",
+      "bytes": 29045,
+      "sha256": "7387e37ea2339f1982b4dc462f0174d6ac02b21a890f8ac9c5186f7b9e39e4aa"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/core.json",
+      "bytes": 749,
+      "sha256": "03abe8af54c2d5631e47b924aee9ff739d3d89ce740bdc8d2ca60f8127affea9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/core.junit.xml",
+      "bytes": 359,
+      "sha256": "551cfd646475692c8ebdbe18ba5df5601b88a6d37845f5c3a8ac29d4a5ae2260"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/core.log",
+      "bytes": 9557,
+      "sha256": "61d531c530824365d1bc80e786542d5e89fadd96cd7cc0caf17d78b29a6d4203"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/core.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/core.stdout.txt",
+      "bytes": 9419,
+      "sha256": "4e83c5427e1dabcd93b6a44b5c17753d70873305c6156172f759edad65e77c83"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/dotnet-info.txt",
+      "bytes": 1262,
+      "sha256": "dad6b66323dcc8236f505cc50cf0dddbe99e8f6d9894a227ad1fb4ca7570fff0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/dsp1-functional-child.json",
+      "bytes": 6817,
+      "sha256": "7f6be901137205b24fba342a30602e8766f4988510f13c475044930d8b1f561c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/dsp1-functional-child.junit.xml",
+      "bytes": 6494,
+      "sha256": "cb2dc56a93f6edf9c8d7ec91a29dae02e01a2676ca77de607d718b696aa8a8be"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/dsp1-functional.json",
+      "bytes": 873,
+      "sha256": "cb54a7b2f20c5198a133b65f251b14eba4607aea42788efbda3a071608b38413"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/dsp1-functional.junit.xml",
+      "bytes": 358,
+      "sha256": "bc8977649ce24b69f630f251e23fa7b5281f62561eefc842e28ff13cb7fcd7ce"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/dsp1-functional.log",
+      "bytes": 298,
+      "sha256": "aaf8264e13d5d12e13a5e976fd71c169337705e9144bd8f33d291682a87a02b9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/dsp1-functional.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/dsp1-functional.stdout.txt",
+      "bytes": 149,
+      "sha256": "85b7b4f5543a6db46c3c2f6613cf0396eccc0f9a520e0d9069a4095a053e8b94"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/frozen-regression.log",
+      "bytes": 6952,
+      "sha256": "2aac789cf5741fe8cb654573fae61fb43b3769894d07e3f55eaa24c19832f287"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/frozen-wrapper-identity.json",
+      "bytes": 813,
+      "sha256": "fe7c548b2ac960ebbc265481d7d19ca91a96a86c0ba55fdc5d38c45f9c915b96"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/functional-child.json",
+      "bytes": 6911,
+      "sha256": "72cc388d0a49588bdf301aca55dee6271d3499bdd105728dd89dba0c8616f582"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/functional-child.junit.xml",
+      "bytes": 7490,
+      "sha256": "91d9128598c53a9a5edb53a3daa02f44cdc0fc3fdf871ca5d91718bef9b77225"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/functional.json",
+      "bytes": 862,
+      "sha256": "09d82d41ada7674d8ff9ab58b8439c3448324377448c35c84aff7d4d2e0817fb"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/functional.junit.xml",
+      "bytes": 358,
+      "sha256": "1442b33185de55e1ebfe01280caecc7d9799d9ef2d8c6fd8beae2cba5a365247"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/functional.log",
+      "bytes": 307,
+      "sha256": "a4ed731d18613900d037e7f805f49473cbd51cebe5b135dbdee62f84090d119f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/functional.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/functional.stdout.txt",
+      "bytes": 163,
+      "sha256": "7b6e8f70d962512622a2379e0a9f5740ec162273096b1a973423dc4528f4d833"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/lab-build.log",
+      "bytes": 826,
+      "sha256": "8a619bba1fb4c4576bdf600df071683058e47aed6d78681df7ad53fdb3e24b2d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/manager-build.log",
+      "bytes": 1740,
+      "sha256": "e88ab4121645b6d11a08ca43f52ecc532665d3e73f12ea7a9a18f3affe444ef4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/manager-child.json",
+      "bytes": 6450,
+      "sha256": "49e0392c5fc36264e41a22e1685c429516d9cac694d68d6297baade08912ca89"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/manager-child.junit.xml",
+      "bytes": 3829,
+      "sha256": "457d9d40d1c0a2ce297e1502f59691bdb9a8f2ef330ec96788e49280d95b0380"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/manager.json",
+      "bytes": 757,
+      "sha256": "82f1e57152d0ac5c560eb2ede12499131ba28cb4d254ce5533edb4e3c1265c74"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/manager.junit.xml",
+      "bytes": 358,
+      "sha256": "f251a33aa2d7b5242b4963de2e8e8993321304d829f9204ed792acbd4af14e37"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/manager.log",
+      "bytes": 1442,
+      "sha256": "29d729c5e05343ff1c0167c725805c1b3b83a7e8b31488d9004b7edee13d8e82"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/manager.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/manager.stdout.txt",
+      "bytes": 1301,
+      "sha256": "356fef15ff3555b45aa876b582b1bd1a3492174a91ec20dbf91b26ab78dfdb9f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/commands.log",
+      "bytes": 6568,
+      "sha256": "1e945b701034c99eb011ad6f94fbfeb34456e717af18cfaa3334d9e734b1a464"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.field0.state",
+      "bytes": 19453,
+      "sha256": "da9f5adc839aefc9ff495793fdada5d6f33b576da78b020aadda20eab84133a7"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.field13.state",
+      "bytes": 19506,
+      "sha256": "65bf30eca3b5a744da25aa492e65b97e2dfd55ced68b7b6a9432b2abd6964c04"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.field13.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.field9.state",
+      "bytes": 19443,
+      "sha256": "fe28c938f2182216f8a3d4f5f8062468f4cb3d94a1639a290da5d2c55df93907"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.json",
+      "bytes": 2987,
+      "sha256": "fc537f811027b22c32ed708f18cb347033573b8191058a404ea7ab7cef33a042"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.pcm.bin",
+      "bytes": 149440,
+      "sha256": "55233dce2e516ce7d3ff721f8a525bdb5fd3c6a0afc3671eb653d85c72907ceb"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.sfc",
+      "bytes": 32768,
+      "sha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.state",
+      "bytes": 19647,
+      "sha256": "cff18df72e771229db8a57d563cd859155e77cbc7eebb51f60d94c88d768f5b1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.field0.state",
+      "bytes": 41732,
+      "sha256": "9e9bddcfe7dd2df521ebf6d612e3a5bbec1d3525fddc71a96ad0f7b972aad306"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.field13.state",
+      "bytes": 48776,
+      "sha256": "2af427d9db00b1fb09b69aeea9d40c2b0cd19f9810638253728096b9308168f4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.field13.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.field9.state",
+      "bytes": 49620,
+      "sha256": "988d29c10c3e0f044fe9522d3c2f893d555638d0157b915ce42451682c1ba405"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.json",
+      "bytes": 2993,
+      "sha256": "ca0082c0e27debd1bed54bbf1cc513c7cd0cb26fcb317ae5ad905b12a11dfdc1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.pcm.bin",
+      "bytes": 149440,
+      "sha256": "644744402e3e2934a74d0e60a43d203395472cefc4202cc4fa65207d31b3ad6c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.sfc",
+      "bytes": 32768,
+      "sha256": "35f3537026357b74d14ec7d1e99c509cc0086ba305431c57d5cc6c5d03d90d00"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.state",
+      "bytes": 49082,
+      "sha256": "5d367a1fb4020829ea14c2d203d96ec57cd9101879bf26385bfe45406a9e398a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/cache-result.json",
+      "bytes": 96,
+      "sha256": "24d667e7e1c50a1a889d03ce976546ab1a63819fe13149e872ae4f1a2eb180db"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/cache.state",
+      "bytes": 41786,
+      "sha256": "42e5945a1d02d4cfe310f3607641e57991328c54e2a6d7497c5b944595a8d823"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/cache.state.bak",
+      "bytes": 41786,
+      "sha256": "42e5945a1d02d4cfe310f3607641e57991328c54e2a6d7497c5b944595a8d823"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/cache.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/clock-result.json",
+      "bytes": 113,
+      "sha256": "66f2152a105906345c3d72941a52f6ee1dd60f2224e74b51106699ddcde4ff55"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/result.json",
+      "bytes": 40277,
+      "sha256": "e0d10771ea39b1b29c2d929b63304447fdc9459fac7cc3131bf6782430c0615f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/scratch.state",
+      "bytes": 20157,
+      "sha256": "a471e9388edb1b85c5b058f16afb2b773ff2842bca10972d98e8d221b5a1e863"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/scratch.state.bak",
+      "bytes": 20157,
+      "sha256": "a471e9388edb1b85c5b058f16afb2b773ff2842bca10972d98e8d221b5a1e863"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/scratch.state.corrupt-65aad5b9fe034a54891eb699e3c1c407",
+      "bytes": 20148,
+      "sha256": "6b2b11256d3368ce085d1ebce0719d13e1e0ccde241369b6e02d672a3cde0d90"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/scratch.state.corrupt-941c74e45cbd4cd4844deb716f0ea18d",
+      "bytes": 20139,
+      "sha256": "f98da61d0d85b822ef276aa3c5615332ef55899bdaf48070bec29bcbfb32c301"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/scratch.state.corrupt-a95456a0b19a426681eae80f944d6488",
+      "bytes": 20133,
+      "sha256": "191360638b8c57ba89ee55f17563fee53f7d5dbf9b3fc1e89223aff9ef3f3801"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/horizons/scratch.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/provenance.json",
+      "bytes": 8261,
+      "sha256": "a80808a0f101013bbcefce492a9698e1bf81f45412cb427ae3fd0178678a965f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/result.json",
+      "bytes": 2198,
+      "sha256": "b2dd5d2f5e821ddadc0947e0dc994c9d0bbc665f17ab2dc417a40e87bd6ac99e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/suspend.json",
+      "bytes": 526,
+      "sha256": "4cde45d7d13e897b445c19c6eaf68ea9e32cbedfd506cf44534a1272431aa3de"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/suspend.jsonl.gz",
+      "bytes": 484922,
+      "sha256": "104fc0a644a2ed00fdfd2fb0a2f4f7fee2cd6a6679d057201ad6a01baf994adc"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.field0.state",
+      "bytes": 19453,
+      "sha256": "da9f5adc839aefc9ff495793fdada5d6f33b576da78b020aadda20eab84133a7"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.field25.state",
+      "bytes": 19498,
+      "sha256": "f8921d892dd6655dcad2ea31e1642496ec85557eef5c788cc7b157de87bccab7"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.field25.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.field9.state",
+      "bytes": 19443,
+      "sha256": "fe28c938f2182216f8a3d4f5f8062468f4cb3d94a1639a290da5d2c55df93907"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.json",
+      "bytes": 4463,
+      "sha256": "2995de2c33a78d065888be946e604aefec70147f75497640503b24fc45e25ab8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.pcm.bin",
+      "bytes": 277240,
+      "sha256": "623eac03299baff45a7f72ff76e39c83f971baca56330635115d97ea2c71b2e4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.sfc",
+      "bytes": 32768,
+      "sha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.state",
+      "bytes": 19618,
+      "sha256": "7cc07ef888ac413ba2f7e2dce27de640cbb774efccd1042383867e7da2c1a26c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.field0.state",
+      "bytes": 41732,
+      "sha256": "9e9bddcfe7dd2df521ebf6d612e3a5bbec1d3525fddc71a96ad0f7b972aad306"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.field25.state",
+      "bytes": 49490,
+      "sha256": "1da0a176384a18af551bb0a843097718ca4be37245bd67a517a71b916fb17cea"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.field25.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.field9.state",
+      "bytes": 49620,
+      "sha256": "988d29c10c3e0f044fe9522d3c2f893d555638d0157b915ce42451682c1ba405"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.json",
+      "bytes": 4487,
+      "sha256": "5917e1c8a0da0d631fd107f54440c1dea7a6dae40ea2488a72c98df996d2c0c3"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.pcm.bin",
+      "bytes": 277240,
+      "sha256": "ce06aa2638b01f2d3f0bdb6eca3c6d98f1051d5bba68935abaefe929541c4a4e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.sfc",
+      "bytes": 32768,
+      "sha256": "35f3537026357b74d14ec7d1e99c509cc0086ba305431c57d5cc6c5d03d90d00"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.state",
+      "bytes": 50717,
+      "sha256": "b5b0894f3ae93e6d8cb6b9185c17951cc0ea259217f83c2bf1c335cae94c7fd5"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.field0.state",
+      "bytes": 19297,
+      "sha256": "2736df96d1ca7a6c2d300bb05a521a9e6ed1981d9be0a3cc7561e82eec66a103"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.field329.state",
+      "bytes": 145838,
+      "sha256": "7b58c420bc362f34b005daa1c60f79cabd779bdb730ae6e6c9b3528874cfbdfd"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.field329.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.field9.state",
+      "bytes": 28689,
+      "sha256": "ac1ed7647fff3c9cda6dd4a0ae4ba698098a147841ebcd7aa4c1f083df85f419"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.json",
+      "bytes": 42631,
+      "sha256": "99e4414b15c7c69e677c4a87e2ab1d0ad58e562621b094e3ff850b441ce7ac85"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.pcm.bin",
+      "bytes": 3514580,
+      "sha256": "56ef6e8a2722b0388ec9dddf2e8f3211513f0286a707058a9d25170d37a603d9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.sfc",
+      "bytes": 262144,
+      "sha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.sram.bin",
+      "bytes": 4096,
+      "sha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.state",
+      "bytes": 146039,
+      "sha256": "730803157a6538045a56c89c6a194db32dbd8dc2fb3739b35b9b509b31425817"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.field0.state",
+      "bytes": 19297,
+      "sha256": "1124d517ed6dbd53aba121b95a33448e30f9476a812305841d93ef619137d978"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.field329.state",
+      "bytes": 145106,
+      "sha256": "a0c387f3f6534ec1385252885c24de9431b505b44ebbf31d631736c2533a8729"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.field329.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.field9.state",
+      "bytes": 29403,
+      "sha256": "440a8223be4757ff38f672e3b8ae339f1376b8c16069075d0030b0287ce611a2"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.json",
+      "bytes": 42627,
+      "sha256": "44685e683b3c6059ed36b83ed97e76dec5aa6fa590e9b58f59e0183c72b8e66c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.pcm.bin",
+      "bytes": 4223780,
+      "sha256": "c1af48b81eee0469c4411fd45cc4397732ca30d6fc2a86516b610adfb85333be"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.sfc",
+      "bytes": 262144,
+      "sha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.sram.bin",
+      "bytes": 4096,
+      "sha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.state",
+      "bytes": 145835,
+      "sha256": "ece142b6a54d986c5679bc18c5d54dc54175162f8a4e79f1e3217384b70bc161"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/game-pal-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.field0.state",
+      "bytes": 33444,
+      "sha256": "269a9917bb7a90830948e236bdd0ba6b34d63519e44c21b132ad473c5c97644c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.field25.state",
+      "bytes": 33545,
+      "sha256": "bfd6ca5376f02a620398b0fa5e1d4d1c3fdabcee528abe7705941dfe73e44c87"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.field25.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.field9.state",
+      "bytes": 33550,
+      "sha256": "e731cd15ef6100870456c45b09b5a40bf0cac86647f35bca0a87a84bc74cd579"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.json",
+      "bytes": 4471,
+      "sha256": "4be59247447d63f46662bc3357a4deefe669db2d1bb1edc165bd1548b59e4785"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.pcm.bin",
+      "bytes": 277720,
+      "sha256": "474dd6f1f003465ab6e54abd3dd5b4a822408fec9f0c096aff0bc68ce876a75f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.sfc",
+      "bytes": 32768,
+      "sha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.state",
+      "bytes": 33575,
+      "sha256": "48c348b8ea54c898eb3ccc8d2b576a4675db217a729e1ea33974d7918fc34efd"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.field0.state",
+      "bytes": 33440,
+      "sha256": "b96890ec4e2345588100139615b165bdcb7aed84c6e1def67d472bc064ce6a28"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.field25.state",
+      "bytes": 33484,
+      "sha256": "36bcc72b19a6b5ba4b118dccbeb2f2f0b3bafbdc63fc0005de1f5ead436fedf4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.field25.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.field9.state",
+      "bytes": 33518,
+      "sha256": "5f7edde635e65961a8b5faa70814b82bb2b8e8b29dfc10194c78b57c70df897d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.json",
+      "bytes": 4464,
+      "sha256": "a06d09a5d1ef7ad85ad5613f19a8e5b00ee98f1a309a396196752ffebe07d776"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.pcm.bin",
+      "bytes": 333620,
+      "sha256": "14bfdc979f6fe11347aedc3435f6cae8f6eaba81bb4f097c5984330ae2af529f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.sfc",
+      "bytes": 32768,
+      "sha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.state",
+      "bytes": 33527,
+      "sha256": "0bbc959cb6a4b0860950df332119d838baf1b00d99eb82cee0930aebef555976"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.field0.state",
+      "bytes": 19453,
+      "sha256": "da9f5adc839aefc9ff495793fdada5d6f33b576da78b020aadda20eab84133a7"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.field129.state",
+      "bytes": 19549,
+      "sha256": "292a53dc42613fc0957cc2d4297c1eab9d5b1b25bc7f46507ab80329d44aeca6"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.field129.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.field9.state",
+      "bytes": 19443,
+      "sha256": "fe28c938f2182216f8a3d4f5f8062468f4cb3d94a1639a290da5d2c55df93907"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.json",
+      "bytes": 17059,
+      "sha256": "f3f77edf032f4ea9c7114e9ada148d1a0d3f4fef5a2824e444f301d73c0073e6"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.pcm.bin",
+      "bytes": 1384740,
+      "sha256": "52bd49062726c47943ded176da349be947985e91a06e7b7fd789049781c03798"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.sfc",
+      "bytes": 32768,
+      "sha256": "34dfe3f8b59b379cc65062c859ad4c9f46addf7ea538f3b33080950092ac1cf0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.state",
+      "bytes": 19666,
+      "sha256": "f898c8a38993c79f41cde9d5e8f8b102a93aedf23c70b78a43c30b133c189d43"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field0.state",
+      "bytes": 41732,
+      "sha256": "9e9bddcfe7dd2df521ebf6d612e3a5bbec1d3525fddc71a96ad0f7b972aad306"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field129.state",
+      "bytes": 49259,
+      "sha256": "c91450bf47e42de816cb4c983bc9ae49784b1e678e6551bd7684c17b3f7356dc"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field129.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field9.state",
+      "bytes": 49620,
+      "sha256": "988d29c10c3e0f044fe9522d3c2f893d555638d0157b915ce42451682c1ba405"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.json",
+      "bytes": 17189,
+      "sha256": "258c11bba62d7b2534c8b6599f6b22cf90cc034efd64d35bf5fb061dc7d3b911"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.pcm.bin",
+      "bytes": 1384740,
+      "sha256": "179f6db844c9a1d1b8338a6530589c9f935d9b9e2357423806f082e750427bc1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.sfc",
+      "bytes": 32768,
+      "sha256": "35f3537026357b74d14ec7d1e99c509cc0086ba305431c57d5cc6c5d03d90d00"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.state",
+      "bytes": 50394,
+      "sha256": "8a2f280207b4d5f739474cfd2db2dd5ff7c7cae9a21887fad00978f1e41b990b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.field0.state",
+      "bytes": 19297,
+      "sha256": "2736df96d1ca7a6c2d300bb05a521a9e6ed1981d9be0a3cc7561e82eec66a103"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.field329.state",
+      "bytes": 145838,
+      "sha256": "7b58c420bc362f34b005daa1c60f79cabd779bdb730ae6e6c9b3528874cfbdfd"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.field329.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.field9.state",
+      "bytes": 28689,
+      "sha256": "ac1ed7647fff3c9cda6dd4a0ae4ba698098a147841ebcd7aa4c1f083df85f419"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.json",
+      "bytes": 42092,
+      "sha256": "a054399838b5b839e88c42ea5ef127d8626e4a097bed2b02ab3aa46e5a22eb35"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.pcm.bin",
+      "bytes": 3514580,
+      "sha256": "56ef6e8a2722b0388ec9dddf2e8f3211513f0286a707058a9d25170d37a603d9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.sfc",
+      "bytes": 262144,
+      "sha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.sram.bin",
+      "bytes": 4096,
+      "sha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.state",
+      "bytes": 146039,
+      "sha256": "730803157a6538045a56c89c6a194db32dbd8dc2fb3739b35b9b509b31425817"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.field0.state",
+      "bytes": 19297,
+      "sha256": "1124d517ed6dbd53aba121b95a33448e30f9476a812305841d93ef619137d978"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.field329.state",
+      "bytes": 145106,
+      "sha256": "a0c387f3f6534ec1385252885c24de9431b505b44ebbf31d631736c2533a8729"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.field329.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.field9.state",
+      "bytes": 29403,
+      "sha256": "440a8223be4757ff38f672e3b8ae339f1376b8c16069075d0030b0287ce611a2"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.json",
+      "bytes": 42083,
+      "sha256": "4da3dffabdb68848b41b5dd910ad5a7f15d6fe3af7daaedd791ab412fdd13034"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.pcm.bin",
+      "bytes": 4223780,
+      "sha256": "c1af48b81eee0469c4411fd45cc4397732ca30d6fc2a86516b610adfb85333be"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.sfc",
+      "bytes": 262144,
+      "sha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.sram.bin",
+      "bytes": 4096,
+      "sha256": "7e533e61cae3e16b321f328e359e35e73fd84da850901969e03a651d3a663014"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.state",
+      "bytes": 145835,
+      "sha256": "ece142b6a54d986c5679bc18c5d54dc54175162f8a4e79f1e3217384b70bc161"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.field0.state",
+      "bytes": 33444,
+      "sha256": "269a9917bb7a90830948e236bdd0ba6b34d63519e44c21b132ad473c5c97644c"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.field129.state",
+      "bytes": 33540,
+      "sha256": "22fd2584b6752702a5d1ff8a3f1d8b447cde2a058933c929c958a48f440a56ea"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.field129.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.field9.state",
+      "bytes": 33550,
+      "sha256": "e731cd15ef6100870456c45b09b5a40bf0cac86647f35bca0a87a84bc74cd579"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.json",
+      "bytes": 17175,
+      "sha256": "ad0de4c017ce3dded7af1a8d09f8c7bec203ab15064de02b9373b740e9ee11a0"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.pcm.bin",
+      "bytes": 1387360,
+      "sha256": "820bcfbc84985ac2ebfff9bccdecacc5ea10d1fc5da0bf6d61daacd4f74c624f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.sfc",
+      "bytes": 32768,
+      "sha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.state",
+      "bytes": 33518,
+      "sha256": "3b6fe675bae1ff0380b19d4af33b89251b36df8d63fcb0d09bc3293935bcabff"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.field0.state",
+      "bytes": 33440,
+      "sha256": "b96890ec4e2345588100139615b165bdcb7aed84c6e1def67d472bc064ce6a28"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.field0.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.field129.state",
+      "bytes": 33519,
+      "sha256": "fbde0f4848469f2c2ebb825e6c5327316ecc5286370a882f9339f972098b2ce5"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.field129.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.field9.state",
+      "bytes": 33518,
+      "sha256": "5f7edde635e65961a8b5faa70814b82bb2b8e8b29dfc10194c78b57c70df897d"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.field9.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.json",
+      "bytes": 17179,
+      "sha256": "f479501fce78298a140908b79a357601dc1400435d090140362284d221777f79"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.pcm.bin",
+      "bytes": 1666760,
+      "sha256": "e780e192c7ecf36b6890589881a045e4c1a3009b5e03088a99637e8d6d1130ba"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.sfc",
+      "bytes": 32768,
+      "sha256": "43be4e2f4db859eb896a624500193086c3c7bc467bcc75562b8af6f2b8568915"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.sram.bin",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.state",
+      "bytes": 33573,
+      "sha256": "3978e592a3dc5bf1998c817f828b461d14b0426452327eb3246afe8977b04030"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.state.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/optional-published-absence-child.json",
+      "bytes": 576,
+      "sha256": "95e38d6943692f722f1dbfd8bc0b58355a05baccc302e8cee0edfe9ceb2f1031"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/optional-published-absence-child.junit.xml",
+      "bytes": 608,
+      "sha256": "472a736bb18a62cd0f3820a527ac6a6aa2de80aad1a222f4066a142d79e6e637"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/optional-published-absence.json",
+      "bytes": 904,
+      "sha256": "1a8fe29eea4309ef3c95be966314184d2801d5673cb01c72ea2c03bb5fea78b4"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/optional-published-absence.junit.xml",
+      "bytes": 905,
+      "sha256": "bdd3ad172f62c626d0b940de3a6c273116e0bc9b1ac07fbe3af2e9213429a075"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/optional-published-absence.log",
+      "bytes": 363,
+      "sha256": "7bb736a30f69a244fc3caac7942f14b3430cc0e376289a17856b1e99fa162a57"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/optional-published-absence.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/optional-published-absence.stdout.txt",
+      "bytes": 200,
+      "sha256": "92701802156288e89221c56e729979e1ff239f8a0840da6d4f6791cc7a5c36c9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/persistence-child.json",
+      "bytes": 3376,
+      "sha256": "960b2d038807f2d283c5d1194b4ff3b8b156da1c880b984426a0a7ddbe7084f3"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/persistence-child.junit.xml",
+      "bytes": 3671,
+      "sha256": "5b5fb2d71e9e2d1cb0ce7c5afc2585a99f7f7392fc032ec0c4857b89ca4a3739"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/persistence.json",
+      "bytes": 772,
+      "sha256": "36b577aceb57d4e58980d0923352d97a561ec99c7423a3028789b965e749b778"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/persistence.junit.xml",
+      "bytes": 356,
+      "sha256": "06abd7c7d8fa4c1370f7452ca6f355c3c5da7bf051931eac875fc98c58d0c3f8"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/persistence.log",
+      "bytes": 3288,
+      "sha256": "d27c2f6ab862c97fbb2373ce39501ab78a44c3adc7a7a4832b9b62ff1df8f66f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/persistence.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/persistence.stdout.txt",
+      "bytes": 3143,
+      "sha256": "698303bb5bb210e71b792bd6d8fb90669b66f404e788757938fe869e85f4111e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/published-rom-child.json",
+      "bytes": 15077,
+      "sha256": "62ab53de35f89f401c4b0145f440754489ef0c4791e218de558c38e8d928cd71"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/published-rom-child.junit.xml",
+      "bytes": 5100,
+      "sha256": "86bfc9b55dfa192eb3f0e8f4d5a9475fdabe0ad223fc021a1d51773878bc418f"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/published-rom.json",
+      "bytes": 919,
+      "sha256": "ff19df74b0343fe7ef09b426b0671eb11a5f503d945da08809dfc8b6fb7a5412"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/published-rom.junit.xml",
+      "bytes": 917,
+      "sha256": "e79a95277dcfe5cc4493b99f226d20cf8ede92d6904e1fd390f73ebab15dcae2"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/published-rom.log",
+      "bytes": 339,
+      "sha256": "6587b3cf4f824d630799bba3a6f138df982de733f0cb0240bf8feea25387b7b1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/published-rom.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/published-rom.stdout.txt",
+      "bytes": 192,
+      "sha256": "06c8b35a8baef21edf18591f097f97eaba9a2b53495d9ba9511da26c703a2d1e"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/runtime-child.json",
+      "bytes": 5653,
+      "sha256": "48b36e057135c215a9399bf03bda8ccf00509294cec980c2acaf1bdc17a4fc8b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/runtime-child.junit.xml",
+      "bytes": 6367,
+      "sha256": "d4b8798c0d112c6968480db94065a4ebe7e3f9ab9b776db0576c02f1f92e2831"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/runtime-library-sha256.txt",
+      "bytes": 303,
+      "sha256": "19332f2b1715e7c1e3f8883c64c013307804d5ef8a5cb36f0a2f4291ac14b6cf"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/runtime-probe.json",
+      "bytes": 893,
+      "sha256": "ca403563901e2d2615354d1ba2fb45d1cf9911210bfbbc0e66d03eac3aa9f001"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/runtime.json",
+      "bytes": 765,
+      "sha256": "f9f6743d69a56701144f7cbc1fcaaeb4258ee6e971dc7d2f5c030a048848e29b"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/runtime.junit.xml",
+      "bytes": 357,
+      "sha256": "b4a5b6c145a54f4752b153ba693b5d39101da0100cf492c6f356f2c72e510504"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/runtime.log",
+      "bytes": 2293,
+      "sha256": "70410159548bf7e99f8488babd1f8a0c1a1ed30b2a96ada6ebd3ae6fd17aa2db"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/runtime.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/runtime.stdout.txt",
+      "bytes": 2152,
+      "sha256": "8c962bdc19a6e277a915e709d0981c10c908ff65295f24c7b511a523ab48851a"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/superfx-functional-child.json",
+      "bytes": 7751,
+      "sha256": "2ab7992ec94411d5aae6d2c9f8c4ba8de3502eee75d8cf59222abb71c1d45f08"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/superfx-functional-child.junit.xml",
+      "bytes": 7635,
+      "sha256": "a6f55b426c6d33fd3de3f4f57c8487e4dd3cdbb84cbffb9201241bd43f8c12ca"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/superfx-functional.json",
+      "bytes": 881,
+      "sha256": "21de8584242d09af5f077d733b97d7e8acbb355b1e2ef62d43b54e0f911977d1"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/superfx-functional.junit.xml",
+      "bytes": 357,
+      "sha256": "09daca2c7d9c70dcdd759beabe50305c0aab5299dfbe75b16ed5ccf4ac530403"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/superfx-functional.log",
+      "bytes": 307,
+      "sha256": "9ffe8d9fdd5d9e0204dba524acfe007078f7ee7edcdea2e2b9eb59adfd6768a9"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/superfx-functional.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/m10c-sa1/ubuntu/superfx-functional.stdout.txt",
+      "bytes": 155,
+      "sha256": "dce6767b424faa7f89b2046e594bae0eb1b56ad5ac969f69ec39fa0940939e65"
+    },
+    {
+      "path": "artifacts/m10c-sa1/windows-runtime-probe.json",
+      "bytes": 1190,
+      "sha256": "41efaa335f03406fe42c5a34387f9773fc7b33e48ca691004be87895c8635073"
+    }
+  ],
+  "originalHardwareSources": {
+    "repository": "https://github.com/VitorVilela7/SnesSpeedTest",
+    "commit": "475a1b87a35bfcbe1b96ddf5042c73bbd5ed297e",
+    "redistributed": false,
+    "files": {
+      "artifacts\\m10c-sa1\\reference\\SnesSpeedTest\\speed_test_v51.sfc": {
+        "bytes": 65536,
+        "sha256": "21c24e4b0ec2cb32eeba25c5311aa39bd3228fc1327d2719c0b88671884c2541"
+      },
+      "artifacts\\m10c-sa1\\reference\\SnesSpeedTest\\README.md": {
+        "bytes": 4533,
+        "sha256": "5e8e51f2c39eece50aa301920088a1f5cff651ae747846efad9ba8254c80a373"
+      },
+      "artifacts\\m10c-sa1\\reference\\SnesSpeedTest\\speed_test.asm": {
+        "bytes": 46453,
+        "sha256": "112ad36c43ef21345a4150140ddbdfeedc3cb0b9e3de19066fabe9d6c85dcea3"
+      },
+      "artifacts\\m10c-sa1\\reference\\SnesSpeedTest\\src\\init.asm": {
+        "bytes": 1512,
+        "sha256": "ab402fa1cff1576049b8a3afbe81ca319961dca9a8f0ccec4f007e00bd3d51da"
+      },
+      "artifacts\\m10c-sa1\\reference\\SnesSpeedTest\\src\\text.asm": {
+        "bytes": 3026,
+        "sha256": "cc4fe338fad79532218d58d4eb9a837c17f46394cfd53f32996b438efa964aa1"
+      },
+      "artifacts\\m10c-sa1\\reference\\SnesSpeedTest\\img\\hardware\\v51-1L8B-10\\v51-1.JPG": {
+        "bytes": 187683,
+        "sha256": "38590af0850f408f79cb669b835725b8ffedf282a16dc448aea3ee360c52edf4"
+      },
+      "artifacts\\m10c-sa1\\reference\\SnesSpeedTest\\img\\hardware\\v51-1L8B-10\\v51-2.JPG": {
+        "bytes": 200594,
+        "sha256": "b5c8ef9a7e0cd20f9f6f6fb8ea76f02fd49ca75a0dbed139571102d5a4427abb"
+      },
+      "artifacts\\m10c-sa1\\reference\\SnesSpeedTest\\img\\hardware\\v51-1L8B-10\\v51-3.JPG": {
+        "bytes": 189182,
+        "sha256": "79227b647cfcc9fe0a5e3ed0154013916ee1553dd2202a3ce36b8617327d92bb"
+      },
+      "artifacts\\m10c-sa1\\reference\\SnesSpeedTest\\img\\hardware\\v51-1L8B-10\\v51-4.JPG": {
+        "bytes": 188105,
+        "sha256": "996ccb06ba2581d036d94c9c7a898081854c284f07c6e8c54e37d65c80373a99"
+      }
+    }
+  },
+  "optionalOriginalInputAbsence": "Both platforms explicitly skipped with exit 2; successful local original-ROM evidence is separate.",
+  "remaining": "Seven original timing deviations; unmeasured arbitration/prefetch/refresh details, conversion latency and timer/revision limits. Other chips/peripherals unsupported as tracked. Root still owns final 37000/31000-field, two native-hour, package, remote CI and push stages.",
+  "pushPerformed": false
+}
