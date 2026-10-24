@@ -1,0 +1,33 @@
+{
+  "schema": "r3-published-evidence-v1",
+  "ownHardware": false,
+  "sources": [
+    {
+      "id": "reset-sequencing",
+      "url": "https://github.com/rasteri/TAStable/blob/109059a2e352e019050b898738d7615051d6f855/README.md",
+      "commit": "109059a2e352e019050b898738d7615051d6f855",
+      "sha256": "ee9c5551657d24e0481ca1a23496d1b5ed999f793c15cde65def58dc71658be5",
+      "bytes": 7493,
+      "scope": "Author investigation on modified SHVC-CPU-01 with SHVC-SOUND; separate oscillators, reset-path differences and nondeterministic divider phase. Does not specify stock VRAM/CGRAM/OAM retention or certify PAL/1CHIP.",
+      "accessed": "2026-10-24",
+      "rawHardwareTrace": null,
+      "capturePcbIdentity": null
+    },
+    {
+      "id": "functional-cpu-roms",
+      "url": "https://github.com/gilyon/snes-tests/blob/5ecdf555da920f0bd7b157542141965a8120186d/cputest/README.md",
+      "commit": "5ecdf555da920f0bd7b157542141965a8120186d",
+      "sha256": "f5401690b6eca6647476e86fca9308468b54f9b1eab81237f0ddf6065d223b9a",
+      "bytes": 2691,
+      "scope": "Independent test author explicitly specifies emulation (direct,X) unaligned-page wrapping; functional expectations, not hardware timing data.",
+      "accessed": "2026-10-24",
+      "rawHardwareTrace": null,
+      "capturePcbIdentity": null
+    }
+  ],
+  "limitations": [
+    "No new original-console capture or universal hardware profile certification",
+    "bsnes and ares share lineage; agreement is software evidence",
+    "Reset memory retention and analog/revision-specific behavior remain unresolved"
+  ]
+}

@@ -1,0 +1,965 @@
+{
+  "source": "c999c7f747ba6e554254e7fa9082ae91357a24ed",
+  "coreSha256": "3f80acd59a5bd0420a2267ba75a0a13802f45a974d15caab2902513ef8c5e77e",
+  "rows": [
+    {
+      "op": 97,
+      "at": 2,
+      "completed": 0,
+      "obsolete": false,
+      "path": "61-2.state",
+      "sha256": "cdf9752e96aea255b47959d2ef4b52a4eeed24237885f099c3fe24264ef039a5",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 0,
+        "LatchClock": 0,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 4,
+      "completed": 1,
+      "obsolete": false,
+      "path": "61-4.state",
+      "sha256": "1a1146e379fcaf720b66cac01c2af046d6c09b16fa679eb49a1ebd04e2e594cc",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 4,
+        "HeldRead": {
+          "Address": 256,
+          "Value": 97,
+          "Pins": "dp-remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 0,
+        "LatchClock": 4,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 6,
+      "completed": 1,
+      "obsolete": false,
+      "path": "61-6.state",
+      "sha256": "5cdd2b5962fb507def135da13dbeddcddabcb3feba8fbc117d7dcd0b4d2b79d3",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 2,
+        "HeldRead": {
+          "Address": 256,
+          "Value": 97,
+          "Pins": "dp-remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 0,
+        "LatchClock": 4,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 8,
+      "completed": 1,
+      "obsolete": false,
+      "path": "61-8.state",
+      "sha256": "475ad17d920b9cf1a2c97e9226a76673b5570254e56f600e6350f553687200c9",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 8,
+        "LatchClock": 4,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 10,
+      "completed": 1,
+      "obsolete": false,
+      "path": "61-10.state",
+      "sha256": "a18ab4cd7b3143fe7c19d46b615143551fbbcc0f6b281faafb4e04a5c3cfdaee",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 8,
+        "LatchClock": 4,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 12,
+      "completed": 2,
+      "obsolete": false,
+      "path": "61-12.state",
+      "sha256": "131d7b404385e34a9dbf1b605a670f6a026ab217a0be4cdead533e5efadf21e6",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 4,
+        "HeldRead": {
+          "Address": 257,
+          "Value": 247,
+          "Pins": "-p-remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 8,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 14,
+      "completed": 2,
+      "obsolete": false,
+      "path": "61-14.state",
+      "sha256": "802067ac899b7f1981e48b65350543f2bc5a27a06596bc4b60bd05d9f4f5bf69",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 2,
+        "HeldRead": {
+          "Address": 257,
+          "Value": 247,
+          "Pins": "-p-remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 8,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 16,
+      "completed": 2,
+      "obsolete": false,
+      "path": "61-16.state",
+      "sha256": "4c525130cb39ea2d86ec621ab074a8c2c624a18f2fa391b6a6a4d18a3f4cab4d",
+      "phase": {
+        "CycleRemaining": 6,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 16,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 18,
+      "completed": 2,
+      "obsolete": false,
+      "path": "61-18.state",
+      "sha256": "80aaab89f523aeb624bc9eb4215f91c9d0a9f85ea0d9d0d62bbe92e5288852e9",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 16,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 20,
+      "completed": 2,
+      "obsolete": false,
+      "path": "61-20.state",
+      "sha256": "1e55aff89d7de61525485eae7166dd27a444d26964ebf961cfa19262dd41be84",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 16,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 22,
+      "completed": 3,
+      "obsolete": false,
+      "path": "61-22.state",
+      "sha256": "e14f34dadfc676eb140ce67e6abba90b485762e108e8e657f803e5bda08c3270",
+      "phase": {
+        "CycleRemaining": 6,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 22,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 24,
+      "completed": 3,
+      "obsolete": false,
+      "path": "61-24.state",
+      "sha256": "153cd65b4ab9bfa69c7cc5501a87bb199cfa86b247c328d1c3237767048c55f6",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 22,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 26,
+      "completed": 3,
+      "obsolete": false,
+      "path": "61-26.state",
+      "sha256": "da1fd0cd56705e37f12efc66c677a2437a78c1b68084d93e594d0e100e2206e7",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 22,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 28,
+      "completed": 4,
+      "obsolete": false,
+      "path": "61-28.state",
+      "sha256": "2e193a3ed7f6804a3133b9a3fd04b8fa06be7a80d0c8d1ce7cbf64653e3b91bd",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 28,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 30,
+      "completed": 4,
+      "obsolete": false,
+      "path": "61-30.state",
+      "sha256": "2b1fe854ba2cfb5cfc0313c8c2f491cc8e3031a588ba3703b959a2d4a8ad1b66",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 28,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 32,
+      "completed": 5,
+      "obsolete": false,
+      "path": "61-32.state",
+      "sha256": "61a71c3b5cbcbc3fcf5f8d2c4c221b5bc1f481fb90b0ce1591d2f31d50e5c877",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 4,
+        "HeldRead": {
+          "Address": 767,
+          "Value": 52,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 28,
+        "LatchClock": 32,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 34,
+      "completed": 5,
+      "obsolete": false,
+      "path": "61-34.state",
+      "sha256": "e3cf9496671ef20a671fb5ba6958a950e32d3fcebc30b535aa21508093b15787",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 2,
+        "HeldRead": {
+          "Address": 767,
+          "Value": 52,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 28,
+        "LatchClock": 32,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 36,
+      "completed": 5,
+      "obsolete": false,
+      "path": "61-36.state",
+      "sha256": "006440ed4a68df58c2543f4701b2e2ad0798a70f07c1a8e90edb0f8ff642931c",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 36,
+        "LatchClock": 32,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 38,
+      "completed": 5,
+      "obsolete": false,
+      "path": "61-38.state",
+      "sha256": "1f5103f55a1e29dabe7636dabb61455b607c17a9eddeb6ee544168d00ece5d4c",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 36,
+        "LatchClock": 32,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 40,
+      "completed": 6,
+      "obsolete": true,
+      "path": "61-40.state",
+      "sha256": "768bdbc939d81f933e3b02db8904fcbd22dea25d32c0d3e6832ccf95e56a458a",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 4,
+        "HeldRead": {
+          "Address": 768,
+          "Value": 86,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 36,
+        "LatchClock": 40,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 42,
+      "completed": 6,
+      "obsolete": true,
+      "path": "61-42.state",
+      "sha256": "26a3b1176481bc6b1a7aa8d687fe22e269c9388f6f204f4442a79bb1762fd5fe",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 2,
+        "HeldRead": {
+          "Address": 768,
+          "Value": 86,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 36,
+        "LatchClock": 40,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 44,
+      "completed": 6,
+      "obsolete": true,
+      "path": "61-44.state",
+      "sha256": "806753d50b8243e411c9ab39fd6f1c2b85d50b13971d10d7710f48cd21d9755e",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 44,
+        "LatchClock": 40,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 46,
+      "completed": 6,
+      "obsolete": true,
+      "path": "61-46.state",
+      "sha256": "67afb98c3bb171208bcde1fbef6729837b7d35fcfb446444f03422b1e138fae6",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 44,
+        "LatchClock": 40,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 48,
+      "completed": 7,
+      "obsolete": true,
+      "path": "61-48.state",
+      "sha256": "b6ded9f86baaa61c4d4da200efa74f343576030cd1c872a1c03f6b3368af8163",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 4,
+        "HeldRead": {
+          "Address": 8345140,
+          "Value": 66,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 44,
+        "LatchClock": 48,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 97,
+      "at": 50,
+      "completed": 7,
+      "obsolete": true,
+      "path": "61-50.state",
+      "sha256": "3b543dc3b834c2dbd665da81058889acde7315648f066a34aaa5fff585e9d74c",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 2,
+        "HeldRead": {
+          "Address": 8345140,
+          "Value": 66,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 44,
+        "LatchClock": 48,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 2,
+      "completed": 0,
+      "obsolete": false,
+      "path": "81-2.state",
+      "sha256": "c31b21c5c9701d42fb91b6f6c3802e37c2086b366c3a7abc1d11b3db9a854fd9",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 0,
+        "LatchClock": 0,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 4,
+      "completed": 1,
+      "obsolete": false,
+      "path": "81-4.state",
+      "sha256": "eb2131c753c2ba0e177dbe3574716c78c467b3f1d73bc25e5f522aa4b867ef96",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 4,
+        "HeldRead": {
+          "Address": 256,
+          "Value": 129,
+          "Pins": "dp-remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 0,
+        "LatchClock": 4,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 6,
+      "completed": 1,
+      "obsolete": false,
+      "path": "81-6.state",
+      "sha256": "ffb25238ffd3b62a730886e27cf9c718835f160007a5a859fa75f08f6634adfe",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 2,
+        "HeldRead": {
+          "Address": 256,
+          "Value": 129,
+          "Pins": "dp-remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 0,
+        "LatchClock": 4,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 8,
+      "completed": 1,
+      "obsolete": false,
+      "path": "81-8.state",
+      "sha256": "99c8c9cc24bd9ad7a7681e5949fe764636575f8613db13e0f3c951ea925df27c",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 8,
+        "LatchClock": 4,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 10,
+      "completed": 1,
+      "obsolete": false,
+      "path": "81-10.state",
+      "sha256": "1860c6115ed9ffbc31a370ac24d2d28afa21da3481664beb257d1239dc589f96",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 8,
+        "LatchClock": 4,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 12,
+      "completed": 2,
+      "obsolete": false,
+      "path": "81-12.state",
+      "sha256": "d63c7167a4872cd9eaa1f8842025becab65789175be35b87684a1da52db971a6",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 4,
+        "HeldRead": {
+          "Address": 257,
+          "Value": 247,
+          "Pins": "-p-remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 8,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 14,
+      "completed": 2,
+      "obsolete": false,
+      "path": "81-14.state",
+      "sha256": "d9f6c19f774d4a66c5379a84faa1ec89a8be2e54bed33c49bd1aa3d690efe7ad",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 2,
+        "HeldRead": {
+          "Address": 257,
+          "Value": 247,
+          "Pins": "-p-remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 8,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 16,
+      "completed": 2,
+      "obsolete": false,
+      "path": "81-16.state",
+      "sha256": "f5e2bbcb2456e3846968e8f378ed59950a46b9cc0abbdd3909a13578bd11baf4",
+      "phase": {
+        "CycleRemaining": 6,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 16,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 18,
+      "completed": 2,
+      "obsolete": false,
+      "path": "81-18.state",
+      "sha256": "98e4b66a8a4891ec484ac75092c9d478d731fdb02056f420ecb41b8b382f8f25",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 16,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 20,
+      "completed": 2,
+      "obsolete": false,
+      "path": "81-20.state",
+      "sha256": "2dbe677250a8afb8aaf09239d42200ae336a559b38182bb935d8088d531a0e67",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 16,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 22,
+      "completed": 3,
+      "obsolete": false,
+      "path": "81-22.state",
+      "sha256": "0af6c48f47ac19b19579020307c7a09b3752139f253e538ea3d3442f78083022",
+      "phase": {
+        "CycleRemaining": 6,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 22,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 24,
+      "completed": 3,
+      "obsolete": false,
+      "path": "81-24.state",
+      "sha256": "2d1ed96f5cc0de80a6f8e20f696ba80bfc0c7cccc65b91d2a1487afae2f23e43",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 22,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 26,
+      "completed": 3,
+      "obsolete": false,
+      "path": "81-26.state",
+      "sha256": "2bdd7b1015a8da48e6d514b4b73f971f318dfe22aa7dbc3508cde2e91e152b20",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 22,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 28,
+      "completed": 4,
+      "obsolete": false,
+      "path": "81-28.state",
+      "sha256": "25d525de831d2c9a9578078423c0e276315b96bf9550e9f0228cde360f46eed2",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 28,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 30,
+      "completed": 4,
+      "obsolete": false,
+      "path": "81-30.state",
+      "sha256": "b25e636fa3ec13dd3da280bc8d1203fb40757004312849f008724a9f42bade61",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 28,
+        "LatchClock": 12,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 32,
+      "completed": 5,
+      "obsolete": false,
+      "path": "81-32.state",
+      "sha256": "76660ce9c72b80b21a4a9957b256c7f99d493eb63bd86199e96b9c37fac3d363",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 4,
+        "HeldRead": {
+          "Address": 767,
+          "Value": 52,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 28,
+        "LatchClock": 32,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 34,
+      "completed": 5,
+      "obsolete": false,
+      "path": "81-34.state",
+      "sha256": "d617243cb8db777d0968123a163663da0303b271d87a3462b9146a64c953e1f3",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 2,
+        "HeldRead": {
+          "Address": 767,
+          "Value": 52,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 28,
+        "LatchClock": 32,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 36,
+      "completed": 5,
+      "obsolete": false,
+      "path": "81-36.state",
+      "sha256": "ddb00ed789c62e2535010ee5363f8e906325eaebca248faa7d7a65c2e89b94e4",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 36,
+        "LatchClock": 32,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 38,
+      "completed": 5,
+      "obsolete": false,
+      "path": "81-38.state",
+      "sha256": "9c1c5223f16e3faa71830158c85bcd91f989dc41a2a950de8d0226177280c058",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 36,
+        "LatchClock": 32,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 40,
+      "completed": 6,
+      "obsolete": true,
+      "path": "81-40.state",
+      "sha256": "1a0719485c180fc946613c2d6a8327861886a395f6d872a0a3b4fba25adfa778",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 4,
+        "HeldRead": {
+          "Address": 768,
+          "Value": 86,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 36,
+        "LatchClock": 40,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 42,
+      "completed": 6,
+      "obsolete": true,
+      "path": "81-42.state",
+      "sha256": "8171b010e089c1ffe4f8068f148532e15c57555863e7de6d81cb4f5086ed6eea",
+      "phase": {
+        "CycleRemaining": 0,
+        "CycleActive": false,
+        "HoldRemaining": 2,
+        "HeldRead": {
+          "Address": 768,
+          "Value": 86,
+          "Pins": "d--remx-",
+          "Read": true,
+          "Valid": true
+        },
+        "CycleStart": 36,
+        "LatchClock": 40,
+        "WriteAluDone": false
+      }
+    },
+    {
+      "op": 129,
+      "at": 44,
+      "completed": 6,
+      "obsolete": true,
+      "path": "81-44.state",
+      "sha256": "2ebe55d94874433fe3b8024f6dc322d5b4b14bf1ee22974e0775ba2148576c5a",
+      "phase": {
+        "CycleRemaining": 8,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 44,
+        "LatchClock": 40,
+        "WriteAluDone": true
+      }
+    },
+    {
+      "op": 129,
+      "at": 46,
+      "completed": 6,
+      "obsolete": true,
+      "path": "81-46.state",
+      "sha256": "4781df87885d3b80fd9bab6a4739d5e3eccaa25160ea1cf7d95935ed991a3af0",
+      "phase": {
+        "CycleRemaining": 6,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 44,
+        "LatchClock": 40,
+        "WriteAluDone": true
+      }
+    },
+    {
+      "op": 129,
+      "at": 48,
+      "completed": 6,
+      "obsolete": true,
+      "path": "81-48.state",
+      "sha256": "5e86cc68cf154680085328a04d3e3b0ec7cebc55053d93474777fdb98b87375a",
+      "phase": {
+        "CycleRemaining": 4,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 44,
+        "LatchClock": 40,
+        "WriteAluDone": true
+      }
+    },
+    {
+      "op": 129,
+      "at": 50,
+      "completed": 6,
+      "obsolete": true,
+      "path": "81-50.state",
+      "sha256": "1f16b94656a4f3c63cdc2e48d4a9f6b79023e51b1af433a22b0a62e1fa019091",
+      "phase": {
+        "CycleRemaining": 2,
+        "CycleActive": true,
+        "HoldRemaining": 0,
+        "HeldRead": null,
+        "CycleStart": 44,
+        "LatchClock": 40,
+        "WriteAluDone": true
+      }
+    }
+  ],
+  "evidence": "Our own previous format9 states, solely compatibility/rejection regression; not independent CPU accuracy goldens"
+}

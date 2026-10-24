@@ -1,0 +1,65 @@
+{
+  "schema": "published-functional-roms-v1",
+  "upstream": "https://github.com/gilyon/snes-tests",
+  "commit": "5ecdf555da920f0bd7b157542141965a8120186d",
+  "release": "v1.4",
+  "releaseAsset": "https://github.com/gilyon/snes-tests/releases/download/v1.4/snes-tests.zip",
+  "releaseZipSha256": "c3a39e15a9f3789fe143e54dfa035c988204576eafacf97df8ff3546a917c5e9",
+  "license": "MIT; copyright 2023 gilyon; LICENSE retained",
+  "origin": "unmodified upstream release ROMs, not locally rebuilt; original source/generator/map/text retained in release ZIP",
+  "evidence": "independently authored functional tests with upstream expected register/memory values; no physical hardware trace or board certification",
+  "exclusions": [
+    "65816 STP/WAI, hardware interrupts, timing, MMIO",
+    "SPC SLEEP/STOP, timing, dummy reads, timers/MMIO, DSP"
+  ],
+  "cases": [
+    {
+      "id": "cputest-full",
+      "rom": "testdata/gilyon-v1.4/cputest-full.sfc",
+      "romSha256": "f61de78d346a68c166d67472a414e5d207368889d37b977d1338f9221ca6400e",
+      "finalTestNumber": 1609,
+      "testCount": 1610,
+      "testNumberWramOffset": 16,
+      "successTileWord": 50,
+      "successText": "Success",
+      "maxFields": 1000,
+      "sourceSha256": "29e05d360ee27659cfb951f6fe760b254c6558dda8e74649b9039a968c9070b7"
+    },
+    {
+      "id": "cputest-basic",
+      "rom": "testdata/gilyon-v1.4/cputest-basic.sfc",
+      "romSha256": "d479bde706b9e16d76c0dfe98e2b2d3f5348f9dcb911e6a36b898f4201fc98bb",
+      "finalTestNumber": 1106,
+      "testCount": 1107,
+      "testNumberWramOffset": 16,
+      "successTileWord": 50,
+      "successText": "Success",
+      "maxFields": 1000,
+      "sourceSha256": "29e05d360ee27659cfb951f6fe760b254c6558dda8e74649b9039a968c9070b7"
+    },
+    {
+      "id": "spctest",
+      "rom": "testdata/gilyon-v1.4/spctest.sfc",
+      "romSha256": "3909f03d55b07081a4e9ac437ba5179731ec6c8ac3c715f712daec0f398dde63",
+      "finalTestNumber": 1367,
+      "testCount": 1368,
+      "testNumberWramOffset": 4,
+      "successTileWord": 50,
+      "successText": "Success",
+      "maxFields": 1000,
+      "sourceSha256": "e10cf408f805002a2ee6435fd5b199eba1ffe4521a72f83e50d317df6c9bff29"
+    }
+  ],
+  "files": {
+    "cputest-basic.sfc": "d479bde706b9e16d76c0dfe98e2b2d3f5348f9dcb911e6a36b898f4201fc98bb",
+    "cputest-full.sfc": "f61de78d346a68c166d67472a414e5d207368889d37b977d1338f9221ca6400e",
+    "cputest-main.asm": "29e05d360ee27659cfb951f6fe760b254c6558dda8e74649b9039a968c9070b7",
+    "cputest-README.md": "f5401690b6eca6647476e86fca9308468b54f9b1eab81237f0ddf6065d223b9a",
+    "LICENSE": "8b2d47e75527c29a67d95e368d37352aa880276cd8dbb3d3a2c7e1606fa14125",
+    "README.md": "f7ecee9e757d727adbc8f61e9f43de9c42aa0baf0fdcf9c9418a6590b60992d8",
+    "snes-tests-v1.4.zip": "c3a39e15a9f3789fe143e54dfa035c988204576eafacf97df8ff3546a917c5e9",
+    "spctest-README.md": "7cf95fc09cc60f25a9e40607e50c3945db1e3728bf9a8f313a672224cdf3f6a9",
+    "spctest-spctest.asm": "e10cf408f805002a2ee6435fd5b199eba1ffe4521a72f83e50d317df6c9bff29",
+    "spctest.sfc": "3909f03d55b07081a4e9ac437ba5179731ec6c8ac3c715f712daec0f398dde63"
+  }
+}

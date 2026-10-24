@@ -19,6 +19,14 @@
       "snapshotPath": "testdata/m8-adapter-baseline/verify-m8-testdata.py",
       "bytes": 987,
       "sha256": "2354ccc01ab680d6e5abdf976dc07f0bb5af11beb8f83c7b0e16e19c8958c559"
+    },
+    {
+      "sourceCommit": "c999c7f747ba6e554254e7fa9082ae91357a24ed",
+      "originalPath": "tools/m8-console-suite.py",
+      "snapshotPath": "testdata/m8-adapter-baseline/m8-console-suite.py",
+      "bytes": 16650,
+      "sha256": "1544f81cbeea44ff27cbb9825834514f8002c4b0f63db69ae27b017259c2a733",
+      "reason": "R3 active console output now prints full-overlap audio status separately; comparison/oracle logic remains unchanged"
     }
   ]
 }

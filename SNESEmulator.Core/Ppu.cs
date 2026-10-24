@@ -43,6 +43,10 @@ public sealed partial class Ppu
         return ((a<<1)|(high?1:0))&65535;
     }
     private void PrefetchVram()=>vramBuffer=MemoryBlank?(ushort)(Vram[VramByteAddress(false)]|Vram[VramByteAddress(true)]<<8):(ushort)0;
+    // Deterministic reset API: currently clears PPU memories on both reset paths.
+    // Published SHVC-CPU-01 reset sequencing does not establish VRAM/CGRAM/OAM
+    // retention values. This policy remains unverified hardware behavior; see
+    // docs/r3-accuracy.md rather than inferring retention from another chip.
     public void Reset()
     {
         Array.Clear(Vram);Array.Clear(Cgram);Array.Clear(Oam);Array.Clear(Registers);Array.Clear(Scroll);Array.Clear(mode7);

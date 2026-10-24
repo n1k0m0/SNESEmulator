@@ -45,7 +45,20 @@ public sealed partial class Cpu65816
     { A=r.A;X=r.X;Y=r.Y;S=r.S;D=r.D;PC=r.PC;P=r.P;PBR=r.PBR;DBR=r.DBR;E=r.E;Waiting=r.Waiting;Stopped=r.Stopped;Instructions=r.Instructions; }
     public CpuContinuation? CaptureContinuation() => initial == null ? null : new(initial,completed.ToArray(),entry,samples.ToArray());
     public void RestoreContinuation(CpuContinuation? state)
-    { initial=state?.Initial; completed.Clear();samples.Clear();cursor=count=lastAddress=0;lastRead=opcode=0;locked=vector=false;
+    {
+      // Format 9 predates the (direct,X) high-byte correction. A journal that
+      // already latched the obsolete next-page byte cannot be migrated: its
+      // read value (and possibly a following store) is an irreversible effect.
+      // Reject while loading the temporary machine, before replacing a worker.
+      if(state is {Entry:CpuEntry.Instruction,Completed.Length:>=6} &&
+         state.Initial.E && (state.Initial.D&255)!=0 &&
+         state.Completed[0].Value is {} op && (op&31)==1 &&
+         state.Completed[1].Value is {} operand){
+          int pointer=(state.Initial.D+operand+state.Initial.X)&65535;
+          if((pointer&255)==255 && state.Completed[5].Address!=(pointer&0xff00))
+              throw new InvalidDataException("Savestate contains an obsolete emulation (direct,X) pointer read; restart the ROM or load an earlier state.");
+      }
+      initial=state?.Initial; completed.Clear();samples.Clear();cursor=count=lastAddress=0;lastRead=opcode=0;locked=vector=false;
       if(state!=null) {if(state.Completed.Length!=state.Samples.Length)throw new InvalidDataException("Invalid CPU continuation");entry=state.Entry;completed.AddRange(state.Completed);samples.AddRange(state.Samples);Restore(state.Initial);} }
     /// <summary>Performs at most one external cycle. Returns false at instruction commit.
     /// Architectural registers commit at instruction completion; latched cycles contain in-flight pins.</summary>

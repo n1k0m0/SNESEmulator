@@ -192,3 +192,15 @@ acquired fixtures changed. Sources, parameters and results are retained under
 in 12 compressed archives, including failed and cancelled historical runs. Archive
 and every uncompressed file SHA256 were reread and verified in a separate pass. The
 parent independently accepted `10164c78e24124dfc613764cffd859409aeed1f8`, full Windows gate Exit0 (209 portable/10 Windows groups), `artifacts/root-m8-validation.log`. Root evidence freezes6 archives/3095 files; manifest SHA256 `c0fc6820a861ba406e18df0cea450f6e1b860a94ed59f4d32bc54f71fc12a60c`, acceptance SHA256 `e966162990912e614f2d38e476be12a9b463e2eba996ebc2be4e931e5bc421ad`. M9a performance now starts.
+
+
+## R3 follow-up (2026-10-24)
+
+[R3 accuracy investigation](r3-accuracy.md) fixes a separately reproduced 65C816
+`(direct,X)` emulation-page defect and adds unmodified published functional ROMs.
+A new isolated external-input DSP replay matches 89,524 native stereo pairs and
+191,408 timed echo writes without injecting DSP outputs. This narrows the first
+bsnes whole-console mismatch to its delivered input timeline; it does not close
+the 18 full-audio failures or certify hardware reset/PPU-memory behavior. Original
+M8 manifests and reference outputs remain unchanged. Active console output now
+shows initial and full-overlap audio differences separately.

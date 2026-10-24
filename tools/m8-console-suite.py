@@ -122,7 +122,10 @@ def verify(accuracy_only=False):
     actual=Path(str(prefix)+'.sram.bin').read_bytes();expectedSram=raw(ref,'sram.bin');sd=byte_diff(actual,expectedSram);row['sramDifference']=sd
     if sd:row['status']='fail'
    key=e['id']+'/'+name;contracts[key]={'video':diff,'audio':row.get('audioDifference'),'audioSequence':row.get('audioSequenceDifference'),'audioWindow':row.get('audioWindowDifference'),'sram':row.get('sramDifference')};rows.append(row)
-   print(row['status'].upper(),key,'pixels',diff,'audio',row.get('audioDifference'),flush=True)
+   # An exact initial checkpoint must not hide a later full-sequence failure.
+   print('ACCURACY',row['status'].upper(),key,'video',diff,
+         'initialAudio',row.get('audioDifference','not tested'),
+         'fullOverlapAudio',row.get('audioSequenceDifference','not tested'),flush=True)
  # Strong negative controls use actual nonuniform independently rendered data.
  example=next(e for e in manifest['entries'] if e['id']=='hdma-repeat-entry-ntsc-24');ref=example['references']['bsnes'];prefix=OUT/(example['id']+'-own');g=read(Path(str(prefix)+'.json'))['Metadata']['frameGeometry'];colors=values(Path(str(prefix)+'.rgb555le.bin').read_bytes(),'H');lights=Path(str(prefix)+'.brightness.bin').read_bytes();ex=extract(ref,g,'ntsc')
  assert len(set(ex))>1 and pixel_diff(colors,lights,ex,256,'bsnes') is None

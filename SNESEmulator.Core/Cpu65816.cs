@@ -63,12 +63,16 @@ public sealed partial class Cpu65816(ICpuBus bus)
     }
     private int Direct(byte offset) { if((D&255)!=0) Idle(); return E && (D & 255) == 0 ? (D & 0xFF00) | offset : (D + offset) & 65535; }
     private int DirectIndexed(byte offset, ushort index) { if((D&255)!=0)Idle();Idle();return E && (D & 255) == 0 ? (D & 0xFF00) | ((offset + index) & 255) : (D + offset + index) & 65535; }
-    private int DirectPointer(int address) => E && (D & 255) == 0
+    // (direct,X) wraps the pointer's high-byte read in emulation mode even
+    // when D is unaligned. Plain (direct) and (direct),Y wrap only for D.low=0.
+    // gilyon/snes-tests v1.4, cputest-full test 0027 exercises D=$011A,
+    // operand=$F7, X=$EE: low at $02FF, high at $0200 (not $0300).
+    private int DirectPointer(int address, bool indexed = false) => E && (indexed || (D & 255) == 0)
         ? Read(address) | Read((address & 0xFF00) | ((address + 1) & 255)) << 8 : Read16(address);
     // ALU group addressing modes shared by ORA/AND/EOR/ADC/STA/LDA/CMP/SBC.
     private int Address(int low) => low switch
     {
-        0x01 => DBR << 16 | DirectPointer(DirectIndexed(Fetch(), X)),
+        0x01 => DBR << 16 | DirectPointer(DirectIndexed(Fetch(), X), true),
         0x03 => StackAddress(),
         0x05 => Direct(Fetch()),
         0x07 => Read24(Direct(Fetch())),

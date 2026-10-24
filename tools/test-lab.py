@@ -34,9 +34,14 @@ supervised('network-relay-contract',[sys.executable,'tools/test-network-relay.py
 supervised('persistence-conformance',['dotnet',str(CORE),'--persistence-only'],timeout=180)
 supervised('interaction-conformance',['dotnet',str(CORE),'--interaction-only'],timeout=180)
 supervised('runtime-conformance',['dotnet',str(CORE),'--runtime-only'],timeout=180)
+run([sys.executable,'tools/verify-r3-testdata.py'])
 run([sys.executable,'tools/generate-spc-hotpath.py','--check'])
 supervised('spc-continuation-guards',['dotnet',str(LAB),'spc-continuation-proof','artifacts/spc-continuation-guards-child'],timeout=120)
 supervised('spc-entry-lifecycle',['dotnet',str(LAB),'spc-entry-proof','artifacts/spc-entry-lifecycle-child'],timeout=120)
+supervised('cpu-dp-quirk',['dotnet',str(LAB),'cpu-dp-proof','artifacts/cpu-dp-proof-child'],timeout=120)
+supervised('audio-epoch-proof',['dotnet',str(LAB),'audio-epoch-proof','artifacts/audio-epoch-proof-child'],timeout=120)
+supervised('dsp-timeline-replay',['dotnet',str(LAB),'dsp-timeline-replay','artifacts/dsp-timeline-replay-child'],timeout=120)
+supervised('published-cpu-roms',['dotnet',str(LAB),'published-cpu-roms','artifacts/published-cpu-roms-child'],timeout=120)
 # M9 frozen preoptimization state/trace regression, separate from accuracy oracles.
 run([sys.executable,'tools/test-performance.py'])
 run([sys.executable,'tools/dsp-reference.py','--verify'])
@@ -94,6 +99,7 @@ conformance=subprocess.run(['dotnet',str(LAB),'supervise','240','artifacts/confo
 inventory=json.loads((ROOT/'artifacts/conformance-child.json').read_text())
 if args.full:
  assert conformance==0 and inventory['Metadata']['executedCases']==5080400 and inventory['Metadata']['failedCases']==0 and inventory['Metadata']['opcodeModeFixturesVerified']==512, 'Full M1 gate failed'
+ assert inventory['Metadata']['rawSemanticMismatches']==246 and inventory['Metadata']['adjudicatedCases']==264, 'Explicit CPU corpus adjudication inventory changed'
 else:
  assert conformance==2 and inventory['Metadata']['executedCases']==2048 and inventory['Metadata']['failedCases']==0, 'Sample semantics failed or missing vectors'
  assert sum(t['Status']=='skipped' for t in inventory['Tests'])==512, 'Sample-only unsampled markers must remain explicit'
@@ -102,6 +108,7 @@ bus_exit=subprocess.run(['dotnet',str(LAB),'supervise','240','artifacts/bus-conf
 bus_report=json.loads((ROOT/'artifacts/bus-conformance-child.json').read_text())
 assert bus_exit==(0 if args.full else 2) and bus_report['Metadata']['executedCases']==(5080400 if args.full else 2048) and bus_report['Metadata']['failedCases']==0, 'M2 generic bus conformance failed'
 assert bus_report['Metadata']['busCyclesCompared']>0
+if args.full:assert bus_report['Metadata']['rawSemanticMismatches']==246 and bus_report['Metadata']['rawBusMismatches']==264 and bus_report['Metadata']['adjudicatedCases']==264, 'Raw CPU differences must remain visible'
 spc_exit=subprocess.run(['dotnet',str(LAB),'supervise','120','artifacts/spc-conformance','dotnet',str(LAB),*(['spc-full','artifacts/spc-conformance-child','testdata/spc700-full'] if args.full else ['spc'])],cwd=ROOT).returncode
 spc=json.loads((ROOT/'artifacts/spc-conformance-child.json').read_text())
 assert spc_exit==(0 if args.full else 2)
@@ -128,4 +135,4 @@ if args.windows:
  native_after={str(p.relative_to(ROOT)):__import__('hashlib').sha256(p.read_bytes()).hexdigest() for directory in ['SNESEmulator/bin/Release/net10.0-windows','SNESEmulatorManager/bin/Release/net10.0-windows','SNESEmulator.Contracts/bin/Release/net10.0','SNESEmulator.Management/bin/Release/net10.0','SNESEmulator.Core/bin/Release/net10.0','SNESEmulator.Runtime/bin/Release/net10.0'] for p in (ROOT/directory).rglob('*') if p.is_file() if p.name.endswith(('.dll','.exe','.deps.json','.runtimeconfig.json'))}
  (ROOT/'artifacts/m9e-gate-native-identities-after.json').write_text(json.dumps(native_after,indent=2))
  assert native_before==native_after, 'Product build identity changed across native starts'
-print('Laboratory checks passed. '+('Full M1 CPU semantics verified.' if args.full else '2048 sampled semantics pass; 5,078,352 upstream cases remain explicitly unsampled.')+' Generic 65816 bus cycles verified separately; SNES profiles are analytical targets, not original-hardware measurements.')
+print('Laboratory checks passed. '+('Full M1 CPU contract verified with explicit (dp,X) supplemental adjudication; raw corpus differences remain visible.' if args.full else '2048 sampled semantics pass; 5,078,352 upstream cases remain explicitly unsampled.')+' Generic 65816 bus cycles verified separately; SNES profiles are analytical targets, not original-hardware measurements.')

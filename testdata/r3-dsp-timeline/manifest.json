@@ -1,0 +1,175 @@
+{
+  "schema": "r3-isolated-dsp-timeline-v1",
+  "reference": "bsnes",
+  "referenceCommit": "78474e5d39f58872dc21aca18cf9eb583b147fe7",
+  "evidence": "software isolation of DSP arithmetic under separately captured input effects; not whole-console agreement or hardware proof",
+  "firmware": "OwnIPL only; original IPL trace remains ignored local evidence",
+  "firmwareSha256": "18aff3c4054c3976a663520956d992011efe210c148dcc0a875f8154c0c39f05",
+  "frames": 168,
+  "pairs": 89524,
+  "executedDspTicks": 2864794,
+  "eventFormat": "LE uint64 executedDSPticks,uint16 RAM/reg address,uint8 value,uint8 kind (0=SMP sharedRAM input write,1=DSP MMIO input write,2=reference DSP echo output write (comparison only)); event after all prior DSP ticks",
+  "initialFormat": "65536 sharedARAM bytes then128 register bytes; immediately after reference power before execution",
+  "files": {
+    "initial.bin": {
+      "file": "initial.bin.gz",
+      "sha256": "760f44d8d1a0b635f2d841939ffb35724cb298e6e19100ecd1d970473e5d16cf",
+      "rawBytes": 65664,
+      "rawSha256": "245701992b54fe0a0e673b0c92d0a9849c4dd6e4739c2f4ef4c166537da53d02"
+    },
+    "events.bin": {
+      "file": "events.bin.gz",
+      "sha256": "f5a8e926cfe4cd1fc92d519407340d1d70ebe62698ec382eb48542b194d8bf96",
+      "rawBytes": 4068312,
+      "rawSha256": "9c9ecc7e3ee639a560f8a3f1ac14c088fad8f5dc38af76383d4a6ce313483ae5"
+    },
+    "pcm.bin": {
+      "file": "pcm.bin.gz",
+      "sha256": "53376c32f221d2b37656264251645b2354716d80f653f9b2917a57bc4ee535ab",
+      "rawBytes": 358096,
+      "rawSha256": "fc72718a95f89961d9a0abf9a314578ef32e330f9d6b4fc89b1daa4eda94f5fe"
+    }
+  },
+  "captureIdentity": {
+    "sources": {
+      "tools\\r3-dsp-timeline-reference.py": "751c1de0e85172731e1cf3fd61a8a11ea82f3c320a4bfe1991211cac54b26639",
+      "artifacts\\r3-accuracy\\dsp-replay\\observer.hpp": "6e5affdac58263e865280b55331cf3a2c60ad341498a493b0c3f3c2200613fd0",
+      "artifacts\\r3-accuracy\\dsp-replay\\adapter.cpp": "d6738d44860f34b6485b806ae784ae4e43de2d82396a52c1a78cb8b4e99d33d2",
+      "artifacts\\r3-accuracy\\dsp-replay\\overlay\\sfc\\dsp\\dsp.cpp": "7df1e888f8f10058fdf4610a2f6d84f4866724c4bcb1f48d0127720748a97fcc",
+      "artifacts\\r3-accuracy\\dsp-replay\\overlay\\sfc\\smp\\memory.cpp": "3dd0315481afc02d6e307298a60826828a20a760b0b24bc3a00112a7ebd85422",
+      "artifacts\\r3-accuracy\\dsp-replay\\overlay\\sfc\\dsp\\SPC_DSP.cpp": "2454d7f1c0852546b825488ff70b1a24171f3d2fdf664a8e22797d3bc7408e5b"
+    },
+    "objects": {
+      "artifacts\\r3-accuracy\\dsp-replay\\smp.o": "01d6eb0b68b1fbf246a6cae69401b251a0df020fcbcf6dbc2fbb1dee9bc2611b",
+      "artifacts\\r3-accuracy\\dsp-replay\\dsp.o": "d7e0dd1653220e9a1f774754e6b4f5f13826d23db0bda3a763f8ef454147f45e",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\emulator.o": "347bfa11e72b819b4cc63cf403902501a9606993a3901f0d9c0cca1bde1a401b",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\filter.o": "fdb02627ee6ee4c93c1900d5d63b4b78fa81166895bb5410017971a49a1878cd",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-apu.o": "f9515ebd6b783d974cbb9c0ed14273887506c28e016ab1b1a0e228197f4c0215",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-camera.o": "146b4b33b07a16fcbedb96337cb81b6e248f17b486644c825e783a210a685ad6",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-display.o": "6faad1dc92c3dabcebb5094196785ba2dc2fb671e937a4265c90b2d72da31443",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-gb.o": "8a9253e32951290cfcf5f718e83857f428ad0292cbbfb0611a565b59e7ca543f",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-joypad.o": "722556d4ebc361a20068480d85118c8470663035dfe88b480912289185ada5c0",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-mbc.o": "9adc116cf66881e2b5bdce28913f0f3bbf8bc1d3011e1d59408b2abda1873ce0",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-memory.o": "772ad0cb6450cfe44a34718e185d12932e2f8665e81b90ce22fd8b1f3e2763c8",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-printer.o": "62a6dc43e35cc78bd7109862ca12a6f3459000883f7c300107f9ec3814e50bd6",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-random.o": "c22c65dfec4d192c887d395b1e5ea145a12c207ab86cf2c8ed2205ab47a6ff5d",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-rewind.o": "a55910dd14b22cbeaf2048798368e9bc9137919cb53f3a848ebee3c71387724d",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-rumble.o": "7bb05c63f597d8fbfcd709b112868052a35f0d60af724ac3a7f83a32fb6f1149",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-save_state.o": "e35ef071e72f65f7dbcdbebe7455521aeeeaa53cbf0ed9c29738e41b8ee661d5",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-sgb.o": "40b4b363918a39081c4018a6e94e59fddf4a845c7203b2703ab73c10970e8e92",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-sm83_cpu.o": "56d0e4966288a587dcba6532b504686b9fc592777c81afda141e7717ff281c5e",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\gb-timing.o": "b87ddcfbdfbd601a95d483e997bbc81987c3fede2d603bf69ac35648e58db29c",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\libco.o": "82e80bc2238d1012f76d0f25e7ee9c66e13ec1b8ddc680a1c17df4f59c95dcfe",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\lzma.o": "1b99c3e19064bea6fe4b2f8e344e31faeffedf0d48dd0d54d861155a78a864f9",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\processor-arm7tdmi.o": "5344bd3555e6af0740951f6dafd1b338e8e9274ddf4498a1912546f595dc5f45",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\processor-spc700.o": "a182ab6bb6beb594df25a922a0a5d09fa205836628af3613de3291be8c1f8617",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\processor-wdc65816.o": "568635232edb1e20a0790b9eaa790fff396c0c9f476f1dcaba4eabbf36e85475",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-cartridge.o": "e4cb7fd190f8e03bd94ff48112046fd898d9eb22c7c5109bf36641f185a11504",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-controller.o": "40ecc269b8e0f45f9caf7e23a66519fb0602be1ae0ec505d866d63b1e6f2fc9a",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-coprocessor.o": "0d5574050bc530b898240b339b0980e1e80d3101a01dd3efebe70dbbf0795be9",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-expansion.o": "9e037780eff32b106dda9c35fdff6feb74ab57581467a65239e4600d5d47d8b9",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-interface.o": "b725288706294330b03405dad81b5a2e3093091826ab1bd7adcd55589c927034",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-memory.o": "408a1eb78c59023045e43c9236ebe944075562ad5967e3320f493a5ffe20c7ff",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-ppu-fast.o": "df9aaf8b8e764a3f9d556bc8efdd90b0ccbf4acb261a36622b2c6e7a0e33b206",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-ppu.o": "187bb260073e8ef6da94ab01bf50daecd2093bc357bc5eabaa72c3989d1cef3e",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-slot.o": "3b47d47d2f3b8e4699766f8081126853397911f8f4fd117459e7628f375747eb",
+      "artifacts\\m8-reference\\bsnes\\bsnes\\obj\\sfc-system.o": "1bcd568662c2e3f6dd661e2936efdf28d778117f86ec50eb00a7ec6cb36ca4ec",
+      "artifacts\\m8-reference\\bsnes-cpu-observer.o": "6e3a175c0977e036076579ddc0e236ade7999cdda1e22373229339baef149db3"
+    },
+    "binary": "e622168270ecfd025b444a89f2959e4f7f4c1495c4258de099a4df0e5c88fc31",
+    "referencePcmMatchesHistorical168Fields": true,
+    "eventFormat": "LE uint64 executedDSPticks,uint16 RAM/reg address,uint8 value,uint8 kind (0=SMP sharedRAM input write,1=DSP MMIO input write,2=reference DSP echo output write (comparison only)); event after all prior DSP ticks",
+    "initialFormat": "65536 sharedARAM bytes then128 register bytes; immediately after reference power before execution"
+  },
+  "negativeControls": [
+    "changed expected PCM",
+    "changed expected echo output",
+    "changed DSP MMIO input",
+    "missing terminal event",
+    "chronologically valid KON input delayed by64 DSP ticks and stable-sorted; output mismatch required"
+  ],
+  "noAlignmentSearch": true,
+  "echoOutputsAreNeverInjected": true,
+  "program": {
+    "rom": "testdata/m8-game/unnamed-snes-game.sfc",
+    "romSha256": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e",
+    "source": "https://github.com/undisbeliever/unnamed-snes-engine",
+    "sourceCommit": "1c06fee8fbaffbc720ca5fee3dd8c5f2f5838254",
+    "license": "MIT code; Zlib audio driver; CC BY-SA 4.0 art/music/SFX; CC0, public domain and Apache-2.0 samples; see retained CREDITS and THIRD_PARTY_LICENSES",
+    "attributionFiles": {
+      "testdata/m8-game/LICENSE": "268d84ee5b2f3e8f1566879052d7c897bcb6f1b8476b767466fb247cd250a58f",
+      "testdata/m8-game/audio-driver-LICENSE": "228d112139d15f8b0a51da82de4c002a0252f5cdec9ebef26bd0d05cfe73bcee",
+      "testdata/m8-game/CREDITS.md": "17a7d0ab10425cbd84e92505d2b9cb28b670d4574011e77a01f2b9e17e895bac",
+      "testdata/m8-game/THIRD_PARTY_LICENSES.md": "e13bae8ee819297448fbd9715e3d891bcb73622d32ae40c839b3069594795c4b"
+    }
+  },
+  "replay": {
+    "case": "game-reference-crystal-300 limited to first168fields",
+    "rawFieldInputPlan": [
+      [
+        150,
+        4096
+      ],
+      [
+        152,
+        0
+      ],
+      [
+        210,
+        32768
+      ],
+      [
+        212,
+        0
+      ],
+      [
+        270,
+        256
+      ],
+      [
+        290,
+        0
+      ],
+      [
+        310,
+        32768
+      ],
+      [
+        312,
+        0
+      ],
+      [
+        340,
+        1024
+      ],
+      [
+        360,
+        0
+      ]
+    ],
+    "textFileSha256": "5ee302ae37313070ad6c510e89c235d6b6f09f741a4ede2626cec82aee3881b4",
+    "sourceManifest": "testdata/m8-console-own-ipl/manifest.json",
+    "sourceManifestSha256": "b4673d449ed9a66d5bf9c1eaeaa5daffffc799e4e5b083ea1d6deed7083c6308"
+  },
+  "profile": {
+    "region": "NTSC",
+    "systemMasterNumerator": 945000000,
+    "systemMasterDenominator": 44,
+    "apuCrystalNumerator": 24606720,
+    "apuCrystalDenominator": 1,
+    "nativePairsPerSecond": 32040,
+    "referenceEffectiveCpuHz": 21477272,
+    "referenceSmpHz": 2050560,
+    "configuration": "cycle PPU, accuracy DSP, no FastPPU/FastDSP/hotfixes; entropy None; zero-filled battery input"
+  },
+  "reset": {
+    "kind": "reference power, no warm reset",
+    "initialRamAndRegisters": "captured after core.power(), before core.run()",
+    "firstDspPhase": 0,
+    "firstTick": 1,
+    "firstNativePairTick": 28,
+    "inputEpoch": "DSP run(1) counter increments before execution; SMP/register writes occur after all prior executed ticks; no alignment search",
+    "ownReplay": "own SnesDsp power state, then copied captured ARAM/register bytes; no sample shift or phase rotation"
+  },
+  "acquireCommand": "python tools/r3-dsp-timeline-reference.py"
+}

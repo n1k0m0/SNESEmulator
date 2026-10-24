@@ -12,7 +12,7 @@ static class Lab
     public static int Run(string[] args)
     {
         if(args.Length==0) {Console.WriteLine("Commands: cpu [report-prefix] [fixture-directory] [case-name], cpu-full [report-prefix] [fixture-directory] [opcode.mode], rom [options], mutations [prefix], supervise <seconds> <report-prefix> <command...>, probe <pass|fail|skipped|hang|crash>. See docs/test-laboratory.md.");return 2;}
-        try { return args[0] switch { "spc-boot-original"=>SpcVector.Boot(args.Skip(1).ToArray()), "spc"=>SpcVector.Run(args.Skip(1).ToArray(),false),"spc-full"=>SpcVector.Run(args.Skip(1).ToArray(),true),"spc-run"=>SpcVector.Run(args.Skip(1).ToArray(),false,true),"spc-run-full"=>SpcVector.Run(args.Skip(1).ToArray(),true,true),"spc-continuation-proof"=>SpcContinuationProof.Run(args.Skip(1).ToArray()),"spc-entry-proof"=>SpcEntryProof.Run(args.Skip(1).ToArray()), "cpu"=>Cpu(args.Skip(1).ToArray()),"cpu-full"=>Cpu(args.Skip(1).ToArray(),true),"cpu-bus"=>Cpu(args.Skip(1).ToArray(),false,true),"cpu-bus-full"=>Cpu(args.Skip(1).ToArray(),true,true),"frame-proof"=>FrameProof.Run(args.Skip(1).ToArray()),"suspend-proof"=>SuspendProof.Run(args.Skip(1).ToArray()),"performance"=>Performance.Run(args.Skip(1).ToArray()),"benchmark"=>Benchmark(),"benchmark-apu"=>Benchmark(true),"benchmark-dsp"=>Benchmark(true,true),"rom"=>Rom(args.Skip(1).ToArray()),"mutations"=>Mutations(args.ElementAtOrDefault(1)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/mutations"),"supervise"=>Supervise(args.Skip(1).ToArray()),"unavailable"=>Unavailable(args[1]),"probe"=>Probe(args[1]),_=>throw new ArgumentException("Unknown command") }; }
+        try { return args[0] switch { "audio-epoch-proof"=>AudioEpochProof.Run(args.Skip(1).ToArray()),"dsp-timeline-replay"=>DspTimelineReplay.Run(args.Skip(1).ToArray()),"published-cpu-roms"=>PublishedCpuRoms.Run(args.Skip(1).ToArray()),"cpu-dp-proof"=>CpuDpProof.Run(args.Skip(1).ToArray()), "spc-boot-original"=>SpcVector.Boot(args.Skip(1).ToArray()), "spc"=>SpcVector.Run(args.Skip(1).ToArray(),false),"spc-full"=>SpcVector.Run(args.Skip(1).ToArray(),true),"spc-run"=>SpcVector.Run(args.Skip(1).ToArray(),false,true),"spc-run-full"=>SpcVector.Run(args.Skip(1).ToArray(),true,true),"spc-continuation-proof"=>SpcContinuationProof.Run(args.Skip(1).ToArray()),"spc-entry-proof"=>SpcEntryProof.Run(args.Skip(1).ToArray()), "cpu"=>Cpu(args.Skip(1).ToArray()),"cpu-full"=>Cpu(args.Skip(1).ToArray(),true),"cpu-bus"=>Cpu(args.Skip(1).ToArray(),false,true),"cpu-bus-full"=>Cpu(args.Skip(1).ToArray(),true,true),"frame-proof"=>FrameProof.Run(args.Skip(1).ToArray()),"suspend-proof"=>SuspendProof.Run(args.Skip(1).ToArray()),"performance"=>Performance.Run(args.Skip(1).ToArray()),"benchmark"=>Benchmark(),"benchmark-apu"=>Benchmark(true),"benchmark-dsp"=>Benchmark(true,true),"rom"=>Rom(args.Skip(1).ToArray()),"mutations"=>Mutations(args.ElementAtOrDefault(1)??Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/mutations"),"supervise"=>Supervise(args.Skip(1).ToArray()),"unavailable"=>Unavailable(args[1]),"probe"=>Probe(args[1]),_=>throw new ArgumentException("Unknown command") }; }
         catch(Exception ex) {Console.Error.WriteLine(ex);var r=new TestReport("laboratory-command");r.Add(args[0],"crash",ex.ToString());r.Save("artifacts/command-crash");return 1;}
     }
     static int Benchmark(bool apu=false,bool audio=false)
@@ -43,6 +43,7 @@ static class Lab
         report.Metadata["sourceCommit"]=manifest.RootElement.GetProperty("commit").GetString();
         report.Metadata["representedCases"]=manifest.RootElement.GetProperty("representedCases").GetInt32();report.Metadata["upstreamCases"]=manifest.RootElement.GetProperty("upstreamCases").GetInt32();
         var files=manifest.RootElement.GetProperty("files").EnumerateArray().ToArray();
+        var adjudication=new CpuDpAdjudication();int rawSemanticMismatches=0,rawBusMismatches=0,adjudicatedCases=0;var rawDifferences=new List<object>();
         var bus=new TraceBus { TraceEnabled=!full };var cpu=new Cpu65816(bus);var cycleTrace=new List<CpuCycle>();if(timed)cpu.CycleObserved=cycleTrace.Add;int executed=0,totalPassed=0,totalFailed=0;long comparedCycles=0;var coverage=new List<string>();
         for(int op=0;op<256;op++) foreach(string mode in new[]{"e","n"})
         {
@@ -71,7 +72,19 @@ static class Lab
                 try
                 {
                     int approximateCycles=CpuVector.ExecuteInstruction(cpu,bus);executed++;if(timed)comparedCycles+=cycleTrace.Count;
-                    string? diff=CpuVector.FirstDifference(cpu,bus,vector.GetProperty("final"));if(timed)diff??=CpuVector.FirstCycleDifference(cycleTrace,vector.GetProperty("cycles"));
+                    // Preserve the raw corpus result before comparing the narrowly pinned,
+                    // separately executed software reference for the documented (dp,X) quirk.
+                    string? rawSemantic=CpuVector.FirstDifference(cpu,bus,vector.GetProperty("final"));
+                    string? rawBus=timed?CpuVector.FirstCycleDifference(cycleTrace,vector.GetProperty("cycles")):null;
+                    if(rawSemantic!=null)rawSemanticMismatches++;if(rawBus!=null)rawBusMismatches++;
+                    var reviewed=adjudication.Expected(vector,op,mode);
+                    string? diff=rawSemantic??rawBus;
+                    if(reviewed is {} reference){
+                        adjudicatedCases++;
+                        diff=CpuVector.FirstDifference(cpu,bus,reference.GetProperty("final"));
+                        if(timed)diff??=CpuVector.FirstCycleDifference(cycleTrace,reference.GetProperty("cycles"));
+                    }
+                    if(rawSemantic!=null||rawBus!=null)rawDifferences.Add(new{name,opcode=$"{op:X2}",mode,rawSemantic,rawBus,adjudicated=reviewed!=null,approvedDifference=diff});
                     if(diff==null) { passed++;totalPassed++; } else { failed++;totalFailed++; firstDiff??=name+": "+diff; firstFailure??=new {name,opcode=$"{op:X2}",mode,emulation=effectiveInitial["e"]!=0,memory8=effectiveInitial["e"]!=0||(effectiveInitial["p"]&32)!=0,index8=effectiveInitial["e"]!=0||(effectiveInitial["p"]&16)!=0,effectiveInitial,initial=vector.GetProperty("initial").Clone(),expected=vector.GetProperty("final").Clone(),actual=CpuVector.State(cpu),expectedCycles=timed?vector.GetProperty("cycles").Clone():default,actualCycles=timed?cycleTrace.ToArray():null}; }
                     if(!full) report.Add(name,diff==null?"pass":"fail",diff,watch.Elapsed.TotalSeconds,diff==null?null:new { opcode=$"{op:X2}",mode,effectiveInitial,initial=vector.GetProperty("initial").Clone(),expected=vector.GetProperty("final").Clone(),actual=CpuVector.State(cpu),logicalBus=bus.Trace.ToArray(),approximateCycles,reproduce=$"dotnet run --project SNESEmulator.Lab -c Release -- {command} {prefix} {directory} \"{name}\"" });
                 }
@@ -82,6 +95,9 @@ static class Lab
             if(!full && filter=="")report.Add(key+"/unsampled","skipped",$"{entry.GetProperty("upstreamCases").GetInt32()-count} upstream vectors not selected; sample count {count}. Full suite available with cpu-full.");
         }
         if(executed==0)report.Add("selected-cases","skipped","No vectors executed, including any requested name filter");
+        report.Metadata["rawSemanticMismatches"]=rawSemanticMismatches;report.Metadata["rawBusMismatches"]=rawBusMismatches;
+        report.Metadata["adjudicatedCases"]=adjudicatedCases;report.Metadata["adjudicationFixtureSha256"]=CpuDpAdjudication.FixtureSha256;
+        report.Metadata["rawDifferences"]=rawDifferences;
         report.Metadata["busCyclesCompared"]=comparedCycles;report.Metadata["executedCases"]=executed;report.Metadata["passedCases"]=totalPassed;report.Metadata["failedCases"]=totalFailed;report.Metadata["coverageKind"]=full?(filter==""?"full":"full-file-filter"):"sample";report.Metadata["stackConvention"]="Raw upstream initial S retained in evidence; before execution E=1 maps S to 0x100|(S&255), the only valid emulation stack page. P/X/Y unchanged.";report.Metadata["opcodeModeFixturesVerified"]=coverage.Count;report.Metadata["coverage"]=coverage;
         report.Save(prefix);return report.ExitCode;
     }
