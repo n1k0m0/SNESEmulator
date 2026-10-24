@@ -138,7 +138,15 @@ assert spc['Metadata']['rawBusMismatches']==(7000 if args.full else 28), 'Only s
 # sample-only use reports an explicit skip when no local firmware was supplied.
 original_path=__import__('os').environ.get('SNESEMULATOR_IPL',str(ROOT/'testdata/local-firmware/ipl.bin'))
 original_expected=0 if pathlib.Path(original_path).is_file() else 2
-supervised('spc-continuation-conformance',['dotnet',str(LAB),*(['spc-run-full','artifacts/spc-continuation-conformance-child','testdata/spc700-full'] if args.full else ['spc-run','artifacts/spc-continuation-conformance-child','testdata/spc700-sample'])],timeout=120)
+# A sample-only continuation report keeps the unsampled vectors explicit (exit2).
+# Its coverage contract is checked separately from the optional full execution.
+supervised('spc-continuation-conformance',['dotnet',str(LAB),*(['spc-run-full','artifacts/spc-continuation-conformance-child','testdata/spc700-full'] if args.full else ['spc-run','artifacts/spc-continuation-conformance-child','testdata/spc700-sample'])],expected=0 if args.full else 2,timeout=120)
+mixed_spc=json.loads((ROOT/'artifacts/spc-continuation-conformance-child.json').read_text())['Metadata']
+assert mixed_spc['executedCases']==(256000 if args.full else 1024) and mixed_spc['failedCases']==0
+assert mixed_spc['fixturesVerified']==256 and mixed_spc['semanticFailures']==0 and mixed_spc['approvedBusFailures']==0
+assert mixed_spc['rawBusMismatches']==(7000 if args.full else 28)
+assert mixed_spc['hotCases']>0 and mixed_spc['legacyCases']>0 and mixed_spc['hotValueEntriesStarted']==mixed_spc['executedCases']
+
 supervised('spc-original-boot',['dotnet',str(LAB),'spc-boot-original','artifacts/spc-original-boot-child',original_path],original_expected)
 if args.full:assert original_expected==0, 'Original IPL execution unperformed: supply local64-byte firmware with SNESEMULATOR_IPL'
 if args.windows:
