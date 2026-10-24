@@ -1,0 +1,18 @@
+{
+  "sourceCommit": "3db3681f2be29e405a1acab265c8731d24e81bf8",
+  "role": "Historical M9 regression adapters, not active test runners",
+  "files": [
+    {
+      "originalPath": "SNESEmulator.Lab/SuspendProof.cs",
+      "snapshotPath": "testdata/m9-adapter-baseline/SuspendProof.cs",
+      "bytes": 4575,
+      "sha256": "b04dfb9bc9258f53ef8ce12a67e040959e7fcf2636ec370c52c44911b33a0763"
+    },
+    {
+      "originalPath": "tools/test-performance.py",
+      "snapshotPath": "testdata/m9-adapter-baseline/test-performance.py",
+      "bytes": 6222,
+      "sha256": "bcfd8b328385d10aa7161fa033a38eb3f78e66239f23bfe897bd4bf9196e0f55"
+    }
+  ]
+}

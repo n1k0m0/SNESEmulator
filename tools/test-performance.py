@@ -15,7 +15,7 @@ tracked=subprocess.check_output(['git','ls-files'],cwd=ROOT,text=True).splitline
 provenance={'commit':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),'status':subprocess.check_output(['git','status','--porcelain'],cwd=ROOT,text=True).strip(),'host':subprocess.check_output(['hostname'],cwd=ROOT,text=True).strip(),'sources':{f:sha(ROOT/f) for f in tracked if f.startswith(('SNESEmulator.Core/','SNESEmulator.Lab/','SNESEmulator.Testing/'))},'inputs':{f:sha(ROOT/f) for f in inputs},'coreDllSha256':sha(ROOT/'SNESEmulator.Core/bin/Release/net10.0/SNESEmulator.Core.dll'),'command':sys.argv}
 (OUT/'provenance.json').write_text(json.dumps(provenance,indent=2)+'\n')
 manifest=json.loads((ROOT/'testdata/m9-performance-manifest.json').read_text())
-for f,h in manifest['files'].items():assert sha(ROOT/f)==h,('Immutable M9 regression/source identity',f)
+subprocess.run([sys.executable, str(ROOT/'tools/verify-m9-testdata.py')], cwd=ROOT, check=True)
 contract=json.loads((ROOT/inputs[0]).read_text());reference=ROOT/inputs[1]
 raw_oracles=json.loads((ROOT/'testdata/m9-raw-state-oracles.json').read_text())['statesByCompressedSha256']
 def compare_state(expected_hash,path):
