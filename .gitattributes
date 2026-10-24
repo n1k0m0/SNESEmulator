@@ -49,3 +49,8 @@ SNESEmulator.Lab/FrameProof.cs text eol=lf
 
 # Preserve the exact preoptimization replay bytes (CRLF).
 testdata/m9-performance-replay.json -text
+# R3 published inputs and actual previous-core states retain exact upstream bytes.
+testdata/gilyon-v1.4/* -text -whitespace
+testdata/gilyon-v1.4/*.sfc binary
+testdata/gilyon-v1.4/*.zip binary
+testdata/r3-cpu-legacy-states/*.state binary

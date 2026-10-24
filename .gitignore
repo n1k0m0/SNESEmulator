@@ -89,3 +89,4 @@ testdata/65816-full/
 !/testdata/ppu-external/vram-mid-scanline-test.sfc
 !/testdata/m8-roms/*.sfc
 !/testdata/m8-game/*.sfc
+!/testdata/gilyon-v1.4/*.sfc
