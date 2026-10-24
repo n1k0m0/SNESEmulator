@@ -110,6 +110,10 @@ public static class SpcVector
         }
         report.Metadata["executionPath"]=continuation?"RunInstruction:23 hot forms, remaining forms explicitly replay decoder":"original Step decoder";
         report.Metadata["hotCases"]=hotCases;report.Metadata["legacyCases"]=legacyCases;
+        report.Metadata["variant"]="Hot instruction entry is retained as a value; public Entry materializes on demand";
+        report.Metadata["hotValueEntriesStarted"]=ReadCounter(typeof(Spc700).GetProperty("HotValueEntriesStarted",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!);
+        report.Metadata["hotEntryRecordsMaterialized"]=ReadCounter(typeof(Spc700).GetProperty("HotEntryRecordsMaterialized",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)!);
+        report.Metadata["actualCoreSha256"]=Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(typeof(Spc700).Assembly.Location)));
         report.Metadata["executedCases"]=executed;report.Metadata["failedCases"]=failed;report.Metadata["busCyclesCompared"]=cycles;report.Metadata["fixturesVerified"]=files;report.Metadata["revision"]=metadata.RootElement.GetProperty("revision").GetString();
         report.Metadata["rawBusPassed"]=executed-rawMismatches;report.Metadata["rawBusMismatches"]=rawMismatches;report.Metadata["sourceAdjudicatedCases"]=adjudicated;report.Metadata["semanticPassed"]=executed-semanticFailures;report.Metadata["semanticFailures"]=semanticFailures;report.Metadata["approvedBusPassed"]=executed-busFailures;report.Metadata["approvedBusFailures"]=busFailures;report.Metadata["adjudicationRule"]="spc-indirect-y-2017-v1: only17/37/57/77/97/B7/F7 order[0,1,3,4,2,5]; hardware researcher discussion https://forums.nesdev.org/viewtopic.php?t=16140";
         report.Save(prefix);return report.ExitCode;

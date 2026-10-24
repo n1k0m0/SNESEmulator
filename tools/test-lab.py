@@ -36,6 +36,7 @@ supervised('interaction-conformance',['dotnet',str(CORE),'--interaction-only'],t
 supervised('runtime-conformance',['dotnet',str(CORE),'--runtime-only'],timeout=180)
 run([sys.executable,'tools/generate-spc-hotpath.py','--check'])
 supervised('spc-continuation-guards',['dotnet',str(LAB),'spc-continuation-proof','artifacts/spc-continuation-guards-child'],timeout=120)
+supervised('spc-entry-lifecycle',['dotnet',str(LAB),'spc-entry-proof','artifacts/spc-entry-lifecycle-child'],timeout=120)
 # M9 frozen preoptimization state/trace regression, separate from accuracy oracles.
 run([sys.executable,'tools/test-performance.py'])
 run([sys.executable,'tools/dsp-reference.py','--verify'])

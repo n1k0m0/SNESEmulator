@@ -34,11 +34,15 @@ public sealed partial class Spc700(ISpcBus bus)
     private int limit;
     private sealed class Yield : Exception;
     private readonly Yield yielded=new();
-    public bool AtInstructionBoundary=>entry==null;
+    // A value-only entry is still an in-progress instruction before any observer asks for a record.
+    public bool AtInstructionBoundary=>entry==null&&hotEntry==null;
     public SpcRegisters Capture()=>new(PC,A,X,Y,SP,PSW,Sleeping,Stopped,Instructions);
     public void Restore(SpcRegisters r) {PC=r.PC;A=r.A;X=r.X;Y=r.Y;SP=r.SP;PSW=r.PSW;Sleeping=r.Sleeping;Stopped=r.Stopped;Instructions=r.Instructions;}
-    public SpcContinuation? CaptureContinuation() => entry == null ? null :
-        new(entry, completed.Select(c => c.Public()).ToArray());
+    public SpcContinuation? CaptureContinuation()
+    {
+        MaterializeHotEntry();
+        return entry == null ? null : new(entry, completed.Select(c => c.Public()).ToArray());
+    }
 
     public void RestoreContinuation(SpcContinuation? continuation)
     {
@@ -118,10 +122,11 @@ public sealed partial class Spc700(ISpcBus bus)
         return NZ(n);
     }
     private void Branch(bool take){int rel=(sbyte)Fetch();if(take){Idle();Idle();PC=(ushort)(PC+rel);}}
-    public int Step(){if(entry!=null)throw new InvalidOperationException("SPC instruction in progress");cursor=0;Execute();return cursor;}
+    public int Step(){if(!AtInstructionBoundary)throw new InvalidOperationException("SPC instruction in progress");cursor=0;Execute();return cursor;}
     public bool AdvanceCycle()
     {
-        InvalidateHotContinuation();single=true;entry??=Capture();limit=completed.Count+1;Restore(entry);cursor=0;
+        // Preserve the original entry before replacing hot decoder locals with cycle replay.
+        MaterializeHotEntry();InvalidateHotContinuation();single=true;entry??=Capture();limit=completed.Count+1;Restore(entry);cursor=0;
         try{Execute();entry=null;completed.Clear();return false;}catch(Yield){return true;}finally{single=false;}
     }
     // Returns false at a cooperative timing boundary. Completed reads/writes are replayed only from data.
