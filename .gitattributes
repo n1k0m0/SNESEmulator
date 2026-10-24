@@ -60,3 +60,5 @@ testdata/dsp1/*.bin binary
 tools/dsp1-reference.cpp text eol=lf
 
 /testdata/superfx/*.gz binary
+
+/testdata/superfx/manifest.json binary
