@@ -23,7 +23,10 @@ boundaries. No timing constant, APU frequency or DSP arithmetic changed.
 The previously pinned SingleStepTests corpus disagrees at 264 `(direct,X)`
 emulation page-boundary cases. Raw results remain visible: 246 final-state
 mismatches and 264 bus mismatches in the full bus run. The original 5,080,400
-vectors and their hashes are unchanged. The separate
+vectors and their hashes are unchanged. The default/offline rejection control
+uses one separately pinned, verbatim MIT-licensed upstream object in
+`testdata/r3-cpu-adjudication-input.json`; its provenance records the exact source
+commit, full-source hash and original byte offset. It needs no optional full cache. The separate
 `testdata/65816-dp-indexed-quirk.json` contains 264 independently executed pinned
 bsnes processor expectations, with original vector hashes, full final registers,
 RAM and every bus cycle. Original pins and idle cycles remain unchanged.

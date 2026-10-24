@@ -34,7 +34,7 @@ supervised('network-relay-contract',[sys.executable,'tools/test-network-relay.py
 supervised('persistence-conformance',['dotnet',str(CORE),'--persistence-only'],timeout=180)
 supervised('interaction-conformance',['dotnet',str(CORE),'--interaction-only'],timeout=180)
 supervised('runtime-conformance',['dotnet',str(CORE),'--runtime-only'],timeout=180)
-run([sys.executable,'tools/verify-r3-testdata.py'])
+run([sys.executable,'tools/verify-r3-testdata.py','--negative-controls'])
 run([sys.executable,'tools/verify-dsp1-testdata.py'])
 run([sys.executable,'tools/verify-superfx-testdata.py','--negative-controls'])
 run([sys.executable,'tools/verify-sa1-testdata.py','--negative-controls'])

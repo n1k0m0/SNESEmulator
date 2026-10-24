@@ -1,0 +1,14 @@
+{
+  "schema": "r3-raw-adjudication-input-v1",
+  "source": "https://raw.githubusercontent.com/SingleStepTests/65816/307c63f5673c8c6b861c52f71ddb89212a227480/v1/01.e.json",
+  "sourceCommit": "307c63f5673c8c6b861c52f71ddb89212a227480",
+  "fullSourceSha256": "1dc660268934f0aa759921f05c14089714f9e1ee72cb8b31fc957e47a8f98e1f",
+  "name": "01 e 328",
+  "selection": "One verbatim JSON object, extracted without changing any byte; used only by the offline mutation rejection control. Existing full corpus and supplemental expectations are unchanged.",
+  "byteOffset": 203596,
+  "bytes": 632,
+  "sha256": "d3c5255d9dd86fbc54c310f905751dbf92dbe2adbe5d91f972bc5774e5bd6778",
+  "rawVectorSha256": "10a4ea9e713bebd62a823aba8496243d93c83717f73df15e7a668cc9d5d9e582",
+  "license": "MIT; 65816/upstream-LICENCE",
+  "licenseSha256": "3f7d091c160096758dced3f5ac0b7d3fb14ce805ddabf63a45bc85f0103afcfe"
+}

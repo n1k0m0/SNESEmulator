@@ -98,8 +98,12 @@ static class CpuDpProof
         {
             using var fixture = JsonDocument.Parse(File.ReadAllBytes("testdata/65816-dp-indexed-quirk.json"));
             var first = fixture.RootElement.GetProperty("cases")[0];
-            using var raw = JsonDocument.Parse(File.ReadAllBytes("testdata/65816-full/01.e.json"));
-            var vector = raw.RootElement.EnumerateArray().Single(v => v.GetProperty("name").GetString() == first.GetProperty("name").GetString());
+            // Keep this rejection control executable in the offline/default gate.
+            // Its single verbatim upstream object has separately pinned provenance;
+            // the optional full corpus is still tested independently by cpu-full.
+            using var raw = JsonDocument.Parse(File.ReadAllBytes("testdata/r3-cpu-adjudication-input.json"));
+            var vector = raw.RootElement;
+            Check(vector.GetProperty("name").GetString() == first.GetProperty("name").GetString(), "Raw mutation-control selection changed");
             var adjudication = new CpuDpAdjudication();
             Check(adjudication.Expected(vector, 1, "e") != null, "Pinned case missing");
             string changed = vector.GetRawText().Replace("\"name\":", "\"unexpectedField\":1,\"name\":");
