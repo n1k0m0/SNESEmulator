@@ -1,0 +1,267 @@
+{
+  "schema": "snes-r4-local-evidence-v1",
+  "meaning": "Local actual verification and source scope; no new hardware or whole-console accuracy oracle, no current package or final soak acceptance. Ignored artifact paths intentionally remain local.",
+  "originalSourceCommit": "34620bfd3ddbdb4473ad10d24f93c9ee63673ba2",
+  "targetedSuiteCommit": "d3627d6",
+  "finalCommentBuildCommit": "5f6b86649c72eb63adb417a3f1e8cc488e7a1d38",
+  "sourceScope": "Eleven C# files have only trivia changes; SoakSmoke has one explicitly reviewed diagnostic string change and otherwise identical non-trivia tokens.",
+  "finalFollowup": "Only MasterClock observer comment precision changed after the five targeted suites; final token proof and solution build passed on clean commit 5f6b866.",
+  "commandsPassed": 14,
+  "targetedGroups": {
+    "runtime": 24,
+    "portableNetwork": 16,
+    "persistence": 15,
+    "cpuPointer": 4,
+    "dspTimeline": 6
+  },
+  "buildWarnings": "Six NU1900 warnings per solution build: inaccessible vulnerability metadata; no successful online vulnerability audit claimed.",
+  "immutableInputChecks": [
+    "M8",
+    "M9",
+    "R3",
+    "PPU",
+    "video",
+    "Gaussian",
+    "SPC generated hot path exact match"
+  ],
+  "source": [
+    {
+      "path": "SNESEmulator.Core/Apu.cs",
+      "checkoutBytes": 13143,
+      "checkoutSha256": "c1f7454114b5bce3e3bb6e93757bc38299134f8d2254f5083767c96e0e5447bf",
+      "canonicalLfSha256": "1a1bd348e9e696deff90d04404d369ac6dd95b5fb855af4e2173375f2355757b"
+    },
+    {
+      "path": "SNESEmulator.Core/AtomicFile.cs",
+      "checkoutBytes": 4842,
+      "checkoutSha256": "ca7a9718626b3b719692477607329a5a375cc282d08d907bf95e15964186ef31",
+      "canonicalLfSha256": "a33bb6c4a8fe9ac5500eee0c46dc4b5cab21a7645f44804b05edabcda5a53c51"
+    },
+    {
+      "path": "SNESEmulator.Core/Cpu65816.Cycles.cs",
+      "checkoutBytes": 10949,
+      "checkoutSha256": "0c68f18a8f6024eee05b4fe1be7900329ccfa8deea93d756bb02365b53aebc40",
+      "canonicalLfSha256": "0c68f18a8f6024eee05b4fe1be7900329ccfa8deea93d756bb02365b53aebc40"
+    },
+    {
+      "path": "SNESEmulator.Core/MasterClock.cs",
+      "checkoutBytes": 8505,
+      "checkoutSha256": "5479c7cc9108dabf796fcfdbef62e504bb78a4b9e3a39ea46f315c29f5a7d2e2",
+      "canonicalLfSha256": "5479c7cc9108dabf796fcfdbef62e504bb78a4b9e3a39ea46f315c29f5a7d2e2"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Pipeline.cs",
+      "checkoutBytes": 16095,
+      "checkoutSha256": "9ee407f2c12f820753bfdbfb07f6ef34c0edc73575d427fd6b363ae292b2cb85",
+      "canonicalLfSha256": "9ee407f2c12f820753bfdbfb07f6ef34c0edc73575d427fd6b363ae292b2cb85"
+    },
+    {
+      "path": "SNESEmulator.Core/SaveStates/StateSerializer.cs",
+      "checkoutBytes": 13684,
+      "checkoutSha256": "91b545f023e9f7405bb0762b36eddd72e10f2824cf35176dfb47afb42406e85a",
+      "canonicalLfSha256": "34bc28bd03e80249a722d21b9901dd99464e200002af3010d562b98fc86802ec"
+    },
+    {
+      "path": "SNESEmulator.Core/SnesDsp.cs",
+      "checkoutBytes": 17180,
+      "checkoutSha256": "161bcd78ff162279755c9775918dffbea258691e1ed4dbf9c3a53faea587d2c8",
+      "canonicalLfSha256": "93d0205d870aee7c79b7fa71b168f2c20fae7cfd968857429f5a88372c0f55eb"
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.HotPath.cs",
+      "checkoutBytes": 6470,
+      "checkoutSha256": "39fa2c774c418fe553f0e512df7b4876b662f8f42941bc747f93e009092ebf6a",
+      "canonicalLfSha256": "de8a7404e796e4cfb3839c3d9c90cae2af788a77fb1ec2d11f0f6c90a1527d5e"
+    },
+    {
+      "path": "SNESEmulator.Runtime/BatteryPersistence.cs",
+      "checkoutBytes": 7091,
+      "checkoutSha256": "57074836a27b131d092341bd6e8d40d1cfacb1f10f50ee51c6f294b1d9123d2b",
+      "canonicalLfSha256": "82496ced1cc4931126578a1583066928b9f29b71e8169ba1b6f784811a9d1be4"
+    },
+    {
+      "path": "SNESEmulator.Runtime/EmulationWorker.cs",
+      "checkoutBytes": 12714,
+      "checkoutSha256": "7d857c040b616b1340e43674947a862d12e13769c4510e54e1afaa5ca733df70",
+      "canonicalLfSha256": "2c2ce5b0a49a889218d4778fb9e299bb2345e68ecaa941fc86fc6f556a8156e8"
+    },
+    {
+      "path": "SNESEmulator/Network/NetworkTimeline.cs",
+      "checkoutBytes": 13724,
+      "checkoutSha256": "91258ad8d06c8bf0c788e99589932ac48d534cfffd6360cf42b24c653e632dac",
+      "canonicalLfSha256": "7abbb56e1bb5881c2059d8f440bbe8264a0f912207f0cc6f7da501039025beba"
+    },
+    {
+      "path": "SNESEmulator/SoakSmoke.cs",
+      "checkoutBytes": 22177,
+      "checkoutSha256": "27ab975255a670bda8cf9e978f89ace197087822282059e65a001cd3e2141b46",
+      "canonicalLfSha256": "27ab975255a670bda8cf9e978f89ace197087822282059e65a001cd3e2141b46"
+    }
+  ],
+  "reports": [
+    {
+      "path": "artifacts/r4-readability/--network-only.json",
+      "bytes": 3627,
+      "sha256": "4bf7bad0a7564982e2e52f143a729a1293fdd96e8986e16d10242459261a5d05"
+    },
+    {
+      "path": "artifacts/r4-readability/--network-only.log",
+      "bytes": 1338,
+      "sha256": "4f78cac6a29c5411a5d24e81d487275e8e8deca05cbe7e44d6af61c857c6d0ac"
+    },
+    {
+      "path": "artifacts/r4-readability/--persistence-only.json",
+      "bytes": 3488,
+      "sha256": "f61649c4d8f14b40146cee25190f6365c73990f5a10a746c1f01c25befbecc90"
+    },
+    {
+      "path": "artifacts/r4-readability/--persistence-only.log",
+      "bytes": 3154,
+      "sha256": "0774861fa4855cf946cf2cb39faacc53e6488b68f029001e0cc89105d9d0cffe"
+    },
+    {
+      "path": "artifacts/r4-readability/--runtime-only.json",
+      "bytes": 5259,
+      "sha256": "7f3dfcb5479dfb0beb995d4a34a63eb68d9dcd6db837a5c98bb5db44f0ae73dd"
+    },
+    {
+      "path": "artifacts/r4-readability/--runtime-only.log",
+      "bytes": 1964,
+      "sha256": "0fc4be9c5b4a5abec97957ea8a4fea07c6428dda0ce89694e7ffa4dabcd74e52"
+    },
+    {
+      "path": "artifacts/r4-readability/build-final.log",
+      "bytes": 6387,
+      "sha256": "3c3ba1c009e28bd7d0865ed0141db4d3eebcd6e11e65b6d9edc08c20c42c9ce2"
+    },
+    {
+      "path": "artifacts/r4-readability/build.log",
+      "bytes": 6387,
+      "sha256": "08d0f9a09e851e6858c61d632f914653642f7ecda2850c422d325f91143602f4"
+    },
+    {
+      "path": "artifacts/r4-readability/cpu-dp-proof.json",
+      "bytes": 1370,
+      "sha256": "0a71f36b8014fd8cba8e5267c883b2f5fdefaeceb2d96986654f61836e3135d3"
+    },
+    {
+      "path": "artifacts/r4-readability/cpu-dp-proof.log",
+      "bytes": 148,
+      "sha256": "030e0f66543e356ab887f2b0ebd4d706ac29486609f5a27fd538dcc7b84171a1"
+    },
+    {
+      "path": "artifacts/r4-readability/documentation-links.json",
+      "bytes": 165,
+      "sha256": "8f57f11c9377ffbc300b1c2bcdd66c88f497b6383732f6c1618ab21f80c2c8bd"
+    },
+    {
+      "path": "artifacts/r4-readability/dsp-timeline-replay.json",
+      "bytes": 2230,
+      "sha256": "84529f86e87da620807101d0c9b3fcd9c6be7003cd7d1aff6f201e516ae21710"
+    },
+    {
+      "path": "artifacts/r4-readability/dsp-timeline-replay.log",
+      "bytes": 163,
+      "sha256": "033f07332d4a1eedcca4cbbd29006e59457400a96f43eade10e0f31d41e334de"
+    },
+    {
+      "path": "artifacts/r4-readability/generate-spc-hotpath.py.log",
+      "bytes": 46,
+      "sha256": "1a84dbacb0b1ef9fbedbef389c13554df819f40a22a5dae9bb93e7fb1190dc9b"
+    },
+    {
+      "path": "artifacts/r4-readability/source-files.json",
+      "bytes": 500,
+      "sha256": "410d1cc7f2194f5aa8c795ac0444508bd8e1355bbbddcc76ead83ed08d1ef228"
+    },
+    {
+      "path": "artifacts/r4-readability/token-equivalence-final.log",
+      "bytes": 108,
+      "sha256": "98e5f71cf12c13e7623634afa4205b25f0b3a1911643dff3a9bfcba03381758d"
+    },
+    {
+      "path": "artifacts/r4-readability/token-equivalence-initial.log",
+      "bytes": 1982,
+      "sha256": "387ad8a19beb6252d1dacfa0fd3cad5e0277385d1fdf4cab8b125fe2222cd63f"
+    },
+    {
+      "path": "artifacts/r4-readability/token-equivalence.json",
+      "bytes": 2246,
+      "sha256": "775671c78ae2d706fea36eb786f3d7810bce9413a18e6b3ef32ce82ed18c2dab"
+    },
+    {
+      "path": "artifacts/r4-readability/token-equivalence.log",
+      "bytes": 108,
+      "sha256": "98e5f71cf12c13e7623634afa4205b25f0b3a1911643dff3a9bfcba03381758d"
+    },
+    {
+      "path": "artifacts/r4-readability/validation-initial.json",
+      "bytes": 1829,
+      "sha256": "c991e73b91498fce621dd8b4222e95da6ede1cdd539bf8db9f6f7e096e8b6c37"
+    },
+    {
+      "path": "artifacts/r4-readability/validation.json",
+      "bytes": 8148,
+      "sha256": "7b4160d729ca1b09c38ef1f46efa3fec174d75c6e0ce9c269d94cad6d1655c74"
+    },
+    {
+      "path": "artifacts/r4-readability/verify-dsp-gaussian.py.log",
+      "bytes": 80,
+      "sha256": "00b29c10d9cd0d763fb717a3d1c8b12e8e662ff1c2d2b0f9b808adee414a240b"
+    },
+    {
+      "path": "artifacts/r4-readability/verify-m8-testdata.py.log",
+      "bytes": 821,
+      "sha256": "ac46e27a6fe0661ce0e57379a7906db6e9ef9a12cd034f0c4f983219ff01a1f7"
+    },
+    {
+      "path": "artifacts/r4-readability/verify-m9-testdata.py.log",
+      "bytes": 458,
+      "sha256": "75c6eb6e0e32598f6c1cbb92f4feddb8043a5c1da2f87c2c0e48d29efa7f6315"
+    },
+    {
+      "path": "artifacts/r4-readability/verify-ppu-testdata.py.log",
+      "bytes": 91,
+      "sha256": "93876517d9332001da6fe44d40a83353f8713d4f9369d9506ad4f7a68eda0e23"
+    },
+    {
+      "path": "artifacts/r4-readability/verify-r3-testdata.py.log",
+      "bytes": 134,
+      "sha256": "6234a1b129656ae07cfe91fee710897d5ef531c1396d8579eef1507f6bc8e773"
+    },
+    {
+      "path": "artifacts/r4-readability/verify-video-testdata.py.log",
+      "bytes": 115,
+      "sha256": "2eef1818f9d8bf152352772b1b9b000cd9d0938dd5b0838bf7cb4b3edb893b86"
+    },
+    {
+      "path": "artifacts/r4-readability/Program.cs",
+      "bytes": 2277,
+      "sha256": "9e9307b5250f32524982ed748d7174419b4fe50820c044f0269a086bab0db571"
+    },
+    {
+      "path": "artifacts/r4-readability/token-check.csproj",
+      "bytes": 604,
+      "sha256": "e5dd1c523a85319bcc4847fd2a706a5bf0167a86952b6445f31fc53100cd741f"
+    },
+    {
+      "path": "artifacts/r4-readability/validate.py",
+      "bytes": 2277,
+      "sha256": "fd11a6fb3b07c6be5fe25e6eff859cb05aab4df700e95e37e16ce9ce60b643ee"
+    },
+    {
+      "path": "artifacts/r4-readability/freeze.py",
+      "bytes": 3529,
+      "sha256": "b99582b3a71b7845894720489910952a075d7c1bc0111bff545a7d090c734ba0"
+    }
+  ],
+  "remaining": [
+    "M10 DSP1 then SuperFX then SA1",
+    "actual final core long NTSC/PAL gates",
+    "strict actual native 3600 seconds NTSC then 3600 seconds PAL",
+    "full final Windows/Ubuntu regression",
+    "actual final native published package",
+    "exact final remote CI",
+    "final commit/push"
+  ]
+}

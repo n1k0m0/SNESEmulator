@@ -302,7 +302,7 @@ M9f freezes self-contained Windows packages for the emulator/relative
 Manager/Updater, an explicit bounded update workflow, isolated preservation-first
 installer tests and actual Linux portability. Package defaults remain immutable;
 operator policy lives in user data and is edited through F10 SETTINGS UPDATE
-SOURCE. The current publish is verified; its complete PRE-M0 predecessor is
+SOURCE. The M9f publish was verified at that milestone; its complete PRE-M0 predecessor is
 retained. Full Windows 276/31 belongs to 9db; test-only lifecycle hardening 905
 has targeted 11/8 Windows Manager evidence, all real package probes and a complete
 276-group Linux gate. Independent Root acceptance passed on `0f8aadc`; see the

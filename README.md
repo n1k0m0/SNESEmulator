@@ -13,7 +13,8 @@ Manager and distribution have independent historical acceptance.
 
 Current follow-ups: [R1 persistence and remote CI](docs/r1-persistence-ci.md),
 [R2 performance and native A/V](docs/r2-performance-soak.md), and
-[R3 CPU accuracy and audio investigation](docs/r3-accuracy.md). R2's previous core
+[R3 CPU accuracy and audio investigation](docs/r3-accuracy.md), and
+[R4 comments and current documentation](docs/r4-readability.md). R2's previous core
 passed long NTSC/PAL duration checks; the corrected worker passed strict
 360-second native probes. Final-source long tests, both strict one-hour native
 runs, the final package and final remote CI remain due after cartridge-chip work.
@@ -140,7 +141,7 @@ sharing option is not included in the SNES menu.
   Colors are not reduced to the C64 palette. Unchanged frames are omitted;
   slow clients retain only the newest pending frame.
 - Filters and upscaling are local. Session and relay passwords stay in memory.
-- The session handshake is `0x534E0003`; audio packets use AUD2. They carry native
+- The session handshake is `0x534E0004`; audio packets use AUD2. They carry native
   lossless stereo PCM at 32,000 Hz in the default profile, together with sample
   indices, crystal time, and sequence numbers. Bounded queues and separate device
   resampling keep hardware time independent of presentation.

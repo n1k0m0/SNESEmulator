@@ -41,4 +41,6 @@ The unchanged MIT/CC-licensed HiROM **unnamed-snes-game** tech demo (`41a13ef6e2
 
 Initial32768 native stereo pairs match both references. Full sequences retain red nominal-frequency and unresolved same-frequency differences. Those rows are never labeled passed audio compatibility. See [M8 contract](m8-compatibility-contract.md) and [audio repro](../testdata/m8-audio-repros.json). This is roughly10 seconds of game flow, not a long-session or realtime claim.
 
-Commercial games, other external mapper families, chips and peripherals are explicitly untested. Internal audio and SETINI diagnostics appear separately in the console reports and are excluded from this external-title table.
+Commercial games have no formal test coverage in this immutable M8 matrix; the
+user-local play observations above are separate. Other external mapper families,
+chips and peripherals remain untested by this matrix. Internal audio and SETINI diagnostics appear separately in the console reports and are excluded from this external-title table.

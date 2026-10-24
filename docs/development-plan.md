@@ -17,8 +17,9 @@ comments, current documentation, and a final commit/push. Current sequence:
    rejection, six published functional ROM runs, isolated DSP timeline and an
    explicit reset-epoch experiment. Eighteen whole-console audio rows remain red;
    physical reset/revision claims remain unverified.
-4. **R4 in progress:** comments/readability and current documentation. This stage
-   does not change hardware behavior or manufacture new correctness evidence.
+4. **R4 complete:** comments/readability and current documentation; SDK Roslyn
+   token proof, solution builds, immutable fixtures and 65 targeted groups pass.
+   See [the R4 evidence](r4-readability.md). Hardware behavior is unchanged.
 5. **M10 next:** DSP1, then SuperFX, then SA1, each with isolated, source-supported
    behavior, mapping, timing, state continuation, tests and documented limits.
    Other cartridge hardware/peripherals require their own scoped evidence.
