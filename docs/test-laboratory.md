@@ -1,12 +1,16 @@
 # Test laboratory: current contracts and historical evidence
 
-## Current status (M10a, October 24, 2026)
+## Current status (M10b, October 24, 2026)
 
-The current source keeps **format 9 for normal carts and format 10 for DSP1 carts**.
+The current source keeps **format 9 for normal carts and format 10 for DSP1/SuperFX carts**.
 [M10a DSP1](m10a-dsp1.md) adds an own C# uPD7725, explicit local firmware/board
 configuration, rational chip time, isolated state and Manager integration. Raw
 software comparison retains 49 source disagreements; no general game/hardware
-certification is implied. SuperFX and SA1 remain the next sequential stages.
+certification is implied. [M10b SuperFX](m10b-superfx.md) adds own GSU execution,
+explicit shared-bus boards, arbitrary-budget microphases and CPU-DMA-PPU graphics
+diagnostics. Windows/Ubuntu functional gates pass within documented scope; raw
+software/primary-source and original FMULT-R4 contradictions remain separate.
+SA1 is the next sequential stage.
 M9b worker/UI, M9c persistence,
 M9d networking, M9e Manager and M9f distribution have independent historical
 acceptance. [R1](r1-persistence-ci.md) records the later persistence correction

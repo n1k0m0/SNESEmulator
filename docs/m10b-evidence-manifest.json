@@ -1,0 +1,629 @@
+{
+  "schema": "m10b-superfx-evidence-v1",
+  "implementationCommit": "1d8faec",
+  "exactFixtureCommit": "47f799747ccbb3e96059b8b53377305937f53a76",
+  "finalDiagnosticCommit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+  "createdUtc": "2026-10-24T10:14:48.420839+00:00",
+  "sourceByteDomain": "SHA256 of canonical Git blob bytes at finalDiagnosticCommit; report/input/binary hashes are exact filesystem bytes.",
+  "sources": {
+    "SNESEmulator.Core.Tests/RuntimeTests.cs": "db03278308217d04e5da870314c9ea77463154b3fd2f63efe96e97bc97650310",
+    "SNESEmulator.Core/Cartridge.cs": "9d6ad6e7ff860ca255a97bce4c67686b18204fc23aa7cf94fb4b22bc671e18c1",
+    "SNESEmulator.Core/Dsp1CartridgeHardware.cs": "8c09c4f103e09f7b14e1f493d3b8fadbe2439690c2f5be90e084683567f1bb2f",
+    "SNESEmulator.Core/Gsu.cs": "aa3bfe3df9d3dd4007b604759f1161cca6a5e3481897fe64062facdca797c752",
+    "SNESEmulator.Core/SaveStates/StateSerializer.cs": "363e74c59dee8b6a40d421ef2411a275bac57a005d78f5bcf52110c41b092ce6",
+    "SNESEmulator.Core/SnesSystem.cs": "aaf6854b700881bab77d8b4429ec611375bda59af639d4b207db183053bf86a8",
+    "SNESEmulator.Core/SuperFxCartridgeHardware.cs": "e349dd28b1c30430677b7d6060deb9caaa087a62c31fd6a89ff43332f951ac6e",
+    "SNESEmulator.Core/SystemBus.cs": "3d92f4c11021325b4243caa6985725300284342bb5623771adb4435617f43a0f",
+    "SNESEmulator.Lab/Dsp1Proof.cs": "7fe603cfb1e1abd99aebc3431c9b52e0bcd535baec725b579b19373e2f242b03",
+    "SNESEmulator.Lab/Program.cs": "98902e995a81839e6cde5d68c0bd7c2efa3fa80a143470d5c8b6bf4aef0756bb",
+    "SNESEmulator.Lab/SuperFxProof.cs": "b8e00db953005c6cc501353c2eeb83ca5dd0bbf9cca376119b5e75a17214adbc",
+    "SNESEmulator.Manager.Tests/Program.cs": "aefbdbda7f5df0ee97fb11c6fa5df316f06afd6c3ef264eedd9e314e2ba36e5a",
+    "SNESEmulator.Runtime/EmulationWorker.cs": "eac76a11a7ab5c209bd9a0ec60641b9beab95adc294cb1230f5ad32f3a39d0e4",
+    "SNESEmulator.Testing/SuperFxDiagnosticRom.cs": "f53ec23a39e43529762f971587b2a85978d966643fd87267cc33ea522e54f108",
+    "tools/superfx-reference.cpp": "b93f48adc7c0347af2472a61f0e24bdbfe6ef8d9ca97ecffbd3c47985de3ca1c",
+    "tools/test-lab.py": "0ba310fe7a5b735395122e60dfee2c457456bb9c1a02230d1bac17e458e2c9da",
+    "tools/verify-superfx-testdata.py": "e0828bba7d85000335ec0af1c95d22f57c97e808ba7656ca94645a4693cd330a"
+  },
+  "reports": {
+    "acceptance/compatibility-state-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/compatibility-state-child.json",
+      "sha256": "1e97f3fb4cb5be5f9f37bbea932cb56b331fd2a47277d758abd5fcc2bf513030",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 27,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "acceptance/core-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/core-child.json",
+      "sha256": "18c1d952754d1cc53205680d028b96a655013fcbf365209acb25fada3dbf189c",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 129,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "acceptance/dsp1-functional-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/dsp1-functional-child.json",
+      "sha256": "3cfad6efba9b1c919938adba4e744775de90ced0fcc23d6d73501b15bdd2792e",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 30,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "acceptance/functional-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/functional-child.json",
+      "sha256": "31293ee7d63b4c8452668e55190767a6ce39417b4e5039641378da55d814b3b6",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 34,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "acceptance/manager-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/manager-child.json",
+      "sha256": "f1940e81979728a85bba368e8fa790a4b43e3fba917fda11a206684be9b4537a",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "acceptance/optional-published-absence-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/optional-published-absence-child.json",
+      "sha256": "3781e620da45f3a88c54bc5f253c0a960777c35e1da5142b1f7fc7a27d0223b3",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 0,
+        "fail": 0,
+        "skipped": 1
+      }
+    },
+    "acceptance/persistence-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/persistence-child.json",
+      "sha256": "608923eb2de0bf11032e2bd9d4d34a0f89abd8b87caab74c7d0fd5f26b309add",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "acceptance/primary-audit-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/primary-audit-child.json",
+      "sha256": "62147d54fa4c6a746e398e48647765df3c409c1ee48248a9176db5d10426019a",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 0,
+        "fail": 3,
+        "skipped": 0
+      }
+    },
+    "acceptance/published-roms-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/published-roms-child.json",
+      "sha256": "37077a4762724c4e61c9ea0575005e91d2380d17810f8a748e9b412c624f6365",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 30,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    "acceptance/raw-audit-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/raw-audit-child.json",
+      "sha256": "f7fb901cb14e34aba4a1dd684e059c1e438136f51ba5cce0830e02922391b6f2",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 1,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    "acceptance/runtime-child.json": {
+      "path": "artifacts/m10b-superfx/acceptance/runtime-child.json",
+      "sha256": "38ca231f68a5329a9391b2515586c8d80fffc11c1ffeb3c381f98db1f5f3622a",
+      "commit": "47f799747ccbb3e96059b8b53377305937f53a76",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "diagnostic-acceptance/functional-child.json": {
+      "path": "artifacts/m10b-superfx/diagnostic-acceptance/functional-child.json",
+      "sha256": "c5ee5b89d1dbe4f559fde885ffe63725e4eb77bc8e901ba7f99f3eed27391605",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 34,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "diagnostic-acceptance/manager-child.json": {
+      "path": "artifacts/m10b-superfx/diagnostic-acceptance/manager-child.json",
+      "sha256": "c2917c11485d8736e04f470d6a507964cfab6fb686a16b404f7ada6233fbb118",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "diagnostic-acceptance/primary-audit-child.json": {
+      "path": "artifacts/m10b-superfx/diagnostic-acceptance/primary-audit-child.json",
+      "sha256": "031c26dc167e424bddee88e48f59646d90640ba233f4116b6bd98a7d00107c33",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 0,
+        "fail": 3,
+        "skipped": 0
+      }
+    },
+    "diagnostic-acceptance/raw-audit-child.json": {
+      "path": "artifacts/m10b-superfx/diagnostic-acceptance/raw-audit-child.json",
+      "sha256": "a1137cc1f0c50ff59fcf7d90554ebb4ddb068fbbc2abec3c67feda1a783bb683",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 1,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    "diagnostic-acceptance/runtime-child.json": {
+      "path": "artifacts/m10b-superfx/diagnostic-acceptance/runtime-child.json",
+      "sha256": "3c28b6f307008539f6a6822cae9efda47a5afad2a8c3d631a62f0426e65ee8d7",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "ubuntu/compatibility-state-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/compatibility-state-child.json",
+      "sha256": "f833eba63ac2a18fe31f8737cbf93804925878b8a8e4c51b5b3ce1be4ce26dda",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 27,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "ubuntu/core-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/core-child.json",
+      "sha256": "17e27b761b712718faff3147fd1bfcbe3bf61049a773d5fd991983e1e98f09b3",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 129,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "ubuntu/dsp1-functional-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/dsp1-functional-child.json",
+      "sha256": "998bae1c6e4a32e2943b0cf9ef28ee42335d6f6b2e1fd1f5c1c1b71894cd77fd",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 30,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "ubuntu/functional-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/functional-child.json",
+      "sha256": "49789269fc39fd1ce5391b942908c0390c73e26f54cd91e5a34b3bcea6967bbb",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 34,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "ubuntu/manager-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/manager-child.json",
+      "sha256": "6709e3e7ac687ecd1c4c502f9285b3466be75d9e28683f17b18c5d132f38fd7c",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "ubuntu/optional-published-absence-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/optional-published-absence-child.json",
+      "sha256": "469e5168a916731be589b458b8648604fa09beb440cfa7487db69b191c069abc",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 0,
+        "fail": 0,
+        "skipped": 1
+      }
+    },
+    "ubuntu/persistence-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/persistence-child.json",
+      "sha256": "1c711471bc9729375105f78872b773eb6a504aade29ec3e72f049e7c486dc214",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 15,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "ubuntu/primary-audit-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/primary-audit-child.json",
+      "sha256": "74901524d9aacbd637a538b9882276c5fe45fd38c8c4156609f1546a316f79ce",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 0,
+        "fail": 3,
+        "skipped": 0
+      }
+    },
+    "ubuntu/published-roms-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/published-roms-child.json",
+      "sha256": "8cf610ff651e4f6644c6d2ee7658ac73edcc78ba5b1c4eb47fe037fb35f602e8",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 30,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    "ubuntu/raw-audit-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/raw-audit-child.json",
+      "sha256": "c998690f420cf16bc6c87c7751d3214f011980eec195cf0b086942c14b601878",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 1,
+        "fail": 1,
+        "skipped": 0
+      }
+    },
+    "ubuntu/runtime-child.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/runtime-child.json",
+      "sha256": "08f8a7028d271b7fb740d0de3f67425e7f4a7a57b71e2712e548834706a6bec9",
+      "commit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+      "workingTreeStatus": "",
+      "counts": {
+        "pass": 26,
+        "fail": 0,
+        "skipped": 0
+      }
+    },
+    "normal-frozen-regression/audio-ntsc-devices.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/devices/audio-ntsc-devices.json",
+      "sha256": "39bf117121c26f9346ce49cd79435fef78ab99f585724c5815cead20f09bc910",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/diagnostic-ntsc-devices.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/devices/diagnostic-ntsc-devices.json",
+      "sha256": "bcf2b80399dfdff4adcb11d4c8f86161af7c3ce6e1034c638d2b92ea83d96871",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/cache-result.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/horizons/cache-result.json",
+      "sha256": "24d667e7e1c50a1a889d03ce976546ab1a63819fe13149e872ae4f1a2eb180db",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/clock-result.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/horizons/clock-result.json",
+      "sha256": "66f2152a105906345c3d72941a52f6ee1dd60f2224e74b51106699ddcde4ff55",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/result.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/result.json",
+      "sha256": "8333fcd9e9cc5e85a8ae00b1dbc7b40f1c2d662063770b8e2bf9cee7936305cb",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/provenance.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/provenance.json",
+      "sha256": "39b99ba2fd2f7649db46330b40feccedaeef4589d353320404611584e9c8e9b5",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/suspend.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/suspend.json",
+      "sha256": "e8db1d2e232645c00b1e9d787b8e50d3ef1cedb83ab5a4198234bd142ad6da48",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/audio-ntsc-traced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/traced/audio-ntsc-traced.json",
+      "sha256": "dc1cee73d62e10dc1b3976057aa4fba723f8c0116da6de44c8f81beffec87c26",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/diagnostic-ntsc-traced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/traced/diagnostic-ntsc-traced.json",
+      "sha256": "08b3e35e6046702a97f381e28278187a4afd0fe349cc3a23b0e08f5a81047f92",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/game-ntsc-traced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/traced/game-ntsc-traced.json",
+      "sha256": "7cd859d9bce912bcf48fb026b019a9623e055e116189b274dedadb898a50d18a",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/game-pal-traced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/traced/game-pal-traced.json",
+      "sha256": "1bfa04a5040e86e7546906ee53dece85afc7b846522ea180c4c576d734cdb57d",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/geometry-ntsc-traced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/traced/geometry-ntsc-traced.json",
+      "sha256": "adb092c7dc72d2c135d1f50f6d8b6687e9606aa8a3db859ac7ba32b537e589d8",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/geometry-pal-traced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/traced/geometry-pal-traced.json",
+      "sha256": "5c5613d33f28bf1ae7d50439fceab39e1ce3a4e833f50d05576e4bfbbf9456d0",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/audio-ntsc-untraced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/untraced/audio-ntsc-untraced.json",
+      "sha256": "592a42560a81495d8ccb192270c18378f2904a43ef0d8ad172ff11193d8b0f20",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/diagnostic-ntsc-untraced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.json",
+      "sha256": "68aece812524aad18e1299bb372c5aefca76b122de05c8553dfb3564e8bb2396",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/game-ntsc-untraced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/untraced/game-ntsc-untraced.json",
+      "sha256": "7952ec93f668ead5af5d65c93efb4ff9dec74bae8e0a12ea8bc42d30197eff3b",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/game-pal-untraced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/untraced/game-pal-untraced.json",
+      "sha256": "f35d8f41acd6535d8e9d6e601003cda2ef09b7af91c0c18e92aca33903c01617",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/geometry-ntsc-untraced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/untraced/geometry-ntsc-untraced.json",
+      "sha256": "e2a7d893583f531cb0e08e0b78f304265c6aed0ccb72cae4ba22ba7611dc2456",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "normal-frozen-regression/geometry-pal-untraced.json": {
+      "path": "artifacts/m10b-superfx/normal-frozen-regression/untraced/geometry-pal-untraced.json",
+      "sha256": "673a66e1760edb3078e6021ae17c4e463129f65595203358c83931855a48b1ca",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/audio-ntsc-devices.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/devices/audio-ntsc-devices.json",
+      "sha256": "84771a59cc9d947501f8715878e5df89980798c0d9b8843dd018c8ee33d22ce7",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/diagnostic-ntsc-devices.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/devices/diagnostic-ntsc-devices.json",
+      "sha256": "6ea99a4055a78ac9e533f23e7f888d0e6cc9677d7e644d5bd5e8d613995d1a14",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/cache-result.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/horizons/cache-result.json",
+      "sha256": "24d667e7e1c50a1a889d03ce976546ab1a63819fe13149e872ae4f1a2eb180db",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/clock-result.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/horizons/clock-result.json",
+      "sha256": "66f2152a105906345c3d72941a52f6ee1dd60f2224e74b51106699ddcde4ff55",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/result.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/result.json",
+      "sha256": "e6b1ec82ab9406fcacc03cc225e3731128fcca64f90fd1294fdee9428d9b79ab",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/provenance.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/provenance.json",
+      "sha256": "5f0206f27f8e44b0b22bab93335c7067decbff3c4ac32ea3ef09b286a6ae99ab",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/suspend.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/suspend.json",
+      "sha256": "4cde45d7d13e897b445c19c6eaf68ea9e32cbedfd506cf44534a1272431aa3de",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/audio-ntsc-traced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/traced/audio-ntsc-traced.json",
+      "sha256": "7425e027ab719940f5aa0921141748cd5a5d3eb3495a9d9fdc25f6eaa5f2acf0",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/diagnostic-ntsc-traced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/traced/diagnostic-ntsc-traced.json",
+      "sha256": "d4dca5ea2b790a868c8db5b02f9dda30dd2005fdfb80e9b28ef60a389cab2da2",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/game-ntsc-traced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/traced/game-ntsc-traced.json",
+      "sha256": "65ee2e63c61fcc64d83a5278e635686e2da36da42270c47564e5c7bc864622fd",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/game-pal-traced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/traced/game-pal-traced.json",
+      "sha256": "98ede6d055d9646184d06cb3b3c62ace56676f571bfe239c9eeff74fb781dc6a",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/geometry-ntsc-traced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/traced/geometry-ntsc-traced.json",
+      "sha256": "d5f0932d525865ea3e970ea1d34013633997c9fb6765f2974a1b4f3887a1edfd",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/geometry-pal-traced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/traced/geometry-pal-traced.json",
+      "sha256": "2c127b4e83cbd00aa272ce3f82b6b93d95467de6ee0d69baa3690e6bcf1955b0",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/audio-ntsc-untraced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/untraced/audio-ntsc-untraced.json",
+      "sha256": "49d3e521aad828859936e60e366001d383182dbe2fcda43d84a913a55620790f",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/diagnostic-ntsc-untraced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/untraced/diagnostic-ntsc-untraced.json",
+      "sha256": "48bd7617c2ea4c6677e367ce6f865e5afd22b9c84216366c4ed3e243da403e53",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/game-ntsc-untraced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/untraced/game-ntsc-untraced.json",
+      "sha256": "1858cf99065010e6f3b6557be5720d366a2be930d2167920ecf3754551b9337e",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/game-pal-untraced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/untraced/game-pal-untraced.json",
+      "sha256": "3336806a6330ac657eca9df7900dc272a196192d34576889c112a2ef67c78f2d",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/geometry-ntsc-untraced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/untraced/geometry-ntsc-untraced.json",
+      "sha256": "052e3cc93144e2506f4fbcc90988cf0639de1de9218993fd4fed19efee34954b",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    },
+    "ubuntu/normal-frozen-regression/geometry-pal-untraced.json": {
+      "path": "artifacts/m10b-superfx/ubuntu/normal-frozen-regression/untraced/geometry-pal-untraced.json",
+      "sha256": "99cf23c68f3e09b5326b0db2d4bc1ce7d6baac14f10ca2e8737749631cda2106",
+      "scope": "Frozen normal cartridge regression; not GSU game or 3D performance."
+    }
+  },
+  "supportingFiles": {
+    "artifacts/m10b-superfx/capture-linux-runtime-probe.py": {
+      "sha256": "1bf9357756108543558212a28a9587d51c3952971710cc7cf5d0ac2798c4fc48",
+      "scope": "Ignored execution/provenance helper, not product source"
+    },
+    "artifacts/m10b-superfx/capture-runtime-probe.py": {
+      "sha256": "4446802abf27254afe27b38ec355e99183746cbd5465fea11dbe5b44ddb5a625",
+      "scope": "Ignored execution/provenance helper, not product source"
+    },
+    "artifacts/m10b-superfx/finalize-evidence.py": {
+      "sha256": "b6aea25e00c935ba1ef81dca13df550e8e0ff984c242139ce59fdd2e8e4c10f8",
+      "scope": "Ignored execution/provenance helper, not product source"
+    },
+    "artifacts/m10b-superfx/run-linux-acceptance.py": {
+      "sha256": "3f4dfe365597130b81d3106e94ec9bdf574a3ca5e6e481b0c107fe2d357a53c2",
+      "scope": "Ignored execution/provenance helper, not product source"
+    },
+    "artifacts/m10b-superfx/run-linux-frozen.py": {
+      "sha256": "e6c2af602b8747252be8c2a344d1bad1682f5619d8bdad8f1a2b76f5d68e04c5",
+      "scope": "Ignored execution/provenance helper, not product source"
+    },
+    "artifacts/m10b-superfx/run-windows-acceptance.py": {
+      "sha256": "16edf71213f280713d1fe1555e8c677d22630a95ddd7b95d8229aa37062bea94",
+      "scope": "Ignored execution/provenance helper, not product source"
+    },
+    "artifacts/m10b-superfx/run-windows-diagnostic-acceptance.py": {
+      "sha256": "ba014ffb9c519821c38ee7e92f8e937ef0741b6e8553b73e8a8da25578ba5a5a",
+      "scope": "Ignored execution/provenance helper, not product source"
+    },
+    "artifacts/m10b-superfx/windows-runtime-probe.json": {
+      "sha256": "9b62a6f139801cda6a18736229cb1724a2329850da82ee08c545ffec112fc500"
+    },
+    "artifacts/m10b-superfx/ubuntu/runtime-probe.json": {
+      "sha256": "52a9a1d4351b389a423892d2bf8a8e28364a1c9d4be98040fd6908abe446f20a"
+    },
+    "artifacts/m10b-superfx/final-windows-binary-identities.json": {
+      "sha256": "100798f058a75e251e9aab9a6f2b516fc29536421bb0de715ced937dd4bb8a49"
+    },
+    "artifacts/m10b-superfx/ubuntu/binary-sha256.json": {
+      "sha256": "72eef9d8b506ae5e821c04d4b62f49df2d724387a206683182c03524d1230c04"
+    },
+    "artifacts/m10b-superfx/acceptance/commands.json": {
+      "sha256": "ae57525c2a1b441e0ccdcea58e24ea2217121d20a38b2c23e2a7e15b1ccfee50"
+    },
+    "artifacts/m10b-superfx/diagnostic-acceptance/commands.json": {
+      "sha256": "8ff6b5d067753610527436e7f49b33a9fedf0492acefa4da36bf0743ef7255da"
+    },
+    "artifacts/m10b-superfx/ubuntu/commands.json": {
+      "sha256": "274ff7369977799d9d16bb0cb5795868bcec7a6a37556b798ec7f7997cccda9a"
+    },
+    "artifacts/m10b-superfx/ubuntu/frozen-wrapper-identity.json": {
+      "sha256": "47d4f73bc3d78bf6865f83f7e54b0aa2414441b16cdd11f4faa51bf84ed6e1b7"
+    },
+    "artifacts/m10b-superfx/ubuntu/frozen-core-provenance-correction.json": {
+      "sha256": "8b6c617667079d577b3e5f95457a2d216c4209335a11490a4869c52679aeeba0"
+    },
+    "artifacts/m10b-superfx/retained-final-windows-identities.json": {
+      "sha256": "b5683789cf612d0b2727c54d794e2f84b638951806e832894c7e92f6f11dce7d"
+    },
+    "artifacts/m10b-superfx/ubuntu/frozen-regression.log": {
+      "sha256": "26a9bf81aea306928f307aa444da506de35b4a5aa7d4c2c0025997f2220640e0"
+    }
+  },
+  "historicalReports": {
+    "artifacts/m10b-superfx/adjudicated-proof.json": "5208dffefa818ae60fd974acefd1bf1535ea22b1569f9732c328f899b7157402",
+    "artifacts/m10b-superfx/adjudicated-raw-source-audit.json": "4a8a8824b5644d783e7aafcdab8f17ab0c446cd3301c59e4ac9c804a0ae6c967",
+    "artifacts/m10b-superfx/expanded-diagnostic-compiled-precommit.json": "6d8a748ab8684a77fa6112a30ef671e240727d41d012fbaae2f1fdc904dcfa95",
+    "artifacts/m10b-superfx/expanded-diagnostic-precommit.json": "9c595270d1d4e03680fcca62e65a6af8ea265b959112e4bdbee76ffc997cfea5",
+    "artifacts/m10b-superfx/expanded-proof.json": "205c43c94d6fe55c08a502d0c6ee17f8f84bc0e4ec188c776539e480b50839bf",
+    "artifacts/m10b-superfx/final-precommit-proof.json": "186c415f4cc266aa77c64cfc53a3983f387cf477111413b81933871dbbb80e30",
+    "artifacts/m10b-superfx/final-windows-binary-identities.json": "100798f058a75e251e9aab9a6f2b516fc29536421bb0de715ced937dd4bb8a49",
+    "artifacts/m10b-superfx/first-raw-source-audit.json": "d73fbcb4610b2c7914bfd0f0f6781ede7813cc538c60c44b0f4ea6ae4d727cb6",
+    "artifacts/m10b-superfx/initial-proof.json": "ba6436a1f524194c1a3129d0bb0d1db9e4737efe641434c7e9362dd472e68fb4",
+    "artifacts/m10b-superfx/initial-published-roms.json": "5cebe963eff35bffc1f6eea6b26213f962f1cda0dd863686475e449f3f759424",
+    "artifacts/m10b-superfx/pixel-diagnostic-precommit.json": "5259ab10b026db7e0128c64d123d787d80aafb1df289b3c7ddf1772f85b89d5d",
+    "artifacts/m10b-superfx/precommit-proof.json": "9b98c3f59a13171b360674b34516e0b9736819a08f2137dd7e1e450ccee6ef6e",
+    "artifacts/m10b-superfx/primary-source-audit.json": "60b13a12d970d769c1527de247492e241ec60083afab04abe52786c78c7ba1ca",
+    "artifacts/m10b-superfx/retained-final-windows-identities.json": "b5683789cf612d0b2727c54d794e2f84b638951806e832894c7e92f6f11dce7d",
+    "artifacts/m10b-superfx/review-asr.json": "2d1ea5221b4519676bea453f1adf0227a0c6cb337d94eea19bb3eaf918d0a769",
+    "artifacts/m10b-superfx/review-proof.json": "aae356fab035b122a94ab2f98c10282c32bef356a8aff78a7f6ba374a9069534",
+    "artifacts/m10b-superfx/review-published-roms.json": "1916586e5b27cacdad28d5d54a9cb50fbe83a4dac82f939a5f323075b8986fb8",
+    "artifacts/m10b-superfx/second-proof.json": "335eba099721ee1e50048e9607ce74bd1f84486764c8637a38a0287366c8aaa7",
+    "artifacts/m10b-superfx/second-raw-source-audit.json": "d4bee36fa4c2411638b7a8bc634b11e9407f9864462c54367cdcbbee13356b9b",
+    "artifacts/m10b-superfx/third-proof.json": "6ee5223d455ab423c182230eda52108296ad3f8d05966cfb5d8160bfdb3bcb46",
+    "artifacts/m10b-superfx/visible-pixel-diagnostic-precommit.json": "d8cb3874673fb7d5173ab3c9da2240859034f45ecd0e79c6fc72b51a6af80c82",
+    "artifacts/m10b-superfx/windows-runtime-probe.json": "9b62a6f139801cda6a18736229cb1724a2329850da82ee08c545ffec112fc500"
+  },
+  "historicalNotes": {
+    "initial-published-roms.json": "13pass/18nonpass;17 terminal-page-contract mistakes were corrected from original source, all original reports/ROMs preserved. FMULT remains red.",
+    "first-raw-source-audit.json": "112 raw R14-hook differences before correcting injected Single previous-PC-write context. Not final acceptance.",
+    "second-raw-source-audit.json": "144 differences:112 R14-hook plus32 ordinarySTOP before independent nocash source adjudication. Original output bytes preserved.",
+    "expanded-diagnostic-precommit.json": "Not acceptance: shell continued with cached old Lab after compile failed; exact stale binary was not retained. Subsequent compiled and clean-commit runs validate strengthened diagnostic.",
+    "pixel-diagnostic-precommit.json": "32pass/2fail: new PPU row0 image not visible with initial vertical offset. Diagnostic now sets documented vertical alignment; product PPU unchanged."
+  },
+  "reference": {
+    "artifacts/m8-reference/bsnes/bsnes/processor/gsu/instructions.cpp": "8684310732efaa98e8539693e99e56e93b59dc1ae1caf406a4614877eb3f705b",
+    "artifacts/m8-reference/bsnes/bsnes/processor/gsu/instruction.cpp": "4bc8c92f64d3dc0e665734f9c6a47d051ac5cf285e8e1ffb09003f5422ad6a28",
+    "artifacts/m8-reference/bsnes/bsnes/processor/gsu/registers.hpp": "2b51ddc5d4c1919263c2f76a3c8eb19fa267555bc88752884bc7eea59c28628c",
+    "artifacts/m8-reference/bsnes/bsnes/processor/gsu/gsu.hpp": "71caa53eff164a8e0941461f7ae712395dbc9e550d0f5238a0de3d4b91053417",
+    "adapterSha256": "7331195b1c0133ca7899beb8c1f0caab26f98b7224644286c9039d20ff54dc22",
+    "binarySha256": "bf7975bc2fc810a8793305d2fe625f5eed5fc20a9b5ff7df202ff4101f1c3d0c",
+    "commit": "78474e5d39f58872dc21aca18cf9eb583b147fe7",
+    "scope": "Separately executed unmodified processor instructions only; source/dest0, zeroRAM/ROM, graphicsstubs and no cycle comparison. Full raw112 R14-hook differences preserved."
+  },
+  "scope": {
+    "windowsFullCoreAndFrozenCommit": "47f799747ccbb3e96059b8b53377305937f53a76",
+    "windowsFinalTargetedAndUbuntuCommit": "5ff6e26ca5173cb23611046ba849b4ff134c8b46",
+    "productCoreSourcesIdenticalBetweenTheseCommits": true,
+    "binaryIdentityCaution": "SourceRevisionId changes assembly metadata; binaries at different commits are not called identical.47 reports retain their original binary/source scope.",
+    "actualHardwareCaptures": false,
+    "normalSustainedResultsDoNotCertifyGsuPerformance": true,
+    "remaining": "Unmeasured physical timing/revision/illegalaccess/fastmultiply/cache-R14 quirks; unsupported backup/CPU-onlyROM boards; original FMULT-R4 conflict; GSU3D/commercialgameperformance unmeasured. Final standard long/nativehour/package/remoteCI gates belong to Root after SA1."
+  }
+}

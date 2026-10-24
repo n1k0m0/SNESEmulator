@@ -22,8 +22,12 @@ comments, current documentation, and a final commit/push. Current sequence:
    See [the R4 evidence](r4-readability.md). Hardware behavior is unchanged.
 5. **M10a implemented:** [DSP1](m10a-dsp1.md), including own uPD7725, explicit
    firmware/board setup, format 10, tests and honest source-conflict inventory.
-   **M10 continues:** SuperFX, then SA1, each with isolated, source-supported
-   behavior, mapping, timing, state continuation, tests and documented limits.
+   **M10b implemented:** [SuperFX](m10b-superfx.md), own GSU instruction/pipeline/
+   cache/buffer/graphics model, explicit shared boards, CPU-DMA-PPU integration,
+   arbitrary-budget replay and clean Windows/Ubuntu functional evidence.
+   **M10 continues:** SA1, with isolated, source-supported behavior, mapping,
+   timing, state continuation, tests and documented limits. SuperFX physical
+   uncertainties and the original FMULT-R4 ROM disagreement remain open.
    Other cartridge hardware/peripherals require their own scoped evidence.
 6. **Final integration due:** validate the actual final core on long NTSC/PAL
    workloads, then strict native 3600-second NTSC and 3600-second PAL runs;

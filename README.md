@@ -78,8 +78,11 @@ with recursive ROM mirroring and SRAM. M3 checks these mappings synthetically;
 external M8 programs currently provide evidence only for LoROM and HiROM.
 [DSP1/1A/1B setup and evidence](docs/m10a-dsp1.md) now support an own C#
 uPD7725 with explicitly supplied, hash-bound local firmware and selected board.
-DSP2/3/4, SuperFX, SA1 and other cartridge hardware remain unsupported at this
-snapshot; the latter two are the next sequential implementation stages.
+[SuperFX setup and evidence](docs/m10b-superfx.md) adds a scoped own GSU model
+with explicit board/clock configuration and shared RAM, graphics, DMA, IRQ and
+state integration. DSP2/3/4, SA1 and other cartridge hardware remain unsupported;
+SA1 is the next sequential stage. Original source-author FMULT-R4 and other
+accuracy contradictions remain visible; neither chip stage certifies all games.
 
 Updates are disabled by default. Configure your own source under
 F10 → SETTINGS → UPDATE SOURCE, then explicitly check through UPDATES in the
