@@ -8,7 +8,8 @@ Snes9x, bsnes, or Libretro core.
 **Status: 0.1.0-preview — experimental, with scoped test evidence and no general
 commercial-game or original-hardware certification.** The independently developed
 C# core supports clocked Mode 0–7 graphics, SPC700/S-DSP stereo, DMA/HDMA, standard
-cartridge mappings and format-9 savestates. Worker/UI, persistence, networking,
+cartridge mappings, normal format 9 savestates and explicitly configured DSP1
+cartridges with versioned format 10 state. Worker/UI, persistence, networking,
 Manager and distribution have independent historical acceptance.
 
 Current follow-ups: [R1 persistence and remote CI](docs/r1-persistence-ci.md),
@@ -75,7 +76,10 @@ argument. A 512-byte copier header is detected and removed.
 The core implements LoROM/HiROM up to 4 MiB and ExLoROM/ExHiROM up to 8 MiB,
 with recursive ROM mirroring and SRAM. M3 checks these mappings synthetically;
 external M8 programs currently provide evidence only for LoROM and HiROM.
-Expansion chips and other cartridge hardware are unsupported.
+[DSP1/1A/1B setup and evidence](docs/m10a-dsp1.md) now support an own C#
+uPD7725 with explicitly supplied, hash-bound local firmware and selected board.
+DSP2/3/4, SuperFX, SA1 and other cartridge hardware remain unsupported at this
+snapshot; the latter two are the next sequential implementation stages.
 
 Updates are disabled by default. Configure your own source under
 F10 → SETTINGS → UPDATE SOURCE, then explicitly check through UPDATES in the

@@ -1,8 +1,13 @@
 # Architecture and development status
 
-## Current status (R4, October 24, 2026)
+## Current status (M10a, October 24, 2026)
 
-The current source uses **savestate format 9**. M9b worker/UI, M9c persistence,
+The current source keeps **format 9 for normal carts and format 10 for DSP1 carts**.
+[M10a DSP1](m10a-dsp1.md) adds an own C# uPD7725, explicit local firmware/board
+configuration, rational chip time, isolated state and Manager integration. Raw
+software comparison retains 49 source disagreements; no general game/hardware
+certification is implied. SuperFX and SA1 remain the next sequential stages.
+M9b worker/UI, M9c persistence,
 M9d networking, M9e Manager and M9f distribution have independent historical
 acceptance. [R1](r1-persistence-ci.md) records the later persistence correction
 and exact successful remote CI run. [R2](r2-performance-soak.md) records the

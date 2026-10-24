@@ -184,7 +184,7 @@ public sealed class LibraryStore : IDisposable
 
     public async Task RelinkAsync(GameItem item, string file, CancellationToken token = default)
     {
-        var cart = await Task.Run(() => new Cartridge(AtomicFile.ReadBytes(file, 8 * 1024 * 1024 + 512)), token);
+        var cart = await Task.Run(() => new Cartridge(AtomicFile.ReadBytes(file, 8 * 1024 * 1024 + 512),file), token);
         if (cart.Hash != item.Hash)
             throw new InvalidDataException("Replacement cartridge differs from canonical content");
         await gate.WaitAsync(token);

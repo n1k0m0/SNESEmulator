@@ -25,7 +25,7 @@ internal static class SoakSmoke
         int errorCount=0;var errors=new List<string>();
         void Error(string text){lock(reportGate){errorCount++;if(errors.Count<16)errors.Add(text);}}
         void Row(object row){lock(reportGate)log.WriteLine(JsonSerializer.Serialize(row));}
-        byte[] romBytes=File.ReadAllBytes(rom);var cartridge=new Cartridge(romBytes);
+        byte[] romBytes=File.ReadAllBytes(rom);var cartridge=new Cartridge(romBytes,rom);
         if(cartridge.Pal!=(region=="pal"))throw new ArgumentException("Soak ROM region does not match requested native hardware profile");
         using var localHash=IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         using var remoteHash=IncrementalHash.CreateHash(HashAlgorithmName.SHA256);

@@ -28,6 +28,16 @@ static class RuntimeTests
     }
     public static void Run(Action<string,Action> test,string root)
     {
+        test("M10a worker DSP1 format10 isolated load reset and direct replay",()=>{
+            var rom=SNESEmulator.Testing.Dsp1DiagnosticRom.Create(Dsp1Board.LoRom1MiB);
+            var config=Dsp1Configuration.SyntheticProgram(SNESEmulator.Testing.Dsp1DiagnosticRom.Firmware(),Dsp1Board.LoRom1MiB);
+            using var w=new EmulationWorker();Await(w.InsertAsync(rom,hardware:config));
+            var direct=new SnesSystem();direct.Insert(new Cartridge(rom,hardware:config));
+            for(int i=0;i<3;i++){direct.RunFrame();var output=Await(w.StepAsync(default));Compare(direct,output,"DSP1 worker");Check(StateSerializer.Capture(direct).SequenceEqual(Await(w.CaptureAsync())),"DSP1 complete state");}
+            var raw=Await(w.CaptureAsync());string path=Path.Combine(root,"dsp1-worker.snessav");StateSerializer.SaveCaptured(raw,path,direct.Bus.Cartridge!);
+            Await(w.ResetAsync());Await(w.LoadAsync(File.ReadAllBytes(path)));Check(Await(w.CaptureAsync()).SequenceEqual(raw),"DSP1 isolated load retains chip state");
+            Await(w.PowerCycleAsync());Check(w.Status.MasterClock==0,"DSP1 cold reset");
+        });
         foreach(var (profile,rom,name) in new[]{(HardwareProfile.Ntsc,DiagnosticRom.Create(),"NTSC"),(HardwareProfile.PalProfile,DiagnosticRom.Create(),"PAL"),(HardwareProfile.Ntsc,GeometryRom(),"NTSC hires interlace239"),(HardwareProfile.PalProfile,GeometryRom(),"PAL hires interlace239"),(HardwareProfile.Ntsc,AudioDiagnosticRom.Create(),"native stereo")})
         test("M9b direct versus worker complete hardware replay "+name,()=>{
             using var w=new EmulationWorker(profile);Await(w.InsertAsync(rom));var d=new SnesSystem(profile);d.Insert(new Cartridge(rom));

@@ -1,0 +1,37 @@
+{
+  "schema": "dsp1-firmware-host-transcript-v1",
+  "plan": "command-plan.json",
+  "planBinary": "command-plan.bin",
+  "tickEpoch": "Reset at masterclock0, first instruction after one full nominal7.6MHz period, same-timestamp chip instructions beforehostporteffect",
+  "hostStepMasterClocks": 24,
+  "profile": "NTSC945000000/44masterHz",
+  "referenceCommit": "78474e5d39f58872dc21aca18cf9eb583b147fe7",
+  "referenceAdapter": "tools/dsp1-reference.cpp",
+  "eventLayout": "UInt32count, repeated Int64masterClock,bytekind,bytevalue. kind0readSR,1readDR,2writeDR,3readDR-hash-only(valuezero); no inputtimingalignmentsearch.",
+  "families": 30,
+  "firmwareDistributed": false,
+  "variants": {
+    "dsp1": {
+      "file": "dsp1-host-transcript.bin.gz",
+      "firmwareSha256": "91e87d11e1c30d172556bed2211cce2efa94ba595f58c5d264809ef4d363a97b",
+      "events": 4297,
+      "ordinaryDataBytes": 124,
+      "dataRomReadBytes": 2048,
+      "dataRomSha256": "0b5da6533e55852ee8fc397977ec5576c5b9f1fb2e05656d8f87123a121b076e",
+      "lastMasterClock": 103104,
+      "readStatusEvents": 1909,
+      "writeDataEvents": 216
+    },
+    "dsp1b": {
+      "file": "dsp1b-host-transcript.bin.gz",
+      "firmwareSha256": "d789cb3c36b05c0b23b6c6f23be7aa37c6e78b6ee9ceac8d2d2aa9d8c4d35fa9",
+      "events": 4298,
+      "ordinaryDataBytes": 124,
+      "dataRomReadBytes": 2048,
+      "dataRomSha256": "8546cbac530830446bb8a277f6b139d4ad64d650bdbac7e4e150e2f095665049",
+      "lastMasterClock": 103128,
+      "readStatusEvents": 1910,
+      "writeDataEvents": 216
+    }
+  }
+}

@@ -29,3 +29,11 @@ and its SQLite3.53.4 native dependency (SQLite public domain). Exact dependency
 versions are retained in NuGet lockfiles; no UI framework beyond built-in WPF.
 The C64 Manager concept informed the architecture; its untracked files were read
 only and have not been incorporated or modified.
+
+DSP1 research uses the NEC1989 manufacturer databook and Nintendo developer
+manual, with source/scan identities documented in docs/m10a-dsp1.md. The own C#
+uPD7725 is independent of the laboratory-only bsnes reference (byuu et al,
+GPL-3.0-or-later); no reference core or firmware bytes are distributed. The
+public numerical reference traces are separate from original hardware evidence.
+Board/interface documentation is credited to Overload and the Snes9x DSP Team;
+the original firmware dump identity source is credited to Caitsith2/byuu.

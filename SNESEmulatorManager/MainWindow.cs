@@ -892,7 +892,7 @@ public sealed class MainWindow : Window
         if (states.SelectedItem is not StateInfo state)
             return;
         preview.Source = null;
-        stateInfo.Text = "Loading State9 preview...";
+        stateInfo.Text = "Loading savestate preview...";
         Cartridge cart;
         try
         {
@@ -985,12 +985,12 @@ public sealed class MainWindow : Window
     {
         var pick = new OpenFileDialog
         {
-            Filter = "SNES State9|*.snessav"
+            Filter = "SNES savestate|*.snessav"
         };
         if (pick.ShowDialog(this) != true)
             return;
         var g = Game();
-        var cart = await Task.Run(() => new Cartridge(AtomicFile.ReadBytes(g.Path, 8 * 1024 * 1024 + 512)), lifetime.Token);
+        var cart = await Task.Run(() => new Cartridge(AtomicFile.ReadBytes(g.Path, 8 * 1024 * 1024 + 512),g.Path), lifetime.Token);
         string destination = Path.Combine(UserDataPaths.GetSaveDirectory(), cart.Hash, Path.GetFileName(pick.FileName));
         await Task.Run(() => StateCatalog.Import(pick.FileName, destination, cart), lifetime.Token);
         await ReloadStates();
@@ -1002,7 +1002,7 @@ public sealed class MainWindow : Window
         var cart = await MatchingCart(state);
         var pick = new SaveFileDialog
         {
-            Filter = "SNES State9|*.snessav",
+            Filter = "SNES savestate|*.snessav",
             FileName = Path.GetFileName(state.Path)
         };
         if (pick.ShowDialog(this) != true)

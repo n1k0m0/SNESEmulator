@@ -20,7 +20,9 @@ comments, current documentation, and a final commit/push. Current sequence:
 4. **R4 complete:** comments/readability and current documentation; SDK Roslyn
    token proof, solution builds, immutable fixtures and 65 targeted groups pass.
    See [the R4 evidence](r4-readability.md). Hardware behavior is unchanged.
-5. **M10 next:** DSP1, then SuperFX, then SA1, each with isolated, source-supported
+5. **M10a implemented:** [DSP1](m10a-dsp1.md), including own uPD7725, explicit
+   firmware/board setup, format 10, tests and honest source-conflict inventory.
+   **M10 continues:** SuperFX, then SA1, each with isolated, source-supported
    behavior, mapping, timing, state continuation, tests and documented limits.
    Other cartridge hardware/peripherals require their own scoped evidence.
 6. **Final integration due:** validate the actual final core on long NTSC/PAL

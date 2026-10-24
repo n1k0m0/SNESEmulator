@@ -18,7 +18,7 @@ public static class StateSerializer
         try{using var file=File.OpenRead(path);_ = Load(cartridge,file);return true;}
         catch(Exception e) when(e is IOException or InvalidDataException or JsonException or ArgumentException or OverflowException or InvalidOperationException){return false;}
     }
-    // Format9: <=512 KiB SRAM, <=512*239 pixels (7 bytes/pixel), fixed
+    // Formats9/10: <=512 KiB SRAM, <=512*239 pixels (7 bytes/pixel), fixed
     // RAM, plus bounded JSON pipelines. 32 MiB leaves >10x normal-state headroom.
     // Increase these explicit versioned budgets when adding hardware, never from input.
     public const int MaximumCompressedBytes=16*1024*1024, MaximumRawBytes=32*1024*1024, MaximumStringBytes=8*1024*1024;
@@ -32,7 +32,7 @@ public static class StateSerializer
     public static void SaveCaptured(byte[] bytes,string path,Cartridge cartridge)
     {
         ArgumentNullException.ThrowIfNull(cartridge);
-        if(bytes.Length>MaximumRawBytes)throw new InvalidDataException("Captured state exceeds format9 size limit.");
+        if(bytes.Length>MaximumRawBytes)throw new InvalidDataException("Captured state exceeds versioned size limit.");
         AtomicFile.Write(path,file=>{using var zip=new GZipStream(file,CompressionLevel.Fastest,true);zip.Write(bytes);},candidate=>Valid(cartridge,candidate));
     }
     private static void Write(SnesSystem machine,Stream destination,bool compress=true)
@@ -43,7 +43,7 @@ public static class StateSerializer
         // must close GZip directly, rather than issuing a leave-open SyncFlush.
         using (var w = new BinaryWriter(zip??destination,System.Text.Encoding.UTF8,!compress))
         {
-            w.Write("SNESSAV"); w.Write(9); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));w.Write(machine.ProfileForced);w.Write((int)cart.Mapping);w.Write(JsonSerializer.Serialize(cart.Options));
+            w.Write("SNESSAV"); w.Write(cart.Hardware==null?9:10); w.Write(cart.Hash); w.Write(cart.Sram.Length);w.Write(JsonSerializer.Serialize(machine.Profile));w.Write(machine.ProfileForced);w.Write((int)cart.Mapping);w.Write(JsonSerializer.Serialize(cart.Options));
             var c = machine.Cpu; var b = machine.Bus; var p = b.Ppu;
             w.Write(c.A); w.Write(c.X); w.Write(c.Y); w.Write(c.S); w.Write(c.D); w.Write(c.PC);
             w.Write(c.P); w.Write(c.PBR); w.Write(c.DBR); w.Write(c.E); w.Write(c.Waiting); w.Write(c.Stopped); w.Write(c.Instructions);
@@ -64,6 +64,7 @@ public static class StateSerializer
             w.Write(JsonSerializer.Serialize(machine.Clock.Capture()));w.Write(JsonSerializer.Serialize(machine.CapturePhase()));
             w.Write(JsonSerializer.Serialize(b.CpuIo.State));w.Write(JsonSerializer.Serialize(b.Dma.State));
             w.Write(JsonSerializer.Serialize(c.CaptureContinuation()));w.Write(JsonSerializer.Serialize(c.CaptureInterrupts()));
+            if(cart.Hardware is {} hardware)w.Write(JsonSerializer.Serialize(hardware.Capture(machine.Clock.Now,machine.Profile)));
         }
     }
     public static SnesSystem Load(Cartridge cartridge, string path)
@@ -128,8 +129,10 @@ public static class StateSerializer
     {
         using var raw=new MemoryStream(Decode(source),false);
         using var r = new LimitedReader(raw);
-        if (r.ReadString() != "SNESSAV" || r.ReadInt32() != 9 || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
-            throw new InvalidDataException("Savestate requires format9 (continuous WAI phase, pending PPU bus endpoints and field-start display latches). Formats1-8 lack an unambiguous corrected timing state; start the ROM again. The cartridge must also match.");
+        if(r.ReadString()!="SNESSAV")throw new InvalidDataException("Invalid savestate signature.");
+        int version=r.ReadInt32();
+        if (version is not (9 or 10) || (version==10)!=(cartridge.Hardware!=null) || r.ReadString() != cartridge.Hash || r.ReadInt32() != cartridge.Sram.Length)
+            throw new InvalidDataException("Savestate requires format9 for normal cartridges or format10 for enhancement hardware (continuous WAI phase, pending PPU bus endpoints and field-start display latches). Formats1-8 lack an unambiguous corrected timing state; start the ROM again. The cartridge must also match.");
         var profile=Json<HardwareProfile>(r.ReadString())??throw new InvalidDataException("Missing hardware profile");
         bool forced=r.ReadBoolean();var mapping=(CartridgeMapping)r.ReadInt32();
         var options=Json<CartridgeOptions>(r.ReadString())??throw new InvalidDataException("Missing cartridge options");
@@ -137,7 +140,7 @@ public static class StateSerializer
         // Decode into independent cartridge/RAM/phase objects. Sharing the live
         // cartridge here would let a corrupt state overwrite its SRAM before
         // validation finished. Runtime installation also checks its host epoch.
-        var restoredCart=new Cartridge(cartridge.Rom,cartridge.SourcePath,options);
+        var restoredCart=new Cartridge(cartridge.Rom,cartridge.SourcePath,options,cartridge.HardwareConfiguration);
         if(restoredCart.Mapping!=mapping)throw new InvalidDataException("Invalid saved mapper options");
         var m = new SnesSystem(profile,forced);m.Insert(restoredCart);
         var c = m.Cpu; var b = m.Bus; var p = b.Ppu;
@@ -164,6 +167,7 @@ public static class StateSerializer
         b.Dma.Restore(Json<DmaState>(r.ReadString())??throw new InvalidDataException("Missing DMA state"));
         c.RestoreContinuation(Json<CpuContinuation>(r.ReadString()));
         c.RestoreInterrupts(Json<CpuInterruptState>(r.ReadString())??throw new InvalidDataException("Missing interrupt state"));
+        if(version==10)b.Cartridge!.Hardware!.Restore(Json<CartridgeHardwareState>(r.ReadString())??throw new InvalidDataException("Missing cartridge hardware state"),m.Clock.Now,m.Profile);
         p.ValidateClock();
         if(frames!=m.Frames||remainder!=m.MasterRemainder)throw new InvalidDataException("Inconsistent clock state");
         if (b.WramAddress is < 0 or > 0x1FFFF || p.Scanline is < 0 or > 312 || p.CgramAddress>511 || p.OamAddress>1023 || p.Brightness.Any(x=>x>15) || p.NativePixels.Any(x=>x>32767) ||

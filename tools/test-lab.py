@@ -35,6 +35,14 @@ supervised('persistence-conformance',['dotnet',str(CORE),'--persistence-only'],t
 supervised('interaction-conformance',['dotnet',str(CORE),'--interaction-only'],timeout=180)
 supervised('runtime-conformance',['dotnet',str(CORE),'--runtime-only'],timeout=180)
 run([sys.executable,'tools/verify-r3-testdata.py'])
+run([sys.executable,'tools/verify-dsp1-testdata.py'])
+supervised('dsp1-functional',['dotnet',str(LAB),'dsp1-proof','artifacts/dsp1-functional-child'],timeout=120)
+# Source disagreements are accuracy failures, explicitly separate from the functional gate.
+dsp1_audit=supervised('dsp1-raw-source-audit',['dotnet',str(LAB),'dsp1-source-audit','artifacts/dsp1-raw-source-audit-child'],expected=1,timeout=120)
+assert dsp1_audit['Tests'][0]['Status']=='fail'
+dsp1_raw=json.loads((ROOT/'artifacts/dsp1-raw-source-audit-child.json').read_text())
+assert dsp1_raw['Metadata']['rawComparison']['Mismatches']==49
+assert dsp1_raw['Metadata']['rawComparison']['OtherMismatches']==0
 run([sys.executable,'tools/generate-spc-hotpath.py','--check'])
 supervised('spc-continuation-guards',['dotnet',str(LAB),'spc-continuation-proof','artifacts/spc-continuation-guards-child'],timeout=120)
 supervised('spc-entry-lifecycle',['dotnet',str(LAB),'spc-entry-proof','artifacts/spc-entry-lifecycle-child'],timeout=120)

@@ -278,6 +278,16 @@ if (!args.Contains("--windows"))
         var metadata = await db.StateMetadataAsync();
         Check(metadata.Count == 1 && metadata.Values.Single().Name == "New name" && metadata.Values.Single().Hash == "hash" && (await db.ListAsync()).Count == 0);
     });
+    await Test("M10a State10 DSP1 catalog preview import export and firmware mismatch", async () =>
+    {
+        var config=Dsp1Configuration.SyntheticProgram(Dsp1DiagnosticRom.Firmware(),Dsp1Board.LoRom1MiB);
+        var cart=new Cartridge(Dsp1DiagnosticRom.Create(Dsp1Board.LoRom1MiB),hardware:config);var machine=new SnesSystem();machine.Insert(cart);machine.RunUntil(201);
+        string file=Path.Combine(root,"dsp1.snessav"),export=Path.Combine(root,"dsp1-export.snessav");StateSerializer.Save(machine,file);
+        Check(StateCatalog.ReadIdentity(file)==cart.Hash);var preview=StateCatalog.Preview(file,cart);Check(preview.Error==null&&preview.Format==10&&preview.Pixels!=null);
+        StateCatalog.Import(file,export,cart);Check(File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(export)));
+        byte[] other=Dsp1DiagnosticRom.Firmware();other[1]^=1;var different=new Cartridge(cart.Rom,hardware:Dsp1Configuration.SyntheticProgram(other,Dsp1Board.LoRom1MiB));
+        Check(StateCatalog.Preview(file,different).Error!=null);await Throws<InvalidDataException>(async()=>{StateCatalog.Import(file,export,different);await Task.CompletedTask;});Check(File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(export)));
+    });
     await Test("M9e State9 strict preview import export recovery delete metadata byte identity", async () =>
     {
         var machine = new SnesSystem();

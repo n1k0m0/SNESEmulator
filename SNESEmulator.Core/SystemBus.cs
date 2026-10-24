@@ -56,9 +56,13 @@ public sealed class SystemBus : ICpuBus
             };
         }
         else if(Cartridge is {} cart) {
+            if(cart.Hardware is {} hardware&&hardware.Decodes(address,out bool status))
+                result=hardware.Read(status,CpuIo.Clock?.Now??0,CpuIo.Clock?.Profile??HardwareProfile.Ntsc);
+            else {
             int sram=cart.SramOffset(address);
             if(sram>=0)result=cart.Sram[sram];
             else if(a>=0x8000||(bank&127)>=0x40)result=cart.Rom[cart.RomOffset(address)];
+            }
         }
         // CPU's internal I/O read path does not drive the external MDR.
         if(origin!=AccessOrigin.Cpu||(!DeferCpuMdr&&(address&0x40fc00)!=0x4000))OpenBus=result;
@@ -88,7 +92,10 @@ public sealed class SystemBus : ICpuBus
                 case 0x420b:Dma.Request(value);break;
             }
         }
-        else if(Cartridge is {} cart&&cart.SramOffset(address) is var sram&&sram>=0)cart.Sram[sram]=value;
+        else if(Cartridge is {} cart) {
+            if(cart.Hardware is {} hardware&&hardware.Decodes(address,out bool status))hardware.Write(status,value,CpuIo.Clock?.Now??0,CpuIo.Clock?.Profile??HardwareProfile.Ntsc);
+            else if(cart.SramOffset(address) is var sram&&sram>=0)cart.Sram[sram]=value;
+        }
         AccessOriginObserved?.Invoke(new(origin,"write",address,value));AccessObserved?.Invoke("write",address,value);
     }
     public void BeginVblank()=>CpuIo.BeginVblank();
@@ -97,9 +104,12 @@ public sealed class SystemBus : ICpuBus
     // reproducible RAM seed, not a measured power-on RAM pattern.
     public void Reset(bool powerOn=true)
     {
+        // A lazily clocked chip may have changed retained working RAM since
+        // its last port access. Commit that interval before asserting warm reset.
+        if(!powerOn&&Cartridge?.Hardware is {} hardware&&CpuIo.Clock is {} clock)hardware.Synchronize(clock.Now,clock.Profile);
         if(powerOn)Array.Clear(Wram);
         Array.Clear(Io);Array.Fill(DmaRegisters,(byte)255);Io[1]=255;Io[7]=Io[9]=255;Io[8]=Io[10]=1;
-        Ppu.Reset();Apu.Reset(powerOn);CpuIo.Reset();Dma.Reset();WramAddress=0;OpenBus=0;NmiPending=NmiFlag=false;
+        Cartridge?.Hardware?.Reset(powerOn);Ppu.Reset();Apu.Reset(powerOn);CpuIo.Reset();Dma.Reset();WramAddress=0;OpenBus=0;NmiPending=NmiFlag=false;
         if(powerOn)Array.Clear(Controllers.Buttons);
         Controllers.Latch();Controllers.Write(0);
     }

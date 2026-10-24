@@ -54,3 +54,7 @@ testdata/gilyon-v1.4/* -text -whitespace
 testdata/gilyon-v1.4/*.sfc binary
 testdata/gilyon-v1.4/*.zip binary
 testdata/r3-cpu-legacy-states/*.state binary
+
+# M10a firmware-free numeric transcripts and reference adapter fingerprints.
+testdata/dsp1/*.bin binary
+tools/dsp1-reference.cpp text eol=lf

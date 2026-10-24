@@ -1,0 +1,369 @@
+{
+  "schema": "authored-dsp1-command-plan-v1",
+  "scope": "Original mathematical inputs, explicit matrix/projection setup, three raster rows then stop. No timing or complete command certification. DATA ROM output is never distributed; only reads+SHA256.",
+  "commands": [
+    {
+      "opcode": "0f",
+      "family": "memory-test",
+      "inputs": [
+        0
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "00",
+      "family": "multiply",
+      "inputs": [
+        16384,
+        8192
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "20",
+      "family": "multiply-alt",
+      "inputs": [
+        16384,
+        8192
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "10",
+      "family": "inverse",
+      "inputs": [
+        16384,
+        0
+      ],
+      "outputs": 2,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "04",
+      "family": "sine-cosine",
+      "inputs": [
+        4096,
+        16384
+      ],
+      "outputs": 2,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "08",
+      "family": "vector-size",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 2,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "18",
+      "family": "vector-compare",
+      "inputs": [
+        100,
+        -200,
+        300,
+        400
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "38",
+      "family": "vector-compare-alt",
+      "inputs": [
+        100,
+        -200,
+        300,
+        400
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "28",
+      "family": "vector-distance",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "0c",
+      "family": "rotation2d",
+      "inputs": [
+        4096,
+        100,
+        200
+      ],
+      "outputs": 2,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "1c",
+      "family": "rotation3d",
+      "inputs": [
+        4096,
+        2048,
+        1024,
+        100,
+        200,
+        300
+      ],
+      "outputs": 3,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "01",
+      "family": "matrixA-setup",
+      "inputs": [
+        16384,
+        4096,
+        2048,
+        1024
+      ],
+      "outputs": 0,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "0d",
+      "family": "matrixA-objective",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 3,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "03",
+      "family": "matrixA-subjective",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 3,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "0b",
+      "family": "matrixA-scalar",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "11",
+      "family": "matrixB-setup",
+      "inputs": [
+        16384,
+        4096,
+        2048,
+        1024
+      ],
+      "outputs": 0,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "1d",
+      "family": "matrixB-objective",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 3,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "13",
+      "family": "matrixB-subjective",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 3,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "1b",
+      "family": "matrixB-scalar",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "21",
+      "family": "matrixC-setup",
+      "inputs": [
+        16384,
+        4096,
+        2048,
+        1024
+      ],
+      "outputs": 0,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "2d",
+      "family": "matrixC-objective",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 3,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "23",
+      "family": "matrixC-subjective",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 3,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "2b",
+      "family": "matrixC-scalar",
+      "inputs": [
+        100,
+        -200,
+        300
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "14",
+      "family": "angle-rotation",
+      "inputs": [
+        4096,
+        2048,
+        1024,
+        100,
+        200,
+        300
+      ],
+      "outputs": 3,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "02",
+      "family": "projection-setup",
+      "inputs": [
+        0,
+        0,
+        256,
+        256,
+        256,
+        0,
+        8192
+      ],
+      "outputs": 4,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "06",
+      "family": "object-projection",
+      "inputs": [
+        100,
+        200,
+        0
+      ],
+      "outputs": 3,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "0e",
+      "family": "screen-coordinate",
+      "inputs": [
+        16,
+        32
+      ],
+      "outputs": 2,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "0a",
+      "family": "two-full-raster-rows-plus-three-words",
+      "inputs": [
+        1
+      ],
+      "outputs": 11,
+      "rasterStop": true,
+      "hashOnly": false,
+      "termination": "Replace third-row D transfer with8000, do not consume D then send stop at next An."
+    },
+    {
+      "opcode": "2f",
+      "family": "version",
+      "inputs": [
+        0
+      ],
+      "outputs": 1,
+      "rasterStop": false,
+      "hashOnly": false
+    },
+    {
+      "opcode": "1f",
+      "family": "dataROM-hash-only",
+      "inputs": [
+        0
+      ],
+      "outputs": 1024,
+      "rasterStop": false,
+      "hashOnly": true
+    }
+  ]
+}

@@ -12,7 +12,7 @@ public static class StateCatalog
         using var input = new MemoryStream(encoded, false);
         byte[] raw = StateSerializer.Decode(input);
         using var reader = new BinaryReader(new MemoryStream(raw, false));
-        if (reader.ReadByte() != 7 || System.Text.Encoding.ASCII.GetString(reader.ReadBytes(7)) != "SNESSAV" || reader.ReadInt32() != 9 || reader.ReadByte() != 64)
+        if (reader.ReadByte() != 7 || System.Text.Encoding.ASCII.GetString(reader.ReadBytes(7)) != "SNESSAV" || reader.ReadInt32() is not (9 or 10) || reader.ReadByte() != 64)
             throw new InvalidDataException("Unsupported state identity");
         string hash = System.Text.Encoding.ASCII.GetString(reader.ReadBytes(64));
         if (hash.Length != 64 || hash.Any(c => !char.IsAsciiHexDigit(c)))
@@ -28,11 +28,11 @@ public static class StateCatalog
             using var input = new MemoryStream(bytes, false);
             var state = StateSerializer.Load(cart, input);
             var frame = state.Bus.Ppu.CompletedFrame ?? state.Bus.Ppu.Frame;
-            return new(path, Path.GetFileNameWithoutExtension(path), cart.Hash, 9, frame.Geometry.Width, frame.Geometry.Height, frame.Argb.ToArray(), null, File.Exists(path + ".bak"));
+            return new(path, Path.GetFileNameWithoutExtension(path), cart.Hash, cart.Hardware==null?9:10, frame.Geometry.Width, frame.Geometry.Height, frame.Argb.ToArray(), null, File.Exists(path + ".bak"));
         }
         catch (Exception e)when (e is IOException or InvalidDataException or UnauthorizedAccessException)
         {
-            return new(path, Path.GetFileNameWithoutExtension(path), cart.Hash, 9, 0, 0, null, e.Message, File.Exists(path + ".bak"));
+            return new(path, Path.GetFileNameWithoutExtension(path), cart.Hash, cart.Hardware==null?9:10, 0, 0, null, e.Message, File.Exists(path + ".bak"));
         }
     }
 

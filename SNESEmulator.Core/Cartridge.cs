@@ -18,8 +18,10 @@ public sealed class Cartridge
     public bool Pal { get; }
     public CartridgeMetadata Metadata { get; }
     public CartridgeOptions Options { get; }
+    public Dsp1Configuration? HardwareConfiguration {get;}
+    public ICartridgeHardware? Hardware {get;}
 
-    public Cartridge(byte[] image, string sourcePath = "", CartridgeOptions? options = null)
+    public Cartridge(byte[] image, string sourcePath = "", CartridgeOptions? options = null, Dsp1Configuration? hardware = null)
     {
         Options = options ?? new();
         bool copier = image.Length % 1024 == 512;
@@ -37,8 +39,18 @@ public sealed class Cartridge
         if (header + 64 > image.Length || (Options.Mapping == null && scores.Max() < 0))
             throw new InvalidDataException("No valid SNES header/reset vector found for selected mapping.");
         byte mode = image[header + 0x15], chipset = image[header + 0x16];
-        if (chipset is not (0 or 1 or 2) || (Options.Mapping == null && (mode & 15) is not (0 or 1 or 2 or 5)))
+        if (chipset is not (0 or 1 or 2 or 3 or 5) || (Options.Mapping == null && (mode & 15) is not (0 or 1 or 2 or 5)))
             throw new NotSupportedException($"Cartridge hardware {mode:X2}/{chipset:X2} is not implemented (normal discrete mappers only).");
+        if(chipset is 3 or 5)
+        {
+            HardwareConfiguration=hardware??Dsp1Configuration.Resolve(sourcePath);
+            bool low=HardwareConfiguration.Board is Dsp1Board.LoRom1MiB or Dsp1Board.LoRom2MiB;
+            int maximum=HardwareConfiguration.Board is Dsp1Board.LoRom1MiB or Dsp1Board.HiRom1MiB?0x100000:0x200000;
+            if(Mapping!=(low?CartridgeMapping.LoRom:CartridgeMapping.HiRom)||image.Length>maximum)
+                throw new InvalidDataException("DSP1 board ROM size/mapper does not match configuration.");
+            Hardware=new Dsp1CartridgeHardware(HardwareConfiguration);
+        }
+        else if(hardware!=null)throw new InvalidDataException("DSP1 hardware supplied for a normal cartridge.");
         Rom = image.ToArray();
         Title = Encoding.ASCII.GetString(image, header, 21).Trim(' ', '\0');
         Hash = Convert.ToHexString(SHA256.HashData(image)); SourcePath = sourcePath;

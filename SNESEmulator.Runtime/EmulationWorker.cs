@@ -71,10 +71,10 @@ public sealed class EmulationWorker : IDisposable
     public Task SetModeAsync(bool pause,bool fast,CancellationToken cancellation=default)=>Enqueue(()=>{
         if(paused!=pause||turbo!=fast){bool inputBoundary=paused!=pause;paused=pause;turbo=fast;Discontinuity(true,inputBoundary);}return true;
     },cancellation);
-    public Task InsertAsync(byte[] rom,byte[]? sram=null,string source="",CancellationToken cancellation=default)
+    public Task InsertAsync(byte[] rom,byte[]? sram=null,string source="",CancellationToken cancellation=default,Dsp1Configuration? hardware=null)
     {
         byte[] ownRom=rom.ToArray(),ownSram=sram?.ToArray()??[];
-        return Enqueue(()=>{var cart=new Cartridge(ownRom,source);if(ownSram.Length!=0){if(ownSram.Length!=cart.Sram.Length)throw new InvalidDataException("Battery size mismatch");ownSram.CopyTo(cart.Sram,0);}
+        return Enqueue(()=>{var cart=new Cartridge(ownRom,source,hardware:hardware);if(ownSram.Length!=0){if(ownSram.Length!=cart.Sram.Length)throw new InvalidDataException("Battery size mismatch");ownSram.CopyTo(cart.Sram,0);}
             machine.Insert(cart);fault=null;Discontinuity();return true;},cancellation);
     }
     public Task PowerCycleAsync(CancellationToken cancellation=default)=>Enqueue(()=>{machine.PowerOn();fault=null;Discontinuity();return true;},cancellation);
@@ -97,7 +97,7 @@ public sealed class EmulationWorker : IDisposable
         byte[] owned=compressed.ToArray();
         var identity=await Enqueue(()=>{
             var cart=machine.Bus.Cartridge??throw new InvalidOperationException("Load matching ROM first");
-            return (Cart:new Cartridge(cart.Rom,cart.SourcePath,cart.Options),Epoch:epoch);
+            return (Cart:new Cartridge(cart.Rom,cart.SourcePath,cart.Options,cart.HardwareConfiguration),Epoch:epoch);
         },cancellation).ConfigureAwait(false);
         var restored=await Task.Run(()=>{cancellation.ThrowIfCancellationRequested();using var stream=new MemoryStream(owned,false);return StateSerializer.Load(identity.Cart,stream);},cancellation).ConfigureAwait(false);
         BeforeStateInstall?.Invoke();cancellation.ThrowIfCancellationRequested();
