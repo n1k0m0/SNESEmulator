@@ -1,5 +1,18 @@
 # M9c persistence contract
 
+## Current follow-up
+
+This contract preserves the historical milestone below. Current persistence/CI,
+performance and accuracy evidence is in [R1](r1-persistence-ci.md),
+[R2](r2-performance-soak.md) and [R3](r3-accuracy.md). M9d networking was accepted
+on `2a5ae39`, Manager on `2534dba`, distribution on `0f8aadc`; later remote CI
+[40042721554](https://github.com/n1k0m0/SNESEmulator/actions/runs/40042721554)
+passed exact `b840f105`. Final-source duration/strict one-hour NTSC and PAL,
+final package and release acceptance remain due. Historical red measurements
+stay red and are not relabelled by later, differently scoped runs.
+
+## Historical milestone status
+
 M9c implements local persistence. M9a sustained realtime remains red (38/62 NTSC
 windows; PAL sustained unexecuted), M9/network/distribution/release remain open.
 The 18 M8 whole-console audio differences and 7000 adjudicated raw SPC bus

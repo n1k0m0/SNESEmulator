@@ -152,7 +152,7 @@ internal static class SoakSmoke
         }
         if(!completed)Error("Native window closed before requested duration");
         if(!File.Exists(Path.Combine(managerProbe,"ready.json"))||scans==0||managerStatusRequests==0)Error("Actual WPF Manager/status polling/shared library readiness missing");
-        if(observed==null||readyAt<0||pairs==0||matched==0||observed.DriverComparedVideo<30)Error("No nonzero actual driver/audio/video/matched evidence");
+        if(observed==null||readyAt<0||pairs==0||matched==0||observed.DriverComparedVideo<30)Error("Missing actual driver/audio/video/matched observations (audio requires pairs, not nonzero amplitude)");
         ObservePending();
         closingMaximum=Math.Max(closingMaximum,Math.Max(coldMaximum,steadyMaximum));
         if(closingMaximum>=.04)Error("Cumulative software A/V exceeded40ms including Cold");

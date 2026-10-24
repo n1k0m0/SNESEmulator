@@ -123,6 +123,9 @@ public sealed partial class Spc700
         return true;
     }
 
+    // The compact private journal and generated decoder are allocation choices,
+    // not a second timing model. Both decoders must admit the same bus effect;
+    // replay reconstructs locals without repeating committed reads or writes.
     private bool TryHotCycle(ushort? address, byte? value, string direction, int next)
     {
         HotCycleAttempts++;

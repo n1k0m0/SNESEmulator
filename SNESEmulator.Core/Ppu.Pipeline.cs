@@ -43,6 +43,9 @@ public sealed partial class Ppu
     }
     private void BeginPipelineLine()
     {
+        // OBJ fetches prepare the following line. Swap completed buffers before
+        // clearing the new destination; clearing the current plane loses sprites
+        // already fetched before this scanline's first visible pixel.
         (objectPalette,nextObjectPalette)=(nextObjectPalette,objectPalette);(objectPriority,nextObjectPriority)=(nextObjectPriority,objectPriority);
         Array.Clear(nextObjectPalette);Array.Clear(nextObjectPriority);Array.Clear(mosaicPalette);Array.Clear(mosaicPriority);
         int size=(Registers[6]>>4)+1;
@@ -85,6 +88,9 @@ public sealed partial class Ppu
                 ushort left=ForcedBlank?(ushort)0:ComposeBelow(x);
                 ushort color=ForcedBlank?(ushort)0:Compose(x);byte light=(byte)(ForcedBlank?0:Registers[0]&15);
                 if(InVblank){left=color=0;light=0;}
+                // Store native color and its brightness latch at the same phase.
+                // Later register changes affect later pixels, never a completed
+                // pixel. ARGB conversion and host scaling cannot retime the PPU.
                 int index=(Scanline-1)*FrameGeometry.Stride+x*(FrameGeometry.Width/256);
                 if(FrameGeometry.Width==512){StorePixel(index,wide?left:color,light);StorePixel(index+1,color,light);}
                 else StorePixel(index,color,light);

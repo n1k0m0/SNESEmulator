@@ -62,6 +62,8 @@ public sealed class MasterClock(HardwareProfile profile)
     {Profile.Validate();Now=H=V=0;Field=false;Fields=ApuTicks=ApuRemainder=StallUntil=sequence=0;Interlace=false;VblankLine=225;events.Clear();ScheduleLine();}
     public void Schedule(long at,HardwareEventKind kind,int payload=0,int priority=0)
     {if(at<Now)throw new ArgumentOutOfRangeException(nameof(at));events.Add(new(at,priority,sequence++,kind,payload));events.Sort(Compare);}
+    // Same-clock ordering is part of the deterministic machine: priority first,
+    // then insertion order. Persist sequence numbers so a load preserves ties.
     private static int Compare(HardwareEvent a,HardwareEvent b) {int n=a.Clock.CompareTo(b.Clock);if(n!=0)return n;n=a.Priority.CompareTo(b.Priority);return n!=0?n:a.Sequence.CompareTo(b.Sequence);}
     private void ScheduleLine()
     {
@@ -90,6 +92,8 @@ public sealed class MasterClock(HardwareProfile profile)
                 case HardwareEventKind.VblankNmi:VblankStarted?.Invoke();break;
             }
             EventObserved?.Invoke(e);
+            // Publish peripheral work after every typed event at this timestamp
+            // has committed. An observer must not capture a half-processed tie.
             if(events.Count==0||events[0].Clock!=Now)PeripheralAdvanced?.Invoke();
         }
         AdvanceRaw(target);
@@ -104,6 +108,9 @@ public sealed class MasterClock(HardwareProfile profile)
     {
         long delta=to-Now;
         ActiveTimeElapsed?.Invoke(checked((int)delta));
+        // Integer carry makes AdvanceTo(a); AdvanceTo(b) equal AdvanceTo(b),
+        // regardless of the host's chosen budgets. Do not round each segment:
+        // that would change APU phase and port polling over a long replay.
         // The serialized remainder stays in the original, unreduced domain.
         // Bound the entire sum in advance; unusual wide profiles retain Int128.
         if(delta<=safeApuDelta){long sum=ApuRemainder+delta*(long)apuRate;ApuTicks+=sum/apuDenominator;ApuRemainder=sum%apuDenominator;}

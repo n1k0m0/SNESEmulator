@@ -50,6 +50,9 @@ public sealed class BatteryPersistence(Func<Task<BatterySnapshot?>> capture,Func
     {try{_ = Decode(bytes,hash,size);return true;}catch(Exception e) when(e is IOException or InvalidDataException){return false;}}
     private async Task FlushOrderedAsync()
     {
+        // The ordering semaphore covers capture as well as the write. Otherwise
+        // an earlier autosave could finish after a same-ROM reload or final close
+        // and durably replace newer SRAM with an older owner-thread snapshot.
         var snapshot=await capture().ConfigureAwait(false);
         if(snapshot==null||snapshot.Bytes.Length==0)return;
         EnsureLease(snapshot.Hash);

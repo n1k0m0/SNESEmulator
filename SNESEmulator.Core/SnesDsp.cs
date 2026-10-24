@@ -225,6 +225,10 @@ public sealed class SnesDsp
         [1,507,604],[508,605,702],[509,606,703],[101,607,704],
         [608,705,2],[30,609,706],[707],[708],[31,709],[],[],[],[],[32],[4,201]
     ];
+    // One phase consumes 24 APU crystal clocks; 32 phases form one native pair.
+    // Echo writes are effects on shared ARAM, not presentation output: execute
+    // them even when the host discards/mutes samples. Publish only after the
+    // complete phase, including voice and echo operations, has committed.
     internal void AdvanceTo(long crystal)
     {
         while(state.NextCrystal<=crystal){

@@ -134,6 +134,9 @@ public static class StateSerializer
         bool forced=r.ReadBoolean();var mapping=(CartridgeMapping)r.ReadInt32();
         var options=Json<CartridgeOptions>(r.ReadString())??throw new InvalidDataException("Missing cartridge options");
         if(!Enum.IsDefined(mapping)||mapping!=cartridge.Mapping)throw new InvalidDataException("Savestate cartridge mapper does not match.");
+        // Decode into independent cartridge/RAM/phase objects. Sharing the live
+        // cartridge here would let a corrupt state overwrite its SRAM before
+        // validation finished. Runtime installation also checks its host epoch.
         var restoredCart=new Cartridge(cartridge.Rom,cartridge.SourcePath,options);
         if(restoredCart.Mapping!=mapping)throw new InvalidDataException("Invalid saved mapper options");
         var m = new SnesSystem(profile,forced);m.Insert(restoredCart);

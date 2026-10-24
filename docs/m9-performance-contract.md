@@ -1,5 +1,18 @@
 # M9a performance contract
 
+## Current follow-up
+
+This contract preserves the historical milestone below. Current persistence/CI,
+performance and accuracy evidence is in [R1](r1-persistence-ci.md),
+[R2](r2-performance-soak.md) and [R3](r3-accuracy.md). M9d networking was accepted
+on `2a5ae39`, Manager on `2534dba`, distribution on `0f8aadc`; later remote CI
+[40042721554](https://github.com/n1k0m0/SNESEmulator/actions/runs/40042721554)
+passed exact `b840f105`. Final-source duration/strict one-hour NTSC and PAL,
+final package and release acceptance remain due. Historical red measurements
+stay red and are not relabelled by later, differently scoped runs.
+
+## Historical milestone status
+
 Status: **M9a incomplete. The sustained realtime gate is red.**
 
 Independent parent regression on `3cb3949b7ca0171a6f3ad36dd027818e84257308`
@@ -25,7 +38,7 @@ The unmodified M8 core is `10164c78e24124dfc613764cffd859409aeed1f8`.
 `artifacts/m9a/baseline-core.dll` and the separate baseline runner preserve that
 actual binary. The initial baseline precedes core edits. The prior implementation
 outputs in `testdata/m9-performance-baseline.json` are explicitly determinism
-regressions, never independent hardware oracles. No M0–M8 expected pixel/sample,
+regressions, never independent hardware oracles. No M0â€“M8 expected pixel/sample,
 known-error contract or acquired fixture changed. M8's18 whole-console audio
 rows remain red.
 
@@ -53,7 +66,7 @@ ROM hashes are in each report; the geometry ROM is assembled by
 `Performance.GeometryRom` with actual65816 register/DMA effects. The game is the
 unchanged M8 MIT/CC techdemo. `m9-performance-replay.json` exactly copies M8's
 physical-field input sequence, including Start at150 and room trigger at210.
-Neutral performance windows are fields10–149,150–209,210–299 and300 onward;
+Neutral performance windows are fields10â€“149,150â€“209,210â€“299 and300 onward;
 these labels do not assert instantaneous scene changes. PAL is an explicit
 workload profile, not a new hardware certification of that demo.
 
@@ -117,7 +130,7 @@ unreduced and wide synthetic clock profiles.
 untraced, six CPU/bus/event/DMA traced and two full SMP/DSP/PPU observer runs.
 The observer path is intentionally allowed to be slower; its digital behavior
 must be identical. `--long` additionally executes1200 fields per workload,
-approximately20–24 emulated seconds; this is an extended workload, not an
+approximately20â€“24 emulated seconds; this is an extended workload, not an
 hours-long soak. `--sustained` separately runs37000 NTSC and31000 PAL game fields,
 more than ten emulated minutes each, with bounded per-field PCM streaming hashes,
 600-field timing/allocation windows, GC, managed-memory and queue measurements.

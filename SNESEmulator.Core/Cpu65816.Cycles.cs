@@ -125,6 +125,10 @@ public sealed partial class Cpu65816
     private byte Cycle(int? address,byte? value,string pins)
     {
         count++;if(address.HasValue)address &= 0xffffff;
+        // Re-execute decoder decisions from the entry registers, but consume the
+        // journal rather than touching MMIO again. ResumeCycle first completes
+        // any scheduler-owned read hold; the latched byte and IRQ/NMI sample
+        // belong to the original access even if the live pins have since changed.
         if(initial!=null && cursor<completed.Count) {ResumeCycle?.Invoke();var prior=completed[cursor];var sampled=samples[cursor++];sampleNmi=sampled.Nmi;sampleIrq=sampled.Irq;lastAddress=address??0;return prior.Value??0;}
         // Invalid idle pins often repeat unchanged throughout WAI. These immutable
         // observations and register caches contain only derived data; saves
@@ -132,6 +136,8 @@ public sealed partial class Cpu65816
         bool idle=pins.StartsWith("---",StringComparison.Ordinal);
         var pending=idle&&idleCache is {} cached&&cached.Address==address&&cached.Value==value&&cached.Pins==pins?cached:new CpuCycle(address,value,pins);
         if(idle)idleCache=pending;
+        // Admission may yield before the bus effect. Keep the first interrupt
+        // sample across that retry so host budget boundaries cannot resample it.
         pendingSample??=Sample(nmiLatched&&(InterruptPollingAllowed?.Invoke()??true),irqLine&&(P&I)==0&&(InterruptPollingAllowed?.Invoke()??true));
         sampleNmi=pendingSample.Nmi;sampleIrq=pendingSample.Irq;
         BeforeCycle?.Invoke(pending);

@@ -1,7 +1,19 @@
 # M9d network contract
 
+## Current follow-up
+
+This contract preserves the historical milestone below. Current persistence/CI,
+performance and accuracy evidence is in [R1](r1-persistence-ci.md),
+[R2](r2-performance-soak.md) and [R3](r3-accuracy.md). M9d networking was accepted
+on `2a5ae39`, Manager on `2534dba`, distribution on `0f8aadc`; later remote CI
+[40042721554](https://github.com/n1k0m0/SNESEmulator/actions/runs/40042721554)
+passed exact `b840f105`. Final-source duration/strict one-hour NTSC and PAL,
+final package and release acceptance remain due. Historical red measurements
+stay red and are not relabelled by later, differently scoped runs.
+
 M9d implements LAN TLS and the local-testable TLS/E2E relay path. Independent
-root acceptance is pending. This is not M9, distribution or release acceptance.
+root acceptance subsequently passed on `2a5ae39`. This is not final M9 or
+release acceptance.
 The own C# hardware core and format9 bytes are unchanged. Formats1–8 remain
 rejected. The18 M8 whole-console audio differences stay red;7000 raw SPC bus
 mismatches retain their source adjudication. M9a sustained realtime remains red
@@ -177,7 +189,7 @@ separate, never reclassified as unmuted playback. The original native runtime an
 persistence probes remain real OpenTK/GL processes with synthetic app callbacks;
 Windows stays locked, with no OS input or browser automation. Final clean-commit
 counts/raw reports/identities and frozen hashes are recorded after execution in
-[the M9d baseline](baselines/m9d.json). Independent root acceptance is still pending.
+[the M9d baseline](baselines/m9d.json). Independent root acceptance subsequently passed on `2a5ae39`.
 
 ### M9d clean implementation gate and frozen handoff
 

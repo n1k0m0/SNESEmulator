@@ -5,30 +5,30 @@ architecture of [C64Emulator](https://github.com/n1k0m0/C64Emulator).
 The SNES hardware core is developed in this repository; it does not embed a
 Snes9x, bsnes, or Libretro core.
 
-**Status: 0.1.0-preview — an experimental hardware core, without general
-game compatibility.** M0–M8, M9b worker/UI isolation, and M9c persistence have
-been independently reviewed. The clocked Mode 0–7 PPU supports sprites, windows,
-color math, offset-per-tile, high resolution, and Mode 7. M9d networking and M9e
-Manager were independently accepted on `2a5ae39`/`2534dba`; M9f distribution/CI
-was independently accepted on `0f8aadc`, subject to the documented CI limits.
+**Status: 0.1.0-preview — experimental, with scoped test evidence and no general
+commercial-game or original-hardware certification.** The independently developed
+C# core supports clocked Mode 0–7 graphics, SPC700/S-DSP stereo, DMA/HDMA, standard
+cartridge mappings and format-9 savestates. Worker/UI, persistence, networking,
+Manager and distribution have independent historical acceptance.
 
-M9g adds configurable input, display options, and reset controls. Its independent
-full acceptance run failed the software A/V limit; the separate label correction
-was verified ([evidence](docs/m9g-followup.md)). M9h contains a targeted software
-A/V correction, but sustained performance and M9/release acceptance remain open
-([performance and A/V follow-up](docs/m9h-performance-av.md)). Current persistence
-and cross-platform CI evidence is recorded in the
-[R1 follow-up](docs/r1-persistence-ci.md).
+Current follow-ups: [R1 persistence and remote CI](docs/r1-persistence-ci.md),
+[R2 performance and native A/V](docs/r2-performance-soak.md), and
+[R3 CPU accuracy and audio investigation](docs/r3-accuracy.md). R2's previous core
+passed long NTSC/PAL duration checks; the corrected worker passed strict
+360-second native probes. Final-source long tests, both strict one-hour native
+runs, the final package and final remote CI remain due after cartridge-chip work.
+The earlier hours completed with post-ready catchup and are not strict passes.
 
-Twenty unchanged licensed test programs and an external tech demo run through
-the custom core and two separately built references. Known audio differences
-and published hardware limitations remain open. The custom S-DSP produces
-phase-clocked native stereo. All 5,080,400 external CPU semantic and bus cases
-pass. The SPC suite covers 256,000 semantic/adjudicated bus cases: 249,000 match
-the raw expectations, while 7,000 require a source-supported indirect-Y
-adjudication. No original-console measurements have been made by this project.
-Native raw fields are 256/512 × 224/239 pixels; 453,726 native stereo pairs pass
-the independent digital DSP reference comparison.
+Each full CPU contract executes 5,080,400 cases; raw expectations differ in
+246 semantic and 264 bus cases after the reviewed indexed-indirect correction.
+A separate 264-case supplement documents the zero-filled sparse-RAM completion.
+SPC covers 256,000 approved cases, including 7,000 adjudicated raw bus differences.
+Three unchanged published functional ROMs also pass in NTSC and PAL.
+The original 18 full-sequence whole-console audio comparisons remain red.
+An isolated DSP trace matches 89,524 stereo pairs and 191,408 timed echo writes;
+this is software-reference evidence under identical external inputs.
+No original-console measurements have been made by this project. User-local
+Super Mario World and Zelda play observations are separate from formal coverage.
 
 See the [test laboratory](docs/test-laboratory.md),
 [M4 APU contract](docs/m4-apu-contract.md),
@@ -48,6 +48,9 @@ containing spaces are forwarded to the application.
 A self-contained Windows x64 package includes the emulator, `Manager/`, and
 `Updater/`, each with .NET runtime **10.0.13**; no SDK is needed to run it.
 Local published packages and test artifacts are not part of a fresh checkout.
+The local `publish/` still belongs to the accepted older M9f package; it is not
+a package of the current follow-ups. After moving the checkout, verify local
+shortcut targets before using them.
 No public release is currently published.
 
 Development requires the exact SDK version **10.0.402**, pinned in `global.json`.
@@ -97,11 +100,16 @@ The interface follows the C64 project.
 
 Local emulation pauses in menus; clients receive the host's menu status.
 SETTINGS includes SHARP/CRT/TV filters, GPU upscaling, fullscreen, gamepad
-enablement, controller port, volume, a custom CPU → SPC → DSP audio diagnostic
+enablement, controller port, volume, FIT/STRETCH presentation, a custom CPU → SPC → DSP audio diagnostic
 ROM, and bindings for the eight SNES action buttons. Gamepads also control the
 menus: Start+Select opens F10, A confirms, B goes back, and X saves in the F12
 menu. L+R+Select opens F12. Use the D-pad or left stick for directions.
 Default button numbers depend on the controller and can be customized.
+
+FIT uses the full available height with a 4:3 image when space permits; narrow
+windows fit by width. Optional persistent STRETCH fills the entire client area
+horizontally and vertically. SETTINGS and Manager expose the same setting.
+Status messages overlay the image for six seconds instead of reserving a footer.
 
 | SNES controller | Keyboard |
 |---|---|

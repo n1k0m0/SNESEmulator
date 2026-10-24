@@ -34,6 +34,9 @@ public static class AtomicFile
                 using(var file=new FileStream(temp,FileMode.CreateNew,FileAccess.Write,FileShare.None))
                 {write(file);Point("after-write");Point("before-flush");file.Flush(true);Point("after-flush");}
                 if(!IsValid(temp))throw new InvalidDataException("New persistence data failed validation; previous data retained.");
+                // Only a valid old primary may replace the last known-good
+                // backup. Preserve an invalid primary separately for diagnosis;
+                // failure before replacement must leave a recoverable generation.
                 if(File.Exists(p))
                 {
                     if(IsValid(p))

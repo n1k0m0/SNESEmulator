@@ -68,6 +68,9 @@ public sealed class NetworkPlayout : IDisposable
     private long timelineResetDrops,capacityResetDrops,sourceDriftResetDrops,shutdownResetDrops,failureResetDrops,invalidGenerationDrops,missingAudioClockDrops,lateAudioDrops,distantVideoDrops,deliveryFailureDrops;
     // All mutations already occur under commitGate. Capture all reasons together
     // so concurrent pumping/reset/shutdown cannot produce a misleading partial sum.
+    // These reason counters partition the same omitted-presentation total;
+    // they are not independent failures to add again. Cold readiness, steady
+    // measurement and disconnect cleanup are separate observation intervals.
     internal DropCounters ReadDropCounters(){lock(commitGate)return new(Dropped,timelineResetDrops,capacityResetDrops,sourceDriftResetDrops,shutdownResetDrops,failureResetDrops,invalidGenerationDrops,missingAudioClockDrops,lateAudioDrops,distantVideoDrops,deliveryFailureDrops);}
     public long Reanchors {get;private set;}
     public long PresentedVideo {get;private set;}

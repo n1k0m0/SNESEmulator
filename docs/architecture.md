@@ -1,5 +1,42 @@
 # Architecture and development status
 
+## Current status (R4, October 24, 2026)
+
+The current source uses **savestate format 9**. M9b worker/UI, M9c persistence,
+M9d networking, M9e Manager and M9f distribution have independent historical
+acceptance. [R1](r1-persistence-ci.md) records the later persistence correction
+and exact successful remote CI run. [R2](r2-performance-soak.md) records the
+SPC optimization and worker deadline correction; [R3](r3-accuracy.md) records
+the indexed-indirect CPU fix and the remaining accuracy limits.
+
+The reviewed CPU contracts execute 5,080,400 cases each for semantics and bus
+behavior. Raw expectations still disagree in 246 semantic and 264 bus cases;
+the separate, reviewed 264-case supplement explicitly completes unspecified
+flat RAM with zero. SPC has 256,000 approved cases, including 7,000 separately
+adjudicated raw bus differences. These are software-reference contracts.
+Three unchanged gilyon v1.4 functional ROMs pass in NTSC and PAL; they exclude
+interrupt/cycle/MMIO behavior specified by their upstream authors.
+
+All 18 default-profile M8 full-sequence audio comparisons remain accuracy
+failures. The isolated DSP input timeline matches 89,524 stereo pairs and
+191,408 timed echo writes; the laboratory-only 186-master-clock CPU-release
+experiment explains the bsnes mismatch under its source-defined reset epoch.
+It does not change the product reset/frequency or establish physical timing.
+Warm PPU reset, ares timing, analog output and unmeasured revisions remain open.
+
+The previous `97a05a7` core passed 37,000 NTSC fields (61 complete 600-field
+windows, minimum 1.00668155x) and 31,000 PAL fields (51 windows, minimum
+1.18235382x). The narrow NTSC margin is not transferable to later builds.
+Both old one-hour native runs completed but exposed post-ready catchup.
+The corrected worker passed strict 360-second NTSC/PAL probes; these scenes'
+source PCM was entirely zero, so they do not demonstrate audible stereo.
+**Final-source core duration gates, strict native 3600-second NTSC then PAL,
+package verification and final remote CI remain due after M10.**
+
+The sections below retain milestone measurements and their original scope.
+An old pass, open item or package identity describes that snapshot; it is not
+a claim that the current source or package has undergone the same validation.
+
 ## Relationship to C64Emulator
 
 The starting point is the local C64Emulator at commit
@@ -25,15 +62,17 @@ transport receive completed raw fields/sample blocks with independent ownership;
 bounded commands and field-bound input replace direct UI access to the core.
 Rational monotonic deadlines preserve every hardware tick independently of
 UI/VSync. The [M9b contract](m9-worker-contract.md) defines epochs, ownership,
-audio and error rules, and outstanding acceptance work.
+audio and error rules; its historical acceptance is distinct from final-source
+performance and release validation.
 
 ## Hardware foundation
 
 `Cpu65816` is an independently developed C# core with separate Read/Write/Internal
 cycles, emulation/native mode and serializable continuation. Completed MMIO
-effects are not repeated when execution resumes. All 5,080,400 pinned external
-semantic cases and 26,184,846 generic electrical bus rows pass. These software
-vectors are not measurements of a physical 5A22.
+effects are not repeated when execution resumes. The current full CPU contracts
+include the explicitly reviewed R3 indexed-indirect supplement and expose raw
+corpus disagreements separately. Historical M2 measured 26,184,846 generic bus
+rows. Neither source establishes physical 5A22 electrical conformance.
 
 `MasterClock` owns integer time, raster counters and stable typed events.
 `RunUntil(t)` stops exactly at t, including during CPU read hold, DMA, HDMA and
@@ -49,7 +88,7 @@ recursive chip mirroring, SRAM, PPU/APU ports and 5A22 I/O. `CpuIo` contains ALU
 intermediate states, timer IRQ/NMI holds, counter latches and serial/automatic
 JOY polling. `DmaController` takes over the bus with its own saved phases:
 A/B read after four clocks, write after another four, priority, start/end sync,
-HDMA tables and preemption. Savestate v8 stores these intermediate states and
+HDMA tables and preemption. Savestate v9 stores these intermediate states and
 binds the mapper as well as the ROM hash. See the [M3 contract](m3-io-contract.md)
 for precise limits and sources. PowerOn defines RAM test seeds; Reset preserves
 CPU WRAM and SRAM, but does not fully model all PPU reset pins.

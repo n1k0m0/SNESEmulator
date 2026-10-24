@@ -137,6 +137,8 @@ public sealed class EmulationWorker : IDisposable
         if(paced)deadline=pacer.Add(machine.Clock.Now-inputClock,machine.Profile,clock.Frequency,turbo?4:1);
         var result=new FieldOutput(epoch,frame,samples,inputSequence,inputClock,value,turbo,!paused&&(clock.Timestamp-deadline)/(double)clock.Frequency>.1);
         Volatile.Write(ref latest,result);
+        // Overflow drops presentation history only. Core time, completed field
+        // ownership and the source sample timestamps above have already committed.
         lock(gate){if(outputs.Count==OutputCapacity){dropped+=outputs.Count;outputs.Clear();}outputs.Enqueue(result);}
         return result;
     }

@@ -1,5 +1,16 @@
 # M9b worker, input and presentation contract
 
+## Current follow-up
+
+This contract preserves the historical milestone below. Current persistence/CI,
+performance and accuracy evidence is in [R1](r1-persistence-ci.md),
+[R2](r2-performance-soak.md) and [R3](r3-accuracy.md). M9d networking was accepted
+on `2a5ae39`, Manager on `2534dba`, distribution on `0f8aadc`; later remote CI
+[40042721554](https://github.com/n1k0m0/SNESEmulator/actions/runs/40042721554)
+passed exact `b840f105`. Final-source duration/strict one-hour NTSC and PAL,
+final package and release acceptance remain due. Historical red measurements
+stay red and are not relabelled by later, differently scoped runs.
+
 M9b moves the live own C# console into `SNESEmulator.Runtime`, a portable .NET10
 host assembly. The hardware scheduler, digital renderers and format9 hardware
 bytes are unchanged. M9a sustained NTSC/PAL realtime remains an open gate; this
@@ -26,7 +37,8 @@ Large capture commands can delay advancement; they are not hidden as a realtime
 success. Closing waits for owned I/O before final SRAM capture/write, then joins
 presentation and worker and closes transports. The same-ROM reload flushes the
 current SRAM before reading its target battery. Backup/recovery/fault-injection
-and periodic durable SRAM saving remain the next persistence package.
+and periodic durable SRAM saving were subsequently accepted in M9c and hardened
+in R1; see the linked persistence contract for the failure/recovery policies.
 
 Critical UI completions have a16-slot backpressured mailbox. Network/audio
 status text coalesces independently; a status burst cannot discard a completion
@@ -72,7 +84,7 @@ open menus or capture controls. Menu-era held buttons stay suppressed until
 released. Keyboard/gamepad local input is neutral in menus/background; remote
 client sends neutral immediately. The prior integration cases still run. M9d closes the revoke/regrant held-input
 gap with generation-tagged input and a fresh neutral-release boundary; see
-[the network contract](m9-network-contract.md), pending independent root review.
+[the network contract](m9-network-contract.md), accepted on `2a5ae39`.
 
 ## Video/audio handoff and limits
 
@@ -81,7 +93,9 @@ owned arrays. The worker shares only that readonly completed object, never
 `Ppu.Frame` or its mutable live planes. Arrays are not pooled or reused. Tests
 retain old fields while many later fields run and compare all three planes.
 Native256/512×224/239, field parity/display/timing interlace and rational clocks
-pass through unchanged. The host draws raw fields in the existing4:3 viewport.
+pass through unchanged. FIT presents a 4:3 image using the available client height
+(or width in a narrow window); optional persistent STRETCH fills the client area.
+These presentation choices do not alter native field geometry or hardware time.
 
 One output FIFO contains at most8 completed fields and owned native sample
 blocks. If presentation stalls, it clears stale entries, counts each omitted
@@ -89,7 +103,10 @@ presentation field and retains the newest. Hardware continues completely.
 A separate presentation task performs network encoding and local audio writes.
 It drains each field's native DSP queue once; UI consumes only Latest video.
 Clock gaps/epoch changes clear source queues and resampler prefetch/history.
-Local source buffering remains250ms/32000bytes. Turbo and >100ms deadline debt
+Local source buffering remains250ms/32000bytes. Debt is measured at field
+completion against that field's scheduled END, after exactly one rational pacer
+advance; paused deterministic Step does not advance host pacing. Turbo and
+>100ms deadline debt
 mute local/AUD2 presentation and clear audio history, while native samples and
 their timestamps remain available in `FieldOutput`. Catchup-muted fields are
 counted. When debt clears, presentation resumes at the current hardware time.

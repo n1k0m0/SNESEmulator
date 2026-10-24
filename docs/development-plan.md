@@ -1,7 +1,36 @@
 # Development plan: a highly faithful SNES emulator
 
-As of October 23, 2026. Starting point: commit `7145184`.
-Status: M0–M8 independently accepted. M9a: accuracy gate passed on `2dbeb5f`, sustained-performance target failing (38/62 NTSC windows); M9 remains incomplete. M9b Worker/UI, M9c persistence, M9d networking and M9e Manager are independently accepted. M9f distribution/CI is independently accepted on `0f8aadc`. M9g interaction parity is implemented on `2ab409d` and has received final targeted checks; the independent Root full gate on `8daf478` fails at the software A/V gate; the label correction is verified. Sustained performance, PAL measurement, a multi-hour soak, accuracy triage and M10 remain open.
+As of October 24, 2026. Historical starting point: commit `7145184`.
+
+## Ordered completion work
+
+The user requested one implementation agent at a time, with tests, useful code
+comments, current documentation, and a final commit/push. Current sequence:
+
+1. **R1 complete:** persistence/CI correction; exact remote run
+   [40042721554](https://github.com/n1k0m0/SNESEmulator/actions/runs/40042721554)
+   passed on `b840f105`.
+2. **R2 implementation complete:** SPC execution optimization, deadline correction,
+   counter-based soak diagnostics and scoped performance evidence. The final
+   build's duration/soak gates remain scheduled below.
+3. **R3 complete within documented scope:** CPU pointer correction, old-state
+   rejection, six published functional ROM runs, isolated DSP timeline and an
+   explicit reset-epoch experiment. Eighteen whole-console audio rows remain red;
+   physical reset/revision claims remain unverified.
+4. **R4 in progress:** comments/readability and current documentation. This stage
+   does not change hardware behavior or manufacture new correctness evidence.
+5. **M10 next:** DSP1, then SuperFX, then SA1, each with isolated, source-supported
+   behavior, mapping, timing, state continuation, tests and documented limits.
+   Other cartridge hardware/peripherals require their own scoped evidence.
+6. **Final integration due:** validate the actual final core on long NTSC/PAL
+   workloads, then strict native 3600-second NTSC and 3600-second PAL runs;
+   full Windows/Ubuntu regression, native published package, exact remote CI,
+   final commit and push. Earlier binary evidence cannot certify this final build.
+
+See [R1](r1-persistence-ci.md), [R2](r2-performance-soak.md),
+[R3](r3-accuracy.md) and the [current laboratory status](test-laboratory.md).
+M9/release and general original-hardware certification are not complete.
+The original milestone checklist below remains a historical development record.
 
 ## Goal and evidence
 

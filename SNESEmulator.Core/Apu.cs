@@ -47,6 +47,9 @@ public sealed class Apu : ISpcBus
     private readonly Timer[] timers=[new(),new(),new()];
     public Apu(byte[]? ipl=null)
     {
+        // Own IPL implements the upload protocol with independently authored
+        // code, not Nintendo-identical instruction timing. Identity is retained
+        // in states; choosing firmware must never silently change a golden.
         firmware=(ipl??OwnIpl.Bytes).ToArray();if(firmware.Length!=64)throw new InvalidDataException("SPC IPL must contain64 bytes");
         FirmwareHash=Convert.ToHexStringLower(SHA256.HashData(firmware));ExternallySuppliedFirmware=ipl!=null;
         OriginalFirmware=FirmwareHash=="c95f88b299030d5afa55b1031e2b5ef2dff650c4b4e6bb6f8b1359436521278f";
@@ -117,6 +120,9 @@ public sealed class Apu : ISpcBus
     // The internal electrical hooks admit/complete a bus cycle using its value
     // fields; allocate public records only for a retained port hold or observer.
     private int Selector(ushort? address)=>address==null||address is >=0xf0 and <=0xff||address>=0xffc0&&(Control&128)!=0?Test>>6:(Test>>4)&3;
+    // Port reads latch halfway through their selected bus period. The trailing
+    // hold is still real APU time: DSP and timers advance before the SPC decoder
+    // may consume the saved byte. Both halves survive a budget stop/save/load.
     private bool BeforeBusCycle(ushort? address,string direction)
     {
         if(!FinishHold())return false;
@@ -150,6 +156,10 @@ public sealed class Apu : ISpcBus
         while(true){if(!FinishHold()||!Cpu.RunInstruction()){FlushDsp();return;}}
     }
     private void FlushDsp(){var row=pendingDsp;pendingDsp=null;if(row!=null)dspObserved?.Invoke(row);}
+    // At a shared SMP/DSP endpoint, finish the DSP phase before the SMP effect,
+    // but defer its observer until the endpoint commit is complete. This order
+    // is a modeled digital contract; reset alignment to physical boards remains
+    // unverified (see the explicit R3 laboratory epoch experiment).
     private void AdvanceCrystal(long target,bool deferFinal)
     {
         while(Dsp.NextBoundary<=target){Crystal=Dsp.NextBoundary;Dsp.AdvanceTo(Crystal);if(Crystal!=target||!deferFinal)FlushDsp();}

@@ -81,8 +81,13 @@ claimed as pinned-runtime evidence. Native binaries were built from the precedin
 HEAD with the documented R1 diagnostic/comment patch before commit; their assembly
 version metadata is not relabelled as the later clean commit.
 
-Remote follow-up remains pending the coordinated push and its exact resulting
-run. The old remote failure is not declared fixed solely from local success.
+The exact remote follow-up
+[40042721554](https://github.com/n1k0m0/SNESEmulator/actions/runs/40042721554)
+passed on `b840f105bd61b54572246a397f4d476182b569cc`. Root downloaded 500 files
+and checked 287 groups per OS; readback is recorded in
+`artifacts/r1-persistence-ci/root-remote-ci-acceptance.json`. This acceptance
+belongs to that commit, not to subsequent R2/R3/R4 or future M10 changes.
+The earlier failed run remains failed.
 
 Commands use SDK 10.0.402/runtime 10.0.13, with process-local DOTNET_ROOT/PATH:
 

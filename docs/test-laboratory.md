@@ -1,4 +1,41 @@
-# Test laboratory: M0–M7 CPU, bus, I/O, SPC700, native PPU and stereo DSP
+# Test laboratory: current contracts and historical evidence
+
+## Current status (R4, October 24, 2026)
+
+The current source uses **savestate format 9**. M9b worker/UI, M9c persistence,
+M9d networking, M9e Manager and M9f distribution have independent historical
+acceptance. [R1](r1-persistence-ci.md) records the later persistence correction
+and exact successful remote CI run. [R2](r2-performance-soak.md) records the
+SPC optimization and worker deadline correction; [R3](r3-accuracy.md) records
+the indexed-indirect CPU fix and the remaining accuracy limits.
+
+The reviewed CPU contracts execute 5,080,400 cases each for semantics and bus
+behavior. Raw expectations still disagree in 246 semantic and 264 bus cases;
+the separate, reviewed 264-case supplement explicitly completes unspecified
+flat RAM with zero. SPC has 256,000 approved cases, including 7,000 separately
+adjudicated raw bus differences. These are software-reference contracts.
+Three unchanged gilyon v1.4 functional ROMs pass in NTSC and PAL; they exclude
+interrupt/cycle/MMIO behavior specified by their upstream authors.
+
+All 18 default-profile M8 full-sequence audio comparisons remain accuracy
+failures. The isolated DSP input timeline matches 89,524 stereo pairs and
+191,408 timed echo writes; the laboratory-only 186-master-clock CPU-release
+experiment explains the bsnes mismatch under its source-defined reset epoch.
+It does not change the product reset/frequency or establish physical timing.
+Warm PPU reset, ares timing, analog output and unmeasured revisions remain open.
+
+The previous `97a05a7` core passed 37,000 NTSC fields (61 complete 600-field
+windows, minimum 1.00668155x) and 31,000 PAL fields (51 windows, minimum
+1.18235382x). The narrow NTSC margin is not transferable to later builds.
+Both old one-hour native runs completed but exposed post-ready catchup.
+The corrected worker passed strict 360-second NTSC/PAL probes; these scenes'
+source PCM was entirely zero, so they do not demonstrate audible stereo.
+**Final-source core duration gates, strict native 3600-second NTSC then PAL,
+package verification and final remote CI remain due after M10.**
+
+The sections below retain milestone measurements and their original scope.
+An old pass, open item or package identity describes that snapshot; it is not
+a claim that the current source or package has undergone the same validation.
 
 M0 establishes measurement, not CPU or SNES accuracy. The original17 assertions
 are preserved as12 portable core regressions and5 Windows/network integrations.
