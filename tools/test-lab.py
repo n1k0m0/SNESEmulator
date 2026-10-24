@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Portable laboratory verification; --windows runs original5 transport cases.
+"""Portable laboratory verification; --windows adds the native Windows suites.
 --full requires all pinned CPU semantics. Sample-only omissions stay explicit.
 """
 import argparse, json, pathlib, subprocess, sys

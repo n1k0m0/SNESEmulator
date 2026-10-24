@@ -116,7 +116,7 @@ and DATA-ROM identity checks and remains ignored historical evidence.
 
 The accepted reference transcripts contain 4297 DSP1 / 4298 DSP1B timestamped SR/DR
 operations. Local own-core replay matches every recorded status/data value and
-resumes from 65 chip snapshots per variant. Negative controls change a parameter
+resumes from 65 chip snapshots per variant. Negative controls change a host-command
 input, a mathematical output sample and truncate an event; each must fail.
 Command 1F reads 2048 bytes but its values are **not in public testdata**: read
 operations carry a zero placeholder, with only byte count and SHA256 compared
@@ -205,3 +205,34 @@ Windows/Ubuntu executed report identities, binary/source hashes and exact
 remaining gates are recorded in the ignored `artifacts/m10a-dsp1/` handoff.
 Final long NTSC/PAL core performance, strict native hours, final package and
 remote CI run after the remaining M10 stages, not on every intermediate chip.
+
+## Executed scoped acceptance
+
+Implementation commit `eb78235849afc9863c077f7a78d4dfc857e16375` was built and
+executed with SDK 10.0.402 / runtime 10.0.13 on Windows and Ubuntu. Each OS passed
+30 public DSP1 functional groups,35 groups with explicit local firmware (including
+those public groups),25 runtime groups,14 Manager groups,27 compatibility-state
+groups,15 persistence groups and129 base-Core groups. These counts describe
+individual suites; they are not additive independent hardware validations.
+The raw source audit separately retains49 failures in 8192 cases, with zero
+unexpected differences; its constrained 1024 RT sample is separately identified.
+
+Windows base-Core completed in 209.328 seconds. Ubuntu's first isolated-build
+Core attempt passed 123 groups and failed 6 because existing four-parent fixture
+resolution targeted the isolated output directory. That red report is preserved.
+A directory link at `artifacts/m10a-dsp1/ubuntu/testdata` points to the unchanged
+repository `testdata` directory; the same binaries then passed 129 groups in
+213.435 seconds under the unchanged 600-second watchdog. No product or fixture
+bytes changed for that rerun. Other already-passing suites were not repeated.
+
+The rejected-state test uses a 2048-byte synthetic battery cartridge, saved SRAM
+filled with 3C and a distinct live A5 pattern. A firmware-identity rejection must
+retain the real nonempty live bytes. Public invocation metadata explicitly says
+that local DSP1/DSP1B firmware was not executed; local 35-group evidence is separate.
+Actual owned Windows CLR/JIT modules and Ubuntu `/proc` library mappings identify
+private runtime 10.0.13; source, binary, fixture and report SHA256 values are indexed
+in `artifacts/m10a-dsp1/handoff.json`. The small later documentation follow-up
+changes no C# source; its Python change is only the module docstring.
+
+Final integrated duration/performance, strict native NTSC/PAL hours, final package,
+remote CI and push remain the parent sequence's later work after SuperFX/SA1.
