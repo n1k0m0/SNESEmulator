@@ -92,8 +92,9 @@ public sealed class MasterClock(HardwareProfile profile)
                 case HardwareEventKind.VblankNmi:VblankStarted?.Invoke();break;
             }
             EventObserved?.Invoke(e);
-            // Publish peripheral work after every typed event at this timestamp
-            // has committed. An observer must not capture a half-processed tie.
+            // Invoke PeripheralAdvanced after all typed events at this timestamp
+            // have committed. EventObserved above intentionally reports each
+            // event individually; it does not promise an atomic same-clock view.
             if(events.Count==0||events[0].Clock!=Now)PeripheralAdvanced?.Invoke();
         }
         AdvanceRaw(target);
