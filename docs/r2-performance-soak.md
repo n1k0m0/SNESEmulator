@@ -238,7 +238,8 @@ Individual Interlocked reads are not one joint atomic field-boundary snapshot.
 A ring retains the latest 256 counter changes and explicitly counts evicted
 detail; cumulative totals continue without loss. Ten deterministic observer/
 drop tests include last-window changes, cold-baseline immutability, overflow,
-regression, stale-generation rejection and concurrent enqueue/reset/shutdown.
+regression, stale-generation rejection, concurrent enqueue/reset snapshots,
+and shutdown after the concurrent tasks have joined.
 
 Network drop reasons are disjoint under the existing commit lock. Explicit
 public timeline/disconnect resets, capacity resets, source drift, invalid
@@ -255,8 +256,9 @@ The first improved observer reproduced four real post-ready muted fields in a
 360-second NTSC diagnostic and correctly returned failure. Its initially
 first-only detail buffer overflowed visibly; the later ring fixes that loss of
 recent context. Original failed reports remain preserved. A separate late
-WinError299 occurred while querying a normally closing Manager's unloading
-modules. Later wrappers stop new module reads at the owned native close signal
+WinError299 was observed during owned normal close while querying Manager
+modules. The close overlap is established; the precise Windows error mechanism
+is not. Later wrappers stop new module reads at the owned native close signal
 and retain the actual successful near-end module identities and timestamps.
 
 ## Bounded corrected-runtime evidence and remaining release gate
