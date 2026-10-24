@@ -81,9 +81,9 @@ internal static class SoakSmoke
         object? endMetrics=null;long endMaster=0,endFields=0;bool completed=false;
         void ObserveQuality(double now,SNESEmulator.Runtime.WorkerStatus status)
         {
-            // The owner marks CatchingUp before advancing its next deadline.
-            // Status reports the updated deadline, so it cannot replace actual
-            // output counters; a ten-second sample also misses short episodes.
+            // The owner advances the deadline before publishing each output.
+            // Status and output are observed asynchronously; cumulative counters
+            // retain short catchup episodes that a periodic sample can miss.
             var presentationCounters=window.PresentationCountersForProbe;
             var currentDropReasons=observed?.ReadDropCounters();
             quality.Observe(now,presentationCounters,currentDropReasons?.Total??0,status.Field,window.ProbeOutput?.CatchingUp??false,status.PacingLateSeconds);
