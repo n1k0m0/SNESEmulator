@@ -1,96 +1,94 @@
-# R2: Dauerleistung und native Dauertests
+# R2: sustained performance and native application soaks
 
-Dieser Schritt ist in Arbeit. Er ist keine Freigabe für M9 oder vollständige
-Hardwaretreue. Die Reihenfolge bleibt Persistenz/CI → Dauerleistung/Soak →
-Genauigkeit → Lesbarkeit/Dokumentation → Zusatzchips.
+This step is in progress. It does not release M9 or claim complete hardware
+accuracy. The authorized order remains persistence/CI, sustained performance
+and soaks, accuracy, readability/documentation, then enhancement chips.
 
-## Implementierung
+## Implementation
 
-Der SPC700 behält seinen eigenen C#-Decoder. Für23 gemessene häufige Formen
-führt ein expliziter Mikrooperations-CFG dieselben Buszyklen aus und behält
-Decoderlokale zwischen Timinggrenzen. Alle übrigen Opcodes verwenden bewusst
-den bisherigen Replaydecoder. Ein Wiedereintritt verzweigt zum gespeicherten
-Punkt; erfolgreiche Zyklus-/Registerübergänge gehen direkt zum Folgeschritt,
-statt erneut eine große sparse Switch-Tabelle auszuwerten.
+The SPC700 retains its independently developed C# decoder. An explicit
+micro-operation CFG executes the same bus cycles for 23 measured common forms
+and preserves decoder locals between timing boundaries. Other opcodes
+intentionally use the existing replay decoder. Resume and opcode selection
+choose a phase; successful cycle/register transitions use direct edges instead
+of repeatedly evaluating a large sparse switch.
 
-`tools/generate-spc-hotpath.py` enthält die benannten Mikroprogramme und prüft
-den SHA256 des besprochenen Legacydecoders. `--check` weist unveränderte
-Generierung nach. Decoderänderungen erfordern erneute fachliche Prüfung und
-die unabhängigen Vector-/Suspendtests. Der Generator ist keine Hardwarequelle.
+`tools/generate-spc-hotpath.py` contains the named microprograms and verifies
+the SHA256 of the reviewed legacy decoder. `--check` verifies reproducible
+output. Decoder changes require another microprogram review and independent
+vector/suspension tests. The generator is not a hardware reference.
 
-Der interne Busadapter übergibt Adresse/Wert/Richtung ohne eine öffentliche
-Zyklusklasse für jeden rein internen Timingversuch anzulegen. Der private
-Journalwert wird bei Capture in weiterhin unveränderliche öffentliche
-`SpcCycle`-Datensätze umgewandelt. Die Diagnosezähler gehören zur jeweiligen
-CPU und sind kein globaler öffentlicher Produktzustand.
+The internal electrical adapter passes address/value/direction without
+allocating a public cycle record for every internal timing attempt. Capturing
+the private value journal still produces immutable public `SpcCycle` records.
+Diagnostic counters belong to each CPU and are not public global product state.
 
-State9 bleibt unverändert: Die zusätzlichen Felder sind Decoderlokale und
-werden nach Restore aus Entry und Completed rekonstruiert. Vorherige MMIO-
-Effekte und Beobachterbenachrichtigungen werden dabei nicht erneut ausgeführt.
-Insbesondere erfolgt PC++ erst nach dem Read/Postlatch-Resume.
+State9 is unchanged: additional fields are decoder locals, reconstructed from
+Entry and Completed after restore. Completed MMIO effects and observer
+notifications are not repeated. In particular, PC++ waits until the read and
+its postlatch suspension have resumed.
 
-## Admission, Postlatch und Lebensdauer
+## Admission, postlatch, and lifetime
 
-Ein Legacy-Veto wird vor elektrischer APU-Zulassung geprüft. Damit entsteht
-kein zusätzlicher nicht serialisierter Zustand zwischen einer bereits
-vorgerückten APU und einem noch nicht journalisierten Buszugriff. Nach einem
-begangenen Zugriff erhalten beide Completionhooks ihre Benachrichtigung,
-auch wenn einer einen Yield verlangt. Das Journal steht vorher bereits fest.
+A legacy veto runs before electrical APU admission. This prevents a new,
+unserialized intermediate state between advanced APU timing and an
+unjournaled bus effect. Both completion hooks observe each committed access,
+even when one requests suspension. The journal is already committed first.
 
-Sieben gezielte Fälle decken diese Kombination, Bus-/Observerunterdrückung,
-Capture/Restore nach Veto, den halb gehaltenen F4-Portread sowie Reset und
-explizites Ersetzen einer Continuation ab. Der isolierte erste Kandidat
-verfehlte vier davon; der korrigierte Kandidat und der integrierte Code
-bestanden alle sieben. Die ursprüngliche Produktversion hatte diese neuen
-internen Hookkombinationen noch nicht.
+Seven targeted cases cover hook composition, suppressing premature bus and
+observer calls, capture/restore after a veto, a half-held F4 port read, reset,
+and explicit replacement of a continuation. The first isolated candidate
+failed four cases. The corrected candidate and integrated implementation
+passed all seven. The original product did not have these new internal hook
+combinations.
 
-## Bisherige Prüfung
+## Verification so far
 
-Auf dem integrierten Quellstand bestanden die18.952 unveränderten eingefrorenen
-Suspend-/Resume-Fälle und alle256.000 SPC-Vektoren über RunInstruction.
-23.000 Vectorfälle laufen tatsächlich über die23 Mikroprogramme,233.000
-über den expliziten Legacyfall. Die bisherige Step-Prüfung bleibt zusätzlich
-bestehen. Die7.000 bekannten Rohbusabweichungen und deren bereits genehmigte
-Adjudikation werden weiterhin getrennt berichtet; sie sind kein Raw-All-Pass.
+The integrated source passed all 18,952 unchanged frozen suspension/resume
+cases and 256,000 SPC vectors through RunInstruction. Exactly 23,000 vector
+cases execute the 23 microprograms; 233,000 explicitly use the replay decoder.
+The original Step verification remains separate. The existing 7,000 raw bus
+differences and their approved adjudication remain separately reported; this
+is not a raw-all-pass claim.
 
-Die neue Kompositionsprüfung und der Regenerationscheck sind Teil des normalen
-Test-Labors. Der zusätzliche `spc-run-full`-Befehl prüft alle Vektoren über den
-integrierten Fortsetzungspfad und berichtet tatsächliche Hot-/Legacy-Zähler.
-CPU-/Busvollsuite, weitere Console-/Horizon-/A/V-Regressionen und die erneute
-Dauerabnahme des endgültigen Quellstands stehen noch aus.
+The composition suite and regeneration check are part of the normal test lab.
+The additional `spc-run-full` command executes every vector through the
+integrated continuation entry point and reports actual hot/replay counters.
+The CPU/bus full suites, remaining console/horizon/A/V regressions, and final
+sustained acceptance are still pending.
 
-## Messung und Grenzen
+## Measurements and limits
 
-Frühere M9h-Dauertests bleiben rot: NTSC54/61 und PAL17/51 vollständige
-600-Feld-Fenster unter Echtzeit. Beide Regionen wurden tatsächlich gemessen.
-Die Grenze wird nicht durch einen guten Gesamtmittelwert ersetzt.
+Previous M9h sustained tests remain red: 54/61 NTSC and 17/51 PAL complete
+600-field windows were below realtime. Both regions actually ran. A good
+overall mean does not replace the per-window criterion.
 
-Neue isolierte Coroutine-/Slot-/Scheduler- und zunächst sparse Flat-Prototypen
-lieferten keinen verlässlich wiederholten Gesamtgewinn und wurden nicht
-übernommen. Alle roten Läufe und die tatsächlichen Modul-/Runtimehashes bleiben
-unter `artifacts/r2-performance-soak` erhalten. Die Messung verwendete den
-privaten SDK10.0.402/Runtime10.0.13; globale Toolchains und Hostpriorität,
-Affinity oder Energieeinstellungen wurden nicht geändert.
+New isolated coroutine, slot, scheduler, and initially sparse flat prototypes
+did not deliver a reliably repeated whole-console gain and were not adopted.
+Their failed runs and actual module/runtime hashes remain under
+`artifacts/r2-performance-soak`. Measurements used the private SDK10.0.402 and
+runtime10.0.13. Global toolchains and host priority, affinity, and power
+settings were not changed.
 
-Der direkte Goto-Prototyp bestand einen begrenzten balancierten Vergleich:
-je600 identische Warmupfelder, dann denselben6600-Startstate erneut laden und
-2400 Felder messen. Original1,52145x/1,49487x, Kandidat1,59719x/1,59662x;
-alle16 vollständigen Fenster grün, kombinierter relativer Gewinn5,89%.
-Video, native Ebenen, PCM und komplette Endstates stimmen exakt überein.
-Das ist eine eigene Vorher-/Nachherregression, kein unabhängiger Hardwarebeleg.
-Dieser Vergleich ersetzt weder die endgültige Quellstandprüfung noch die
-langen NTSC37000-/PAL31000-Feld-Gates oder die echten Stunden-Soaks.
+The direct-goto prototype passed a bounded balanced comparison: each process
+ran 600 identical warmup fields, reloaded the same field6600 state, then
+measured 2,400 fields. Controls reached 1.52145x/1.49487x and candidates
+1.59719x/1.59662x. All 16 complete windows passed, with a combined relative gain
+of 5.89%. Video/native planes, PCM, and full endstates matched exactly. This is
+an own before/after regression, not an independent hardware measurement.
+The integrated readable implementation requires its own fresh measurement;
+prototype results do not replace its acceptance, the NTSC37,000/PAL31,000-field
+sustained gates, or the actual hour-long application soaks.
 
-EventPipe-Samplezuordnung und tatsächliche GC-Suspenddauer sind ausdrücklich
-verschiedene Größen. Die auffällige PollGC-Samplezuordnung ist ungeklärt;
-sie beweist keine GC-Ursache. Periodisches Sampling jeder1024sten Methode kann
-mit Emulationsperioden aliasieren. Die spätere Callindex-Hashauswahl bleibt
-ebenfalls eine instrumentierte Beobachtung mit Timer-/Wrapperaufwand, keine
-Echtzeitabnahme.
+EventPipe sample attribution and actual GC suspension duration are different
+quantities. The unusual PollGC sample attribution is unresolved and proves no
+GC cause. Sampling every 1,024th call may alias with emulation periods. The
+later call-index hash selection is still an instrumented observation with
+timer/wrapper overhead, not a realtime acceptance test.
 
-Die ausstehenden nativen Tests müssen jeweils3600 echte Wallsekunden NTSC und
-PAL mit normalem Pacing, Eingaben, TLS/WinMM, echtem WPF-Manager und Bibliotheks-
-last laufen. Beide Regionen werden auch nach einem Readinessfehler ausgeführt.
-Cold zählt weiter zur kumulativen40-ms-A/V-Grenze. Quell-PCM vor Gain und
-physische Audio-/Displaylatenz werden klar getrennt; ein erfolgreicher Test
-behauptet keinen eigenen Originalhardware-Abgleich.
+The remaining native tests must each run 3,600 actual wall seconds of NTSC and
+PAL with normal pacing, input, TLS/WinMM, the actual WPF Manager, and library
+load. Both regions run even after a readiness failure. Cold observations still
+count toward the cumulative 40-ms A/V limit. Source PCM before gain is reported
+separately from physical audio/display latency. Passing does not imply an
+original-hardware comparison.
