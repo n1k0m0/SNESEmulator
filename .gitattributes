@@ -62,3 +62,5 @@ tools/dsp1-reference.cpp text eol=lf
 /testdata/superfx/*.gz binary
 
 /testdata/superfx/manifest.json binary
+
+/docs/m10b-evidence-manifest.json text eol=lf
