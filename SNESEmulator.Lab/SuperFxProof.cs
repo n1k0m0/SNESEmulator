@@ -214,9 +214,14 @@ static class SuperFxProof
         });
         foreach(var p in new[]{HardwareProfile.Ntsc,HardwareProfile.PalProfile})
         Test("65816 authored ROM cache/shared RAM/IRQ and2MC snapshot replay "+p.Id,()=>{
-            var m=Machine(p);m.RunUntil(30000);Check(m.Cpu.Stopped&&m.Bus.Wram[0]==0x34&&m.Bus.Wram[1]==0x12&&(m.Bus.Wram[2]&128)!=0,"CPU/GSU mailbox terminal");Check(m.Bus.Cartridge!.Sram[0x22]==0x35,"Second GSU mailbox");
+            var m=Machine(p);var dma=new List<SNESEmulator.Core.BusAccess>();m.Bus.AccessOriginObserved=a=>{if(a.Origin is AccessOrigin.DmaA or AccessOrigin.DmaB)dma.Add(a);};m.RunUntil(60000);Check(m.Cpu.Stopped&&m.Bus.Wram[0]==0x34&&m.Bus.Wram[1]==0x12&&(m.Bus.Wram[2]&128)!=0,"CPU/GSU mailbox terminal");Check(m.Bus.Cartridge!.Sram[0x22]==0x35,"Second GSU mailbox");
+            Check(m.Bus.Wram[3]==3&&m.Bus.Cartridge.Sram[0x114]==0x40&&m.Bus.Cartridge.Sram[0x115]==0x40,"GSU PLOT/RPIX literal planar mailbox");
+            Check(m.Bus.Ppu.Vram[0x100]==0x40&&m.Bus.Ppu.Vram[0x101]==0x40,"GSU planar row did not reach PPU VRAM");
+            Check(dma.Count(a=>a.Origin==AccessOrigin.DmaA&&a.Direction=="read"&&a.Address is 0x700114 or 0x700115&&a.Value==0x40)==2&&dma.Count(a=>a.Origin==AccessOrigin.DmaB&&a.Direction=="write"&&a.Address is 0x2118 or 0x2119&&a.Value==0x40)==2,"Literal DMA A/B origin and nonzero transfer bytes");
+            m.RunFrame();m.RunFrame();var image=m.Bus.Ppu.CompletedFrame!.Native.ToArray();m.RunFrame();Check(image.AsSpan().Contains((ushort)0x7fff)&&image.AsSpan().SequenceEqual(m.Bus.Ppu.CompletedFrame!.Native.Span),"GSU/DMA/PPU nonzero stable rendered field");
+            report.Metadata[p.Pal?"palGsuWhitePixels":"ntscGsuWhitePixels"]=image.Count(pixel=>pixel==0x7fff);
             var final=StateSerializer.Capture(m);var source=Machine(p);
-            long start=0;while(((SuperFxCartridgeHardware)source.Bus.Cartridge!.Hardware!).Processor.Instructions==0&&start<25000){start+=20;source.RunUntil(start);}Check(start<25000,"GSU never activated");var seen=new HashSet<int>();
+            long start=0;while(((SuperFxCartridgeHardware)source.Bus.Cartridge!.Hardware!).Processor.Instructions==0&&start<50000){start+=20;source.RunUntil(start);}Check(start<50000,"GSU never activated");var seen=new HashSet<int>();
             for(int t=0;t<=600;t+=2){source.RunUntil(start+t);seen.Add(((SuperFxCartridgeHardware)source.Bus.Cartridge!.Hardware!).Processor.Capture().Phase);var raw=StateSerializer.Capture(source);using var mem=new MemoryStream();using(var z=new GZipStream(mem,CompressionLevel.Fastest,true))z.Write(raw);mem.Position=0;var loaded=StateSerializer.Load(source.Bus.Cartridge!,mem);source.RunUntil(start+t+200);loaded.RunUntil(start+t+200);Check(StateSerializer.Capture(source).SequenceEqual(StateSerializer.Capture(loaded)),"2MC continuation"+t);source=Machine(p);}
             report.Metadata[p.Pal?"palSystemSnapshots":"ntscSystemSnapshots"]=301;Check(seen.Count>=2,"No active GSU phase coverage");
         });
