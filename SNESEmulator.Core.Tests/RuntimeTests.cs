@@ -28,6 +28,12 @@ static class RuntimeTests
     }
     public static void Run(Action<string,Action> test,string root)
     {
+        test("M10c worker SA1 direct pixel PCM state replay and immutable board load",()=>{
+            var rom=SNESEmulator.Testing.Sa1DiagnosticRom.Create();var config=new Sa1Configuration();
+            using var w=new EmulationWorker();Await(w.InsertAsync(rom,hardware:config));var direct=new SnesSystem();direct.Insert(new Cartridge(rom,hardware:config));
+            for(int i=0;i<3;i++){direct.RunFrame();var output=Await(w.StepAsync(default));Compare(direct,output,"SA1 worker");Check(StateSerializer.Capture(direct).SequenceEqual(Await(w.CaptureAsync())),"SA1 full processor/shared RAM/pending state");}
+            var raw=Await(w.CaptureAsync());string file=Path.Combine(root,"sa1-worker.snessav");StateSerializer.SaveCaptured(raw,file,direct.Bus.Cartridge!);Await(w.ResetAsync());Await(w.LoadAsync(File.ReadAllBytes(file)));Check(raw.SequenceEqual(Await(w.CaptureAsync())),"SA1 isolated load");Await(w.PowerCycleAsync());Check(w.Status.MasterClock==0,"SA1 power epoch");
+        });
         test("M10b worker SuperFX direct replay and immutable board load",()=>{
             var rom=SNESEmulator.Testing.SuperFxDiagnosticRom.Create();var config=new SuperFxConfiguration(SuperFxRevision.Gsu2);
             using var w=new EmulationWorker();Await(w.InsertAsync(rom,hardware:config));var direct=new SnesSystem();direct.Insert(new Cartridge(rom,hardware:config));

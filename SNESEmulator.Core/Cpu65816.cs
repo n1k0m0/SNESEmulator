@@ -7,6 +7,14 @@ public sealed partial class Cpu65816(ICpuBus bus)
     public byte P, PBR, DBR;
     public bool E = true, Waiting, Stopped;
     public long Instructions;
+    // Only the SA-1 processor enables the ROM-prefetch refill cycle. Generic
+    // 65816 and S-CPU cycle streams keep their existing byte-exact contract.
+    public bool Sa1RomPrefetchTiming {get;init;}
+    internal bool Sa1PrefetchCycle {get;private set;}
+    private void Sa1FlowIdle(bool branch=false)
+    {if(Sa1RomPrefetchTiming&&(!branch||(PC&1)!=0)&&((PBR&0x40)==0&&PC>=0x8000||PBR>=0xc0)){
+        Sa1PrefetchCycle=true;try{Idle(PBR<<16|PC);}finally{Sa1PrefetchCycle=false;}
+    }}
     private const byte C = 1, Z = 2, I = 4, Decimal = 8, Index8 = 16, Memory8 = 32, V = 64, N = 128;
     private bool M8 => E || (P & Memory8) != 0;
     private bool X8 => E || (P & Index8) != 0;
@@ -122,7 +130,7 @@ public sealed partial class Cpu65816(ICpuBus bus)
         else Flag(C, subtract ? binary >= 0 : binary > mask);
         SetA(result);
     }
-    private void Branch(bool condition) { sbyte delta = (sbyte)Fetch(); if (condition) {Idle();int before=PC;PC=(ushort)(PC+delta);if(E&&(before&0xff00)!=(PC&0xff00))Idle();} }
+    private void Branch(bool condition) { sbyte delta = (sbyte)Fetch(); if (condition) {Idle();int before=PC;PC=(ushort)(PC+delta);if(E&&(before&0xff00)!=(PC&0xff00))Idle();if(Sa1RomPrefetchTiming)Sa1FlowIdle(true);} }
     private int Execute()
     {
         if (Stopped || Waiting) {Idle(PBR<<16|PC);return 1;}
@@ -180,7 +188,7 @@ public sealed partial class Cpu65816(ICpuBus bus)
             case 0x7B: A = (ushort)Nz(D, false); break;
             case 0x7C: { int a = (Fetch16() + X) & 65535; Idle(); PC = (ushort)Read16(PBR << 16 | a); break; }
             case 0x80: Branch(true); break;
-            case 0x82: { short d = (short)Fetch16(); Idle(); PC = (ushort)(PC + d); break; }
+            case 0x82: { short d = (short)Fetch16(); Idle(); PC = (ushort)(PC + d);if(Sa1RomPrefetchTiming)Sa1FlowIdle(true); break; }
             case 0x88: Y = (ushort)Nz(Y - 1, X8); break;
             case 0x8A: SetA(X); break;
             case 0x8B: Push(DBR); break;
@@ -286,6 +294,7 @@ public sealed partial class Cpu65816(ICpuBus bus)
                 else throw new NotSupportedException($"Opcode {op:X2} at {instructionAddress:X6}");
                 break;
         }
+        if(Sa1RomPrefetchTiming&&op is 0x20 or 0x22 or 0x40 or 0x4c or 0x5c or 0x60 or 0x6b or 0x6c or 0x7c or 0xdc or 0xfc)Sa1FlowIdle();
         return 4;
     }
 }

@@ -171,6 +171,7 @@ public static class StateSerializer
         if(version==10){
             bool external=b.ExternalIrqLine;
             b.Cartridge!.Hardware!.Restore(Json<CartridgeHardwareState>(r.ReadString())??throw new InvalidDataException("Missing cartridge hardware state"),m.Clock.Now,m.Profile);
+            if(b.Cartridge.Hardware is Sa1CartridgeHardware sa&&sa.IrqOutput!=external)throw new InvalidDataException("Inconsistent SA-1 IRQ line.");
             if(b.Cartridge.Hardware is SuperFxCartridgeHardware fx&&fx.Processor.IrqOutput!=external)throw new InvalidDataException("Inconsistent SuperFX IRQ line.");
         }
         p.ValidateClock();

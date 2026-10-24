@@ -9,7 +9,7 @@ Snes9x, bsnes, or Libretro core.
 commercial-game or original-hardware certification.** The independently developed
 C# core supports clocked Mode 0–7 graphics, SPC700/S-DSP stereo, DMA/HDMA, standard
 cartridge mappings, normal format 9 savestates and explicitly configured DSP1
-cartridges with versioned format 10 state. Worker/UI, persistence, networking,
+cartridges, explicit SuperFX boards and SA-1 boards with versioned format10 state. Worker/UI, persistence, networking,
 Manager and distribution have independent historical acceptance.
 
 Current follow-ups: [R1 persistence and remote CI](docs/r1-persistence-ci.md),
@@ -80,8 +80,7 @@ external M8 programs currently provide evidence only for LoROM and HiROM.
 uPD7725 with explicitly supplied, hash-bound local firmware and selected board.
 [SuperFX setup and evidence](docs/m10b-superfx.md) adds a scoped own GSU model
 with explicit board/clock configuration and shared RAM, graphics, DMA, IRQ and
-state integration. DSP2/3/4, SA1 and other cartridge hardware remain unsupported;
-SA1 is the next sequential stage. Original source-author FMULT-R4 and other
+state integration. [SA-1 setup and evidence](docs/m10c-sa1.md) adds own dual-CPU/MMC/DMA/character-conversion integration. DSP2/3/4 and other cartridge hardware remain unsupported. Original source-author FMULT-R4 and other
 accuracy contradictions remain visible; neither chip stage certifies all games.
 
 Updates are disabled by default. Configure your own source under
@@ -296,4 +295,4 @@ M10b adds the scoped own C# SuperFX shared-bus model, explicit board configurati
 resumable microphases and separately reported manufacturer/software conflicts.
 See [M10b SuperFX](docs/m10b-superfx.md). Its functional diagnostics are separate from the still-red
 raw accuracy inventory and local source-author FMULT destination-R4 contradiction.
-SA1 and final integrated long/native-hour gates remain separate pending work.
+SA-1 now has a scoped digital implementation; see [M10c SA-1](docs/m10c-sa1.md). Published hardware timing differences and final integrated long/native-hour gates remain open.

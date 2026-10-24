@@ -33,14 +33,14 @@ public sealed class Cartridge
         int selected = Array.IndexOf(scores, scores.Max());
         Mapping = Options.Mapping ?? (CartridgeMapping)selected;
         if(!Enum.IsDefined(Mapping))throw new InvalidDataException("Unknown cartridge mapping override.");
-        if(image.Length>0x400000&&Mapping is CartridgeMapping.LoRom or CartridgeMapping.HiRom)
-            throw new NotSupportedException("LoROM/HiROM wire at most4 MiB; select a documented extended mapper for larger normal boards.");
-        int header = headers[(int)Mapping];
+                int header = headers[(int)Mapping];
         if (header + 64 > image.Length || (Options.Mapping == null && scores.Max() < 0))
             throw new InvalidDataException("No valid SNES header/reset vector found for selected mapping.");
         byte mode = image[header + 0x15], chipset = image[header + 0x16];
-        if (chipset is not (0 or 1 or 2 or 3 or 5 or 0x13 or 0x14 or 0x15 or 0x1a) || (Options.Mapping == null && (mode & 15) is not (0 or 1 or 2 or 5)))
-            throw new NotSupportedException($"Cartridge hardware {mode:X2}/{chipset:X2} is not implemented (normal discrete mappers only).");
+        if(image.Length>0x400000&&Mapping is CartridgeMapping.LoRom or CartridgeMapping.HiRom&&chipset is not (0x34 or 0x35))
+            throw new NotSupportedException("LoROM/HiROM wire at most4 MiB; select a documented extended mapper for larger normal boards.");
+        if (chipset is not (0 or 1 or 2 or 3 or 5 or 0x13 or 0x14 or 0x15 or 0x1a or 0x34 or 0x35) || (Options.Mapping == null && ((mode & 15) is not (0 or 1 or 2 or 5)&&!((mode&15)==3&&chipset is 0x34 or 0x35))))
+            throw new NotSupportedException($"Cartridge hardware {mode:X2}/{chipset:X2} is not supported by the implemented cartridge boards.");
         if(chipset is 3 or 5)
         {
             var dsp=hardware as Dsp1Configuration??(hardware==null?Dsp1Configuration.Resolve(sourcePath):throw new InvalidDataException("DSP1 configuration required."));
@@ -57,14 +57,20 @@ public sealed class Cartridge
             if(Mapping!=CartridgeMapping.LoRom||image.Length>0x200000)throw new InvalidDataException("Supported SuperFX boards require LoROM and at most2MiB ROM.");
             HardwareConfiguration=fx;
         }
-        else if(hardware!=null)throw new InvalidDataException("DSP1 hardware supplied for a normal cartridge.");
+        else if(chipset is 0x34 or 0x35)
+        {
+            var sa=hardware as Sa1Configuration??(hardware==null?Sa1Configuration.Resolve(sourcePath):throw new InvalidDataException("SA-1 configuration required."));
+            sa.Validate();if(Mapping!=CartridgeMapping.LoRom||(mode&15)!=3)throw new InvalidDataException("SA-1 requires its MMC mapper with the header at007FC0 and map mode3.");HardwareConfiguration=sa;
+        }
+        else if(hardware!=null)throw new InvalidDataException("Enhanced hardware configuration supplied for a normal cartridge.");
         Rom = image.ToArray();
         Title = Encoding.ASCII.GetString(image, header, 21).Trim(' ', '\0');
         Hash = Convert.ToHexString(SHA256.HashData(image)); SourcePath = sourcePath;
         Pal = Options.Pal ?? (image[header + 0x19] is >= 2 and <= 12);
         int size = image[header + 0x18];
         if (size > 9) throw new NotSupportedException("SRAM size exceeds 512 KiB.");
-        Sram = new byte[HardwareConfiguration is SuperFxConfiguration fxConfig?fxConfig.RamBytes:(size == 0 ? 0 : 1024 << size)];
+        Sram = new byte[HardwareConfiguration is Sa1Configuration saConfig?saConfig.RamBytes:HardwareConfiguration is SuperFxConfiguration fxConfig?fxConfig.RamBytes:(size == 0 ? 0 : 1024 << size)];
+        if(HardwareConfiguration is Sa1Configuration saHardware)Hardware=new Sa1CartridgeHardware(saHardware,Rom,Sram);
         if(HardwareConfiguration is SuperFxConfiguration fxHardware)Hardware=new SuperFxCartridgeHardware(fxHardware,Rom,Sram);
         int checksum = image[header+0x1c] | image[header+0x1d]<<8;
         int complement = image[header+0x1e] | image[header+0x1f]<<8;

@@ -1,8 +1,8 @@
 # Architecture and development status
 
-## Current status (M10b, October 24, 2026)
+## Current status (M10c, October 24, 2026)
 
-The current source keeps **format 9 for normal carts and format 10 for DSP1/SuperFX carts**.
+The current source keeps **format 9 for normal carts and format10 for DSP1/SuperFX/SA-1 carts**.
 [M10a DSP1](m10a-dsp1.md) adds an own C# uPD7725, explicit local firmware/board
 configuration, rational chip time, isolated state and Manager integration. Raw
 software comparison retains 49 source disagreements; no general game/hardware
@@ -10,7 +10,7 @@ certification is implied. [M10b SuperFX](m10b-superfx.md) adds own GSU execution
 explicit shared-bus boards, arbitrary-budget microphases and CPU-DMA-PPU graphics
 diagnostics. Windows/Ubuntu functional gates pass within documented scope; raw
 software/primary-source and original FMULT-R4 contradictions remain separate.
-SA1 is the next sequential stage.
+[M10c SA-1](m10c-sa1.md) adds own second-65816 execution, MMC, timed DMA/CC1/CC2, math/timer/bit reader and isolated states. Published board timing still differs in the separate accuracy inventory.
 M9b worker/UI, M9c persistence,
 M9d networking, M9e Manager and M9f distribution have independent historical
 acceptance. [R1](r1-persistence-ci.md) records the later persistence correction
@@ -322,4 +322,4 @@ M10b adds the scoped own C# SuperFX shared-bus model, explicit board configurati
 resumable microphases and separately reported manufacturer/software conflicts.
 See [M10b SuperFX](m10b-superfx.md). Its functional diagnostics are separate from the still-red
 raw accuracy inventory and local source-author FMULT destination-R4 contradiction.
-SA1 and final integrated long/native-hour gates remain separate pending work.
+SA-1 has its scoped digital implementation; see [M10c SA-1](m10c-sa1.md). Physical timing and final integrated long/native-hour gates remain open.

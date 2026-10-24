@@ -73,12 +73,17 @@ public sealed class SnesSystem
         Clock.PeripheralBoundary=()=>Math.Min(boundary(),fx.NextBoundary(Clock.Now,Profile));
         Clock.PeripheralAdvanced=()=>{fx.Synchronize(Clock.Now,Profile);advanced();};
         fx.IrqChanged=value=>Bus.ExternalIrqLine=value;
+    }if(cartridge.Hardware is Sa1CartridgeHardware sa){
+        var boundary=Clock.PeripheralBoundary!;var advanced=Clock.PeripheralAdvanced!;
+        Clock.PeripheralBoundary=()=>Math.Min(boundary(),sa.NextBoundary(Clock.Now,Profile));
+        Clock.PeripheralAdvanced=()=>{sa.Synchronize(Clock.Now,Profile);advanced();};
+        sa.IrqChanged=value=>Bus.ExternalIrqLine=value;
     }PowerOn();}
     public void PowerOn()=>ResetCore(true);
     public void Reset()=>ResetCore(false);
     private void ResetCore(bool powerOn)
     {
-        Bus.Reset(powerOn);if(Bus.Cartridge?.Hardware is SuperFxCartridgeHardware)Clock.Reset();Cpu.BeforeCycle=null;Cpu.EffectCompleted=null;Cpu.AfterCycle=null;Cpu.ResumeCycle=null;Cpu.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;
+        Bus.Reset(powerOn);if(Bus.Cartridge?.Hardware is SuperFxCartridgeHardware or Sa1CartridgeHardware)Clock.Reset();Cpu.BeforeCycle=null;Cpu.EffectCompleted=null;Cpu.AfterCycle=null;Cpu.ResumeCycle=null;Cpu.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;
         Clock.Reset();cycleRemaining=holdRemaining=0;cycleActive=false;heldRead=null;cycleStart=latchClock=0;writeAluDone=false;ScheduleIoLine();
     }
     public ExecutionPhase CapturePhase()=>new(cycleRemaining,cycleActive,holdRemaining,heldRead,cycleStart,latchClock,writeAluDone);
@@ -98,7 +103,9 @@ public sealed class SnesSystem
         if(!cycleActive){
             if(cycle.Valid&&!cycle.Read&&!writeAluDone){Bus.CpuIo.AluEdge();writeAluDone=true;}
             int clocks=Profile.AccessClocks(cycle,(Bus.Io[13]&1)!=0);
+            if(Bus.Cartridge?.Hardware is Sa1CartridgeHardware sa){clocks=sa.HostAccessClocks(cycle,clocks);}
             if(Bus.Dma.CpuBoundary(clocks,Clock.Now))AdvanceDma();
+            if(Bus.Cartridge?.Hardware is Sa1CartridgeHardware owner)owner.BeginHostCycle(cycle,Clock.Now,clocks);
             cycleStart=Clock.Now;cycleRemaining=clocks-(cycle.Valid&&cycle.Read?4:0);cycleActive=true;
         }
         AdvanceActive(ref cycleRemaining,false);

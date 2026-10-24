@@ -66,7 +66,12 @@ public sealed class DmaController(SystemBus bus)
         if(State.HdmaPending!=0)StartHdma();else StartDma();
         Set(DmaPhase.Align,8-(int)(now&7));return true;
     }
-    private void Set(DmaPhase phase,int clocks){State.Phase=phase;State.Remaining=clocks;}
+    private void Set(DmaPhase phase,int clocks){State.Phase=phase;State.Remaining=clocks;
+        // Announce the A-bus reservation before the shared chip advances, not
+        // after the read latch. Reload/pointer reads own the same physical bus.
+        if(bus.Cartridge?.Hardware is Sa1CartridgeHardware sa&&phase is DmaPhase.Read or DmaPhase.ReloadRead or DmaPhase.PointerLowRead or DmaPhase.PointerHighRead)
+            sa.BeginHostDma(State.AddressA,bus.CpuIo.Clock?.Now??0,phase==DmaPhase.Read?8:4);
+    }
     public void Elapse(int clocks){State.Remaining-=clocks;State.ActiveClocks+=clocks;}
     private void StartDma(){State.Job=DmaJob.Dma;State.Pending=false;State.ResumeDma=false;State.Channel=0;State.Index=0;State.DmaChannel=0;State.DmaIndex=0;}
     private void StartHdma(){State.Job=State.HdmaPending==1?DmaJob.Setup:DmaJob.Line;State.HdmaPending=0;State.Channel=0;State.Index=0;State.AdvancePass=false;}

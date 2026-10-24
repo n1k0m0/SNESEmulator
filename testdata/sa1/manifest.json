@@ -1,0 +1,27 @@
+{
+  "schema": "snes-own-sa1-fixtures-v1",
+  "license": "Apache-2.0; authored in this repository",
+  "generator": "SNESEmulator.Testing/Sa1DiagnosticRom.cs, lab sa1-export-own",
+  "files": {
+    "own-ntsc-cc1.sfc": "83edef95c86643ca78c24932146388e8189edf504d8508a739a66b37cd9537f9",
+    "own-ntsc-cc2.sfc": "61215d6d8ad427e5ef393a4a30e36d7e3dfc218045260ecfe03fb4e02bfebd28",
+    "own-pal-cc1.sfc": "2c6421c81ce4f137c83c2f311c24cc2e55212b86237cbe9a7493add61a47661d",
+    "own-pal-cc2.sfc": "a637732d2ddeb3accc4672e8ccbe1f300cdf811c332ff81ccfdb8c92db3f18e3"
+  },
+  "primaryEvidence": [
+    {
+      "source": "Nintendo SNES Development Manual BookII sections1-2,1-4,1-6,1-7,1-8,1-9",
+      "url": "https://floating.muncher.se/bot/manual/book2_text.pdf",
+      "sha256": "887340a415e2c5f377074019cabbb9154b60d69149cb69b4fceb84d3c33d2751"
+    },
+    {
+      "source": "VitorVilela7/SnesSpeedTest",
+      "commit": "475a1b87a35bfcbe1b96ddf5042c73bbd5ed297e",
+      "romSha256": "21c24e4b0ec2cb32eeba25c5311aa39bd3228fc1327d2719c0b88671884c2541",
+      "capture": "img/hardware/v51-1L8B-10/v51-1.JPG",
+      "captureSha256": "38590af0850f408f79cb669b835725b8ffedf282a16dc448aea3ee360c52edf4",
+      "redistributed": false,
+      "scope": "Original ROM and images are local-only; no explicit redistribution license found. One original NTSC board photograph is distinct from approximate README rates."
+    }
+  ]
+}

@@ -25,8 +25,7 @@ comments, current documentation, and a final commit/push. Current sequence:
    **M10b implemented:** [SuperFX](m10b-superfx.md), own GSU instruction/pipeline/
    cache/buffer/graphics model, explicit shared boards, CPU-DMA-PPU integration,
    arbitrary-budget replay and clean Windows/Ubuntu functional evidence.
-   **M10 continues:** SA1, with isolated, source-supported behavior, mapping,
-   timing, state continuation, tests and documented limits. SuperFX physical
+   **M10c implemented within scope:** [SA-1](m10c-sa1.md), with own second65816, MMC, DMA/CC1/CC2, arithmetic, timer, bit reader, state continuation and authored integration tests. Seven published first-page hardware timing differences remain open. SuperFX physical
    uncertainties and the original FMULT-R4 ROM disagreement remain open.
    Other cartridge hardware/peripherals require their own scoped evidence.
 6. **Final integration due:** validate the actual final core on long NTSC/PAL
