@@ -57,7 +57,7 @@ assert dsp1_raw['Metadata']['rawComparison']['OtherMismatches']==0
 run([sys.executable,'tools/generate-spc-hotpath.py','--check'])
 supervised('spc-continuation-guards',['dotnet',str(LAB),'spc-continuation-proof','artifacts/spc-continuation-guards-child'],timeout=120)
 supervised('spc-entry-lifecycle',['dotnet',str(LAB),'spc-entry-proof','artifacts/spc-entry-lifecycle-child'],timeout=120)
-supervised('cpu-dp-quirk',['dotnet',str(LAB),'cpu-dp-proof','artifacts/cpu-dp-proof-child'],timeout=120)
+supervised('cpu-dp-quirk',['dotnet',str(LAB),'cpu-dp-proof','artifacts/cpu-dp-quirk-child'],timeout=120)
 supervised('audio-epoch-proof',['dotnet',str(LAB),'audio-epoch-proof','artifacts/audio-epoch-proof-child'],timeout=120)
 supervised('dsp-timeline-replay',['dotnet',str(LAB),'dsp-timeline-replay','artifacts/dsp-timeline-replay-child'],timeout=120)
 supervised('published-cpu-roms',['dotnet',str(LAB),'published-cpu-roms','artifacts/published-cpu-roms-child'],timeout=120)

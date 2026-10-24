@@ -280,7 +280,8 @@ The historical M7 full gate on clean commit `7cf7cc1` passed 182 portable and
 10 Windows groups. Later error-message and laboratory-adapter corrections on
 `adef880` were verified separately with targeted checks. Format 8 stored complete
 native raw fields and pipeline states and rejected earlier formats with an
-explanation; the current format is 9. VID3 transmits geometry, field parity,
+explanation; current normal carts retain format 9 while DSP1, SuperFX and SA-1
+use the versioned format 10 envelope. VID3 transmits geometry, field parity,
 and rational time domains losslessly, while AUD2 retains stereo audio. The GUI
 and savestate previews use actual image dimensions with 4:3 presentation.
 

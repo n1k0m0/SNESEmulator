@@ -11,7 +11,10 @@ passed exact `b840f105`. Final-source duration/strict one-hour NTSC and PAL,
 final package and release acceptance remain due. Historical red measurements
 stay red and are not relabelled by later, differently scoped runs.
 
-The hardware core and State9/VID3/AUD2 are unchanged. SDK10.0.402 and
+At the historical M9f milestone below, the hardware core and State9/VID3/AUD2
+were unchanged. Current enhancement cartridges use format 10; normal carts keep
+format 9. See [DSP1](m10a-dsp1.md), [SuperFX](m10b-superfx.md) and
+[SA-1](m10c-sa1.md) for the subsequent core changes. SDK10.0.402 and
 runtime10.0.13 are explicitly pinned; the SDK may be installed privately.
 `global.json` rejects silent feature-band changes. Existing portable locks remain;
 separate `packages.win-x64.lock.json` files are required by locked publish.
