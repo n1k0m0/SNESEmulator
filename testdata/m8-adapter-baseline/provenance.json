@@ -1,0 +1,24 @@
+{
+  "sourceCommit": "3db3681f2be29e405a1acab265c8731d24e81bf8",
+  "role": "Historical M8 evidence adapters, not the active test runners",
+  "files": [
+    {
+      "originalPath": "SNESEmulator.Lab/Program.cs",
+      "snapshotPath": "testdata/m8-adapter-baseline/Program.cs",
+      "bytes": 33885,
+      "sha256": "9d8c15463e94b922cb7e69223fa6b439268280fb50cb8ed33a515a59d438f427"
+    },
+    {
+      "originalPath": "tools/test-lab.py",
+      "snapshotPath": "testdata/m8-adapter-baseline/test-lab.py",
+      "bytes": 12813,
+      "sha256": "f1f306cc7486365d4b9755ede89ba776a507062bac39ca47445eeec03ac74c54"
+    },
+    {
+      "originalPath": "tools/verify-m8-testdata.py",
+      "snapshotPath": "testdata/m8-adapter-baseline/verify-m8-testdata.py",
+      "bytes": 987,
+      "sha256": "2354ccc01ab680d6e5abdf976dc07f0bb5af11beb8f83c7b0e16e19c8958c559"
+    }
+  ]
+}
