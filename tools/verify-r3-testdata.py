@@ -9,7 +9,7 @@ PINS={
  'testdata/r3-cpu-legacy-states/manifest.json':'f2fb944ca78c9a9d43c7771f42d08c91d6c759efb7f290ebddb21801609345a5',
  'testdata/65816-dp-indexed-quirk.json':'a5edc1ed2fb06356b3e14cd63651d116bee51a8fc91351f2780136ef1eb7f199',
  'testdata/r3-dsp-timeline/manifest.json':'a213ffbece48043bfadcae4191ffebe3dbaaeb61339b1979e14b5e5153c58e0b',
- 'testdata/r3-published-evidence.json':'9cd7aa12388c73f84390ca888bfca1db0748664b756f93c3df121ba799a4738f',
+ 'testdata/r3-published-evidence.json':'10130dbddc5526c880c612893fc658eaa0d809bc0caf4880608b8057bcd55463',
 }
 def sha(data):return hashlib.sha256(data).hexdigest()
 for path,digest in PINS.items():assert sha((ROOT/path).read_bytes())==digest,path

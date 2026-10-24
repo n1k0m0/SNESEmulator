@@ -141,7 +141,7 @@ bytes; comparisons and all original expectations remain unchanged.
 ## Published hardware evidence and reset limits
 
 The [additional primary-source ledger](../testdata/r3-published-evidence.json)
-pins the author's [TAStable investigation](https://github.com/rasteri/TAStable/tree/109059a2e352e019050b898738d7615051d6f855).
+pins both checkout-byte and canonical Git-blob identities for the author's [TAStable investigation](https://github.com/rasteri/TAStable/tree/109059a2e352e019050b898738d7615051d6f855).
 Its stated scope is a modified SHVC-CPU-01 with SHVC-SOUND. Separate oscillators,
 reset-path differences and divider phase undermine universal deterministic
 power/reset assumptions. The front-panel and external reset paths differ.
@@ -169,3 +169,51 @@ identities and an observable expected result.
 the raw contradiction counts. The subsequent final integration still owes the
 strict real 3600-second NTSC and 3600-second PAL native/network/audio/Manager
 gates after all remaining work; the R3 tests are not substitutes for those runs.
+
+## Executed R3 validation
+
+The code build is `668c094126b5e3f6be96247cae9cc6cc36b5fb17` on both platforms.
+Each clean, unchanged source checkout completed 15 serial validation commands
+using the private SDK 10.0.402 and **actually observed** runtime 10.0.13 CoreCLR/JIT
+modules in our retained child processes. The [evidence inventory](r3-evidence-manifest.json)
+records canonical code-source identities, platform-specific assembly hashes and
+120 report/log identities. It distinguishes the subsequent provenance-only
+ledger/domain/verifier-pin/documentation changes from that code build.
+
+| Gate | Windows | Ubuntu |
+|---|---:|---:|
+| Indexed-pointer, old/new state and mutation groups | 4 pass | 4 pass |
+| Unmodified published functional ROM/region runs | 6 pass | 6 pass |
+| Isolated DSP timeline and negative controls | 6 pass | 6 pass |
+| Default-red/reference-epoch causal controls | 2 pass | 2 pass |
+| Existing core groups | 129 pass | 129 pass |
+| M8 full-system state groups | 27 pass | 27 pass |
+| Frozen M9 resume/horizon/14 console comparisons | exact | exact |
+| Mixed SPC corpus | 256000 approved | 256000 approved |
+| M8 default audio accuracy failures, Own/local-original IPL | 7 / 11 retained | 7 / 11 retained |
+
+The mixed SPC result still includes the previously documented 7000 raw
+indirect-Y bus-order differences; it is not raw all-pass. Both M8 datasets retain
+exact video and game SRAM contracts, with the unchanged 18 red full-audio rows.
+Separate full CPU semantic and bus runs executed 5,080,400 cases / 512 groups each,
+with zero unapproved differences, 246 raw semantic contradictions and 264 raw bus
+contradictions under the explicit supplemental contract. Those full runs preceded
+the final laboratory/documentation additions; their original dirty-source report
+identity is retained rather than relabeled as a clean final-build execution. The
+CPU implementation was unchanged afterward.
+
+Eight isolated integrity controls pass: unchanged M8/R3 inputs are accepted;
+changed fourth historical adapter, actual M8 PCM, published ROM, timeline,
+supplemental CPU fixture and previous-core state are rejected. Original fixtures
+are never mutated for these controls. The M8 integrity manifest remains SHA256
+`47d19c15e8b613e06897159aec2241191f6ec9aca08f0e206f7fd04f807360d5`.
+Its fourth adapter is the exact `c999c7f` Git blob, SHA256
+`1544f81cbeea44ff27cbb9825834514f8002c4b0f63db69ae27b017259c2a733`.
+Git attributes preserve all actual state/ROM/archive and upstream attribution
+bytes across fresh Windows/Linux checkouts; pinned Git blobs were reread exactly.
+
+The final byte-domain provenance addition was separately checked by the strict
+R3 verifier and all eight isolated integrity controls. No changed core binary,
+new hardware acceptance or extra long native-soak result is inferred from that
+metadata check. Ares timing, physical reset/retention/revision behavior and the
+strict final native two-hour gate remain outstanding as scoped above.

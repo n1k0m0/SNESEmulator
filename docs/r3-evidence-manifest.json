@@ -1,0 +1,717 @@
+{
+  "schema": "r3-validation-evidence-v1",
+  "createdUtc": "2026-10-24T07:37:08.420486+00:00",
+  "codeBuildCommit": "668c094126b5e3f6be96247cae9cc6cc36b5fb17",
+  "codeSourceCanonicalGitBlobSha256": {
+    "SNESEmulator.Core/Apu.cs": "d9cff5736ae6f0199757aca79f94c1a019c43d880361ed802a2a7122743ab7b1",
+    "SNESEmulator.Core/AtomicFile.cs": "e52aea46b50cb2d808863f48ed9a774740d8b179f1a491b6eecf3c86f39070c1",
+    "SNESEmulator.Core/AudioDiagnosticRom.cs": "77fd761913c02deb72d7a1aa936876ec066ead2e8c0a62f3c5adfbee749b1f1d",
+    "SNESEmulator.Core/Cartridge.cs": "6fd980946280ba6ab3f56a6ec504b05c431362ebe93efed749b598cabb2ec6a4",
+    "SNESEmulator.Core/ControllerPorts.cs": "2c1793f66af6b5f18ba776428b55b42d45839b5ceca05b21471f251b3459a3e5",
+    "SNESEmulator.Core/Cpu65816.Cycles.cs": "4b087ca2a88c6e67044e77a34ac81664e236605362a1bc4af94d454d8c6e5571",
+    "SNESEmulator.Core/Cpu65816.cs": "2693e99949f1bf19430883378a922d47ac2b9a230c53c3d6c529bbb2b227e13c",
+    "SNESEmulator.Core/CpuCycle.cs": "cbb5acf5bc59f8c2308d57a7b5691c40336b804a5c40d24822875fbe6f407830",
+    "SNESEmulator.Core/CpuIo.cs": "bbeef0d2583323e7577da239bd8e4e1bd30008c1b6ac61ba6f878313d5049517",
+    "SNESEmulator.Core/DiagnosticRom.cs": "d9573272081901d21d53f6ecd762ebf2b945863315593a60fb8e66d13a2a621b",
+    "SNESEmulator.Core/DmaController.cs": "a6e6c3939eaa469b1af3f619be80bdb38caeb8965ca18feb88d86b81ce246ac0",
+    "SNESEmulator.Core/DspGaussian.cs": "8747164fa65b199c7057c9fb2675ecf70ef90c03ad03b541ede990c720c8b327",
+    "SNESEmulator.Core/EmulatorSettings.cs": "90c7d42bc5973451c7279666be2bd77bde76ca47442c1272ca92724eb704bc34",
+    "SNESEmulator.Core/HardwareProfile.cs": "fa683ae4e36eef2d6811228a5deb094605b75be68d1b3f59c856bf72d4b9ac07",
+    "SNESEmulator.Core/InputBindings.cs": "6a6f72e74cd773f7c19ee4829299555bf3fd42a2345844ed9e66d6c642fa16f6",
+    "SNESEmulator.Core/IoDmaDiagnosticRom.cs": "1b0eedf498a9e2cc8c27b75de9b9bf26998e5de0bf3d4bc79e22f27d2e533b70",
+    "SNESEmulator.Core/MasterClock.cs": "70ba128a53863d2adadc7d95ce307af76f8577e4922de7ace4b74036153392f8",
+    "SNESEmulator.Core/OwnIpl.cs": "a7bc93883ae294ab53cdf08140395bed6d8a9f89c23228cd89480aa7ea51fb33",
+    "SNESEmulator.Core/Ppu.Objects.cs": "64807894494ee9f29895e9f3488f9a928f1afd0751395c7e9f2884ddf8f0c29b",
+    "SNESEmulator.Core/Ppu.Pipeline.cs": "db9821801df3c951f8df5c96b32c8fef2862cc885b0bf60ffd59b4548238300b",
+    "SNESEmulator.Core/Ppu.State.cs": "d5a50c24d4f48b647a042d20fd56f63e2d7e9def8b2355fcb71786add85cb134",
+    "SNESEmulator.Core/Ppu.Video.cs": "c8a0a2671611e39374f3e653d80a4e9e98d878fae4690c140a75c44ac038038d",
+    "SNESEmulator.Core/Ppu.VideoState.cs": "f8e92631d34bb8115bb16401a4c28169fb524efe30760b174203010da9c9e0e2",
+    "SNESEmulator.Core/Ppu.cs": "f0c7f67b6588bfebeb4d8ae0c82c92826743535b63781ab36348d9c30e8fed1a",
+    "SNESEmulator.Core/PpuDiagnosticRom.cs": "a4ddbef10396684987969af14a38b5908bf558c96bf3dfd27b1436f78fbfe72c",
+    "SNESEmulator.Core/SNESEmulator.Core.csproj": "3472fccce5613343d3b55f6c2bbc48cbfd3de01f9cf32fd8607b8ac3a7e26395",
+    "SNESEmulator.Core/SaveStates/StateSerializer.cs": "7add20eb32fab89fe9488b60aa360d944b33b357270b7bdec13eb5f7b1cb4759",
+    "SNESEmulator.Core/SnesDsp.cs": "90b972adbe937958a1f750d5f7d579273a840442111aa1d7f59d1196763ceb13",
+    "SNESEmulator.Core/SnesSystem.cs": "ad17ff87631bcc8a3e464911a507fce97b640aea6745d7de5c8397c97e806811",
+    "SNESEmulator.Core/Spc700.HotPath.cs": "f564d0349cf897f190c2e2214f266772697aae50869a538db4bc23fbb7af4397",
+    "SNESEmulator.Core/Spc700.HotPath.g.cs": "384a9eee483756457ea196b2d9157a90d1a42f209bac6153b3848f8267f24f23",
+    "SNESEmulator.Core/Spc700.cs": "853b9b903764a3de46f773db7ff3efa24022d49e3ca0e6ce1b025467aa28f461",
+    "SNESEmulator.Core/SpcUploadRom.cs": "b72fe72fad2b7c82ffadcac65a3ccf9cbf4b047dd13178864066864125d752ae",
+    "SNESEmulator.Core/SystemBus.cs": "24cc2434bcf6f94d837a08ffc9482cc071214ff891ccfc6c81400548c2497ed3",
+    "SNESEmulator.Core/UserDataPaths.cs": "7217f39589739e7443906709640301e7e2f011390870cfcedc2a06584758fc8d",
+    "SNESEmulator.Core/packages.lock.json": "a29c6aa8cfb81874ff8bb78dc369d7416f28c9b8cc47e99592bfc019b20c41eb",
+    "SNESEmulator.Core/packages.win-x64.lock.json": "c30b149eb0b6c271aabe8d79d7b0318ba25f0bbd2ebf6a08faa3b67056bce9b3",
+    "SNESEmulator.Lab/AudioEpochProof.cs": "62cd8bbfee368a6b1b8bf314e4aea491357e005c9f23ca0538923518da0f1a28",
+    "SNESEmulator.Lab/CpuDpAdjudication.cs": "10de657bb5fead82f82678a60370991db7eb2196f6b3f81630335cf7724d7f34",
+    "SNESEmulator.Lab/CpuDpProof.cs": "65ead9ba7318e08d85e5e740330468cb3c11f855e32e0a2d3c42a075dd3559d1",
+    "SNESEmulator.Lab/DspTimelineReplay.cs": "c9a4ee0858dd3910e5d46e78b2b33b2986ed33bc2643cf251caf5b0384ef8ce1",
+    "SNESEmulator.Lab/FrameProof.cs": "126271cdb148cd7971da9f846e3b3c94132453ea62ae4d6b907c30a6c7c7dda3",
+    "SNESEmulator.Lab/Performance.cs": "5b9a42b343bfae60eb08bddbc91d4e2edf609a6a09194abcd38498ec1ffa4765",
+    "SNESEmulator.Lab/Program.cs": "82af720510f9bedec0bd15392d955d22c4c8b36cc2e0339d5d54834f25f83504",
+    "SNESEmulator.Lab/PublishedCpuRoms.cs": "94f85c310e628b77106c1ed8993f3e868355f5850fb7b4ca1646a7996d797986",
+    "SNESEmulator.Lab/SNESEmulator.Lab.csproj": "305619ed54184b343077bfcca33ee485c2b3771e6d940acbb9d33f240f451eef",
+    "SNESEmulator.Lab/SpcContinuationProof.cs": "c00e52739fbbb16d2532df4979a54f32fd58d9a0265946042a3fc9046bcebfeb",
+    "SNESEmulator.Lab/SpcEntryProof.cs": "fbc56a41dab0166ea26f687905e0000fdbd4e79a821369d851e066556317dcc3",
+    "SNESEmulator.Lab/SuspendProof.cs": "dfe6018681411b9d8cd788b82a3c5fddf08e87f203cd66cd8ec608a7749c79da",
+    "SNESEmulator.Testing/CpuVector.cs": "4e842b92282dfc74649c4a4ea086066c50770d4f6a81e3d7e1f74bf7e85f17c9",
+    "SNESEmulator.Testing/NativeFrameOracle.cs": "21085d63c8580da3b6150d6bd58ca2821ba9c307af13d4c030397287e3191c9a",
+    "SNESEmulator.Testing/SNESEmulator.Testing.csproj": "22b7b28e06f790b5370926bfdcba1ca72fc767fbafeef25dba454cff2d8b98aa",
+    "SNESEmulator.Testing/SpcVector.cs": "c7e5e827227299c92d22e8a48dc57cf530131e22d1f6392444b829b0f45e35e6",
+    "SNESEmulator.Testing/StereoOracle.cs": "9601b2b4655d4bec58d35eea912207366ba01f621210d30e67e09258a84bdd04",
+    "SNESEmulator.Testing/TestReport.cs": "32b606a8012cda679b0431fe20ec518ac3bd92319602f2e2acb644873b1c3012",
+    "SNESEmulator.Testing/packages.lock.json": "af3df3d3b5ffbcaa607191538f82c1125462e3e5a7ca9e39c9f6adefe5ba9cbf",
+    "tools/65816-dp-reference.cpp": "717964f5cc9bb047584ab959e2d93c75758aaaf9e367340b68047d06376a9239",
+    "tools/65816-dp-reference.py": "12e4226dc61737b59dc5afb165fe39c2664323adf05f6e5b84d4ecd2102973b0",
+    "tools/ares-console.cpp": "cab7ecd0c5e604ed5002d9cccdb527a86d7094568503aaea943cce227b432407",
+    "tools/bsnes-console.cpp": "0b93db05690e06e88a144e3f49d2fc692e44353a5c29aef9edab6044b6e87d07",
+    "tools/dsp-oracle.cpp": "e98e40562fcbbb16d5cf713ec29638a775d9b24c2c8778d1434f42fb9f5a6f93",
+    "tools/dsp-reference.py": "1f9385e7470bb8726cd91aaea8fa7fc4c2e7886b0c55d63e5c1f20c9573da859",
+    "tools/fetch-full-testdata.py": "010fccfe1886809eb90e741df263f707a7813b773edcfd1ce1edf5133f8d43a6",
+    "tools/fetch-spc700.py": "4b518ba5ee8ffddcbc0f16fbd898d4342083bfe93e5886a3a72a75a48e471257",
+    "tools/fetch-testdata.py": "5391c5de22ca0e66798c833463e78b94b22ab0cd94197ad720005057e74852f4",
+    "tools/generate-spc-hotpath.py": "f196a92181ea13dce76da28d753d677c1b7c0821056953e22b3bb4ea9a0daed2",
+    "tools/m8-audio-probe.cpp": "b3dd4dbd3299b005163fd56b3dd0aedab4e4d2093a2a448c6a021f8a36a92471",
+    "tools/m8-audio-probe.py": "1f286314d5c7b080bf68ac47771303089d70eb37cf6a892b535bc191689c18f1",
+    "tools/m8-console-suite.py": "60a4d76e8f9827a5be94ab4ec2f08daedbdaa2e4c78ad8f40cba3d976390b650",
+    "tools/m8-game-build.py": "9d1e3d70f2fc502d8649b7f602967da86b9cb50881c93fbb7f7b8e2aede428b2",
+    "tools/m8-internal-roms.py": "44c729e44b48108ebdef70abcc73dbc694873ad7de2c317a4a397b81ce675fbd",
+    "tools/m8-observer.hpp": "97afa0f3f02af9fef0451de83b424efbb7f0239f7dc1ebc8cc7c5b1d4858c987",
+    "tools/m8-probe-observer.hpp": "fe707f815d21703d0c873ed9df30c91ce7704cf5125223650edc869e3a0f093a",
+    "tools/m8-reference-build.py": "10fd50d8820a2a592ef46c9238289bec8a2cbba2674d8a96ecce21d3b0c09d1d",
+    "tools/m8-replay.hpp": "7288d586902ef7487d988b38f8ab138f5a5d863168ddccab1505405acb506f4f",
+    "tools/m8-rom-build.py": "df55acb4210b840a72a15a2d5feade4e00c28a7c9621c514085cd8a9ec0cda3c",
+    "tools/m8-rust-bootstrap.py": "89353e5e16a5044a384ae541dd96f5a07a88d06520989d776767b4a653b09612",
+    "tools/m8-title-matrix.py": "c980e0013c8d750b16ceadc6fdbcd02cd3c80b31ee147bc1da1fbf2fd348f84d",
+    "tools/m9e-dev-build.py": "d0a87eef773f0ef902f56031ed1a0ff45f300fe3aa2787660f83c1bd3423d3e1",
+    "tools/own-ipl.py": "588bc1868e07ed27e37c24f6de65a251ade1f67d4ac0b37da0a3484fd6c0ae74",
+    "tools/r3-dsp-timeline-reference.py": "751c1de0e85172731e1cf3fd61a8a11ea82f3c320a4bfe1991211cac54b26639",
+    "tools/rebuild-ppu-fixture.py": "0d932762811a6af182e1bab57fc9b06721034abd7d68fe505c2067980ac1844a",
+    "tools/test-distribution.py": "06e9bbed4a5be8c2ed35e645819ec251c846a60adf57ebd69be4dd62344ddbe4",
+    "tools/test-installer.py": "9c6d81c2519ec175c1c307869d424df68c0bba7ea99c1a1ea41adf46bbfbbcf4",
+    "tools/test-lab.py": "a61c7f6432ec51c335c23987464c87f62c8df47fa2e11bdc8480e644c0f623bc",
+    "tools/test-network-relay.py": "ace0cf1fb3f24d08bb0ea08c2a0e3fa06fffffc35d74f810b1e572dc9c155ecc",
+    "tools/test-performance.py": "0bec013da86592751df0d3d28e8b8456d694981388255afbde06c87252db807d",
+    "tools/test-ui-interaction.py": "fd8d0079195d85c71f8e958de2806eebeeae05ed019178f651a5837d13e1373e",
+    "tools/test-ui-persistence.py": "1bd5246b26c48191963fff9b30f7b15417250b788ed424652614aed4f42ec702",
+    "tools/test-ui-runtime.py": "b7fa1ba2d37770251e75683919bc3b6616839ecf8a132b4efc0b7d03daea4943",
+    "tools/test-video-cli.py": "4f2c5220adc9e2a062d12ab1080c4f4403479471ce47252fb7cda7f4ca655453",
+    "tools/verify-dsp-gaussian.py": "b81b70afac2e1c99d309ece1b8a6c5ef7bfe8788d0b35fdb4f59fc04c41eca7f",
+    "tools/verify-m8-testdata.py": "11e111be47727b23d3f3923c77f46472a713874557519bda945c6799102c0b7c",
+    "tools/verify-m9-testdata.py": "02e665969ccceff6402c84efe2b7d1b2ba0e968c1054615cf7f9db2d1f507177",
+    "tools/verify-ppu-testdata.py": "45efa33c3a5d1f03d68ec7f47e009cd5fde151706ce287bb20ca5ad260910ba0",
+    "tools/verify-r3-testdata.py": "6adb167a2917a65daf0238ce09f691b09481717ee65c24d3b5c379bef05df74b",
+    "tools/verify-video-testdata.py": "213b3515e3e4e63292f7847b7125556cf48b256faefafd8dfcb3a4646bc484c4",
+    "tools/video-mutations.py": "d89b9b01b70a68cbb84a21e22517b7fff7d84aea27884f957fe74411eae582ab"
+  },
+  "platforms": {
+    "windows": {
+      "build": {
+        "commit": "668c094126b5e3f6be96247cae9cc6cc36b5fb17",
+        "sourceCleanAndUnchanged": true,
+        "coreAssemblySha256": "c66e385004a5c661a4b6d747d9703fc033e1bfa971b4c086f5b4b79a6b3de8f3",
+        "labAssemblySha256": "b44bc3b088d4e16459b5b7d5f9152a4b9986580f7cbf10699f7783905260b7b5",
+        "commands": 15,
+        "privateRuntimeModulesObserved": true
+      },
+      "commands": 15,
+      "allCommandExitCodesZero": true,
+      "groups": {
+        "cpu-dp-proof": 4,
+        "published-cpu-roms": 6,
+        "dsp-timeline-replay": 6,
+        "audio-epoch-proof": 2,
+        "core": 129,
+        "m8-state": 27
+      },
+      "accuracy": {
+        "m8-own-ipl": {
+          "rows": 86,
+          "accuracyFailures": 7,
+          "allVideoExact": true
+        },
+        "m8-original-ipl": {
+          "rows": 142,
+          "accuracyFailures": 11,
+          "allVideoExact": true
+        }
+      },
+      "observedPrivateRuntimeModulePaths": [
+        "C:\\Users\\nilsk\\Desktop\\Anwendungsentwicklung mit KI\\SNESEmulator\\artifacts\\toolchains\\dotnet-10.0.402-win-x64\\shared\\Microsoft.NETCore.App\\10.0.13\\clrjit.dll",
+        "C:\\Users\\nilsk\\Desktop\\Anwendungsentwicklung mit KI\\SNESEmulator\\artifacts\\toolchains\\dotnet-10.0.402-win-x64\\shared\\Microsoft.NETCore.App\\10.0.13\\coreclr.dll"
+      ],
+      "observedPrivateRuntimeModuleHashes": [
+        "18eed8c40d05fc455be95d12cc77eacf379265063b15ca84bd7a11cf29078a22",
+        "2a2332c3c0cb023e71deb356b5fb85ce9045fb8434734dcfe9a7529e427dc858"
+      ]
+    },
+    "linux": {
+      "build": {
+        "commit": "668c094126b5e3f6be96247cae9cc6cc36b5fb17",
+        "canonicalSourceCleanAndUnchanged": true,
+        "coreAssemblySha256": "2c6b25d7d6e700841223bfa69ad62fba9b58760dee5b7d9e6f034997391f1d85",
+        "labAssemblySha256": "85377fab626237d10c723d56bf2840a28734dde8f7700ce6e53d287bb7e1af54",
+        "commands": 15,
+        "privateRuntimeModulesObserved": true
+      },
+      "commands": 15,
+      "allCommandExitCodesZero": true,
+      "groups": {
+        "cpu-dp-proof": 4,
+        "published-cpu-roms": 6,
+        "dsp-timeline-replay": 6,
+        "audio-epoch-proof": 2,
+        "core": 129,
+        "m8-state": 27
+      },
+      "accuracy": {
+        "m8-own-ipl": {
+          "rows": 86,
+          "accuracyFailures": 7,
+          "allVideoExact": true
+        },
+        "m8-original-ipl": {
+          "rows": 142,
+          "accuracyFailures": 11,
+          "allVideoExact": true
+        }
+      },
+      "observedPrivateRuntimeModulePaths": [
+        "/home/nilsk/.snes-m9f/sdk-10.0.402/shared/Microsoft.NETCore.App/10.0.13/libclrjit.so",
+        "/home/nilsk/.snes-m9f/sdk-10.0.402/shared/Microsoft.NETCore.App/10.0.13/libcoreclr.so"
+      ],
+      "observedPrivateRuntimeModuleHashes": [
+        "2d4d3f0b2698a74f186329510d93785e55d10934cb9ebe6e3edca6b24c624402",
+        "39b743f983aee4e89d29a7a06728806045a0629391b63cbb199fa198b5710652"
+      ]
+    }
+  },
+  "fullCpuReports": {
+    "cpu-full": {
+      "report": "artifacts/r3-accuracy/cpu-full.json",
+      "reportSha256": "a139ace4e4990d77c33bc9f637662fff17525777afadfad54f48ad508a98920d",
+      "recordedCommit": "c999c7f747ba6e554254e7fa9082ae91357a24ed",
+      "recordedWorkingTreeStatus": "M SNESEmulator.Core/Cpu65816.Cycles.cs\n M SNESEmulator.Core/Cpu65816.cs\n M SNESEmulator.Lab/Program.cs\n M testdata/m8-adapter-baseline/provenance.json\n M tools/m8-console-suite.py\n M tools/test-lab.py\n M tools/verify-m8-testdata.py\n?? SNESEmulator.Lab/CpuDpAdjudication.cs\n?? SNESEmulator.Lab/CpuDpProof.cs\n?? SNESEmulator.Lab/PublishedCpuRoms.cs\n?? testdata/65816-dp-indexed-quirk.json\n?? testdata/gilyon-v1.4/\n?? testdata/m8-adapter-baseline/m8-console-suite.py\n?? testdata/r3-cpu-legacy-states/\n?? tools/65816-dp-reference.cpp\n?? tools/65816-dp-reference.py",
+      "scope": "pre-commit full run of the same CPU implementation, before subsequent lab/docs additions; not identified as the final clean build binary",
+      "executedCases": 5080400,
+      "approvedFailures": 0,
+      "rawSemanticMismatches": 246,
+      "rawBusMismatches": 0,
+      "adjudicatedCases": 264,
+      "coreAssemblySha256": null
+    },
+    "cpu-bus-full": {
+      "report": "artifacts/r3-accuracy/cpu-bus-full.json",
+      "reportSha256": "2715927bb95e5a69fdf16261b67d1b4c564221c96609d4dc2f51c0be7a9f805e",
+      "recordedCommit": "c999c7f747ba6e554254e7fa9082ae91357a24ed",
+      "recordedWorkingTreeStatus": "M SNESEmulator.Core/Cpu65816.Cycles.cs\n M SNESEmulator.Core/Cpu65816.cs\n M SNESEmulator.Lab/Program.cs\n M testdata/m8-adapter-baseline/provenance.json\n M tools/m8-console-suite.py\n M tools/test-lab.py\n M tools/verify-m8-testdata.py\n?? SNESEmulator.Lab/CpuDpAdjudication.cs\n?? SNESEmulator.Lab/CpuDpProof.cs\n?? SNESEmulator.Lab/PublishedCpuRoms.cs\n?? testdata/65816-dp-indexed-quirk.json\n?? testdata/gilyon-v1.4/\n?? testdata/m8-adapter-baseline/m8-console-suite.py\n?? testdata/r3-cpu-legacy-states/\n?? tools/65816-dp-reference.cpp\n?? tools/65816-dp-reference.py",
+      "scope": "pre-commit full run of the same CPU implementation, before subsequent lab/docs additions; not identified as the final clean build binary",
+      "executedCases": 5080400,
+      "approvedFailures": 0,
+      "rawSemanticMismatches": 246,
+      "rawBusMismatches": 264,
+      "adjudicatedCases": 264,
+      "coreAssemblySha256": null
+    }
+  },
+  "historicalM8ManifestSha256": "47d19c15e8b613e06897159aec2241191f6ec9aca08f0e206f7fd04f807360d5",
+  "historicalM9ManifestSha256": "510151f2001f779ff322e2b048c5da5d791d1c6b3b435e72104098e9b6b24915",
+  "m8HistoricalAdapterCount": 4,
+  "m8FourthAdapter": {
+    "logicalPath": "tools/m8-console-suite.py",
+    "snapshotPath": "testdata/m8-adapter-baseline/m8-console-suite.py",
+    "snapshotSourceCommit": "c999c7f747ba6e554254e7fa9082ae91357a24ed",
+    "sha256": "1544f81cbeea44ff27cbb9825834514f8002c4b0f63db69ae27b017259c2a733",
+    "activeChange": "printing/comment only; no comparison or oracle branch changed"
+  },
+  "postGateProvenanceOnlyChanges": [
+    "Source-byte domain and canonical Git-blob hashes added to r3-published-evidence.json; corresponding strict verifier hash literal updated; targeted verifier and all eight isolated controls passed.",
+    "This evidence inventory and the R3 validation documentation; no Core or laboratory execution-code change."
+  ],
+  "reports": {
+    "artifacts/r3-accuracy/windows-final/audio-epoch-proof.json": {
+      "sha256": "65f478f40bfe7e38821aa6cf312c2aa8b9a32d15abeaea8a8a5e5b6f6ab6ad6a",
+      "bytes": 2859
+    },
+    "artifacts/r3-accuracy/windows-final/audio-epoch-proof.junit.xml": {
+      "sha256": "a7ea5afd1daabcb8479acb91d363277f6b9013be6457679daeae329681f81260",
+      "bytes": 634
+    },
+    "artifacts/r3-accuracy/windows-final/audio-epoch-proof.log": {
+      "sha256": "de85a181a027d3ed7286c6e4e8d8d3e2c134f225ec5f7f3c6063c18621420bae",
+      "bytes": 169
+    },
+    "artifacts/r3-accuracy/windows-final/build-core-tests.log": {
+      "sha256": "d8f29310321f250486068245a5de49cde6dce1e16eef26395f828c24e7c3776a",
+      "bytes": 875
+    },
+    "artifacts/r3-accuracy/windows-final/build-lab.log": {
+      "sha256": "2c91dcc3c467ab6b0f0a25bd93e9258296ee6179d62925338cb072187588440e",
+      "bytes": 696
+    },
+    "artifacts/r3-accuracy/windows-final/completion.json": {
+      "sha256": "9303141b6a35f0ffa49060cecb5096492c465860af8a9bd849525c0c01969c91",
+      "bytes": 344
+    },
+    "artifacts/r3-accuracy/windows-final/core.json": {
+      "sha256": "73b3e726ab10385204addb037175d2a82983301466e93872ef4d0a2470454eb1",
+      "bytes": 34890
+    },
+    "artifacts/r3-accuracy/windows-final/core.junit.xml": {
+      "sha256": "f42c3342b3463e0e051411af6d86266fc1dc18b2b3650d59a9b6e6ffc1463775",
+      "bytes": 29698
+    },
+    "artifacts/r3-accuracy/windows-final/core.log": {
+      "sha256": "083f0ba464db8782c7bd47855080e5fb4b0110d6d75a93cfd98a4f1dd3c3cb33",
+      "bytes": 9584
+    },
+    "artifacts/r3-accuracy/windows-final/cpu-dp-proof.json": {
+      "sha256": "35b67aaadece95ead6cc9d2dbcee598ebd0d2b15e9eea5a60bb53178ae9e20e7",
+      "bytes": 1370
+    },
+    "artifacts/r3-accuracy/windows-final/cpu-dp-proof.junit.xml": {
+      "sha256": "17fcaec0cbea506dab47d079cbeb6c5c1552320846a6275a36a5f1a567185bfc",
+      "bytes": 1151
+    },
+    "artifacts/r3-accuracy/windows-final/cpu-dp-proof.log": {
+      "sha256": "4d4abd087490ecb18ab032b71b49d4284a9cc80c0bd9966d3dcba937a817076b",
+      "bytes": 159
+    },
+    "artifacts/r3-accuracy/windows-final/dsp-timeline-replay.json": {
+      "sha256": "162fee5cdbdbaae6d24698abbb6a266276d5e266b5d730adcffc0a23b59abb0e",
+      "bytes": 2230
+    },
+    "artifacts/r3-accuracy/windows-final/dsp-timeline-replay.junit.xml": {
+      "sha256": "08ac4d0a673715ff21e2ae12a7be647537a2efd74fc187b720d8dddb07c49a76",
+      "bytes": 1603
+    },
+    "artifacts/r3-accuracy/windows-final/dsp-timeline-replay.log": {
+      "sha256": "5334cb6623a4c43a47a9e69283231249a1d858d6a8e6b468e1b7d1b1752f43f4",
+      "bytes": 174
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/commands.log": {
+      "sha256": "d93ae90de6c5d4bb2b72b971c0de58c0a604bd3d48eeb322eb4d64c2beda8cbb",
+      "bytes": 6036
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/devices/audio-ntsc-devices.json": {
+      "sha256": "ea89dde36886c1f9c6e432b7fe8cabcce9893fa3a321a178be1f3beaea559e6f",
+      "bytes": 3105
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/devices/diagnostic-ntsc-devices.json": {
+      "sha256": "cf6be0da789181aa4c65f5c2482ef88afc5e305083994f9fb293bdd2b6321572",
+      "bytes": 3128
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/horizons/cache-result.json": {
+      "sha256": "24d667e7e1c50a1a889d03ce976546ab1a63819fe13149e872ae4f1a2eb180db",
+      "bytes": 96
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/horizons/clock-result.json": {
+      "sha256": "66f2152a105906345c3d72941a52f6ee1dd60f2224e74b51106699ddcde4ff55",
+      "bytes": 113
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/horizons/result.json": {
+      "sha256": "abf0e488e539ffd5b16182bed49126d40e96b67092f0fcb99d0e1f727c5c1481",
+      "bytes": 41561
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/provenance.json": {
+      "sha256": "2b9872673b6a69749c606eba95fc4b01dfcf74b24ff10ebd33e6349a0b02e78b",
+      "bytes": 6992
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/result.json": {
+      "sha256": "76906dc0f61127ad7d96bfc8b8f38a34adfc55c324de58a9980a4fa1a9fb4d4e",
+      "bytes": 2293
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/suspend.json": {
+      "sha256": "e8db1d2e232645c00b1e9d787b8e50d3ef1cedb83ab5a4198234bd142ad6da48",
+      "bytes": 539
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/traced/audio-ntsc-traced.json": {
+      "sha256": "233a62c7446e8efed556c3c20188a7fe82dd3c8e3deaa2521c407333a70b2261",
+      "bytes": 4635
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/traced/diagnostic-ntsc-traced.json": {
+      "sha256": "f0d2db7de52f053863517453f4b3ac9b66d09a48824e3aa50470c6ffe0734797",
+      "bytes": 4658
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/traced/game-ntsc-traced.json": {
+      "sha256": "bffbb36464ac387b380b354e26d98e4fa6bb4fff522ada6178665f442b758452",
+      "bytes": 44658
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/traced/game-pal-traced.json": {
+      "sha256": "26ba5bcff4233f83ac27fcdb37b0f0b9128a07dcaddcdf932fc097ed0d099e79",
+      "bytes": 44649
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/traced/geometry-ntsc-traced.json": {
+      "sha256": "e2046a856dffe45bedd0d145ca0404a1745e3979514cfc260a2f689b9e3399b4",
+      "bytes": 4637
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/traced/geometry-pal-traced.json": {
+      "sha256": "24a37ec9f689d6bf9b964e13e5effff02f39529084d2b44e7f87e2a2a88ba305",
+      "bytes": 4653
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/untraced/audio-ntsc-untraced.json": {
+      "sha256": "a2c204d633ce438d314a363d652a3b742e799a49e5ca6f1b71b819cd5d9e773a",
+      "bytes": 17871
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/untraced/diagnostic-ntsc-untraced.json": {
+      "sha256": "31b9d7756a9bff1397515072602d4c87835f9ae79b21b68d8a8562a8d51c935a",
+      "bytes": 18007
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/untraced/game-ntsc-untraced.json": {
+      "sha256": "7ece756f8c485828e973178a6ec81f977a3a285a8c3923e2e30af204e094e242",
+      "bytes": 44121
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/untraced/game-pal-untraced.json": {
+      "sha256": "89704684e0e0022103515b703c272c169fa8a7350e9c91a935872ab6eafdfefc",
+      "bytes": 44123
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/untraced/geometry-ntsc-untraced.json": {
+      "sha256": "fcda4ad09830e6f9211ba20abdb5399feb87452a79d8021f6442e16918f79743",
+      "bytes": 17987
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9/untraced/geometry-pal-untraced.json": {
+      "sha256": "b8d7444721f17399511ea41421273b8bc8cd90edd28560228231c86e1a0031cc",
+      "bytes": 17966
+    },
+    "artifacts/r3-accuracy/windows-final/frozen-m9.log": {
+      "sha256": "84be28cb86b9449eda570cfcdcac105dd457a3edfbb303a4a5cd5563249b38cd",
+      "bytes": 6408
+    },
+    "artifacts/r3-accuracy/windows-final/generate-spc-hotpath.log": {
+      "sha256": "1a84dbacb0b1ef9fbedbef389c13554df819f40a22a5dae9bb93e7fb1190dc9b",
+      "bytes": 46
+    },
+    "artifacts/r3-accuracy/windows-final/m8-original-ipl-accuracy.json": {
+      "sha256": "2013fb78ee656f7037150e9bfc908b8f256f214faf859bd713f321a39ced916a",
+      "bytes": 299422
+    },
+    "artifacts/r3-accuracy/windows-final/m8-original-ipl-observed-differences.json": {
+      "sha256": "fdab9150f677e7ad607e02e5a5e9673009d82d31a9b20e15620e80f9f447a986",
+      "bytes": 32282
+    },
+    "artifacts/r3-accuracy/windows-final/m8-original-ipl.log": {
+      "sha256": "023a07c0196cee1df9df13a2118bc466329de7bcbf77362da4b9c461ba39f77d",
+      "bytes": 18449
+    },
+    "artifacts/r3-accuracy/windows-final/m8-own-ipl-accuracy.json": {
+      "sha256": "d0131dce14ab06cce7e113a3f8fcd7d3cfc30b29408bd9d6b89c4af9c46341e1",
+      "bytes": 183596
+    },
+    "artifacts/r3-accuracy/windows-final/m8-own-ipl-observed-differences.json": {
+      "sha256": "dd1363ab70afbf1d229c18ad0b56cef9e062aadcde79fd991ec196de47008fd3",
+      "bytes": 20358
+    },
+    "artifacts/r3-accuracy/windows-final/m8-own-ipl.log": {
+      "sha256": "c6e924c70766847913f8f7dd3aa9f0e52a45a7ff1451ac3bcab13179e201a1e8",
+      "bytes": 11169
+    },
+    "artifacts/r3-accuracy/windows-final/m8-state.json": {
+      "sha256": "d3518c60fa3321e6456c8b44fb0604afb8cd1774c81066cca051b800e24af409",
+      "bytes": 16952
+    },
+    "artifacts/r3-accuracy/windows-final/m8-state.log": {
+      "sha256": "5781b423a8128e7865b59ce53e5b8f66bb4f5ef9df2ce9232177ab09934dc45d",
+      "bytes": 1683
+    },
+    "artifacts/r3-accuracy/windows-final/published-cpu-roms.json": {
+      "sha256": "c04a8e779f1a6e993e70257e710729e23162e63ec89d6846ac0c4dbafcd4d5d7",
+      "bytes": 5845
+    },
+    "artifacts/r3-accuracy/windows-final/published-cpu-roms.junit.xml": {
+      "sha256": "80d138896d3b6137ffcf15a39e888d790df3fb61d870daab66042ff4abb24715",
+      "bytes": 1476
+    },
+    "artifacts/r3-accuracy/windows-final/published-cpu-roms.log": {
+      "sha256": "580c981db1b2c0584642ae1132942ee50a2ad348e6cff4ac046228c5aa414158",
+      "bytes": 172
+    },
+    "artifacts/r3-accuracy/windows-final/result.json": {
+      "sha256": "887502ae8e608042566ff28a16c171e32bccb6f8415c6e00c42b3fcf724e8519",
+      "bytes": 23746
+    },
+    "artifacts/r3-accuracy/windows-final/spc-mixed-full.json": {
+      "sha256": "4223c9cbb1d9c1545b02501158a4f59728f3ef6a8c5783a80e3fe2f8eb7be5db",
+      "bytes": 84263
+    },
+    "artifacts/r3-accuracy/windows-final/spc-mixed-full.junit.xml": {
+      "sha256": "1786c795a6b83ae1303844c81cfd873a32130d37844f8d13beabeacf6f5cdb7e",
+      "bytes": 50392
+    },
+    "artifacts/r3-accuracy/windows-final/spc-mixed-full.log": {
+      "sha256": "76652c7574830b28b15b3a39977f74f40d17d75d18ea214a0bf438996ce8f23f",
+      "bytes": 8635
+    },
+    "artifacts/r3-accuracy/windows-final/verify-m8-testdata.log": {
+      "sha256": "ac46e27a6fe0661ce0e57379a7906db6e9ef9a12cd034f0c4f983219ff01a1f7",
+      "bytes": 821
+    },
+    "artifacts/r3-accuracy/windows-final/verify-r3-testdata.log": {
+      "sha256": "6234a1b129656ae07cfe91fee710897d5ef531c1396d8579eef1507f6bc8e773",
+      "bytes": 134
+    },
+    "artifacts/r3-accuracy/linux-final/audio-epoch-proof.json": {
+      "sha256": "6bfcf4345fe49c3844e4fff9419bc436dda30a3634c973c6648d5e9d57e48ebb",
+      "bytes": 2778
+    },
+    "artifacts/r3-accuracy/linux-final/audio-epoch-proof.junit.xml": {
+      "sha256": "e31ab219c993d705033aa18e4a5853ec5b177412da64001363b6ec8137ae1f6d",
+      "bytes": 622
+    },
+    "artifacts/r3-accuracy/linux-final/audio-epoch-proof.log": {
+      "sha256": "92e70a9ac716c4b7650bb9433d3e3d4f762a68e30eee7baa58f0ad6590120031",
+      "bytes": 135
+    },
+    "artifacts/r3-accuracy/linux-final/build-core-tests.log": {
+      "sha256": "9a8fd317c90fd63e8140c7ea866e0b7cf447882217439562510fc5a3945b49d0",
+      "bytes": 937
+    },
+    "artifacts/r3-accuracy/linux-final/build-lab.log": {
+      "sha256": "87c2e1b737fae694643e7cd39cf0107c76d31695612ee95887c3e81fdb4717be",
+      "bytes": 828
+    },
+    "artifacts/r3-accuracy/linux-final/completion.json": {
+      "sha256": "4e7bc2483ca951aa8845ddbf5f0a51f0109e872a8c6744b9add3422dea01cf39",
+      "bytes": 345
+    },
+    "artifacts/r3-accuracy/linux-final/core.json": {
+      "sha256": "5e246ac818318f92869883d5a4c09c9ab9f8a4b37921631426820da394d4ea39",
+      "bytes": 33839
+    },
+    "artifacts/r3-accuracy/linux-final/core.junit.xml": {
+      "sha256": "80be4b631a9b8b4a6ece2a7b026aff3fd01582f93f8146df8b85268440ed1be3",
+      "bytes": 29037
+    },
+    "artifacts/r3-accuracy/linux-final/core.log": {
+      "sha256": "408f8deae8caf55370e6d9dc92039ce75846ecef0dc2fe72e54f2aaca62cb7d3",
+      "bytes": 9386
+    },
+    "artifacts/r3-accuracy/linux-final/cpu-dp-proof.json": {
+      "sha256": "2040912e2290eab84baaae9a6abb47346a3db44b72164d9c9c9eab1c7dbdf057",
+      "bytes": 1327
+    },
+    "artifacts/r3-accuracy/linux-final/cpu-dp-proof.junit.xml": {
+      "sha256": "94c911c6c90139c49d90421977cc90a07ceb4970199afbff7550a7e7a58d1274",
+      "bytes": 1129
+    },
+    "artifacts/r3-accuracy/linux-final/cpu-dp-proof.log": {
+      "sha256": "880db06ca574e8006c3ce9c491a9c03012024ef868782ed04772cc9ce35e36b4",
+      "bytes": 125
+    },
+    "artifacts/r3-accuracy/linux-final/dsp-timeline-replay.json": {
+      "sha256": "eecf809ca9733152aef421a17fae0a9be97c8947f4587bd4e3c0ac66150ebae2",
+      "bytes": 2164
+    },
+    "artifacts/r3-accuracy/linux-final/dsp-timeline-replay.junit.xml": {
+      "sha256": "98e59ae4de508b7ba9620cb8f83768a5eaa6ca0cf15d4e5a99a10f2e505eab4f",
+      "bytes": 1571
+    },
+    "artifacts/r3-accuracy/linux-final/dsp-timeline-replay.log": {
+      "sha256": "0432d5117e4423edcb435d6c278662e04958f19a1494cbd6d25b9deba9e975f1",
+      "bytes": 140
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/commands.log": {
+      "sha256": "bbcb55bed6213c81fec3f3742d3cc10f43e4a0a73ab4a1fe44da5bf6bf97ec76",
+      "bytes": 5071
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/devices/audio-ntsc-devices.json": {
+      "sha256": "d69a2f63d5a59e22995309cd338ceff1405e26226e70a2aee66ca8299093f5f0",
+      "bytes": 3008
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/devices/diagnostic-ntsc-devices.json": {
+      "sha256": "a0acec8cdb7ddf091a0a5707aff341ac9b949a870f070f2cde77b5598b5cc61e",
+      "bytes": 2991
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/horizons/cache-result.json": {
+      "sha256": "24d667e7e1c50a1a889d03ce976546ab1a63819fe13149e872ae4f1a2eb180db",
+      "bytes": 96
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/horizons/clock-result.json": {
+      "sha256": "66f2152a105906345c3d72941a52f6ee1dd60f2224e74b51106699ddcde4ff55",
+      "bytes": 113
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/horizons/result.json": {
+      "sha256": "e0d10771ea39b1b29c2d929b63304447fdc9459fac7cc3131bf6782430c0615f",
+      "bytes": 40277
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/provenance.json": {
+      "sha256": "866d2c5280a70a3cd6741bc6b9d5ded78287ba3c0174c403052d1dc3fb77f261",
+      "bytes": 6876
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/result.json": {
+      "sha256": "76a8d964877111eef7fb485013a6fb58ea4cac95e09fad58831a6c93aacb65b6",
+      "bytes": 2198
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/suspend.json": {
+      "sha256": "f99b263f33dddbb450aea9ec70b009f989d1f7734d9977996cb1b988468b16ab",
+      "bytes": 500
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/traced/audio-ntsc-traced.json": {
+      "sha256": "5946020a9e59c62a24ec0e74ed4e50f6986ba0508dcfcf05e7a3bf771be38fd1",
+      "bytes": 4445
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/traced/diagnostic-ntsc-traced.json": {
+      "sha256": "dd1743146c3add59773c02564929e6289a8fc90a73c591b82a65849b314858e4",
+      "bytes": 4469
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/traced/game-ntsc-traced.json": {
+      "sha256": "3c08b8be41049b19d15d310f77843bfba15b3c5b76c4e562a747759ab40408b0",
+      "bytes": 42625
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/traced/game-pal-traced.json": {
+      "sha256": "6d2a5d369ef7aa0663969be023184d8587e9673ceda1dfec4ea6ac03d3a67b8f",
+      "bytes": 42604
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/traced/geometry-ntsc-traced.json": {
+      "sha256": "36ff0d835b633d40d2b28f2d5377a4b378422e80200eeb1eef7ab38ce05f411d",
+      "bytes": 4466
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/traced/geometry-pal-traced.json": {
+      "sha256": "381d8c953bca5fa1240bae82273c421763b59439e5b09efb84c62523299532c0",
+      "bytes": 4464
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/untraced/audio-ntsc-untraced.json": {
+      "sha256": "58e8cd4b8cbfeef7078d5eb2b0d80c8ea05864e327d1adc6721aff68a8ec2eeb",
+      "bytes": 17062
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/untraced/diagnostic-ntsc-untraced.json": {
+      "sha256": "edc5b7dd1a2fa7cb6f2629343d7b7c360f9382f8e5984082f086aa4203435dc0",
+      "bytes": 17159
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/untraced/game-ntsc-untraced.json": {
+      "sha256": "cd903f98e6c4c960cf33396cb55ef97ff0265b7634a636ccbad895a62860f6ee",
+      "bytes": 42073
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/untraced/game-pal-untraced.json": {
+      "sha256": "91b7dcd536554b5fdf293ec3040168e96938fee14e41b325bb84879d26716fd7",
+      "bytes": 42082
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/untraced/geometry-ntsc-untraced.json": {
+      "sha256": "e8631874431dfd249a9fcb7162b25c2c9e7192b575fad97c22d208ad3cca6575",
+      "bytes": 17175
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9/untraced/geometry-pal-untraced.json": {
+      "sha256": "1b82efe9c93f3daaf9426ea19d83820fd228cda95cf0ef6000fca4fc627fc49e",
+      "bytes": 17187
+    },
+    "artifacts/r3-accuracy/linux-final/frozen-m9.log": {
+      "sha256": "011ccbd26dac5be9e11ec42fe50e13f5f4b3cdd9ca4e2fde8a45671a2cb7c15f",
+      "bytes": 5455
+    },
+    "artifacts/r3-accuracy/linux-final/generate-spc-hotpath.log": {
+      "sha256": "72482af5fa75457859d15b79afb3f0d5e907a21a765e95f51a04ec617ba460fd",
+      "bytes": 45
+    },
+    "artifacts/r3-accuracy/linux-final/m8-original-ipl-accuracy.json": {
+      "sha256": "cc322b9770b2f6dc74eaac1b6006e009c66ed90153f1f703a7dc5e4f88148c93",
+      "bytes": 299138
+    },
+    "artifacts/r3-accuracy/linux-final/m8-original-ipl-observed-differences.json": {
+      "sha256": "fdab9150f677e7ad607e02e5a5e9673009d82d31a9b20e15620e80f9f447a986",
+      "bytes": 32282
+    },
+    "artifacts/r3-accuracy/linux-final/m8-original-ipl.log": {
+      "sha256": "5670e23505c7beb9827c23261291eebbd903a3102386f277a2fed935b4763875",
+      "bytes": 18306
+    },
+    "artifacts/r3-accuracy/linux-final/m8-own-ipl-accuracy.json": {
+      "sha256": "66bd2d0756bc551ab52c3639226c6fc724b1020f78fd099ed12093e4625a149f",
+      "bytes": 183424
+    },
+    "artifacts/r3-accuracy/linux-final/m8-own-ipl-observed-differences.json": {
+      "sha256": "dd1363ab70afbf1d229c18ad0b56cef9e062aadcde79fd991ec196de47008fd3",
+      "bytes": 20358
+    },
+    "artifacts/r3-accuracy/linux-final/m8-own-ipl.log": {
+      "sha256": "d6dbf7632fd77d6f6d7d89caf165d2c5c3dfec415820d07f3259eacdfa87d1f2",
+      "bytes": 11082
+    },
+    "artifacts/r3-accuracy/linux-final/m8-state.json": {
+      "sha256": "84e8ab6fd08291e52bf17ce165ae558065febb0a7029dd70b919c8a416c3e315",
+      "bytes": 16416
+    },
+    "artifacts/r3-accuracy/linux-final/m8-state.log": {
+      "sha256": "b459ab6cef5b4cc6f8fa1cb07b007533fc2b4bcc6e4ee81c6ceff55e2709e239",
+      "bytes": 1655
+    },
+    "artifacts/r3-accuracy/linux-final/published-cpu-roms.json": {
+      "sha256": "1eea1a75c4bd946a8da350d1d5cb57312c116e048d5868764ac03be513fc5d0e",
+      "bytes": 5671
+    },
+    "artifacts/r3-accuracy/linux-final/published-cpu-roms.junit.xml": {
+      "sha256": "e96c79d36f226f6ee0ab3f2bd1a22ebcf8c00e14a491866342bba41d34d2612e",
+      "bytes": 1444
+    },
+    "artifacts/r3-accuracy/linux-final/published-cpu-roms.log": {
+      "sha256": "d27bbe6ecee2019bb17c96f418c90b50bb35bc884eefa731447e71f4e1c0c1df",
+      "bytes": 138
+    },
+    "artifacts/r3-accuracy/linux-final/result.json": {
+      "sha256": "c941b80664725924d8027e575152437f3047b42bd6556bf4aa161c7c27583c35",
+      "bytes": 285449
+    },
+    "artifacts/r3-accuracy/linux-final/spc-mixed-full.json": {
+      "sha256": "64c6c836743b8c52a7efa90b5457a18179f8dcc54ccd37b7156cb9ea42973bee",
+      "bytes": 80513
+    },
+    "artifacts/r3-accuracy/linux-final/spc-mixed-full.junit.xml": {
+      "sha256": "04d571a9999a022066e48d460be575b432e58d6eb002e56573d1e688bf628cd5",
+      "bytes": 49110
+    },
+    "artifacts/r3-accuracy/linux-final/spc-mixed-full.log": {
+      "sha256": "deda3e2d5d71672b0bd1b257200fbbf0cdfee16cb3e7d2c848e23a9345f9b022",
+      "bytes": 8345
+    },
+    "artifacts/r3-accuracy/linux-final/verify-m8-testdata.log": {
+      "sha256": "fe0951d807abe2770f1e90d623e750bc32fbd0818be8cbe06305ea44d0dc04ef",
+      "bytes": 816
+    },
+    "artifacts/r3-accuracy/linux-final/verify-r3-testdata.log": {
+      "sha256": "b903152a10f89efe3e6a1f48d3338705060dc059e63b4eedb07065d1aa1a3b87",
+      "bytes": 133
+    },
+    "artifacts/r3-accuracy/integrity-negative-controls.json": {
+      "sha256": "04ad342efe4d9f9a410d298481d0215bb09f133821eb288e05f716666fe58d1c",
+      "bytes": 4794
+    },
+    "artifacts/r3-accuracy/final-provenance-verifier.log": {
+      "sha256": "6234a1b129656ae07cfe91fee710897d5ef531c1396d8579eef1507f6bc8e773",
+      "bytes": 134
+    },
+    "artifacts/r3-accuracy/final-integrity-negative-controls.log": {
+      "sha256": "6e792c98c75c41883d845bc4837cb044538cf2add33e5f30eaf36c9ae221fc3a",
+      "bytes": 61
+    },
+    "artifacts/r3-accuracy/primary-source-byte-domains.json": {
+      "sha256": "af774b9ccdb4fa3d58afe5f6b1918fee4eb7eb269de2f3e36bb20cee47f72056",
+      "bytes": 834
+    },
+    "artifacts/r3-accuracy/initial-rom-probe.jsonl": {
+      "sha256": "4c4cb524f10cebcd917a4d37405f6a6866ead38d324a94e486605f9d4b6d9d78",
+      "bytes": 1522
+    },
+    "artifacts/r3-accuracy/corrected-rom-probe.jsonl": {
+      "sha256": "12465579e2b325bbd96b4a440630b23e88c073a8ed1de833c2f4c651c2237cbc",
+      "bytes": 765
+    },
+    "artifacts/r3-accuracy/dsp-playback-initial.jsonl": {
+      "sha256": "524ad4b673cd0e3471938cc45a11621cb1175af9b0173f76a1e92cfae8787e8f",
+      "bytes": 623
+    },
+    "artifacts/r3-accuracy/reset-epoch/results-corrected.jsonl": {
+      "sha256": "f669dda096f22ce9754525ae5c78232a8ba317cdffb231c7508246f872755b4b",
+      "bytes": 2128
+    },
+    "artifacts/r3-accuracy/dsp-replay/whole-input-comparison.json": {
+      "sha256": "dd40a13969a021df3d196ad4f68e2abde0377b047686e239f9fa50e2cad4a91c",
+      "bytes": 5802
+    },
+    "artifacts/r3-accuracy/old-states/manifest.json": {
+      "sha256": "075739bd292fdb2f4764256d18219d98a458f69b87d007906835150337d33ed0",
+      "bytes": 26434
+    }
+  },
+  "remaining": [
+    "18 default-profile full-sequence audio accuracy failures:7OwnIPL+11localOriginalIPL; ares origin not closed",
+    "No universal hardware reset release epoch, PPU memory-retention or chip-revision/analog certification",
+    "Final strict native NTSC3600s+PAL3600s with network/audio/Manager remains due after R4/M10; no R3 replacement"
+  ],
+  "notHardwareCertification": true
+}

@@ -11,7 +11,10 @@
       "scope": "Author investigation on modified SHVC-CPU-01 with SHVC-SOUND; separate oscillators, reset-path differences and nondeterministic divider phase. Does not specify stock VRAM/CGRAM/OAM retention or certify PAL/1CHIP.",
       "accessed": "2026-10-24",
       "rawHardwareTrace": null,
-      "capturePcbIdentity": null
+      "capturePcbIdentity": null,
+      "byteDomain": "Git working checkout bytes after autocrlf; canonical Git blob identity is recorded separately",
+      "canonicalGitBlobSha256": "e8965bdc5b50f182e8929726ed44cb3ff9bc01748312922239dbf4148a092e12",
+      "canonicalGitBlobBytes": 7396
     },
     {
       "id": "functional-cpu-roms",
@@ -22,7 +25,10 @@
       "scope": "Independent test author explicitly specifies emulation (direct,X) unaligned-page wrapping; functional expectations, not hardware timing data.",
       "accessed": "2026-10-24",
       "rawHardwareTrace": null,
-      "capturePcbIdentity": null
+      "capturePcbIdentity": null,
+      "byteDomain": "Git working checkout bytes after autocrlf; canonical Git blob identity is recorded separately",
+      "canonicalGitBlobSha256": "473e5ed5be9a0e3d5e847972586e54c26126e6299950e3cb133784b7854b7c2c",
+      "canonicalGitBlobBytes": 2639
     }
   ],
   "limitations": [
