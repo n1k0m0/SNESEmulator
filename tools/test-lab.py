@@ -36,6 +36,14 @@ supervised('interaction-conformance',['dotnet',str(CORE),'--interaction-only'],t
 supervised('runtime-conformance',['dotnet',str(CORE),'--runtime-only'],timeout=180)
 run([sys.executable,'tools/verify-r3-testdata.py'])
 run([sys.executable,'tools/verify-dsp1-testdata.py'])
+run([sys.executable,'tools/verify-superfx-testdata.py','--negative-controls'])
+supervised('superfx-functional',['dotnet',str(LAB),'superfx-proof','artifacts/superfx-functional-child'],timeout=120)
+supervised('superfx-raw-source-audit',['dotnet',str(LAB),'superfx-source-audit','artifacts/superfx-raw-source-audit-child'],expected=1,timeout=120)
+fx_raw=json.loads((ROOT/'artifacts/superfx-raw-source-audit-child.json').read_text())
+assert fx_raw['Metadata']['mismatches']==112 and fx_raw['Metadata']['primaryStopOnly']==0 and fx_raw['Metadata']['outerRomBusyHookOnly']==112
+supervised('superfx-primary-audit',['dotnet',str(LAB),'superfx-primary-audit','artifacts/superfx-primary-audit-child'],expected=1,timeout=120)
+# Source-author originals are optional/local-only; absence remains explicit.
+supervised('superfx-published-roms',['dotnet',str(LAB),'superfx-published-roms','artifacts/superfx-published-roms-child'],expected=2,timeout=120)
 supervised('dsp1-functional',['dotnet',str(LAB),'dsp1-proof','artifacts/dsp1-functional-child'],timeout=120)
 # Source disagreements are accuracy failures, explicitly separate from the functional gate.
 dsp1_audit=supervised('dsp1-raw-source-audit',['dotnet',str(LAB),'dsp1-source-audit','artifacts/dsp1-raw-source-audit-child'],expected=1,timeout=120)

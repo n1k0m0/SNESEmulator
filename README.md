@@ -287,3 +287,10 @@ separate two-BRR forced-blank workload achieved 24.29. Both were below real time
 Source/hardware limits, earlier failing findings, and unchanged evidence are
 recorded in the [M7 baseline](docs/baselines/m7.json). These historical results
 do not establish current sustained-performance or release acceptance.
+
+
+M10b adds the scoped own C# SuperFX shared-bus model, explicit board configuration,
+resumable microphases and separately reported manufacturer/software conflicts.
+See [M10b SuperFX](docs/m10b-superfx.md). Its functional diagnostics are separate from the still-red
+raw accuracy inventory and local source-author FMULT destination-R4 contradiction.
+SA1 and final integrated long/native-hour gates remain separate pending work.

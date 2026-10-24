@@ -18,10 +18,10 @@ public sealed class Cartridge
     public bool Pal { get; }
     public CartridgeMetadata Metadata { get; }
     public CartridgeOptions Options { get; }
-    public Dsp1Configuration? HardwareConfiguration {get;}
+    public ICartridgeConfiguration? HardwareConfiguration {get;}
     public ICartridgeHardware? Hardware {get;}
 
-    public Cartridge(byte[] image, string sourcePath = "", CartridgeOptions? options = null, Dsp1Configuration? hardware = null)
+    public Cartridge(byte[] image, string sourcePath = "", CartridgeOptions? options = null, ICartridgeConfiguration? hardware = null)
     {
         Options = options ?? new();
         bool copier = image.Length % 1024 == 512;
@@ -39,16 +39,23 @@ public sealed class Cartridge
         if (header + 64 > image.Length || (Options.Mapping == null && scores.Max() < 0))
             throw new InvalidDataException("No valid SNES header/reset vector found for selected mapping.");
         byte mode = image[header + 0x15], chipset = image[header + 0x16];
-        if (chipset is not (0 or 1 or 2 or 3 or 5) || (Options.Mapping == null && (mode & 15) is not (0 or 1 or 2 or 5)))
+        if (chipset is not (0 or 1 or 2 or 3 or 5 or 0x13 or 0x14 or 0x15 or 0x1a) || (Options.Mapping == null && (mode & 15) is not (0 or 1 or 2 or 5)))
             throw new NotSupportedException($"Cartridge hardware {mode:X2}/{chipset:X2} is not implemented (normal discrete mappers only).");
         if(chipset is 3 or 5)
         {
-            HardwareConfiguration=hardware??Dsp1Configuration.Resolve(sourcePath);
-            bool low=HardwareConfiguration.Board is Dsp1Board.LoRom1MiB or Dsp1Board.LoRom2MiB;
-            int maximum=HardwareConfiguration.Board is Dsp1Board.LoRom1MiB or Dsp1Board.HiRom1MiB?0x100000:0x200000;
+            var dsp=hardware as Dsp1Configuration??(hardware==null?Dsp1Configuration.Resolve(sourcePath):throw new InvalidDataException("DSP1 configuration required."));
+            HardwareConfiguration=dsp;
+            bool low=dsp.Board is Dsp1Board.LoRom1MiB or Dsp1Board.LoRom2MiB;
+            int maximum=dsp.Board is Dsp1Board.LoRom1MiB or Dsp1Board.HiRom1MiB?0x100000:0x200000;
             if(Mapping!=(low?CartridgeMapping.LoRom:CartridgeMapping.HiRom)||image.Length>maximum)
                 throw new InvalidDataException("DSP1 board ROM size/mapper does not match configuration.");
-            Hardware=new Dsp1CartridgeHardware(HardwareConfiguration);
+            Hardware=new Dsp1CartridgeHardware(dsp);
+        }
+        else if(chipset is 0x13 or 0x14 or 0x15 or 0x1a)
+        {
+            var fx=hardware as SuperFxConfiguration??(hardware==null?SuperFxConfiguration.Resolve(sourcePath):throw new InvalidDataException("SuperFX configuration required."));
+            if(Mapping!=CartridgeMapping.LoRom||image.Length>0x200000)throw new InvalidDataException("Supported SuperFX boards require LoROM and at most2MiB ROM.");
+            HardwareConfiguration=fx;
         }
         else if(hardware!=null)throw new InvalidDataException("DSP1 hardware supplied for a normal cartridge.");
         Rom = image.ToArray();
@@ -57,7 +64,8 @@ public sealed class Cartridge
         Pal = Options.Pal ?? (image[header + 0x19] is >= 2 and <= 12);
         int size = image[header + 0x18];
         if (size > 9) throw new NotSupportedException("SRAM size exceeds 512 KiB.");
-        Sram = new byte[size == 0 ? 0 : 1024 << size];
+        Sram = new byte[HardwareConfiguration is SuperFxConfiguration fxConfig?fxConfig.RamBytes:(size == 0 ? 0 : 1024 << size)];
+        if(HardwareConfiguration is SuperFxConfiguration fxHardware)Hardware=new SuperFxCartridgeHardware(fxHardware,Rom,Sram);
         int checksum = image[header+0x1c] | image[header+0x1d]<<8;
         int complement = image[header+0x1e] | image[header+0x1f]<<8;
         int declared = image[header+0x17];

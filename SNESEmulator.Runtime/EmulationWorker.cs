@@ -71,7 +71,7 @@ public sealed class EmulationWorker : IDisposable
     public Task SetModeAsync(bool pause,bool fast,CancellationToken cancellation=default)=>Enqueue(()=>{
         if(paused!=pause||turbo!=fast){bool inputBoundary=paused!=pause;paused=pause;turbo=fast;Discontinuity(true,inputBoundary);}return true;
     },cancellation);
-    public Task InsertAsync(byte[] rom,byte[]? sram=null,string source="",CancellationToken cancellation=default,Dsp1Configuration? hardware=null)
+    public Task InsertAsync(byte[] rom,byte[]? sram=null,string source="",CancellationToken cancellation=default,ICartridgeConfiguration? hardware=null)
     {
         byte[] ownRom=rom.ToArray(),ownSram=sram?.ToArray()??[];
         return Enqueue(()=>{var cart=new Cartridge(ownRom,source,hardware:hardware);if(ownSram.Length!=0){if(ownSram.Length!=cart.Sram.Length)throw new InvalidDataException("Battery size mismatch");ownSram.CopyTo(cart.Sram,0);}

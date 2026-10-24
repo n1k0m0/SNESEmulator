@@ -312,3 +312,10 @@ retained. Full Windows 276/31 belongs to 9db; test-only lifecycle hardening 905
 has targeted 11/8 Windows Manager evidence, all real package probes and a complete
 276-group Linux gate. Independent Root acceptance passed on `0f8aadc`; see the
 [M9f baseline](baselines/m9f.json). M9 and release acceptance remain incomplete.
+
+
+M10b adds the scoped own C# SuperFX shared-bus model, explicit board configuration,
+resumable microphases and separately reported manufacturer/software conflicts.
+See [M10b SuperFX](m10b-superfx.md). Its functional diagnostics are separate from the still-red
+raw accuracy inventory and local source-author FMULT destination-R4 contradiction.
+SA1 and final integrated long/native-hour gates remain separate pending work.

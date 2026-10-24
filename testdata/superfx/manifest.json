@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "reference": {
+    "repository": "https://github.com/bsnes-emu/bsnes",
+    "commit": "78474e5d39f58872dc21aca18cf9eb583b147fe7",
+    "scope": "GSU processor instruction semantics only. Adapter stubs graphics, uses zeroRAM/ROM; no timing, bus arbitration, pixel or hardware certification. Retains all original outputs including primary STOP disagreements."
+  },
+  "cases": 8192,
+  "files": {
+    "expected.bin.gz": "22c07db38ec861a74ca5bbdc8a7da4cb22c2a09e0100e6026fe276582864a817",
+    "inputs.bin.gz": "0e4499d4d931dc373f049cf52ca364f0ab248af0a96e7f5783265fda503d486d"
+  }
+}

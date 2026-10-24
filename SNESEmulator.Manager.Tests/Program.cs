@@ -278,6 +278,11 @@ if (!args.Contains("--windows"))
         var metadata = await db.StateMetadataAsync();
         Check(metadata.Count == 1 && metadata.Values.Single().Name == "New name" && metadata.Values.Single().Hash == "hash" && (await db.ListAsync()).Count == 0);
     });
+    await Test("M10b State10 SuperFX preview import export and board mismatch",async()=>{
+        var config=new SuperFxConfiguration(SuperFxRevision.Gsu2);var cart=new Cartridge(SuperFxDiagnosticRom.Create(),hardware:config);var m=new SnesSystem();m.Insert(cart);m.RunUntil(18000);
+        string file=Path.Combine(root,"superfx.snessav"),export=Path.Combine(root,"superfx-export.snessav");StateSerializer.Save(m,file);Check(StateCatalog.ReadIdentity(file)==cart.Hash);var preview=StateCatalog.Preview(file,cart);Check(preview.Format==10&&preview.Error==null&&preview.Pixels!=null);StateCatalog.Import(file,export,cart);Check(File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(export)));
+        var other=new Cartridge(cart.Rom,hardware:config with{Revision=SuperFxRevision.Gsu1});Check(StateCatalog.Preview(file,other).Error!=null);await Throws<InvalidDataException>(async()=>{StateCatalog.Import(file,export,other);await Task.CompletedTask;});Check(File.ReadAllBytes(file).SequenceEqual(File.ReadAllBytes(export)));
+    });
     await Test("M10a State10 DSP1 catalog preview import export and firmware mismatch", async () =>
     {
         var config=Dsp1Configuration.SyntheticProgram(Dsp1DiagnosticRom.Firmware(),Dsp1Board.LoRom1MiB);

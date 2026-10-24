@@ -37,3 +37,8 @@ GPL-3.0-or-later); no reference core or firmware bytes are distributed. The
 public numerical reference traces are separate from original hardware evidence.
 Board/interface documentation is credited to Overload and the Snes9x DSP Team;
 the original firmware dump identity source is credited to Caitsith2/byuu.
+
+M10b laboratory comparisons execute unmodified bsnes GSU processor instructions
+(commit78474e5d39f58872dc21aca18cf9eb583b147fe7) in a separate lab-only binary.
+No reference core is linked into the emulator. PeterLemon original GSU ROMs are
+local-only and are not redistributed.

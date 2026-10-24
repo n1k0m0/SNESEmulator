@@ -58,3 +58,5 @@ testdata/r3-cpu-legacy-states/*.state binary
 # M10a firmware-free numeric transcripts and reference adapter fingerprints.
 testdata/dsp1/*.bin binary
 tools/dsp1-reference.cpp text eol=lf
+
+/testdata/superfx/*.gz binary

@@ -7,7 +7,9 @@ public enum Dsp1Board { LoRom1MiB, LoRom2MiB, HiRom1MiB, HiRom2MiB }
 
 // Firmware is immutable and shared by isolated cartridge clones; mutable chip
 // RAM is never shared. Local firmware paths are not embedded in a savestate.
-public sealed class Dsp1Configuration
+public interface ICartridgeConfiguration { }
+
+public sealed class Dsp1Configuration : ICartridgeConfiguration
 {
     private readonly byte[] firmware;
     public Dsp1Variant Variant { get; }
@@ -57,6 +59,10 @@ public sealed class Dsp1Configuration
 public interface ICartridgeHardware
 {
     string Kind { get; }
+    bool TryRead(int address, byte openBus, long clock, HardwareProfile profile, out byte value)
+    { value=openBus; if(!Decodes(address,out bool status))return false;value=Read(status,clock,profile);return true; }
+    bool TryWrite(int address, byte value, long clock, HardwareProfile profile)
+    { if(!Decodes(address,out bool status))return false;Write(status,value,clock,profile);return true; }
     bool Decodes(int address, out bool status);
     byte Read(bool status, long masterClock, HardwareProfile profile);
     void Write(bool status, byte value, long masterClock, HardwareProfile profile);

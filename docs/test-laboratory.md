@@ -623,3 +623,10 @@ M9e adds the separate WPF Manager, portable bounded user-local IPC, SQLite libra
 [Baseline](baselines/m9g.json): pre-UI full Windows gate7effa47 passed285 portable/31 Windows groups. Final WPF-only source2ab409d passed Manager12 portable, complete32 native Windows groups and151 separate interaction stages with1194 exact before/after identities; the subsequent independent Root gate failed the software A/V bound (followup below). Ubuntu WSL59 is targeted portability, not another full Linux corpus gate. Linux settings busy/ENOENT observations remain unresolved. Input snapshots/callbacks are synthetic through actual native windows; physical controllers and OS focus remain unmeasured.
 
 M9g independent Root result on8daf478:285 portable and31/32 Windows groups plus151 interaction stages passed; cumulative49.942ms software A/V distance failed the unchanged40ms bound. No overall pass. [Followup](m9g-followup.md): label151 and15 portable network groups underWindows, two isolated30s readiness failures, one new instrumented13-group pass with separately retained cold/measurement data. No new Linux or full-corpus run; no selection/metric/threshold change and no inferred cause or fix for the Root failure.
+
+
+M10b adds the scoped own C# SuperFX shared-bus model and resumable microphases.
+See [M10b SuperFX](m10b-superfx.md) for explicit board configuration, tests and
+retained manufacturer/software/source-author disagreements. Its functional gate
+is separate from the red raw accuracy inventory. SA1 and final integrated long
+performance/native-hour gates remain pending stages.

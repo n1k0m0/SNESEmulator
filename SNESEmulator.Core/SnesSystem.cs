@@ -66,12 +66,19 @@ public sealed class SnesSystem
         if(Clock.V<Clock.VblankLine)Clock.Schedule(Clock.Now+1104,HardwareEventKind.Device,0x107,-2);
     }
     public void Insert(Cartridge cartridge)
-    {Bus.Cartridge=cartridge;if(!forcedProfile&&cartridge.Pal!=Profile.Pal){Profile=cartridge.Pal?HardwareProfile.PalProfile:HardwareProfile.Ntsc;Clock=new(Profile);ConfigureClock();}PowerOn();}
+    {if(cartridge.Hardware is SuperFxCartridgeHardware candidate)candidate.ValidateProfile(forcedProfile?Profile:cartridge.Pal?HardwareProfile.PalProfile:HardwareProfile.Ntsc);Bus.Cartridge=cartridge;ConfigureClock();if(!forcedProfile&&cartridge.Pal!=Profile.Pal){Profile=cartridge.Pal?HardwareProfile.PalProfile:HardwareProfile.Ntsc;Clock=new(Profile);ConfigureClock();}if(cartridge.Hardware is SuperFxCartridgeHardware fx){
+        // Only shared-memory boards install this extra boundary. Normal boards
+        // retain their previous PPU/APU callbacks without per-dot chip probing.
+        var boundary=Clock.PeripheralBoundary!;var advanced=Clock.PeripheralAdvanced!;
+        Clock.PeripheralBoundary=()=>Math.Min(boundary(),fx.NextBoundary(Clock.Now,Profile));
+        Clock.PeripheralAdvanced=()=>{fx.Synchronize(Clock.Now,Profile);advanced();};
+        fx.IrqChanged=value=>Bus.ExternalIrqLine=value;
+    }PowerOn();}
     public void PowerOn()=>ResetCore(true);
     public void Reset()=>ResetCore(false);
     private void ResetCore(bool powerOn)
     {
-        Bus.Reset(powerOn);Cpu.BeforeCycle=null;Cpu.EffectCompleted=null;Cpu.AfterCycle=null;Cpu.ResumeCycle=null;Cpu.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;
+        Bus.Reset(powerOn);if(Bus.Cartridge?.Hardware is SuperFxCartridgeHardware)Clock.Reset();Cpu.BeforeCycle=null;Cpu.EffectCompleted=null;Cpu.AfterCycle=null;Cpu.ResumeCycle=null;Cpu.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;
         Clock.Reset();cycleRemaining=holdRemaining=0;cycleActive=false;heldRead=null;cycleStart=latchClock=0;writeAluDone=false;ScheduleIoLine();
     }
     public ExecutionPhase CapturePhase()=>new(cycleRemaining,cycleActive,holdRemaining,heldRead,cycleStart,latchClock,writeAluDone);

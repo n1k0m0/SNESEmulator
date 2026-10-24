@@ -151,7 +151,7 @@ static class Dsp1Proof
             string source = Path.GetFullPath(prefix + "-sidecar.sfc"), sidecar = source + ".hardware.json"; Directory.CreateDirectory(Path.GetDirectoryName(source)!);
             string firmware = Path.GetFullPath(Path.Combine(args[1], "dsp1b.rom"));
             var config = new { Variant = "Dsp1B", Board = "LoRom1MiB", Firmware = firmware, FirmwareSha256 = "D789CB3C36B05C0B23B6C6F23BE7AA37C6E78B6EE9CEAC8D2D2AA9D8C4D35FA9" }; File.WriteAllText(sidecar, JsonSerializer.Serialize(config));
-            var cart = new Cartridge(Dsp1DiagnosticRom.Create(Dsp1Board.LoRom1MiB), source); Check(cart.HardwareConfiguration!.Variant == Dsp1Variant.Dsp1B, "Sidecar was not resolved from actual ROM path");
+            var cart = new Cartridge(Dsp1DiagnosticRom.Create(Dsp1Board.LoRom1MiB), source); Check(((Dsp1Configuration)cart.HardwareConfiguration!).Variant == Dsp1Variant.Dsp1B, "Sidecar was not resolved from actual ROM path");
             File.WriteAllText(sidecar, "{broken"); try { Dsp1Configuration.FromFile(sidecar); throw new Exception("Malformed sidecar accepted"); } catch (InvalidDataException) { }
             File.WriteAllText(sidecar, JsonSerializer.Serialize(config with { Variant = "Dsp2" })); try { Dsp1Configuration.FromFile(sidecar); throw new Exception("DSP2 accepted as DSP1"); } catch (InvalidDataException) { }
             File.WriteAllText(sidecar, JsonSerializer.Serialize(config with { FirmwareSha256 = new string('0', 64) })); try { Dsp1Configuration.FromFile(sidecar); throw new Exception("Wrong firmware hash accepted"); } catch (InvalidDataException) { }

@@ -28,6 +28,12 @@ static class RuntimeTests
     }
     public static void Run(Action<string,Action> test,string root)
     {
+        test("M10b worker SuperFX direct replay and immutable board load",()=>{
+            var rom=SNESEmulator.Testing.SuperFxDiagnosticRom.Create();var config=new SuperFxConfiguration(SuperFxRevision.Gsu2);
+            using var w=new EmulationWorker();Await(w.InsertAsync(rom,hardware:config));var direct=new SnesSystem();direct.Insert(new Cartridge(rom,hardware:config));
+            for(int i=0;i<3;i++){direct.RunFrame();var output=Await(w.StepAsync(default));Compare(direct,output,"SuperFX worker");Check(StateSerializer.Capture(direct).SequenceEqual(Await(w.CaptureAsync())),"SuperFX complete phase/RAM state");}
+            var raw=Await(w.CaptureAsync());string file=Path.Combine(root,"superfx-worker.snessav");StateSerializer.SaveCaptured(raw,file,direct.Bus.Cartridge!);Await(w.ResetAsync());Await(w.LoadAsync(File.ReadAllBytes(file)));Check(raw.SequenceEqual(Await(w.CaptureAsync())),"SuperFX isolated load");
+        });
         test("M10a worker DSP1 format10 isolated load reset and direct replay",()=>{
             var rom=SNESEmulator.Testing.Dsp1DiagnosticRom.Create(Dsp1Board.LoRom1MiB);
             var config=Dsp1Configuration.SyntheticProgram(SNESEmulator.Testing.Dsp1DiagnosticRom.Firmware(),Dsp1Board.LoRom1MiB);

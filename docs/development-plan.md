@@ -626,3 +626,10 @@ Root gate on 8daf478 fails because of a 49.942 ms software A/V distance.
 and the Root A/V cause remain open; a new 13-group run is not evidence of a fix.
 Sustained performance/soak, open Linux persistence findings, accuracy and M10
 remain open.
+
+
+M10b adds the scoped own C# SuperFX shared-bus model and resumable microphases.
+See [M10b SuperFX](m10b-superfx.md) for explicit board configuration, tests and
+retained manufacturer/software/source-author disagreements. Its functional gate
+is separate from the red raw accuracy inventory. SA1 and final integrated long
+performance/native-hour gates remain pending stages.

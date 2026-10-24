@@ -56,8 +56,8 @@ public sealed class SystemBus : ICpuBus
             };
         }
         else if(Cartridge is {} cart) {
-            if(cart.Hardware is {} hardware&&hardware.Decodes(address,out bool status))
-                result=hardware.Read(status,CpuIo.Clock?.Now??0,CpuIo.Clock?.Profile??HardwareProfile.Ntsc);
+            if(cart.Hardware is {} hardware&&hardware.TryRead(address,OpenBus,CpuIo.Clock?.Now??0,CpuIo.Clock?.Profile??HardwareProfile.Ntsc,out byte chipValue))
+                result=chipValue;
             else {
             int sram=cart.SramOffset(address);
             if(sram>=0)result=cart.Sram[sram];
@@ -93,7 +93,7 @@ public sealed class SystemBus : ICpuBus
             }
         }
         else if(Cartridge is {} cart) {
-            if(cart.Hardware is {} hardware&&hardware.Decodes(address,out bool status))hardware.Write(status,value,CpuIo.Clock?.Now??0,CpuIo.Clock?.Profile??HardwareProfile.Ntsc);
+            if(cart.Hardware is {} hardware&&hardware.TryWrite(address,value,CpuIo.Clock?.Now??0,CpuIo.Clock?.Profile??HardwareProfile.Ntsc)){}
             else if(cart.SramOffset(address) is var sram&&sram>=0)cart.Sram[sram]=value;
         }
         AccessOriginObserved?.Invoke(new(origin,"write",address,value));AccessObserved?.Invoke("write",address,value);

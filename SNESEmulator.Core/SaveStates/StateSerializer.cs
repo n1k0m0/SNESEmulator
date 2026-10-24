@@ -38,6 +38,7 @@ public static class StateSerializer
     private static void Write(SnesSystem machine,Stream destination,bool compress=true)
     {
         var cart=machine.Bus.Cartridge??throw new InvalidOperationException("Load a cartridge first.");
+        var hardwareState=cart.Hardware?.Capture(machine.Clock.Now,machine.Profile);
         using var zip=compress?new GZipStream(destination,CompressionLevel.Fastest,true):null;
         // Preserve the original compressed byte stream: closing BinaryWriter
         // must close GZip directly, rather than issuing a leave-open SyncFlush.
@@ -64,7 +65,7 @@ public static class StateSerializer
             w.Write(JsonSerializer.Serialize(machine.Clock.Capture()));w.Write(JsonSerializer.Serialize(machine.CapturePhase()));
             w.Write(JsonSerializer.Serialize(b.CpuIo.State));w.Write(JsonSerializer.Serialize(b.Dma.State));
             w.Write(JsonSerializer.Serialize(c.CaptureContinuation()));w.Write(JsonSerializer.Serialize(c.CaptureInterrupts()));
-            if(cart.Hardware is {} hardware)w.Write(JsonSerializer.Serialize(hardware.Capture(machine.Clock.Now,machine.Profile)));
+            if(hardwareState!=null)w.Write(JsonSerializer.Serialize(hardwareState));
         }
     }
     public static SnesSystem Load(Cartridge cartridge, string path)
@@ -167,7 +168,11 @@ public static class StateSerializer
         b.Dma.Restore(Json<DmaState>(r.ReadString())??throw new InvalidDataException("Missing DMA state"));
         c.RestoreContinuation(Json<CpuContinuation>(r.ReadString()));
         c.RestoreInterrupts(Json<CpuInterruptState>(r.ReadString())??throw new InvalidDataException("Missing interrupt state"));
-        if(version==10)b.Cartridge!.Hardware!.Restore(Json<CartridgeHardwareState>(r.ReadString())??throw new InvalidDataException("Missing cartridge hardware state"),m.Clock.Now,m.Profile);
+        if(version==10){
+            bool external=b.ExternalIrqLine;
+            b.Cartridge!.Hardware!.Restore(Json<CartridgeHardwareState>(r.ReadString())??throw new InvalidDataException("Missing cartridge hardware state"),m.Clock.Now,m.Profile);
+            if(b.Cartridge.Hardware is SuperFxCartridgeHardware fx&&fx.Processor.IrqOutput!=external)throw new InvalidDataException("Inconsistent SuperFX IRQ line.");
+        }
         p.ValidateClock();
         if(frames!=m.Frames||remainder!=m.MasterRemainder)throw new InvalidDataException("Inconsistent clock state");
         if (b.WramAddress is < 0 or > 0x1FFFF || p.Scanline is < 0 or > 312 || p.CgramAddress>511 || p.OamAddress>1023 || p.Brightness.Any(x=>x>15) || p.NativePixels.Any(x=>x>32767) ||
