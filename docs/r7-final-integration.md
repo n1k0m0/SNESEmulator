@@ -68,13 +68,37 @@ Actual packaged CLR/JIT SHA256:
 `18eed8c40d05fc455be95d12cc77eacf379265063b15ca84bd7a11cf29078a22` /
 `2a2332c3c0cb023e71deb356b5fb85ce9045fb8434734dcfe9a7529e427dc858`.
 
-All 42 Core files (39 C# plus project/two locks) are canonically unchanged from
+All 42 Core files (39 C# plus project/two locks) have byte-identical Git blobs from
 `6db7c8a`. The new Core DLL has different compilation metadata/path identity;
 source continuity does not transfer the old exact-binary timing acceptance.
 A supplementary identity helper completed the headless/module/binding checks,
 then failed an incorrect count assumption (42 C# rather than 42 total files).
-The retained separate recovery audit verifies all42 with zero content differences;
-this was an audit counting error, not a failed product contract.
+The retained count-recovery audit compared 42 exported archive files. The
+byte-safe Git-blob proof below now verifies actual committed Core bytes with zero
+content differences; neither audit issue was a failed product contract.
+
+## Pre-push hash-domain correction
+
+The independent audit of documentation commit `d80ccab` rejected 167 of its
+233 canonical-source hashes (334 mismatches when checked against both the
+implementation and documentation revisions). The earlier `git archive` helpers
+emitted Windows export/CRLF bytes and incorrectly labeled them canonical Git
+blob/LF bytes. The raw artifact, package and functional-report hashes passed.
+
+The replacement `hash-domain-correction/git-blob-proof.json` uses binary
+`subprocess.check_output(["git", "show", "<commit>:<path>"])` for every content
+payload. It verifies all 233 source entries and all 42 Core files without text
+decoding or newline conversion, preserving the CP1252 bytes in `Apu.cs`.
+The current evidence manifest uses these actual Git-blob SHA256 values and
+references this new continuity proof. It makes no blanket UTF-8/LF assumption
+about committed source blobs.
+
+The original `d80ccab` report/manifest are retained byte-for-byte under local
+`artifacts/r7-final-integration/hash-domain-correction/`; the original archive
+helpers, `core-source-continuity.json`, handoff and failed root audit remain
+unchanged. They are historical export-byte evidence, not the corrected Git-blob
+proof. This narrow evidence correction rebuilds/retests no product, transfers no
+timing acceptance and changes no original package or functional result.
 
 ## Delivery boundary and limitations
 
