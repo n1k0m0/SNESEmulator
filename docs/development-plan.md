@@ -1,18 +1,19 @@
 # Development plan: a highly faithful SNES emulator
 
-As of October 24, 2026. Historical starting point: commit `7145184`.
+As of October 25, 2026. Historical starting point: commit `7145184`.
 
 ## Ordered completion work
 
 The user requested one implementation agent at a time, with tests, useful code
-comments, current documentation, and a final commit/push. Current sequence:
+comments, current documentation, and a final commit/push. Sequence and results:
 
 1. **R1 complete:** persistence/CI correction; exact remote run
    [40042721554](https://github.com/n1k0m0/SNESEmulator/actions/runs/40042721554)
    passed on `b840f105`.
 2. **R2 implementation complete:** SPC execution optimization, deadline correction,
-   counter-based soak diagnostics and scoped performance evidence. The final
-   build's duration/soak gates remain scheduled below.
+   counter-based soak diagnostics and scoped performance evidence. The actual
+   final build's duration/soak gates have run; strict timing acceptance remains
+   open, as recorded below.
 3. **R3 complete within documented scope:** CPU pointer correction, old-state
    rejection, six published functional ROM runs, isolated DSP timeline and an
    explicit reset-epoch experiment. Eighteen whole-console audio rows remain red;
@@ -28,10 +29,17 @@ comments, current documentation, and a final commit/push. Current sequence:
    **M10c implemented within scope:** [SA-1](m10c-sa1.md), with own second 65816, MMC, DMA/CC1/CC2, arithmetic, timer, bit reader, state continuation and authored integration tests. Seven published first-page hardware timing differences remain open. SuperFX physical
    uncertainties and the original FMULT-R4 ROM disagreement remain open.
    Other cartridge hardware/peripherals require their own scoped evidence.
-6. **Final integration due:** validate the actual final core on long NTSC/PAL
-   workloads, then strict native 3600-second NTSC and 3600-second PAL runs;
-   full Windows/Ubuntu regression, native published package, exact remote CI,
-   final commit and push. Earlier binary evidence cannot certify this final build.
+6. **Final integration executed; strict timing acceptance remains open:**
+   [final integration](final-integration.md) records the actual implementation
+   `affae58` and tested package. Both long core runs retained slow complete
+   600-field windows. Both actual native 3,600-second runs completed: PAL passed;
+   NTSC retained 288 post-ready muted fields and 127 remote drops. Scoped
+   Windows/Ubuntu functional checks and distribution checks passed; the exact
+   tested 972-file package is active and the previous package is preserved.
+   Exact implementation-head CI
+   [40100657828](https://github.com/n1k0m0/SNESEmulator/actions/runs/40100657828)
+   passed on `affae58`. Each later documentation commit has its own exact-commit
+   CI status; this implementation result does not certify a different commit.
 
 See [R1](r1-persistence-ci.md), [R2](r2-performance-soak.md),
 [R3](r3-accuracy.md) and the [current laboratory status](test-laboratory.md).
