@@ -1,6 +1,11 @@
 # R5: native realtime investigation and owner checkpoint pauses
 
-The current bounded native checks pass: NTSC for 360 seconds and PAL for
+The subsequent [exact-tail Core phase](r5-tail-core.md) clears both sustained
+regional Core gates. Native hours remain pending for its package. The later
+f64 PAL hour failed and its NTSC attempt was user-interrupted; the bounded
+native results below remain historical evidence, not hour acceptance.
+
+The historical bounded native checks pass: NTSC for 360 seconds and PAL for
 180 seconds, with the original 30-second readiness, 100-ms catchup/mute and
 40-ms software A/V limits. Both have zero actual post-readiness muted catchup
 fields, zero steady remote drops and zero later measurement-cutoff drops.

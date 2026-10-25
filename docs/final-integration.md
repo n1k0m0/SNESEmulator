@@ -1,6 +1,13 @@
 # Final integration: tested implementation and remaining release limits
 
-The subsequent [R5 core follow-up](r5-realtime-core.md) reduces allocation and
+The latest [exact-tail Core follow-up](r5-tail-core.md), implementation
+`6db7c8a`, now passes fresh 37,000-field NTSC and 31,000-field PAL sustained
+gates with every complete 600-field window above real time. Actual native
+hour acceptance remains pending for that package. The intervening f64 PAL
+hour failed and its NTSC attempt was user-interrupted; both are retained in
+the new report. The affae package and outcomes below are historical evidence.
+
+The earlier [R5 core follow-up](r5-realtime-core.md) reduces allocation and
 empty-observer overhead. Its bounded tests do not replace the historical
 package/long/native outcomes recorded below.
 
@@ -11,8 +18,9 @@ implementation. The delivered package preserves the tested implementation's
 identity; a documentation-only commit does not trigger another publish.
 
 The functional follow-ups, comments, documentation and cartridge implementations
-are present. The strict sustained-performance and native-hour release gates
-have **not** earned acceptance. A green functional suite or hosted workflow does
+are present. At that historical implementation, the strict sustained-performance
+and native-hour release gates had **not** earned acceptance. A green functional
+suite or hosted workflow does
 not override these independent timing failures, nor establish complete SNES
 hardware accuracy.
 

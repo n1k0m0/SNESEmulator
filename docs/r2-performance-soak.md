@@ -1,17 +1,13 @@
 # R2: sustained performance and native application soaks
 
-[R5 core overhead](r5-realtime-core.md) records the later allocation and empty-
-observer optimization, scoped short-run evidence and rejected alternatives.
-It does not clear the independent sustained/native release gates.
-
-[Final integration](final-integration.md) now records the exact final package:
-37,000 NTSC and 31,000 PAL fields both retained slow complete 600-field windows.
-Both actual strict native hours completed; PAL passed, while NTSC retained
-288 post-ready muted fields, 127 remote drops and late probe readiness.
-Functional and package checks and exact implementation-head hosted CI passed.
-Strict timing release acceptance remains open. The sections below retain the
-historical R2 implementation and its bounded evidence; their previous passes
-do not override the final measurements.
+[The latest exact-tail Core phase](r5-tail-core.md) passes fresh original
+37,000-field NTSC and 31,000-field PAL sustained gates, including every complete
+600-field window. The preceding [Core overhead](r5-realtime-core.md) and
+[checkpoint capture](r5-realtime-runtime.md) changes remain included.
+Native 3,600-second acceptance is still pending for the new exact package:
+the intervening f64 PAL hour failed and its NTSC attempt was user-interrupted.
+The [historical final integration](final-integration.md), previous failures and
+R2 implementation below remain retained; bounded checks do not override them.
 
 ## Implementation
 
