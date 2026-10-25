@@ -218,6 +218,8 @@ rather than silently rewriting the original report.
 Normal-cart regression/performance contracts do not establish sustained real-time
 GSU3D or commercial-game performance. The authored GSU job stops after completion;
 source-author ROMs are bounded functional workloads. Sustained GSU performance
-remains unmeasured. Standard final long/native-hour/package/remote-CI gates remain
-the next integrated acceptance after SA1. No NuGet vulnerability audit completion
+remains unmeasured. [Final integration](final-integration.md) now records the
+actual normal-cart long/native-hour results, package verification and exact
+implementation-head remote CI. Independent strict timing release failures remain.
+No NuGet vulnerability audit completion
 is claimed when package metadata access emits NU1900 warnings.

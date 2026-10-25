@@ -71,3 +71,6 @@ tools/dsp1-reference.cpp text eol=lf
 
 # Preserve the single upstream CPU mutation-control object byte for byte.
 /testdata/r3-cpu-adjudication-input.json -text
+
+# Final provenance manifest hashes use stable LF bytes on every checkout.
+/docs/final-integration-evidence-manifest.json text eol=lf

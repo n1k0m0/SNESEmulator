@@ -12,14 +12,15 @@ cartridge mappings, normal format 9 savestates and explicitly configured DSP1
 cartridges, explicit SuperFX boards and SA-1 boards with versioned format 10 state. Worker/UI, persistence, networking,
 Manager and distribution have independent historical acceptance.
 
-Current follow-ups: [R1 persistence and remote CI](docs/r1-persistence-ci.md),
-[R2 performance and native A/V](docs/r2-performance-soak.md), and
-[R3 CPU accuracy and audio investigation](docs/r3-accuracy.md), and
-[R4 comments and current documentation](docs/r4-readability.md). R2's previous core
-passed long NTSC/PAL duration checks; the corrected worker passed strict
-360-second native probes. Final-source long tests, both strict one-hour native
-runs, the final package and final remote CI remain due after cartridge-chip work.
-The earlier hours completed with post-ready catchup and are not strict passes.
+The ordered follow-ups are implemented: [R1 persistence/CI](docs/r1-persistence-ci.md),
+[R2 pacing/performance](docs/r2-performance-soak.md), [R3 accuracy](docs/r3-accuracy.md),
+[R4 comments](docs/r4-readability.md), DSP1, SuperFX and SA-1.
+[Final integration](docs/final-integration.md) passed functional, distribution and
+exact implementation-head hosted CI checks. Both actual native hours completed:
+PAL passed; NTSC retained 288 post-ready muted fields and 127 remote drops.
+Both final core duration tests retained sub-real-time 600-field windows.
+**Strict performance/native release acceptance remains open.** Known raw
+accuracy and full-sequence audio differences remain separately documented.
 
 Each full CPU contract executes 5,080,400 cases; raw expectations differ in
 246 semantic and 264 bus cases after the reviewed indexed-indirect correction.
@@ -50,9 +51,11 @@ containing spaces are forwarded to the application.
 A self-contained Windows x64 package includes the emulator, `Manager/`, and
 `Updater/`, each with .NET runtime **10.0.13**; no SDK is needed to run it.
 Local published packages and test artifacts are not part of a fresh checkout.
-The local `publish/` still belongs to the accepted older M9f package; it is not
-a package of the current follow-ups. After moving the checkout, verify local
-shortcut targets before using them.
+The local `publish/` now contains the exact tested final implementation package
+(`affae58`); its Core SHA256 and full file identity are recorded in
+[final integration](docs/final-integration.md). The previous complete package is
+preserved locally under `artifacts/final-integration/previous-publish-preserved/`.
+The current documentation commit is separate from the tested package commit.
 No public release is currently published.
 
 Development requires the exact SDK version **10.0.402**, pinned in `global.json`.
@@ -296,4 +299,4 @@ M10b adds the scoped own C# SuperFX shared-bus model, explicit board configurati
 resumable microphases and separately reported manufacturer/software conflicts.
 See [M10b SuperFX](docs/m10b-superfx.md). Its functional diagnostics are separate from the still-red
 raw accuracy inventory and local source-author FMULT destination-R4 contradiction.
-SA-1 now has a scoped digital implementation; see [M10c SA-1](docs/m10c-sa1.md). Published hardware timing differences and final integrated long/native-hour gates remain open.
+SA-1 now has a scoped digital implementation; see [M10c SA-1](docs/m10c-sa1.md). Published hardware timing differences remain unverified; [final integration](docs/final-integration.md) records actual long/native outcomes and independent strict release failures.

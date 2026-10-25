@@ -65,7 +65,7 @@ assembly path and failed before token analysis. Its log/report are retained.
 Using the SDK's `MSBuildSDKsPath` resolved the helper references; no product code
 or fixture was changed to obtain the passing comparison.
 
-## Remaining ordered work
+## Ordered work after this historical stage
 
 M10 proceeds DSP1, then SuperFX, then SA1 with source-supported behavior, mapping,
 timing, states and tests. Remaining peripherals/revisions need explicit scope.
@@ -74,3 +74,5 @@ Windows/Ubuntu regression, native published-package verification, exact remote
 CI and the final commit/push are still due. The 18 original full-sequence audio
 rows remain red; reset alignment and unmeasured physical hardware remain open.
 Historical R2 passes and older `publish/` identities do not certify future builds.
+
+The ordered chip stages and final validation have since run. See [final integration](final-integration.md) for functional/package/CI acceptance, the passing PAL native hour, and the independent NTSC native/core timing failures.

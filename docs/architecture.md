@@ -1,6 +1,6 @@
 # Architecture and development status
 
-## Current status (M10c, October 24, 2026)
+## Current status (final integration, October 25, 2026)
 
 The current source keeps **format 9 for normal carts and format 10 for DSP1/SuperFX/SA-1 carts**.
 [M10a DSP1](m10a-dsp1.md) adds an own C# uPD7725, explicit local firmware/board
@@ -39,8 +39,12 @@ windows, minimum 1.00668155x) and 31,000 PAL fields (51 windows, minimum
 Both old one-hour native runs completed but exposed post-ready catchup.
 The corrected worker passed strict 360-second NTSC/PAL probes; these scenes'
 source PCM was entirely zero, so they do not demonstrate audible stereo.
-**Final-source core duration gates, strict native 3600-second NTSC then PAL,
-package verification and final remote CI remain due after M10.**
+[Final integration](final-integration.md) executed the actual final-source
+37,000/31,000-field core tests and both actual strict native 3,600-second runs.
+Both core tests retained slow 600-field windows. PAL native passed; NTSC retained
+288 post-ready muted fields and 127 remote drops. Functional, package and exact
+implementation-head remote CI checks passed. Strict timing release acceptance
+remains open; this is separate from those functional results.
 
 The sections below retain milestone measurements and their original scope.
 An old pass, open item or package identity describes that snapshot; it is not
@@ -322,7 +326,7 @@ M10b adds the scoped own C# SuperFX shared-bus model, explicit board configurati
 resumable microphases and separately reported manufacturer/software conflicts.
 See [M10b SuperFX](m10b-superfx.md). Its functional diagnostics are separate from the still-red
 raw accuracy inventory and local source-author FMULT destination-R4 contradiction.
-SA-1 has its scoped digital implementation; see [M10c SA-1](m10c-sa1.md). Physical timing and final integrated long/native-hour gates remain open.
+SA-1 has its scoped digital implementation; see [M10c SA-1](m10c-sa1.md). Physical timing remains unverified; [final integrated timing](final-integration.md) was measured and retains independent release failures.
 
 
 M10c clean implementation acceptance: SA-1 functional 32, SuperFX 34, DSP1 30,
@@ -333,5 +337,5 @@ arbitrary pending CPU/DMA/conversion states replay. Both platforms retain 14
 normal console outputs, 18,952 SPC resumes and 128 horizons exactly. The original
 author benchmark completes all four pages, but seven of twelve photographed
 first-page rates still differ. See [M10c SA-1](m10c-sa1.md) and its
-[evidence manifest](m10c-evidence-manifest.json). Final integrated long/native-hour,
-package and remote-CI gates remain a separate final-source acceptance stage.
+[evidence manifest](m10c-evidence-manifest.json). [Final integration](final-integration.md) records actual long/native-hour results,
+package acceptance and exact implementation-head remote CI separately.

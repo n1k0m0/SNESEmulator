@@ -189,8 +189,9 @@ A pinned bsnes SA-1 source was consulted independently for comparison, never lin
 into the application; agreement between software models is not hardware evidence.
 
 Other chips/peripherals (DSP2/3/4, CX4, S-DD1, SPC7110/RTC, S-RTC, OBC1, ST010/11/18,
-mouse, multitap, Super Scope) remain separately tracked. Final integrated long
-performance/native-hour/package/remote-CI gates remain the next root stage.
+mouse, multitap, Super Scope) remain separately tracked. [Final integration](final-integration.md) has now executed long/native-hour,
+package and exact implementation-head remote CI checks. Strict timing failures
+remain independent of this scoped functional chip acceptance.
 
 ## Clean implementation acceptance
 

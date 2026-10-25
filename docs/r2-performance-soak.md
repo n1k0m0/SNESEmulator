@@ -1,10 +1,13 @@
 # R2: sustained performance and native application soaks
 
-The implementation and bounded checks below are ready for review. The final
-strict native-hour release gate remains open. This does not release M9 or claim
-complete hardware accuracy. Work proceeds from persistence/CI and sustained
-performance to accuracy, readability/documentation and enhancement chips,
-followed by final validation of the resulting binaries.
+[Final integration](final-integration.md) now records the exact final package:
+37,000 NTSC and 31,000 PAL fields both retained slow complete 600-field windows.
+Both actual strict native hours completed; PAL passed, while NTSC retained
+288 post-ready muted fields, 127 remote drops and late probe readiness.
+Functional and package checks and exact implementation-head hosted CI passed.
+Strict timing release acceptance remains open. The sections below retain the
+historical R2 implementation and its bounded evidence; their previous passes
+do not override the final measurements.
 
 ## Implementation
 
@@ -285,13 +288,13 @@ stereo. The separately passing native audio/network tests provide different,
 explicitly scoped nonzero evidence. None of these tests measures physical
 DAC/display latency or establishes correctness against original hardware.
 
-**Still open for final release validation:** after the subsequent accuracy,
+**Historical R2 remaining gate (now executed in [final integration](final-integration.md)):** after the subsequent accuracy,
 documentation and enhancement-chip work, run the final actual binaries for
 3,600 wall seconds NTSC and then 3,600 PAL with the strict cumulative counter
 observer, unchanged cold-readiness rule and cumulative 40-ms A/V limit. Both
 must run fully even after a quality failure. The old `97a05a7` hours are
-historical, and the corrected runtime currently has only the bounded probes.
-No new two-hour acceptance or remote CI result is claimed here.
+historical, and that R2 candidate had only the bounded probes.
+The final integrated hour/CI results are reported separately above.
 
 `docs/r2-evidence-manifest.json` records the local report identities, scopes and
 remaining gate. Paths under ignored `artifacts/` refer to preserved local actual
