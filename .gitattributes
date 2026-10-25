@@ -86,3 +86,6 @@ tools/dsp1-reference.cpp text eol=lf
 
 # R6 remote clock recovery evidence uses stable LF bytes.
 /docs/r6-realtime-runtime-evidence-manifest.json text eol=lf
+
+# R6 Core investigation provenance uses stable LF bytes.
+/docs/r6-realtime-core-evidence-manifest.json text eol=lf

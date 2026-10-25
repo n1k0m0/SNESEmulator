@@ -15,6 +15,7 @@ void Test(string name,Action test)
     try { test(); passed++; report.Add(name,"pass",seconds:watch.Elapsed.TotalSeconds); Console.WriteLine("PASS "+name); }
     catch(Exception e) { failed++; report.Add(name,"fail",e.ToString(),watch.Elapsed.TotalSeconds); Console.WriteLine("FAIL "+name+": "+e); }
 }
+if(args.Contains("--cpu-hooks-only")){CpuObserverTests.Run(Test,testRoot);report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/r6-cpu-hooks");return failed==0?0:1;}
 if(args.Contains("--network-only")){NetworkTimelineTests.Run(Test);report.Metadata["limits"]="Deterministic injected clock/driver playhead; actual Socket TLS/Relay tests are separate Windows groups";report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9d-network-portable");return failed==0?0:1;}
 if(args.Contains("--persistence-only")){PersistenceTests.Run((name,body)=>{if(args.Length<3||name.Contains(args[2],StringComparison.OrdinalIgnoreCase))Test(name,body);},testRoot);report.Metadata["limits"]="Isolated real OS files, injected exceptions/cancellation and owned process; no physical power-cut guarantee";report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9c-persistence");return failed==0?0:1;}
 if(args.Contains("--interaction-only")){InteractionTests.Run(Test,testRoot);report.Metadata["limits"]="Synthetic raw input sessions and existing core reset semantics; no physical pad/focus/hardware evidence";report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9g-interaction");return failed==0?0:1;}
@@ -209,6 +210,7 @@ Test("M1 permanently reduced upstream failure regressions",()=>
     }
 });
 TimingTests.Run(Test,testRoot);
+CpuObserverTests.Run(Test,testRoot);
 IoDmaTests.Run(Test,testRoot);
 ApuTests.Run(Test,testRoot);
 PpuTests.Run(Test,testRoot);

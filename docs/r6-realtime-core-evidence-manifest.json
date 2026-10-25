@@ -1,0 +1,1188 @@
+{
+  "schema": "r6-realtime-core-rejected-v1",
+  "productImplementationCommit": "b6ba6ad650426943dd7d83af000b074196e5c762",
+  "testAndDocumentationCommit": "successor recorded in artifacts/r6-realtime-core/handoff.json; no Core product change",
+  "scope": "Rejected profiling experiments; retained public contract tests; remaining owner catchup unresolved; no performance fix claim",
+  "hashDomains": {
+    "sha256RawBytes": "SHA256 of retained file bytes, including Windows line endings",
+    "gitLfBlobSha256": "SHA256 of exact product implementation Git blob",
+    "sha256GitLfText": "SHA256 of new test source after CRLF-to-LF normalization; verified against committed blob after commit",
+    "manifest": "This JSON is explicitly LF-pinned; working bytes must equal its Git blob"
+  },
+  "canonicalCoreSources": [
+    {
+      "path": "SNESEmulator.Core/Apu.cs",
+      "workingWindowsSha256": "68c46dc7f75ffcd73d37306d6f698659a59d7f51f5c7533324984fb8832c6bd6",
+      "gitLfBlobSha256": "bfcd279852d773e3ea65987944b35a868b2dc48232056000f5fcb1a97fa466c0",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/AtomicFile.cs",
+      "workingWindowsSha256": "ca7a9718626b3b719692477607329a5a375cc282d08d907bf95e15964186ef31",
+      "gitLfBlobSha256": "a33bb6c4a8fe9ac5500eee0c46dc4b5cab21a7645f44804b05edabcda5a53c51",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/AudioDiagnosticRom.cs",
+      "workingWindowsSha256": "77fd761913c02deb72d7a1aa936876ec066ead2e8c0a62f3c5adfbee749b1f1d",
+      "gitLfBlobSha256": "77fd761913c02deb72d7a1aa936876ec066ead2e8c0a62f3c5adfbee749b1f1d",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Cartridge.cs",
+      "workingWindowsSha256": "000745745e943e07db054b9314f2e5e430dcb2d5603c5e0b4575be9560b759e2",
+      "gitLfBlobSha256": "4e755d31e2df4da46e372c2542d37542989d06af1904546349765c22a11f3243",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/ControllerPorts.cs",
+      "workingWindowsSha256": "2c1793f66af6b5f18ba776428b55b42d45839b5ceca05b21471f251b3459a3e5",
+      "gitLfBlobSha256": "2c1793f66af6b5f18ba776428b55b42d45839b5ceca05b21471f251b3459a3e5",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Cpu65816.Cycles.cs",
+      "workingWindowsSha256": "f6978021dac2d9e4de35dc2e62f058329901466d935375906e3ed5b73d38ee02",
+      "gitLfBlobSha256": "0c68f18a8f6024eee05b4fe1be7900329ccfa8deea93d756bb02365b53aebc40",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Cpu65816.cs",
+      "workingWindowsSha256": "652b8d8e5a029e0b4fc8950cdc0875d83ed559033d9ff9085c4442c3427ec5ba",
+      "gitLfBlobSha256": "e33fdf26dbf0704e69630ec11a04b5684a00ca40226ac96d31439d4ed6505679",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/CpuCycle.cs",
+      "workingWindowsSha256": "cbb5acf5bc59f8c2308d57a7b5691c40336b804a5c40d24822875fbe6f407830",
+      "gitLfBlobSha256": "cbb5acf5bc59f8c2308d57a7b5691c40336b804a5c40d24822875fbe6f407830",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/CpuIo.cs",
+      "workingWindowsSha256": "249fc000c6e1d02feba48e0dee3265f336e298b972f65193218c11546579edb7",
+      "gitLfBlobSha256": "bbeef0d2583323e7577da239bd8e4e1bd30008c1b6ac61ba6f878313d5049517",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/DiagnosticRom.cs",
+      "workingWindowsSha256": "d9573272081901d21d53f6ecd762ebf2b945863315593a60fb8e66d13a2a621b",
+      "gitLfBlobSha256": "d9573272081901d21d53f6ecd762ebf2b945863315593a60fb8e66d13a2a621b",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/DmaController.cs",
+      "workingWindowsSha256": "754dfdf0d0529e7b1f31348b5daf9d65d628aaac69728dabe4cc95494392d607",
+      "gitLfBlobSha256": "7d583e2105d301ae49b352f2132e5327953f84c5707c54c41d39a9fccd09be0b",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Dsp1CartridgeHardware.cs",
+      "workingWindowsSha256": "84077cfb6328ce64b27dc7f59e6a1a069fb9d2e898bb2335ddb1a7fd93b982c2",
+      "gitLfBlobSha256": "8c09c4f103e09f7b14e1f493d3b8fadbe2439690c2f5be90e084683567f1bb2f",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/DspGaussian.cs",
+      "workingWindowsSha256": "16ea5ffc8db97fc5a91e2a554285af417a07b62ab8e2299e7a2664e6deb68fde",
+      "gitLfBlobSha256": "8747164fa65b199c7057c9fb2675ecf70ef90c03ad03b541ede990c720c8b327",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/EmulatorSettings.cs",
+      "workingWindowsSha256": "1ba16636f6b96ba7d613bc57b71b65eacc6fce7a08c3ac34fa8a4c57c7e5633b",
+      "gitLfBlobSha256": "90c7d42bc5973451c7279666be2bd77bde76ca47442c1272ca92724eb704bc34",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Gsu.cs",
+      "workingWindowsSha256": "55d448a5e5713550ed3e90f1bd59a5d778dde4abfb966bb6851468de9bd1b0e2",
+      "gitLfBlobSha256": "aa3bfe3df9d3dd4007b604759f1161cca6a5e3481897fe64062facdca797c752",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/HardwareProfile.cs",
+      "workingWindowsSha256": "fa683ae4e36eef2d6811228a5deb094605b75be68d1b3f59c856bf72d4b9ac07",
+      "gitLfBlobSha256": "fa683ae4e36eef2d6811228a5deb094605b75be68d1b3f59c856bf72d4b9ac07",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/InputBindings.cs",
+      "workingWindowsSha256": "e2e5cfc2c86b43f7373c281dc4fd002e21305f805ed6c4b0b4977b1dab984eca",
+      "gitLfBlobSha256": "6a6f72e74cd773f7c19ee4829299555bf3fd42a2345844ed9e66d6c642fa16f6",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/IoDmaDiagnosticRom.cs",
+      "workingWindowsSha256": "1b0eedf498a9e2cc8c27b75de9b9bf26998e5de0bf3d4bc79e22f27d2e533b70",
+      "gitLfBlobSha256": "1b0eedf498a9e2cc8c27b75de9b9bf26998e5de0bf3d4bc79e22f27d2e533b70",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/MasterClock.cs",
+      "workingWindowsSha256": "5479c7cc9108dabf796fcfdbef62e504bb78a4b9e3a39ea46f315c29f5a7d2e2",
+      "gitLfBlobSha256": "5479c7cc9108dabf796fcfdbef62e504bb78a4b9e3a39ea46f315c29f5a7d2e2",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/OwnIpl.cs",
+      "workingWindowsSha256": "a7bc93883ae294ab53cdf08140395bed6d8a9f89c23228cd89480aa7ea51fb33",
+      "gitLfBlobSha256": "a7bc93883ae294ab53cdf08140395bed6d8a9f89c23228cd89480aa7ea51fb33",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Objects.cs",
+      "workingWindowsSha256": "d29f41a936ff56dd7a7dc80e0e0e281d901a5ad9d91b174712bda7860fd02548",
+      "gitLfBlobSha256": "1ab11b50b7da9b268fb0a9f128f375b6ec54665b6219108de48b473125323b05",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Pipeline.cs",
+      "workingWindowsSha256": "f73c90708bca7dc85cab2dd76868bcea328cc4be22bf355ef4100ade9f125be1",
+      "gitLfBlobSha256": "390ae59f423e867bd87f3917810c4e2fe478ad33c9c2e978b4b6515938c2ba04",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.State.cs",
+      "workingWindowsSha256": "79e1c3de2c3551f74e6eb0f600eb333b8f243617d37325508be5d0c2f49a274c",
+      "gitLfBlobSha256": "bc5a313fefca106708fddda8bc58595c983115210f0c7bce7d18b75cae487ff1",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Video.cs",
+      "workingWindowsSha256": "373a1a8c95b865a52338dee0961761822d7e36aa82d3f0bccc0a015ddb2c2997",
+      "gitLfBlobSha256": "c8a0a2671611e39374f3e653d80a4e9e98d878fae4690c140a75c44ac038038d",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.VideoState.cs",
+      "workingWindowsSha256": "a70b82f222c493903b6ca8e5aebb8d4466569dde183f8bd9024e2c2cfa88f172",
+      "gitLfBlobSha256": "0a327ea13491e4acdd6bc0203dda821345a60da5b134caaf08df6f2a9c911485",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.cs",
+      "workingWindowsSha256": "ad3c73636eef84f52c79fdf252cb186139e221af07b9a62fa45a340c3030b909",
+      "gitLfBlobSha256": "d2e9faf760595729e2087ae67004c0705dd5e9f98608227492226a882ae74eb4",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/PpuDiagnosticRom.cs",
+      "workingWindowsSha256": "a4ddbef10396684987969af14a38b5908bf558c96bf3dfd27b1436f78fbfe72c",
+      "gitLfBlobSha256": "a4ddbef10396684987969af14a38b5908bf558c96bf3dfd27b1436f78fbfe72c",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/SNESEmulator.Core.csproj",
+      "workingWindowsSha256": "3472fccce5613343d3b55f6c2bbc48cbfd3de01f9cf32fd8607b8ac3a7e26395",
+      "gitLfBlobSha256": "3472fccce5613343d3b55f6c2bbc48cbfd3de01f9cf32fd8607b8ac3a7e26395",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Sa1CartridgeHardware.cs",
+      "workingWindowsSha256": "334b574c5608f67e63f6e949e55a032287e662059b96b2710f222efb6b674647",
+      "gitLfBlobSha256": "334b574c5608f67e63f6e949e55a032287e662059b96b2710f222efb6b674647",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/SaveStates/StateSerializer.cs",
+      "workingWindowsSha256": "c55556a75937730dcfa9a235984cd7cc58e33374b6e2d577405c015ded13bfbb",
+      "gitLfBlobSha256": "41096ccf4f4d260814218a1fc07b0d5d295cca9c888fc2898adf2603c7c725bd",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/SnesDsp.cs",
+      "workingWindowsSha256": "161bcd78ff162279755c9775918dffbea258691e1ed4dbf9c3a53faea587d2c8",
+      "gitLfBlobSha256": "93d0205d870aee7c79b7fa71b168f2c20fae7cfd968857429f5a88372c0f55eb",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/SnesSystem.cs",
+      "workingWindowsSha256": "713214ceb35bafe81a9ec8be6ff79ac97eee42d1716630c0422906781593e232",
+      "gitLfBlobSha256": "4d290076d39f7159f3f1853575edbc9c512a0d8e12605fbb53dda0b2aff08c27",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.HotPath.cs",
+      "workingWindowsSha256": "39fa2c774c418fe553f0e512df7b4876b662f8f42941bc747f93e009092ebf6a",
+      "gitLfBlobSha256": "de8a7404e796e4cfb3839c3d9c90cae2af788a77fb1ec2d11f0f6c90a1527d5e",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.HotPath.g.cs",
+      "workingWindowsSha256": "77348d2c3d955769ff1856838cc39a3050c6e3b3a93d720b6dff8c3bc4109352",
+      "gitLfBlobSha256": "384a9eee483756457ea196b2d9157a90d1a42f209bac6153b3848f8267f24f23",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.cs",
+      "workingWindowsSha256": "95f60ba110ac12b1cf203382fdaea056ece06900a716483618315b1aefeef107",
+      "gitLfBlobSha256": "67f4efa09168bea400d593b168b6bae86061807022ca65b9e570e9328331a7ba",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/SpcUploadRom.cs",
+      "workingWindowsSha256": "b72fe72fad2b7c82ffadcac65a3ccf9cbf4b047dd13178864066864125d752ae",
+      "gitLfBlobSha256": "b72fe72fad2b7c82ffadcac65a3ccf9cbf4b047dd13178864066864125d752ae",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/SuperFxCartridgeHardware.cs",
+      "workingWindowsSha256": "41f4a269e71ad21a81f1812dcd5b9e6757a9380222d68878dd0652409755838d",
+      "gitLfBlobSha256": "e349dd28b1c30430677b7d6060deb9caaa087a62c31fd6a89ff43332f951ac6e",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/SystemBus.cs",
+      "workingWindowsSha256": "b621660c4f214b02cab94d6900b2587572da94c2df23a21f6cea0b710d8791a1",
+      "gitLfBlobSha256": "3d92f4c11021325b4243caa6985725300284342bb5623771adb4435617f43a0f",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/Upd7725.cs",
+      "workingWindowsSha256": "9de14bb90961e854f864e3825a4eb45114758739a3a5f9a413e4e8331d956b36",
+      "gitLfBlobSha256": "5a931f64276db14c2d3a502c16088b0a64c6bae69bf000a408488a5d62e73d3f",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/UserDataPaths.cs",
+      "workingWindowsSha256": "7217f39589739e7443906709640301e7e2f011390870cfcedc2a06584758fc8d",
+      "gitLfBlobSha256": "7217f39589739e7443906709640301e7e2f011390870cfcedc2a06584758fc8d",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/packages.lock.json",
+      "workingWindowsSha256": "a4364d81a6de2707d66fbced18fbbc926c882ab96e1d1aebbb17e871285b9d75",
+      "gitLfBlobSha256": "a29c6aa8cfb81874ff8bb78dc369d7416f28c9b8cc47e99592bfc019b20c41eb",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    },
+    {
+      "path": "SNESEmulator.Core/packages.win-x64.lock.json",
+      "workingWindowsSha256": "cd97f644c24bb2cd8c96d92c519036a65133ab22cafc294d07b527626ad20e84",
+      "gitLfBlobSha256": "c30b149eb0b6c271aabe8d79d7b0318ba25f0bbd2ebf6a08faa3b67056bce9b3",
+      "matchesPriorRuntimeSeal": true,
+      "matchesB6GitBlobAfterLfNormalization": true
+    }
+  ],
+  "coreSourceRestoration": {
+    "files": 42,
+    "csharp": 39,
+    "projectAndLocks": 3,
+    "rawAndGitLfMismatches": 0,
+    "rebuiltCoreEqualsBaselineBinary": true,
+    "coreSha256": "6b8581f0c1151ea16107d8717ec253589e6b00e1342937e2524d69d7b6225e30"
+  },
+  "testSources": [
+    {
+      "path": "SNESEmulator.Core.Tests/Program.cs",
+      "sha256WindowsWorkingBytes": "2a73a5fe6327924e3f4d7ea125942274ff5835ee951701b00e6d459591d3ad37",
+      "sha256GitLfText": "af4d4c81873bd82582d5dbfe9b6ca08faedd6e57e9cc6ec86dee9dd6bf7989ba"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/CpuObserverTests.cs",
+      "sha256WindowsWorkingBytes": "bce1a6c47b70440b39a4ef6312f4f0cd3009199e0ea13407239cbf0748c9140d",
+      "sha256GitLfText": "2533b41f74f22a999bedd9f631989036144e731a41aea3a4908a4358f4bbe021"
+    }
+  ],
+  "tests": {
+    "publicCpuHookGroups": 5,
+    "fullCoreGroups": 144,
+    "frozenWholeConsole": 14,
+    "frozenSuspensions": 18952,
+    "frozenHorizons": 128,
+    "fullCpuSpcCorpusRepeated": false,
+    "strictLongCoreGatesRepeated": false,
+    "newNativeRuns": false
+  },
+  "pairedSeries": [
+    {
+      "series": "candidate1-pal",
+      "fieldsPerVariant": 1200,
+      "pairs": 24,
+      "fasterPairs": 11,
+      "combinedGainPercent": -6.312878534015908,
+      "medianPairedGainPercent": -2.6179410966440275,
+      "baselineAllocatedBytes": 945661064,
+      "candidateAllocatedBytes": 859301376,
+      "allocatedChangePercent": -9.1322029940317,
+      "baselineThreadCycles": 65541323323,
+      "candidateThreadCycles": 68730519645,
+      "baselineThreadUserSeconds": 14.84375,
+      "candidateThreadUserSeconds": 15.578125,
+      "sameFinalStateVideoPcm": true
+    },
+    {
+      "series": "candidate2-pal",
+      "fieldsPerVariant": 1200,
+      "pairs": 24,
+      "fasterPairs": 22,
+      "combinedGainPercent": 10.856444765856299,
+      "medianPairedGainPercent": 7.045235451262966,
+      "baselineAllocatedBytes": 945684488,
+      "candidateAllocatedBytes": 859285328,
+      "allocatedChangePercent": -9.136150703150792,
+      "baselineThreadCycles": 68080992455,
+      "candidateThreadCycles": 61651830811,
+      "baselineThreadUserSeconds": 15.515625,
+      "candidateThreadUserSeconds": 14.03125,
+      "sameFinalStateVideoPcm": true
+    },
+    {
+      "series": "candidate2-ntsc",
+      "fieldsPerVariant": 1200,
+      "pairs": 24,
+      "fasterPairs": 16,
+      "combinedGainPercent": 1.67834885287228,
+      "medianPairedGainPercent": 0.7736372024944149,
+      "baselineAllocatedBytes": 914973072,
+      "candidateAllocatedBytes": 828578272,
+      "allocatedChangePercent": -9.442332528011278,
+      "baselineThreadCycles": 53748872562,
+      "candidateThreadCycles": 52926175078,
+      "baselineThreadUserSeconds": 12.1875,
+      "candidateThreadUserSeconds": 11.953125,
+      "sameFinalStateVideoPcm": true
+    },
+    {
+      "series": "candidate2-late-pal",
+      "fieldsPerVariant": 1200,
+      "pairs": 24,
+      "fasterPairs": 5,
+      "combinedGainPercent": -8.62025358510181,
+      "medianPairedGainPercent": -2.991486139321564,
+      "baselineAllocatedBytes": 944583568,
+      "candidateAllocatedBytes": 858359224,
+      "allocatedChangePercent": -9.128291759570395,
+      "baselineThreadCycles": 61501590786,
+      "candidateThreadCycles": 66681703728,
+      "baselineThreadUserSeconds": 13.953125,
+      "candidateThreadUserSeconds": 15.03125,
+      "sameFinalStateVideoPcm": true
+    },
+    {
+      "series": "candidate3-late-pal",
+      "fieldsPerVariant": 1200,
+      "pairs": 24,
+      "fasterPairs": 16,
+      "combinedGainPercent": 1.7738634987154223,
+      "medianPairedGainPercent": 2.2579572364427314,
+      "baselineAllocatedBytes": 944545320,
+      "candidateAllocatedBytes": 858304400,
+      "allocatedChangePercent": -9.130416315015989,
+      "baselineThreadCycles": 62550803314,
+      "candidateThreadCycles": 61452640442,
+      "baselineThreadUserSeconds": 14.046875,
+      "candidateThreadUserSeconds": 14.015625,
+      "sameFinalStateVideoPcm": true
+    },
+    {
+      "series": "candidate3-ntsc",
+      "fieldsPerVariant": 1200,
+      "pairs": 24,
+      "fasterPairs": 6,
+      "combinedGainPercent": -6.975205855181665,
+      "medianPairedGainPercent": -5.785957108976469,
+      "baselineAllocatedBytes": 915016960,
+      "candidateAllocatedBytes": 828732712,
+      "allocatedChangePercent": -9.429797672821284,
+      "baselineThreadCycles": 62330294770,
+      "candidateThreadCycles": 66052566595,
+      "baselineThreadUserSeconds": 13.84375,
+      "candidateThreadUserSeconds": 14.75,
+      "sameFinalStateVideoPcm": true
+    },
+    {
+      "series": "candidate3-pal",
+      "fieldsPerVariant": 1200,
+      "pairs": 24,
+      "fasterPairs": 16,
+      "combinedGainPercent": 3.722881729855576,
+      "medianPairedGainPercent": 6.506519390178411,
+      "baselineAllocatedBytes": 945755152,
+      "candidateAllocatedBytes": 859334144,
+      "allocatedChangePercent": -9.137778188915435,
+      "baselineThreadCycles": 71078116904,
+      "candidateThreadCycles": 68459385618,
+      "baselineThreadUserSeconds": 16.0625,
+      "candidateThreadUserSeconds": 15.453125,
+      "sameFinalStateVideoPcm": true
+    },
+    {
+      "series": "candidate4-late-pal",
+      "fieldsPerVariant": 1200,
+      "pairs": 24,
+      "fasterPairs": 8,
+      "combinedGainPercent": -5.706725291981685,
+      "medianPairedGainPercent": -3.077013342321455,
+      "baselineAllocatedBytes": 944606848,
+      "candidateAllocatedBytes": 895253560,
+      "allocatedChangePercent": -5.2247438290855985,
+      "baselineThreadCycles": 64039683971,
+      "candidateThreadCycles": 67446107816,
+      "baselineThreadUserSeconds": 14.46875,
+      "candidateThreadUserSeconds": 15.203125,
+      "sameFinalStateVideoPcm": true
+    }
+  ],
+  "prototypes": [
+    {
+      "prototype": 1,
+      "adopted": false,
+      "sourceSnapshots": [
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype1/Cpu65816.Cycles.cs",
+          "bytes": 11985,
+          "sha256RawBytes": "76ca569e13767e9b6cc38b03e7bf1348fecb70d17baa12c707295ef27c412176"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype1/CpuCycle.cs",
+          "bytes": 1462,
+          "sha256RawBytes": "7887cb3da9803deba3129c7143eef2527406691fe3c8ae5410a6bf7390ffc721"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype1/HardwareProfile.cs",
+          "bytes": 2567,
+          "sha256RawBytes": "53f0873ccd4c3af138fb79e930262a0741d92ab54d01c9decfd91f83a78251e6"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype1/SnesSystem.cs",
+          "bytes": 13071,
+          "sha256RawBytes": "bba4b4f874aeaaa7c6a8b0ee3283756cb1d3396f288216513c631ed4e0ae27e0"
+        }
+      ],
+      "coreBinary": {
+        "path": "artifacts/r6-realtime-core/candidate1/SNESEmulator.Core.dll",
+        "bytes": 413696,
+        "sha256RawBytes": "57513610b0975d97ebb64e7c910c278ae7d147b99cb42ebe0928da4b90477ffc"
+      }
+    },
+    {
+      "prototype": 2,
+      "adopted": false,
+      "sourceSnapshots": [
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype2/Cpu65816.Cycles.cs",
+          "bytes": 12137,
+          "sha256RawBytes": "169e258ff9de5e41c3adb7840e4994b74415545b6a3655e0986194c9034e013f"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype2/CpuCycle.cs",
+          "bytes": 1462,
+          "sha256RawBytes": "7887cb3da9803deba3129c7143eef2527406691fe3c8ae5410a6bf7390ffc721"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype2/HardwareProfile.cs",
+          "bytes": 3099,
+          "sha256RawBytes": "a8e7eefc42d77b2308e1d5fa0dad1db0b22dc4e3b9044f74b8a07069aa594c56"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype2/SnesSystem.cs",
+          "bytes": 13772,
+          "sha256RawBytes": "2400c31f2123fb544534c1482a3514e11c5f8115c553d1fdfaf7c398dae6742e"
+        }
+      ],
+      "coreBinary": {
+        "path": "artifacts/r6-realtime-core/candidate2/SNESEmulator.Core.dll",
+        "bytes": 414208,
+        "sha256RawBytes": "ccfd65a64e5aed9d98143fe5059da34195a48a665f587bb5810139e77a620348"
+      }
+    },
+    {
+      "prototype": 3,
+      "adopted": false,
+      "sourceSnapshots": [
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype3/Cpu65816.Cycles.cs",
+          "bytes": 12322,
+          "sha256RawBytes": "8f9fbab2e44bac4b12c075c98da7ae6bcc2596022ee56e3542f1162dd98afdc8"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype3/CpuCycle.cs",
+          "bytes": 1462,
+          "sha256RawBytes": "7887cb3da9803deba3129c7143eef2527406691fe3c8ae5410a6bf7390ffc721"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype3/CpuObserverTests.cs",
+          "bytes": 9052,
+          "sha256RawBytes": "11df3360659249da3750b858ac6d4b749917a34752657e2e5e6e9cd3c9a91f16"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype3/HardwareProfile.cs",
+          "bytes": 3099,
+          "sha256RawBytes": "a8e7eefc42d77b2308e1d5fa0dad1db0b22dc4e3b9044f74b8a07069aa594c56"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype3/SnesSystem.cs",
+          "bytes": 13772,
+          "sha256RawBytes": "2400c31f2123fb544534c1482a3514e11c5f8115c553d1fdfaf7c398dae6742e"
+        }
+      ],
+      "coreBinary": {
+        "path": "artifacts/r6-realtime-core/candidate3/SNESEmulator.Core.dll",
+        "bytes": 414208,
+        "sha256RawBytes": "8f72505a5d9d884c29551463b8a626ac92e9f852ccad134e21e3d05e00965a1f"
+      }
+    },
+    {
+      "prototype": 4,
+      "adopted": false,
+      "sourceSnapshots": [
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype4/Cpu65816.Cycles.cs",
+          "bytes": 12492,
+          "sha256RawBytes": "060716808e066cdd3aa32ec149db5f7aac2b08865f776681273822f7134d9033"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype4/CpuCycle.cs",
+          "bytes": 1030,
+          "sha256RawBytes": "cbb5acf5bc59f8c2308d57a7b5691c40336b804a5c40d24822875fbe6f407830"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype4/CpuObserverTests.cs",
+          "bytes": 9442,
+          "sha256RawBytes": "fa36e63fc8a458943d4efa43fd257c53c58919360f39513ea216c5fe346bde18"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype4/HardwareProfile.cs",
+          "bytes": 2382,
+          "sha256RawBytes": "fa683ae4e36eef2d6811228a5deb094605b75be68d1b3f59c856bf72d4b9ac07"
+        },
+        {
+          "path": "artifacts/r6-realtime-core/rejected-prototype4/SnesSystem.cs",
+          "bytes": 12829,
+          "sha256RawBytes": "bbca371afd61462a51c57cd6ca7b7993d00bfa1d291c522699718a4bfee8a370"
+        }
+      ],
+      "coreBinary": {
+        "path": "artifacts/r6-realtime-core/candidate4/SNESEmulator.Core.dll",
+        "bytes": 412160,
+        "sha256RawBytes": "cb64ba6e93942a36f481c3f3e557d6d823a10bf789c983c33340b63e6407d756"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "path": "artifacts/r6-realtime-runtime/final-short-pal-native-pal/checkpoint-0.state",
+      "bytes": 145426,
+      "sha256RawBytes": "fcdbda7cf633f286b3f36302a67f0767c8e67de461800be45c5498cf4d9da933"
+    },
+    {
+      "path": "artifacts/r5-final-acceptance/retained-native-phase-checkpoints/pal-1215.089087-checkpoint-0.state",
+      "bytes": 149798,
+      "sha256RawBytes": "efabdfa94c6e780600cf764bf622518882178be6c4fcd6457789c2716f0d9698"
+    },
+    {
+      "path": "artifacts/r5-tail-core/tail34810.prepared.state",
+      "bytes": 145645,
+      "sha256RawBytes": "bc80d236695bd2e17dc57b175c78e4d5c4149bf2bd32f8b52435d1e7617404ed"
+    },
+    {
+      "path": "testdata/m9-performance-replay.json",
+      "bytes": 661,
+      "sha256RawBytes": "c5e7e91e565ee6feaf3a3bf377d8a068f60581e737f72dbb8ae35b140309bde6"
+    },
+    {
+      "path": "artifacts/m9h/pal-soak-techdemo.sfc",
+      "bytes": 262144,
+      "sha256RawBytes": "0eb94e0a605ded645fa59cfb78151c8a49aa5d54ee77b47d97c441bf2d01ee63"
+    },
+    {
+      "path": "testdata/m8-game/unnamed-snes-game.sfc",
+      "bytes": 262144,
+      "sha256RawBytes": "41a13ef6e25f8647a090efa33c0517307405b50d032f67a621cf1b1665ccd42e"
+    },
+    {
+      "path": "testdata/m9-performance-baseline.json",
+      "bytes": 25653,
+      "sha256RawBytes": "11c9c7a2b6ae55cfaa102c291fb7e76a02ead3e90e00cf08efa1ef582f622377"
+    },
+    {
+      "path": "testdata/m9-raw-state-oracles.json",
+      "bytes": 11266,
+      "sha256RawBytes": "3d9eefd1396da5212c53c1abe50f85a87d9bc820876b61b525011373e11eb2a8"
+    },
+    {
+      "path": "testdata/m9-spc-suspension-reference.jsonl.gz",
+      "bytes": 485151,
+      "sha256RawBytes": "837e898f015a401db0be290794d7938b507a5eb0c95d4b9248d301f54bc3ff84"
+    }
+  ],
+  "measurementHelpers": [
+    {
+      "path": "artifacts/r6-realtime-core/bridge/Bridge.cs",
+      "bytes": 5698,
+      "sha256RawBytes": "dd491f1c291f92996009791788d9da2d435069b4345f337dbf23dee3ae188ba2"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/bridge/Bridge.csproj",
+      "bytes": 310,
+      "sha256RawBytes": "0bf5ea7b05576709878a252b8bad68af605e4bc01acd2851e0eed6ef71236475"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/host/Host.csproj",
+      "bytes": 210,
+      "sha256RawBytes": "099acc6a5d77b39b9b8f1e7beeb4a0ecc8e00f48f2f4999b7c7277ba86f6dd03"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/host/Program.cs",
+      "bytes": 2093,
+      "sha256RawBytes": "8e7ea0064c43983086115d0e0ff0d7acbe6d2697bf28d226a36737f5f8bdaae3"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/owner-profile/Owner.csproj",
+      "bytes": 183,
+      "sha256RawBytes": "83f4a7fcb79a4d14c3efe178e1d3921495991b5f2b7a89b677ab81815183ca3a"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/owner-profile/Program.cs",
+      "bytes": 1318,
+      "sha256RawBytes": "8a1bbcf8ea91101c1a12411b495f9d9dc2bd3cb6b0c304137d46232048c02e8f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader/Program.cs",
+      "bytes": 1261,
+      "sha256RawBytes": "93cedde272f0200caefe04eb0f3d5b7e28844b15308eddf9f612ea439672a18c"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader/Reader.csproj",
+      "bytes": 564,
+      "sha256RawBytes": "def338d1d37e4abfbf1fdb1ea78a2fe4d478227ca6bee6517d9b36092a2fdf1c"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/locality-bridge/Bridge.cs",
+      "bytes": 6712,
+      "sha256RawBytes": "3e1ea4bbd4ae7b1cffb48471c2fd7a861e1f4e363ca94fe9794bf682074a9ff6"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/locality-bridge/Bridge.csproj",
+      "bytes": 310,
+      "sha256RawBytes": "0bf5ea7b05576709878a252b8bad68af605e4bc01acd2851e0eed6ef71236475"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/analyse-pairs.py",
+      "bytes": 2612,
+      "sha256RawBytes": "f248801e324e8768ade555e39c655c4ef4cc99dfff8fc169fea6459fa691a872"
+    }
+  ],
+  "retainedMeasurementBinaries": [
+    {
+      "path": "artifacts/r6-realtime-core/baseline/Bridge.deps.json",
+      "bytes": 827,
+      "sha256RawBytes": "98a40fdbe3c228a5f7615e54bcff34745e3ce40cae01409abd14a6b085aa488f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/baseline/Bridge.dll",
+      "bytes": 28160,
+      "sha256RawBytes": "8bf0ba9c60174bfa6d872443dd5929ae8489dd43cfebdf2014622dbfd45017f1"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/baseline/Bridge.pdb",
+      "bytes": 15708,
+      "sha256RawBytes": "adbf278284d239347a216aa1b0b93eba269f95722f264ff8b9300b7b476319ef"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/baseline/SNESEmulator.Core.deps.json",
+      "bytes": 445,
+      "sha256RawBytes": "95786864b7f5ef44e7cb69fd038a2d2e0cab0a17af99ad2816ca0a780938d8c8"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/baseline/SNESEmulator.Core.dll",
+      "bytes": 411648,
+      "sha256RawBytes": "6b8581f0c1151ea16107d8717ec253589e6b00e1342937e2524d69d7b6225e30"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/baseline/SNESEmulator.Core.pdb",
+      "bytes": 117896,
+      "sha256RawBytes": "7bc7029c00c297c3a4ad06e5558ecaeef533f9d98924d6603429a24bc5718280"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate1/Bridge.deps.json",
+      "bytes": 827,
+      "sha256RawBytes": "98a40fdbe3c228a5f7615e54bcff34745e3ce40cae01409abd14a6b085aa488f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate1/Bridge.dll",
+      "bytes": 28160,
+      "sha256RawBytes": "8bf0ba9c60174bfa6d872443dd5929ae8489dd43cfebdf2014622dbfd45017f1"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate1/Bridge.pdb",
+      "bytes": 15708,
+      "sha256RawBytes": "adbf278284d239347a216aa1b0b93eba269f95722f264ff8b9300b7b476319ef"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate1/SNESEmulator.Core.deps.json",
+      "bytes": 445,
+      "sha256RawBytes": "95786864b7f5ef44e7cb69fd038a2d2e0cab0a17af99ad2816ca0a780938d8c8"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate1/SNESEmulator.Core.dll",
+      "bytes": 413696,
+      "sha256RawBytes": "57513610b0975d97ebb64e7c910c278ae7d147b99cb42ebe0928da4b90477ffc"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate1/SNESEmulator.Core.pdb",
+      "bytes": 118356,
+      "sha256RawBytes": "cfe3a262c7cb5ff15067b22d6153801de6f3dddd1950fb7304662696593c9a47"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate2/Bridge.deps.json",
+      "bytes": 827,
+      "sha256RawBytes": "98a40fdbe3c228a5f7615e54bcff34745e3ce40cae01409abd14a6b085aa488f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate2/Bridge.dll",
+      "bytes": 28160,
+      "sha256RawBytes": "8bf0ba9c60174bfa6d872443dd5929ae8489dd43cfebdf2014622dbfd45017f1"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate2/Bridge.pdb",
+      "bytes": 15708,
+      "sha256RawBytes": "adbf278284d239347a216aa1b0b93eba269f95722f264ff8b9300b7b476319ef"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate2/SNESEmulator.Core.deps.json",
+      "bytes": 445,
+      "sha256RawBytes": "95786864b7f5ef44e7cb69fd038a2d2e0cab0a17af99ad2816ca0a780938d8c8"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate2/SNESEmulator.Core.dll",
+      "bytes": 414208,
+      "sha256RawBytes": "ccfd65a64e5aed9d98143fe5059da34195a48a665f587bb5810139e77a620348"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate2/SNESEmulator.Core.pdb",
+      "bytes": 118636,
+      "sha256RawBytes": "5541e36c7eb9312ce8e2e162a84d83254a1c8f29b3e40bedf41137e74ab9c933"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate3/Bridge.deps.json",
+      "bytes": 827,
+      "sha256RawBytes": "98a40fdbe3c228a5f7615e54bcff34745e3ce40cae01409abd14a6b085aa488f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate3/Bridge.dll",
+      "bytes": 28160,
+      "sha256RawBytes": "8bf0ba9c60174bfa6d872443dd5929ae8489dd43cfebdf2014622dbfd45017f1"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate3/Bridge.pdb",
+      "bytes": 15708,
+      "sha256RawBytes": "adbf278284d239347a216aa1b0b93eba269f95722f264ff8b9300b7b476319ef"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate3/SNESEmulator.Core.deps.json",
+      "bytes": 445,
+      "sha256RawBytes": "95786864b7f5ef44e7cb69fd038a2d2e0cab0a17af99ad2816ca0a780938d8c8"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate3/SNESEmulator.Core.dll",
+      "bytes": 414208,
+      "sha256RawBytes": "8f72505a5d9d884c29551463b8a626ac92e9f852ccad134e21e3d05e00965a1f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate3/SNESEmulator.Core.pdb",
+      "bytes": 118664,
+      "sha256RawBytes": "34d90f9b73adc3c6a396f20ee264870d4e0c8398f719d03b7b4cb413e9feab14"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate4/Bridge.deps.json",
+      "bytes": 827,
+      "sha256RawBytes": "98a40fdbe3c228a5f7615e54bcff34745e3ce40cae01409abd14a6b085aa488f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate4/Bridge.dll",
+      "bytes": 28160,
+      "sha256RawBytes": "8bf0ba9c60174bfa6d872443dd5929ae8489dd43cfebdf2014622dbfd45017f1"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate4/Bridge.pdb",
+      "bytes": 15708,
+      "sha256RawBytes": "adbf278284d239347a216aa1b0b93eba269f95722f264ff8b9300b7b476319ef"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate4/SNESEmulator.Core.deps.json",
+      "bytes": 445,
+      "sha256RawBytes": "95786864b7f5ef44e7cb69fd038a2d2e0cab0a17af99ad2816ca0a780938d8c8"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate4/SNESEmulator.Core.dll",
+      "bytes": 412160,
+      "sha256RawBytes": "cb64ba6e93942a36f481c3f3e557d6d823a10bf789c983c33340b63e6407d756"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/candidate4/SNESEmulator.Core.pdb",
+      "bytes": 118088,
+      "sha256RawBytes": "bf0df8f4f20c387cb5946213cac450157e78a0af7c6f81aef7bae13ca070a555"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/bridge-bin/Bridge.deps.json",
+      "bytes": 827,
+      "sha256RawBytes": "98a40fdbe3c228a5f7615e54bcff34745e3ce40cae01409abd14a6b085aa488f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/bridge-bin/Bridge.dll",
+      "bytes": 28160,
+      "sha256RawBytes": "8bf0ba9c60174bfa6d872443dd5929ae8489dd43cfebdf2014622dbfd45017f1"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/bridge-bin/Bridge.pdb",
+      "bytes": 15708,
+      "sha256RawBytes": "adbf278284d239347a216aa1b0b93eba269f95722f264ff8b9300b7b476319ef"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/bridge-bin/SNESEmulator.Core.dll",
+      "bytes": 411648,
+      "sha256RawBytes": "6b8581f0c1151ea16107d8717ec253589e6b00e1342937e2524d69d7b6225e30"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/bridge-bin/SNESEmulator.Core.pdb",
+      "bytes": 117896,
+      "sha256RawBytes": "7bc7029c00c297c3a4ad06e5558ecaeef533f9d98924d6603429a24bc5718280"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/host-bin/Host.deps.json",
+      "bytes": 406,
+      "sha256RawBytes": "0c60102940352d4b28ad99dd41211051f11ba02d17e811f72733a7e46346dccd"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/host-bin/Host.dll",
+      "bytes": 10240,
+      "sha256RawBytes": "2f53b9f0f33773da8072820a4a43ab7ede1f1cbbec60105447ea85f17e94e3cd"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/host-bin/Host.pdb",
+      "bytes": 13488,
+      "sha256RawBytes": "7d0144e8aefd8b1e6490321cc0822a420278695d151cb9a8182f206cafc3bf44"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/host-bin/Host.runtimeconfig.json",
+      "bytes": 342,
+      "sha256RawBytes": "c230a317a54dd960bcbeb5f347f52e18dc665a26f7efda2159fced9a5ac7e097"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/owner-bin/Owner.deps.json",
+      "bytes": 409,
+      "sha256RawBytes": "3065b1861674c7d942ea6a19f1e18eab932c86065708364378121a2df739da0d"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/owner-bin/Owner.dll",
+      "bytes": 8704,
+      "sha256RawBytes": "57f026084fcefff5cbc61e9fe791d83d1735a1ad40109d805c6baa62a3f85363"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/owner-bin/Owner.pdb",
+      "bytes": 12744,
+      "sha256RawBytes": "bd91d3813441176ff019d8ba84efa5ccc728c6e4d8029db55501146491ccc070"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/owner-bin/Owner.runtimeconfig.json",
+      "bytes": 342,
+      "sha256RawBytes": "c230a317a54dd960bcbeb5f347f52e18dc665a26f7efda2159fced9a5ac7e097"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Dia2Lib.dll",
+      "bytes": 59024,
+      "sha256RawBytes": "6c4cac68010fe032218efe5e9fcf46eef9f77bfaa5f3bd33f03c5ff77d5a8fac"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Microsoft.Diagnostics.FastSerialization.dll",
+      "bytes": 76600,
+      "sha256RawBytes": "ad9c4e4001b2aed5e7337188747d0791c2a8d6058fd9a7eb5f12832982f76934"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Microsoft.Diagnostics.NETCore.Client.dll",
+      "bytes": 151064,
+      "sha256RawBytes": "e2cc9e1f6c97b3c4ee45ebabaa92408eb9b2fc81cb08ceeb342fe48bf79db15f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Microsoft.Diagnostics.Tracing.TraceEvent.dll",
+      "bytes": 3327800,
+      "sha256RawBytes": "9e20d3797881c237e891dd97b5137f0d738fd4ecbbda7e64568a6a21171ff4b7"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Microsoft.Extensions.DependencyInjection.Abstractions.dll",
+      "bytes": 63768,
+      "sha256RawBytes": "67fa4325000db017dc0c35829b416f024f042d24efb868bcf17a895ee6500a93"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Microsoft.Extensions.Logging.Abstractions.dll",
+      "bytes": 65288,
+      "sha256RawBytes": "bb853130f5afaf335be7858d661f8212ec653835100f5a4e3aa2c66a4d4f685d"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Reader.deps.json",
+      "bytes": 3291,
+      "sha256RawBytes": "c0f1aa3b871c2256d98a1ef6da3be879611a3f17f0f25b47c018dff61d7657e5"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Reader.dll",
+      "bytes": 11776,
+      "sha256RawBytes": "6aebe359848c224b613f0e004439dd230de15f04132790c2bdb858b54e3c645f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Reader.pdb",
+      "bytes": 13056,
+      "sha256RawBytes": "c8990af44e922c1461b73716bbbf9582cfd9e2c5d3a48c3b74d3072ff3119a71"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/Reader.runtimeconfig.json",
+      "bytes": 342,
+      "sha256RawBytes": "c230a317a54dd960bcbeb5f347f52e18dc665a26f7efda2159fced9a5ac7e097"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/alloc-reader-bin/TraceReloggerLib.dll",
+      "bytes": 23216,
+      "sha256RawBytes": "6830c0f1d3f3c17719181e73dd5cfa8ccbb3f3c575329d2120576545103467b5"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/locality-baseline/Bridge.deps.json",
+      "bytes": 827,
+      "sha256RawBytes": "98a40fdbe3c228a5f7615e54bcff34745e3ce40cae01409abd14a6b085aa488f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/locality-baseline/Bridge.dll",
+      "bytes": 30720,
+      "sha256RawBytes": "7d8ede85930595f7e5c476e5cbe3e98f715f530c146c8224f3629b7365bb3868"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/locality-baseline/Bridge.pdb",
+      "bytes": 16484,
+      "sha256RawBytes": "f22be9cfbed5624f6faaef26918c4be35a45a783acf37bf1e6d55a679871eb6d"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/locality-baseline/SNESEmulator.Core.dll",
+      "bytes": 411648,
+      "sha256RawBytes": "6b8581f0c1151ea16107d8717ec253589e6b00e1342937e2524d69d7b6225e30"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/locality-baseline/SNESEmulator.Core.pdb",
+      "bytes": 117896,
+      "sha256RawBytes": "7bc7029c00c297c3a4ad06e5558ecaeef533f9d98924d6603429a24bc5718280"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "artifacts/r6-realtime-core/restored-source-proof.json",
+      "bytes": 15154,
+      "sha256RawBytes": "c7a3f8df2114bcbf58920e9a075345f7f7284c00e8c3dd002ed5752abfe7abd5"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/paired-summary.json",
+      "bytes": 4518,
+      "sha256RawBytes": "fba8d3193998531a4f991ed7abbcb12cd7d35422d4a62dc375549d9ca28403c7"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/cpu-hooks-baseline.json",
+      "bytes": 1492,
+      "sha256RawBytes": "c0c9de74d52d58581249e31f69a67eece5ac07be4c191155746a7f8e76b9188e"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/cpu-hooks-baseline.log",
+      "bytes": 510,
+      "sha256RawBytes": "f8fa2cb180fcd15dfdde0b1c8b4e2bfdb8a61dbf4319760fa05aa1af3686333e"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/cpu-hooks.json",
+      "bytes": 1347,
+      "sha256RawBytes": "56386f5b2ec9b86e20a1de291b2cfccdece2884d98be5f4e446196167b0f7b87"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/cpu-hooks-v2.json",
+      "bytes": 2217,
+      "sha256RawBytes": "8d3495f54c015d7c30e815402bcd0ad36c4ac65bb1cbeb4104116eec4068dbb8"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/cpu-hooks-v3.json",
+      "bytes": 2266,
+      "sha256RawBytes": "5b07587c1476f27a97fdc14506c1cd16ea738e96bbdb09147e06b4d0897eb491"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/core-restored.json",
+      "bytes": 38166,
+      "sha256RawBytes": "ff1ef8a54789a8538f42338c2234a08fe7876c0806729da030468831774988b9"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/core-restored.log",
+      "bytes": 10800,
+      "sha256RawBytes": "a38644deccadbb20aa2a3aae5ea8a94d071c1bfb0c376a5cd43455fd65c33b9e"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/frozen-restored/result.json",
+      "bytes": 2294,
+      "sha256RawBytes": "763a51347d65b5f1d2e6b43073273e194d941d0bdf77890bdfe6315b5557dc87"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/frozen-restored/provenance.json",
+      "bytes": 8354,
+      "sha256RawBytes": "00eeb8a02d827c7178a791b3f805b283a83e4cbd7758c388cb1a34f92d2814dd"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/frozen-restored/commands.log",
+      "bytes": 5987,
+      "sha256RawBytes": "0da19fe127b29d9ed8dadb807008d4e1829c78ed6dbdfdb9f953cdde9e736397"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/frozen-restored/suspend.json",
+      "bytes": 539,
+      "sha256RawBytes": "e8db1d2e232645c00b1e9d787b8e50d3ef1cedb83ab5a4198234bd142ad6da48"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pal-native-baseline-alloc.nettrace",
+      "bytes": 5612906,
+      "sha256RawBytes": "4d8cfe2af346d2bf6c971d5482dea564b43e8aa33934128cdc25651859d1cb44"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pal-native-baseline-alloc.log",
+      "bytes": 2652,
+      "sha256RawBytes": "4c08c50c9a9950baf32d246e15a32423fa383d3185174785980d04622f04b833"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pal-native-baseline-alloc.profile.json",
+      "bytes": 1928,
+      "sha256RawBytes": "42db385cc1595362df9a262bb35181db0ef58b09b2999a6a8a238d05188ad75b"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pal-native-baseline-alloc.state",
+      "bytes": 145649,
+      "sha256RawBytes": "500d4b8efc91978113847eb44108f5af026fb13c5db9f9be519ecb79719ebd7b"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pal-late-locality.locality.json",
+      "bytes": 278,
+      "sha256RawBytes": "e47fae20098f53d664fd9bb41059c99d9fd1ef1071336576504d07121e7f58db"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pal-late-locality.log",
+      "bytes": 2626,
+      "sha256RawBytes": "95a6d0095d6ce4f7e3d0257904c7344051d1780fc2f78f232e3ca1aaa85bcd23"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate1-pal.analysis.json",
+      "bytes": 10746,
+      "sha256RawBytes": "d1e1299429d14b702f648bb1373835df1a83959910007fb5b71cc9837af49806"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate1-pal.jsonl",
+      "bytes": 29128,
+      "sha256RawBytes": "dd55ac5366de9802219b149d81dc3bfd8ce07420ea9ee8f9f8b88d246c6d5319"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate2-pal.analysis.json",
+      "bytes": 10744,
+      "sha256RawBytes": "560e2a0b38b6dc89e6c446c4f61c29a0eff4925bde370806b44b6bafe6296613"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate2-pal.jsonl",
+      "bytes": 28429,
+      "sha256RawBytes": "095ad53eb4ef0f935885f4f11a1c3eb4f4cfaebba5df8bb30b283ad4dbdf31dd"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate2-ntsc.analysis.json",
+      "bytes": 10802,
+      "sha256RawBytes": "0cb49982c2bee396fb2d6e9a239850358c45d51d647e3086ea4c5d1c11b5e5a9"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate2-ntsc.jsonl",
+      "bytes": 28063,
+      "sha256RawBytes": "3f009d1a1b4ef9b50c4c5b79234e64dce30fc529145367cebda09d2b02510f88"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate2-late-pal.analysis.json",
+      "bytes": 10801,
+      "sha256RawBytes": "fa511a5f33a819c54a34aee5e1d95d88b8a4ee7ef74694fb06cbbb51ee502f89"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate2-late-pal.jsonl",
+      "bytes": 28968,
+      "sha256RawBytes": "4f49228afb7ad2f65c640b775bce2e70ea1a34eb776b949d059d58e2fb8ed537"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate3-late-pal.analysis.json",
+      "bytes": 10791,
+      "sha256RawBytes": "b2e9000447e12566786cb2078cd1f65add2fba9440a02a7607e055a9ff143bb8"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate3-late-pal.jsonl",
+      "bytes": 28505,
+      "sha256RawBytes": "fe6e11cbbf0dbebb587c48931994874b71d0d7d2f18951361dc2af910298b4ac"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate3-ntsc.analysis.json",
+      "bytes": 10800,
+      "sha256RawBytes": "b6eb535b4ecefa4207162f73d32e6cd199a300044a14cd51d98401d84e0498fa"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate3-ntsc.jsonl",
+      "bytes": 30075,
+      "sha256RawBytes": "ed58b168b955493931c7ae0a1d57548037224763cf36d194a7a44f3d49055e49"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate3-pal.analysis.json",
+      "bytes": 10750,
+      "sha256RawBytes": "6247afb7b37635100a2fa3d09efdcd884e72c4936a7c2fe3ef748758978f697e"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate3-pal.jsonl",
+      "bytes": 29417,
+      "sha256RawBytes": "220fc928bc6f2964c6d3e0cfd6028ab67dbb6e4dadc2901f94773edc7db71268"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate4-late-pal.analysis.json",
+      "bytes": 10791,
+      "sha256RawBytes": "e3693561f3889ad1d84c69ac4c355e1feb1856d4f6a42116914f42965634f16f"
+    },
+    {
+      "path": "artifacts/r6-realtime-core/pair-candidate4-late-pal.jsonl",
+      "bytes": 29368,
+      "sha256RawBytes": "0b9addda8563e76271659d94dd1eeb70298982bde190a54242ae4cd26ea8f631"
+    }
+  ],
+  "allocationProfileScope": "Exact owner-thread total versus sampled per-type attribution; not native-process allocation rate or CPU percentage",
+  "runtime": "Private SDK10.0.402 Microsoft.NETCore.App10.0.13; actual CLR/JIT paths and hashes in each retained identity",
+  "foreignUserWorkloads": "left running; no process kill, priority/affinity/power/global timer change or external-load causal claim",
+  "nextAuthorizedScope": "Sequential Runtime measurement of WaitRequest/Wake/Owner lateness/GC before any local high-resolution waitable-timer implementation",
+  "canonicalPublishActivated": false,
+  "pushPerformed": false
+}

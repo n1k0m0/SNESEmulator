@@ -1,5 +1,10 @@
 # R6 remote presentation clock recovery
 
+The subsequent [Core admission investigation](r6-realtime-core.md) rejected all
+four allocation prototypes after independent throughput regressions, restored
+all 42 Core files and retained five public callback/continuation tests. PAL
+owner catchup remains unresolved; that phase does not upgrade native acceptance.
+
 This phase fixes two reproducible remote presentation failures: a fixed 3:2
 resampler retains clock drift or padding latency, and a wall-clock video deadline
 can subsequently hold pictures behind the real audio driver. It also removes two
