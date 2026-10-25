@@ -1,5 +1,9 @@
 # Final integration: tested implementation and remaining release limits
 
+The subsequent [R5 core follow-up](r5-realtime-core.md) reduces allocation and
+empty-observer overhead. Its bounded tests do not replace the historical
+package/long/native outcomes recorded below.
+
 This report records the actual final implementation at
 `affae58f1b4ca127b2d14865569615334f6f8856`, rather than transferring acceptance
 from earlier binaries. The final documentation commit is a successor of that

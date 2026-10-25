@@ -49,6 +49,17 @@ static class PpuTests
     }
     public static void Run(Action<string,Action> test,string directory)
     {
+        test("R5 queued PPU observations use the current subscriber and clear removed observers",()=>{
+            var c=new MasterClock(HardwareProfile.Ntsc);c.Reset();var p=new Ppu{Clock=c};
+            int oldCalls=0,newCalls=0;p.PhaseObserved=_=>oldCalls++;p.Synchronize(false);
+            p.PhaseObserved=_=>newCalls++;p.PublishNotifications();p.PublishNotifications();
+            Check(oldCalls==0&&newCalls==1,"Queued line notice was lost, duplicated or delivered to a stale subscriber");
+            c.AdvanceTo(1364);p.StartLine(1);p.Synchronize(false);p.PhaseObserved=null;p.PublishNotifications();
+            p.PhaseObserved=_=>newCalls++;p.PublishNotifications();
+            Check(newCalls==1,"Removed observer left an old queued notice for a new subscriber");
+        });
+
+
         test("M5 CPU ROM VRAM prefetch old buffer increment remap and wrapped address",()=>{
             foreach(int mapping in new[]{0,1,2,3})foreach(int inc in new[]{0,1,2,3})
             {

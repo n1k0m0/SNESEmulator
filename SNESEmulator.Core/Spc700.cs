@@ -16,7 +16,7 @@ public sealed partial class Spc700(ISpcBus bus)
     public Action<SpcCycle>? BeforeCycle {get;set;}
     public Action<SpcCycle>? CycleObserved {get;set;}
     internal Func<SpcCycle,bool>? PrepareCycle {get;set;}
-    private SpcRegisters? suspended;
+    private HotRegisters? suspended;
     private bool cooperative;
     internal Func<SpcCycle,bool>? EffectCompleted {get;set;}
     private SpcRegisters? entry;
@@ -72,28 +72,31 @@ public sealed partial class Spc700(ISpcBus bus)
         if(suspended!=null)return 0;
         if(entry!=null&&cursor<completed.Count){var c=completed[cursor++];if(c.Address!=address||c.Direction!=direction||(direction=="write"&&c.Value!=value))throw new InvalidDataException("SPC replay diverged");return c.Value??0;}
         if(single&&cursor>=limit)throw yielded;
-        var next=new SpcCycle(address,value,direction);
+        SpcCycle? next = null;
         // A legacy veto must precede electrical admission: otherwise an APU
         // endpoint could advance without a committed bus cycle in the journal.
-        if((PrepareCycle!=null&&!PrepareCycle(next))||(PrepareBusCycle!=null&&!PrepareBusCycle(address,direction))){
+        if((PrepareCycle!=null&&!PrepareCycle(next = new(address,value,direction)))||(PrepareBusCycle!=null&&!PrepareBusCycle(address,direction))){
             // Keep exactly the register point formerly exposed by budget throw.
             // Remaining decoder operations are private speculation: all bus and
             // observer calls are suppressed, then every architectural field is
             // restored. The finite decoder has no host effects outside Cycle.
             return Suspend();
         }
-        BeforeCycle?.Invoke(next);
+        BeforeCycle?.Invoke(next ??= new(address,value,direction));
         if(direction=="read")value=bus.Read(address!.Value);
         if(direction=="write")bus.Write(address!.Value,value!.Value);
-        next=next with {Value=value};if(entry!=null)completed.Add(next);cursor++;
+        // Decoder replay retains values, not observer objects. A public row is
+        // materialized only for a public hook; the journal remains State9 data.
+        if(entry!=null)completed.Add(new JournalCycle(address,value,direction));cursor++;
         // Both callbacks observe this committed effect, including when either
         // requests suspension. Short-circuiting here would lose a notification.
         bool fastCompleted = CompleteBusCycle?.Invoke(address, value, direction) ?? true;
-        bool legacyCompleted = EffectCompleted?.Invoke(next) ?? true;
+        SpcCycle? actual = null;
+        bool legacyCompleted = EffectCompleted?.Invoke(actual = new(address,value,direction)) ?? true;
         if(!fastCompleted||!legacyCompleted){return Suspend();}
-        CycleObserved?.Invoke(next);return value??0;
+        CycleObserved?.Invoke(actual ?? new(address,value,direction));return value??0;
     }
-    private byte Suspend(){if(!cooperative)throw yielded;suspended=Capture();return 0;}
+    private byte Suspend(){if(!cooperative)throw yielded;suspended=CaptureHotRegisters();return 0;}
     private byte R(int a)=>Cycle((ushort)a,0,"read");
     private void W(int a,int v)=>Cycle((ushort)a,(byte)v,"write");
     private void Idle()=>Cycle(null,null,"wait");
@@ -135,7 +138,7 @@ public sealed partial class Spc700(ISpcBus bus)
         entry??=Capture();Restore(entry);cursor=0;suspended=null;cooperative=true;
         try {
             Execute();
-            if(suspended!=null){Restore(suspended);return false;}
+            if(suspended is {} saved){RestoreHotRegisters(saved);return false;}
             entry=null;completed.Clear();return true;
         } finally {suspended=null;cooperative=false;}
     }

@@ -1,5 +1,9 @@
 # R2: sustained performance and native application soaks
 
+[R5 core overhead](r5-realtime-core.md) records the later allocation and empty-
+observer optimization, scoped short-run evidence and rejected alternatives.
+It does not clear the independent sustained/native release gates.
+
 [Final integration](final-integration.md) now records the exact final package:
 37,000 NTSC and 31,000 PAL fields both retained slow complete 600-field windows.
 Both actual strict native hours completed; PAL passed, while NTSC retained

@@ -172,13 +172,42 @@ static class SpcContinuationProof
             Finish(c);
             Check(c.X == 0x7f && c.A == 0 && c.PC == 0x302 && c.Instructions == 1, "Replacement reused stale opcode/operand");
         });
+        Run("Legacy value journal preserves postlatch veto and snapshot without repeating the effect", () =>
+        {
+            var b=new Bus();var c=Make(b);b.Ram[0x200]=0x88; // ADC A,#imm uses the original decoder.
+            c.A=0x11;int effects=0;bool veto=true;
+            Set(c,"CompleteBusCycle",(Func<ushort?,byte?,string,bool>)((a,v,d)=>{effects++;return a!=0x201||!veto;}));
+            Check(!c.RunInstruction(),"Operand postlatch veto was ignored");
+            var journal=c.CaptureContinuation()!;
+            Check(journal.Completed.Length==2&&journal.Completed[1].Value==0x35&&c.PC==0x201&&c.A==0x11,"Incorrect exposed latch or register point");
+            Check(b.Reads.SequenceEqual(new ushort[]{0x200,0x201})&&effects==2,"Unexpected pre-resume effects");
+            var copyBus=new Bus();b.Ram.CopyTo(copyBus.Ram,0);var copy=new Spc700(copyBus);copy.RestoreContinuation(journal);
+            veto=false;Finish(c);Finish(copy);
+            Check(c.A==0x46&&c.PC==0x202&&copy.Capture()==c.Capture(),"Legacy resume registers differ");
+            Check(b.Reads.Count==2&&copyBus.Reads.Count==0&&effects==2,"A latched read or completion hook repeated");
+        });
+        Run("Legacy observer changes retain before and shared committed record semantics", () =>
+        {
+            var b=new Bus();var c=Make(b);b.Ram[0x200]=0x88;c.A=0x11;
+            SpcCycle? effect=null,observed=null;int before=0;
+            c.BeforeCycle=row=>{
+                if(row.Address!=0x201)return;before++;
+                Check(row.Value==0,"BeforeCycle must retain the decoder's pending read value");
+                Set(c,"EffectCompleted",(Func<SpcCycle,bool>)(actual=>{
+                    effect=actual;c.CycleObserved=next=>observed=next;return true;
+                }));
+            };
+            Finish(c);
+            Check(before==1&&effect?.Value==0x35&&ReferenceEquals(effect,observed),"Late hook changes lost or replaced the immutable committed row");
+            Check(c.A==0x46&&c.PC==0x202&&b.Reads.Count==2,"Observer changes altered the instruction");
+        });
         long Count(Spc700 cpu, string name) => (long)typeof(Spc700).GetProperty(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(cpu)!;
         report.Metadata["executionPaths"] = new
         {
             hotInstructions = checkedCpus.Sum(cpu => Count(cpu, "HotInstructionsCompleted")),
             legacyCompletions = checkedCpus.Sum(cpu => Count(cpu, "ReplayRunsCompleted")),
             hotCycleAttempts = checkedCpus.Sum(cpu => Count(cpu, "HotCycleAttempts")),
-            meaning = "Actual per-CPU diagnostics; chosen guard forms run hot. Other opcodes are separately verified by mixed vector coverage."
+            meaning = "Actual per-CPU diagnostics; guards cover both hot and legacy forms. Other opcodes are separately verified by mixed vector coverage."
         };
         report.Metadata["coreAssemblySha256"] = Convert.ToHexStringLower(SHA256.HashData(File.ReadAllBytes(typeof(Spc700).Assembly.Location)));
         report.Save(args.ElementAtOrDefault(0) ?? "artifacts/spc-continuation-guards");

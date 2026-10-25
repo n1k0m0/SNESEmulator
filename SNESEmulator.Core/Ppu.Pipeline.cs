@@ -100,7 +100,14 @@ public sealed partial class Ppu
         if(h==0||h==1080)if(PhaseObserved!=null)Notice(new(Clock.Now,h,Scanline,h==0?"line":"obj-fetch",selectedCount));
         if(publish)PublishNotifications();
     }
-    public void PublishNotifications(){foreach(var notice in notifications)PhaseObserved?.Invoke(notice);notifications.Clear();}
+    public void PublishNotifications()
+    {
+        // Most half-dots have no public observer. Keep that empty path small
+        // enough to inline, while queued rows still use the current subscriber.
+        if(notifications.Count!=0)PublishPendingNotifications();
+    }
+    private void PublishPendingNotifications()
+    {foreach(var notice in notifications)PhaseObserved?.Invoke(notice);notifications.Clear();}
     private bool Hires=>(Registers[5]&7) is 5 or 6;
     private static int BitsPerPixel(int mode,int bg)=>mode switch{
         0=>2,1=>bg==2?2:bg<2?4:0,2=>bg<2?4:0,3=>bg==0?8:bg==1?4:0,

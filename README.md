@@ -19,6 +19,9 @@ The ordered follow-ups are implemented: [R1 persistence/CI](docs/r1-persistence-
 exact implementation-head hosted CI checks. Both actual native hours completed:
 PAL passed; NTSC retained 288 post-ready muted fields and 127 remote drops.
 Both final core duration tests retained sub-real-time 600-field windows.
+[R5 core overhead](docs/r5-realtime-core.md) reduces observation allocations and
+records a bounded NTSC improvement; new native/realtime acceptance is still pending.
+
 **Strict performance/native release acceptance remains open.** Known raw
 accuracy and full-sequence audio differences remain separately documented.
 

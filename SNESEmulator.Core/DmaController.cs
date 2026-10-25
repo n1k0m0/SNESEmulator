@@ -36,7 +36,13 @@ public sealed class DmaController(SystemBus bus)
 {
     public DmaState State {get;private set;}=new();
     public Action<DmaTrace>? Observed {get;set;}
-    private DmaTrace? notice;
+    // Keep the latch even if a bus callback installs/replaces the observer before
+    // Boundary completes. Only the escaping public record needs an allocation.
+    private readonly record struct PendingNotice(long Clock,string Phase,DmaJob Job,int Channel,int Address,byte Value,bool Valid)
+    {
+        public DmaTrace Public()=>new(Clock,Phase,Job,Channel,Address,Value,Valid);
+    }
+    private PendingNotice? notice;
     private byte[] R=>bus.DmaRegisters;
     public bool Busy=>State.Phase!=DmaPhase.Idle;
     public bool Requested=>State.Pending||State.HdmaPending!=0;
@@ -191,6 +197,6 @@ public sealed class DmaController(SystemBus bus)
             case DmaPhase.Sync:State.Job=DmaJob.None;State.Phase=DmaPhase.Idle;break;
             default:throw new InvalidOperationException("Invalid DMA transition");
         }
-        var completedNotice=notice;notice=null;if(completedNotice!=null)Observed?.Invoke(completedNotice);
+        var completedNotice=notice;notice=null;if(completedNotice is {} row)Observed?.Invoke(row.Public());
     }
 }

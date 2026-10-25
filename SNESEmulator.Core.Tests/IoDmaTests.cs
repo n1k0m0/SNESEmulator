@@ -34,6 +34,21 @@ static class IoDmaTests
     }
     public static void Run(Action<string,Action> test,string directory)
     {
+        test("R5 DMA notification latches survive observer replacement and removal at bus effects",()=>{
+            var m=Machine();var b=m.Bus;b.Wram[0]=0x53;b.Wram[1]=0x64;
+            Channel(m,0,0,0x18,0x7e0000,2);var rows=new List<DmaTrace>();int oldCalls=0;
+            b.Dma.Observed=_=>oldCalls++;
+            b.AccessObserved=(direction,address,value)=>{
+                if(address==0x7e0000&&direction=="read")b.Dma.Observed=row=>{
+                    rows.Add(row);Check(b.Dma.State.Phase==DmaPhase.Hold,"Read observer must run after the phase transition");b.Dma.Observed=null;
+                };
+                if(address==0x7e0001&&direction=="read")b.Dma.Observed=rows.Add;
+            };
+            b.Write(0x420b,1);m.RunUntil(100);
+            Check(oldCalls==0&&rows.Count==3,"Notification used an obsolete or removed observer");
+            Check(rows[0]==new DmaTrace(28,"read-A",DmaJob.Dma,0,0x7e0000,0x53,true),"First latch changed with phase transition");
+            Check(rows[1]==new DmaTrace(36,"read-A",DmaJob.Dma,0,0x7e0001,0x64,true)&&rows[2].Phase=="write-B"&&rows[2].Clock==40&&rows[2].Value==0x64,"Later observer lost the bus latch");
+        });
         test("M3 recursive ROM mirror and mapper metadata manual overrides",()=>{
             Check(Cartridge.Mirror(0x300000,0x300000)==0x200000,"3 MiB absent address line mirrors last chip");
             Check(Cartridge.Mirror(0x3fffff,0x300000)==0x2fffff);

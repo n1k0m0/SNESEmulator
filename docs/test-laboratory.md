@@ -46,6 +46,11 @@ Both core tests retained slow 600-field windows. PAL native passed; NTSC retaine
 implementation-head remote CI checks passed. Strict timing release acceptance
 remains open; this is separate from those functional results.
 
+[R5](r5-realtime-core.md) adds two core observer regressions (131 core groups)
+and two legacy SPC guards (nine continuation guard groups). It reduces unused
+observation allocations and empty PPU publication overhead; short performance
+comparisons do not replace the still-open actual native/realtime gate.
+
 The sections below retain milestone measurements and their original scope.
 An old pass, open item or package identity describes that snapshot; it is not
 a claim that the current source or package has undergone the same validation.
