@@ -1,5 +1,24 @@
 # Final integration: tested implementation and remaining release limits
 
+## Current follow-up pointer
+
+The historical implementation and measurements below are preserved. The latest
+[bounded integration](r7-final-integration.md) checks an isolated self-contained
+package from clean `1431b93`; it does not activate the desktop package or earn
+strict native acceptance. The desktop launcher still uses `affae58`.
+
+[R5 long Core gates](r5-tail-core.md) passed on their exact tested package.
+Both subsequent R5 actual native hours remained red: NTSC retained 19,242
+post-ready muted fields and 2,562 drops; PAL retained 103 and 17,846.
+[R6 presentation fixes](r6-realtime-runtime.md) correct demonstrated buffer
+recovery and video-clock defects. [R7](r7-realtime-runtime.md) corrects extreme
+wait-deadline overflow and adds bounded owner evidence; the measured native
+owner CPU deficit remains unresolved. No new long Core/native runs or accepted
+JIT/MMCSS policy are claimed here. Exact-head hosted CI remains separately
+reported after push.
+
+## Earlier follow-up and original integration record
+
 The latest [exact-tail Core follow-up](r5-tail-core.md), implementation
 `6db7c8a`, now passes fresh 37,000-field NTSC and 31,000-field PAL sustained
 gates with every complete 600-field window above real time. Actual native

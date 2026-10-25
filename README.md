@@ -22,10 +22,14 @@ gates passed, but both actual 3,600-second native regional sessions remained red
 clock-drift/padding and competing video-clock defects, with deterministic and
 actual WinMM comparisons. A complete 300-second NTSC session passes; PAL retains
 six owner-muted fields and eight timeline-reset drops in its retained samples.
-Native-hour acceptance after the fixes and the remaining owner timing work are
-still open. Original red evidence and hardware-accuracy limits remain explicit.
+[R7 owner timing](docs/r7-realtime-runtime.md) fixes extreme-deadline overflow
+and adds opt-in bounded diagnostics, but leaves the measured native owner CPU
+deficit unresolved. No experimental JIT/MMCSS policy remains. The
+[bounded final integration](docs/r7-final-integration.md) checks a fresh isolated
+`1431b93` package; it does not earn strict native-hour acceptance. Original red
+evidence and hardware-accuracy limits remain explicit.
 
-**Strict performance/native release acceptance remains open.** Known raw
+**Strict native release acceptance remains open.** Known raw
 accuracy and full-sequence audio differences remain separately documented.
 
 Each full CPU contract executes 5,080,400 cases; raw expectations differ in
@@ -57,11 +61,13 @@ containing spaces are forwarded to the application.
 A self-contained Windows x64 package includes the emulator, `Manager/`, and
 `Updater/`, each with .NET runtime **10.0.13**; no SDK is needed to run it.
 Local published packages and test artifacts are not part of a fresh checkout.
-The local `publish/` now contains the exact tested final implementation package
+The desktop launcher still uses the historical local `publish/` implementation package
 (`affae58`); its Core SHA256 and full file identity are recorded in
 [final integration](docs/final-integration.md). The previous complete package is
 preserved locally under `artifacts/final-integration/previous-publish-preserved/`.
 The current documentation commit is separate from the tested package commit.
+The fresh `1431b93` package remains isolated under
+`artifacts/r7-final-integration/package/`; it has not replaced `publish/`.
 No public release is currently published.
 
 Development requires the exact SDK version **10.0.402**, pinned in `global.json`.

@@ -1,5 +1,28 @@
 # Development plan: a highly faithful SNES emulator
 
+## Current follow-up status
+
+[R5 exact-tail Core](r5-tail-core.md) passed the retained 37,000-field NTSC and
+31,000-field PAL gates on its exact tested package. The subsequent R5 actual
+native hours both failed: NTSC retained 19,242 post-ready muted fields and 2,562
+drops; PAL retained 103 muted fields and 17,846 drops. These are distinct from
+the older affae58 outcomes in the historical sequence below.
+
+[R6](r6-realtime-runtime.md) corrects demonstrated presentation-buffer recovery,
+driver-timed video and private allocation costs. Its NTSC300 pass does not
+cancel its PAL300 owner-catchup failure. [R7](r7-realtime-runtime.md) fixes an
+independent extreme-deadline overflow and adds bounded opt-in owner diagnostics;
+no qualified native owner remedy was found, and experimental JIT/MMCSS policies
+were removed. Strict native release acceptance remains open.
+
+[Bounded final integration](r7-final-integration.md) checks a fresh isolated
+package from clean `1431b93`. The desktop launcher continues to use historical
+`affae58`; the new package is not activated. No new sustained Core gates or
+native hours were run in this bounded integration. Exact-head hosted CI is
+reported separately after push, never presumed from an earlier result.
+
+The ordered sequence below retains its original snapshot scope.
+
 As of October 25, 2026. Historical starting point: commit `7145184`.
 
 ## Ordered completion work

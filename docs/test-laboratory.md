@@ -1,5 +1,24 @@
 # Test laboratory: current contracts and historical evidence
 
+## Current R5–R7 follow-up scope
+
+[R5 long Core gates](r5-tail-core.md) passed on the exact retained `6db7c8a`
+package; both later R5 actual native hours remained red (NTSC: 19,242 muted
+fields/2,562 drops; PAL: 103/17,846 after readiness). These are historical
+measurements of those binaries, not a new-package acceptance claim.
+[R6 presentation recovery](r6-realtime-runtime.md) fixes the demonstrated
+remote-buffer and competing video-clock defects. [R7 owner evidence](r7-realtime-runtime.md)
+adds a tested extreme-deadline correction and bounded diagnostics; the native
+owner CPU deficit and strict native acceptance remain unresolved. Rejected
+Core/JIT/MMCSS prototypes do not remain in shipping code.
+
+[Bounded final integration](r7-final-integration.md) records exact-package
+functional checks for isolated clean `1431b93`, with no repeated long timing
+runs and no canonical-package activation. The desktop launcher still selects
+historical `affae58`. Hosted full-suite/external-vector CI requires its own
+exact-head result after push. The milestone observations below retain their
+original source, package and accuracy scope.
+
 ## Current status (final integration, October 25, 2026)
 
 The current source keeps **format 9 for normal carts and format 10 for DSP1/SuperFX/SA-1 carts**.

@@ -92,3 +92,7 @@ tools/dsp1-reference.cpp text eol=lf
 
 # R7 owner timing provenance uses stable LF bytes.
 /docs/r7-realtime-runtime-evidence-manifest.json text eol=lf
+
+# R7 bounded integration report and evidence use stable LF bytes.
+/docs/r7-final-integration.md text eol=lf
+/docs/r7-final-integration-evidence-manifest.json text eol=lf
