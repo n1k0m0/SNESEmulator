@@ -1,0 +1,56 @@
+{
+  "schema": "m5-ppu-fixtures-v1",
+  "profile": "separate-chip proposed NTSC2/1/3; no console capture",
+  "originalLicense": "Apache-2.0",
+  "originalGenerator": "SNESEmulator.Core/PpuDiagnosticRom.cs",
+  "originalOracle": "Literal mathematical/priority/window/timing worksheets in PpuTests; no current output promoted to golden",
+  "external": {
+    "repository": "https://github.com/undisbeliever/snes-test-roms",
+    "commit": "ac6ef8006809c0ff5dabc8ff137a4623967697fe",
+    "sourcePath": "src/hardware-tests/vram-mid-scanline-test.asm",
+    "license": "Zlib",
+    "assembler": "ARM9/bass v18 Windows + unchanged ISC wdc65816-strict.arch from bass-untech9db6088a378061afc7b82f50997a5b9a1d951175",
+    "assemblerArchiveSha256": "822bdf518815c19f92178530c4e5e5e16fb2e9ecc9d6c397218069c1f43b3079",
+    "sourceArchiveSha256": "29df957d60d9e751a2fe062e55ad901d43db1bcf8b078abcccbabce9a19fe23e",
+    "assemblerForkArchiveSha256": "bc800e41014012efd32a86abb8e01660d43e2ebdf46e4af8877b3f8867ed6490",
+    "success": "24 actual emulated fields; every native256x224pixel=RGB5557FFF. Source says WHITE:VRAM writes ignored,RED:changed,BLANK:crash. Independent source-derived oracle; not our hardware measurement."
+  },
+  "files": [
+    {
+      "path": "testdata/ppu-external/vram-mid-scanline-test.sfc",
+      "bytes": 131072,
+      "sha256": "fc04912719a8b6eb1ba4fc19ed12b46f6ec488f0b987cf7834c23d181075f90f"
+    },
+    {
+      "path": "testdata/ppu-external/upstream-LICENSE",
+      "bytes": 913,
+      "sha256": "20fc99a7b0024b4ad755633876e35a8c836829cdb46bf7cb39b14a3d32f6a529"
+    },
+    {
+      "path": "testdata/ppu-external/vram-mid-scanline-test.asm",
+      "bytes": 3855,
+      "sha256": "95044a7a11cf287778c77872d27e33b9f2c8ec081c586680023437bbf87366ff"
+    },
+    {
+      "path": "SNESEmulator.Core/PpuDiagnosticRom.cs",
+      "bytes": 2181,
+      "sha256": "a4ddbef10396684987969af14a38b5908bf558c96bf3dfd27b1436f78fbfe72c"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/PpuTests.cs",
+      "bytes": 34489,
+      "sha256": "2940df41b1f99653dc30980d786061bb70bb92bf42cd8d8e90a05cd294dd7ff5"
+    }
+  ],
+  "m8ReviewedCorrections": [
+    {
+      "superseded": {
+        "path": "SNESEmulator.Core.Tests/PpuTests.cs",
+        "bytes": 34494,
+        "sha256": "53ec6593fdc352cfcf5275165eb236ecc72a30fc88796f58954881662d9f4006"
+      },
+      "reason": "Format9 rejects ambiguous old WAI/H0 saves, including8; no rendering oracle change.",
+      "evidence": "docs/m8-compatibility-contract.md; testdata/m8-console/manifest.json; testdata/m8-console-own-ipl/manifest.json"
+    }
+  ]
+}

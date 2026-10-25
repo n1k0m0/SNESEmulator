@@ -8,6 +8,7 @@ manifest=json.loads((ROOT/'testdata/m8-integrity.json').read_text())
 # Keep the original manifest (including every expected hash) immutable. Bundled
 # snapshots make verification independent of Git history in shallow CI checkouts.
 HISTORICAL_ADAPTERS = {
+ 'testdata/m5-ppu-manifest.json': 'testdata/m8-adapter-baseline/m5-ppu-manifest.json',
  'tools/m8-console-suite.py': 'testdata/m8-adapter-baseline/m8-console-suite.py',
  'SNESEmulator.Lab/Program.cs': 'testdata/m8-adapter-baseline/Program.cs',
  'tools/test-lab.py': 'testdata/m8-adapter-baseline/test-lab.py',

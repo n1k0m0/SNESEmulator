@@ -27,6 +27,14 @@
       "bytes": 16650,
       "sha256": "1544f81cbeea44ff27cbb9825834514f8002c4b0f63db69ae27b017259c2a733",
       "reason": "R3 active console output now prints full-overlap audio status separately; comparison/oracle logic remains unchanged"
+    },
+    {
+      "sourceCommit": "14c150b1e28dce57566261f9695e0f0e61af72c2",
+      "originalPath": "testdata/m5-ppu-manifest.json",
+      "snapshotPath": "testdata/m8-adapter-baseline/m5-ppu-manifest.json",
+      "bytes": 2587,
+      "sha256": "ab8b9dd8ca6f1870434f7cbec1ee3c7003a470a5e36e2ccbda880c06531ed9e6",
+      "reason": "R5 active M5 support manifest now pins added PPU regression source coverage. Preserve the original M8 evidence manifest bytes and every M8 oracle hash unchanged."
     }
   ]
 }
