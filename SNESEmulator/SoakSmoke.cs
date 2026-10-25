@@ -77,6 +77,8 @@ internal static class SoakSmoke
             bool captured=TryCaptureScreenshot(width,height,()=>RuntimeSmoke.Screenshot(window,Path.Combine(directory,name)),Error);
             Row(new{Kind="screenshot",WallSeconds=timer.Elapsed.TotalSeconds,Name=name,Width=width,Height=height,Captured=captured});
         }
+        bool ownerTiming=Environment.GetEnvironmentVariable("SNESEMULATOR_OWNER_TIMING")=="1",firstOwnerPointExported=false;
+        if(ownerTiming)window.EnableOwnerTimingForProbe();
         window.Title="SNESEmulator - M9h soak ("+region+")";
         window.ManagerRequestForProbe=command=>{if(command=="Status")Interlocked.Increment(ref managerStatusRequests);};
         window.ProbeSettings.AudioVolume=0; // Gain only: source PCM, providers and real devices remain active.
@@ -111,6 +113,7 @@ internal static class SoakSmoke
         Row(new{Kind="identity",StartedUtc=began,DurationSeconds=seconds,Region=region,Rom=Path.GetFullPath(rom),RomSha256=Convert.ToHexStringLower(SHA256.HashData(romBytes)),CoreSha256=HashFile(typeof(SnesSystem).Assembly.Location),AppSha256=HashFile(typeof(SoakSmoke).Assembly.Location),Process=Environment.ProcessId,Meaning="Actual SNESEmulator native window, normal pacing, synthetic application input, actual localhost TLS/WinMM and WPF Manager; zero audio gain; no physical DAC/display or hardware-console claim"});
         window.RenderFrame+=frameEvent=>{
             double now=timer.Elapsed.TotalSeconds;var status=window.RuntimeStatus;
+            if(ownerTiming&&!firstOwnerPointExported&&window.FirstSteadyTimingCatchup.HasValue){firstOwnerPointExported=true;Row(new{Kind="owner-timing-first-steady",WallSeconds=now,Owner=window.OwnerTimingForProbe});}
             if(status.Fault!=null&&!remoteFailure){remoteFailure=true;Error("Worker: "+status.Fault);}
             if(status.Turbo)Error("Unexpected turbo in normally paced soak");
             if(!firstScreenshot&&status.Field>=20){Screenshot("native-start.png");firstScreenshot=true;}
@@ -139,7 +142,7 @@ internal static class SoakSmoke
                 if(!remote.IsConnected&&!remoteFailure&&now<seconds-.1){remoteFailure=true;Error("Remote disconnected during soak");}
                 if(observed.Fault!=null&&!remoteFailure){remoteFailure=true;Error("Playout: "+observed.Fault);}
                 maxPending=Math.Max(maxPending,observed.Pending);
-                if(readyAt<0&&status.PacingLateSeconds<.05&&remote.TimelineIdentity is {Muted:false}&&observed.DriverComparedVideo>=5&&observed.PresentedAudio>=5){if(stableSince<0)stableSince=now;if(now-stableSince>=.5){readyAt=now;readyDropReasons=observed.ReadDropCounters();coldDrops=readyDropReasons.Value.Total;quality.MarkReady(now,window.PresentationCountersForProbe,coldDrops);}}
+                if(readyAt<0&&status.PacingLateSeconds<.05&&remote.TimelineIdentity is {Muted:false}&&observed.DriverComparedVideo>=5&&observed.PresentedAudio>=5){if(stableSince<0)stableSince=now;if(now-stableSince>=.5){readyAt=now;readyDropReasons=observed.ReadDropCounters();coldDrops=readyDropReasons.Value.Total;quality.MarkReady(now,window.PresentationCountersForProbe,coldDrops);window.MarkOwnerTimingReady();}}
                 else if(readyAt<0)stableSince=-1;
             }
             ObserveQuality(now,status);
@@ -147,13 +150,20 @@ internal static class SoakSmoke
             if(manager==null&&window.ManagerPipe!=null){
                 var start=new ProcessStartInfo(Path.GetFullPath(managerExe)){UseShellExecute=false,CreateNoWindow=true,WindowStyle=ProcessWindowStyle.Hidden,RedirectStandardOutput=true,RedirectStandardError=true};
                 start.Environment["SNESEMULATOR_MANAGER_TEST_ID"]="soak-"+Guid.NewGuid().ToString("N");
+                // A code-generation comparison targets only this explicit test App child.
+                // Never inherit its diagnostic suspension or JIT variants into Manager.
+                if(Environment.GetEnvironmentVariable("SNESEMULATOR_CODEGEN_PROFILE") is string profile){
+                    string[] isolated={"DOTNET_TieredPGO","DOTNET_TieredCompilation","COMPlus_TieredPGO","COMPlus_TieredCompilation","DOTNET_DiagnosticPorts","DOTNET_DefaultDiagnosticPortSuspend","COMPlus_DefaultDiagnosticPortSuspend","SNESEMULATOR_CODEGEN_PROFILE"};
+                    foreach(string variable in isolated)start.Environment.Remove(variable);
+                    Row(new{Kind="codegen-manager-isolation",Profile=profile,RemovedVariables=isolated});
+                }
                 foreach(string a in new[]{"--connect",Environment.ProcessId.ToString(),"--manager-probe",managerProbe})start.ArgumentList.Add(a);
                 manager=Process.Start(start)??throw new IOException("Manager did not start");managerOut=Drain(manager.StandardOutput,Path.Combine(managerProbe,"stdout.log"));managerErr=Drain(manager.StandardError,Path.Combine(managerProbe,"stderr.log"));
             }
             if(manager is {HasExited:true}&&!managerFailure){managerFailure=true;Error("WPF Manager exited during soak: "+manager.ExitCode);}
             if(now>=nextLibrary&&File.Exists(Path.Combine(managerProbe,"ready.json"))&&libraryTask.IsCompleted){nextLibrary=now+300;libraryTask=Task.Run(async()=>{try{await catalog.InitializeAsync(lifetime.Token);int count=await catalog.ScanAsync(libraryRoms,lifetime.Token);var items=await catalog.ListAsync(token:lifetime.Token);Interlocked.Increment(ref scans);if(count!=1||items.Count!=1)Error("Bounded shared library scan/list differs");}catch(OperationCanceledException)when(lifetime.IsCancellationRequested){}catch(Exception e){Error("Library: "+e.Message);}});}
             if(now>=nextState&&now<seconds-10&&stateTask.IsCompleted&&!window.MediaOperationPending){nextState=now+300;int slot=checkpoints++%2;stateTask=Task.Run(async()=>{try{byte[] raw=await window.CaptureStateForProbe();string path=Path.Combine(directory,"checkpoint-"+slot+".state");StateSerializer.SaveCaptured(raw,path,cartridge);_ = StateSerializer.Load(cartridge,path);Row(new{Kind="checkpoint",WallSeconds=timer.Elapsed.TotalSeconds,Path=path,Sha256=HashFile(path)});}catch(Exception e){Error("Checkpoint: "+e.Message);}});}
-            if(now>=nextRow){var gcInfo=GC.GetGCMemoryInfo();nextRow=now+10;peakManaged=Math.Max(peakManaged,GC.GetTotalMemory(false));
+            if(now>=nextRow){if(ownerTiming)Row(new{Kind="owner-timing",WallSeconds=now,Owner=window.OwnerTimingForProbe});var gcInfo=GC.GetGCMemoryInfo();nextRow=now+10;peakManaged=Math.Max(peakManaged,GC.GetTotalMemory(false));
                 if(readyAt>=0&&File.Exists(Path.Combine(managerProbe,"ready.json"))){if(managerStatusRequests==priorManagerRequests){if(++noPollSamples==2)Error("Actual WPF Manager supplied no status request for20 seconds");}else noPollSamples=0;priorManagerRequests=managerStatusRequests;}
                 if(readyAt>=0&&status.PacingLateSeconds>.1&&++steadyCatchupSamples==1)Error("Steady normal pacing crossed existing100ms catchup/mute boundary");
                 if(observed!=null){if(priorReady&&(observed.PresentedAudio==priorAudio||observed.DriverComparedVideo==priorDriver)&&++noMediaSamples==1)Error("A steady10-second observation window had no audio or driver-synchronized video");priorAudio=observed.PresentedAudio;priorDriver=observed.DriverComparedVideo;priorReady=readyAt>=0;}
@@ -182,6 +192,7 @@ internal static class SoakSmoke
         if(closingMaximum>=.04)Error("Cumulative software A/V exceeded40ms including Cold");
         if(window.RuntimeStatus.DroppedPresentation!=0)Error("Owner presentation queue discarded native fields");
         if(peakManaged>=256*1024*1024||maxPending>NetworkPlayout.Capacity||mismatches!=0||observationGaps!=0)Error("Memory/queue/native-output/observation bound violated");
+        if(ownerTiming)File.WriteAllText(Path.Combine(directory,"owner-timing.json"),JsonSerializer.Serialize(window.OwnerTimingForProbe,new JsonSerializerOptions{WriteIndented=true}));
         File.WriteAllText(Path.Combine(directory,"max-observations.json"),JsonSerializer.Serialize(new{Cold=coldMaximumRow,Steady=steadyMaximumRow,Last128=observed?.DiagnosticSnapshot().TakeLast(128).ToArray(),ColdBoundary=readyAt<0?(double?)null:beganStopwatch+readyAt,Meaning="Bounded actual-run software evidence; cumulative metric is not reset or clamped"},new JsonSerializerOptions{WriteIndented=true}));
         Row(new{Kind="quality",steadyCatchupSamples,ActualPostReadyMutedFields=quality.SteadyActualCatchupFields,CounterRegressions=quality.CounterRegressions,OmittedCounterEvents=quality.OmittedChangeEvents,noMediaSamples,ManagerStatusRequests=managerStatusRequests,NoPollSamples=noPollSamples,ProducerDropped=window.RuntimeStatus.DroppedPresentation,MaximumAllowedSoftwareAvSeconds=.04,ExistingCatchupMuteBoundarySeconds=.1,Meaning="Ten-second PacingLate samples are not continuous; actual cumulative muted fields are checked at every RenderFrame. Remote freshness/reset discards are classified, not required to be zero. No relaxed Core sustained-window acceptance"});
         var result=new{

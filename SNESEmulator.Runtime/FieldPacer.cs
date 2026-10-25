@@ -14,12 +14,24 @@ public sealed class MonotonicClock : IMonotonicClock
 {
     public long Timestamp=>Stopwatch.GetTimestamp();
     public long Frequency=>Stopwatch.Frequency;
-    public void WaitUntil(long deadline,WaitHandle changed,CancellationToken cancellation)
+    internal static int WaitTimeoutMilliseconds(long deadline,long now,long frequency)
     {
-        long remaining=deadline-Timestamp;
-        if(remaining<=0)return;
-        int ms=(int)Int128.Clamp(((Int128)remaining*1000+Frequency-1)/Frequency,1,50);
-        WaitHandle.WaitAny([changed,cancellation.WaitHandle],ms);
+        if(frequency<=0)throw new ArgumentOutOfRangeException(nameof(frequency));
+        // Compare/subtract in a wider domain: an already-past MinValue deadline
+        // must not wrap into a positive50ms wait. Ordinary ceil/cap is unchanged.
+        Int128 remaining=(Int128)deadline-now;
+        return remaining<=0?0:(int)Int128.Clamp((remaining*1000+frequency-1)/frequency,1,50);
+    }
+    public void WaitUntil(long deadline,WaitHandle changed,CancellationToken cancellation)=>WaitCore(deadline,changed,cancellation,false);
+    internal ClockWaitTiming WaitObserved(long deadline,WaitHandle changed,CancellationToken cancellation)=>WaitCore(deadline,changed,cancellation,true);
+    private ClockWaitTiming WaitCore(long deadline,WaitHandle changed,CancellationToken cancellation,bool observe)
+    {
+        long start=Timestamp;int ms=WaitTimeoutMilliseconds(deadline,start,Frequency);
+        if(ms==0)return new(deadline,start,start,WaitReturnReason.DeadlineReached);
+        int result=WaitHandle.WaitAny([changed,cancellation.WaitHandle],ms);
+        // Return diagnostics directly to the caller, without mutable clock state;
+        // injected/shared clock instances retain independent caller observations.
+        return observe?new(deadline,start,Timestamp,result==0?WaitReturnReason.Changed:result==1?WaitReturnReason.Cancelled:WaitReturnReason.Timeout):default;
     }
 }
 

@@ -29,6 +29,11 @@ public sealed class EmulationWorker : IDisposable
     private readonly Thread thread;
     private readonly IMonotonicClock clock;
     private readonly FieldPacer pacer=new();
+    private OwnerTimingRecorder? timing;
+    public void EnableTimingDiagnostics(){lock(gate){if(timing==null)Volatile.Write(ref timing,new(clock.Frequency));}}
+    public OwnerTimingSnapshot? ReadTimingDiagnostics()=>Volatile.Read(ref timing)?.Snapshot();
+    public OwnerTimingPoint? FirstSteadyTimingCatchup=>Volatile.Read(ref timing)?.FirstSteady;
+    public void MarkTimingReady()=>Volatile.Read(ref timing)?.MarkReady(clock.Timestamp);
     private SnesSystem machine;
     private bool paused=true,turbo,disposed,exited;
     private string? fault;
@@ -37,9 +42,10 @@ public sealed class EmulationWorker : IDisposable
     private FieldInput input;
     private FieldOutput? latest;
     private WorkerStatus status=new(1,0,0,"","",true,false,null,0,0,0,0,24576000,1);
-    private interface ICommand {void Execute();void Cancel();}
-    private sealed class Command<T>(Func<T> action,CancellationToken cancellation) : ICommand
+    private interface ICommand {string Name {get;}void Execute();void Cancel();}
+    private sealed class Command<T>(Func<T> action,CancellationToken cancellation,string name) : ICommand
     {
+        public string Name=>name;
         public readonly TaskCompletionSource<T> Completion=new(TaskCreationOptions.RunContinuationsAsynchronously);
         public void Execute(){if(cancellation.IsCancellationRequested){Completion.TrySetCanceled(cancellation);return;}try{Completion.TrySetResult(action());}catch(Exception e){Completion.TrySetException(e);}}
         public void Cancel()=>Completion.TrySetCanceled();
@@ -53,9 +59,9 @@ public sealed class EmulationWorker : IDisposable
     public WorkerStatus Status=>Volatile.Read(ref status);
     public FieldOutput? Latest=>Volatile.Read(ref latest);
     public bool IsAlive=>thread.IsAlive;
-    private Task<T> Enqueue<T>(Func<T> action,CancellationToken cancellation=default)
+    private Task<T> Enqueue<T>(Func<T> action,CancellationToken cancellation=default,[System.Runtime.CompilerServices.CallerMemberName]string name="")
     {
-        var command=new Command<T>(()=>{var result=action();PublishStatus();return result;},cancellation);
+        var command=new Command<T>(()=>{var result=action();PublishStatus();return result;},cancellation,name);
         lock(gate){if(disposed||stopping.IsCancellationRequested)return Task.FromException<T>(new ObjectDisposedException(nameof(EmulationWorker)));
             if(exited)return Task.FromException<T>(new InvalidOperationException("Emulation owner stopped; restart the application. "+fault));
             if(commands.Count>=CommandCapacity)return Task.FromException<T>(new InvalidOperationException("Emulation command queue is full; retry after pending operation."));
@@ -123,8 +129,12 @@ public sealed class EmulationWorker : IDisposable
     }
     private FieldOutput Emulate(FieldInput value,long inputSequence,bool paced=false)
     {
+        var diagnostic=Volatile.Read(ref timing);
+        long started=diagnostic!=null?clock.Timestamp:0,scheduledStart=deadline,allocated=diagnostic!=null?GC.GetAllocatedBytesForCurrentThread():0,pause=diagnostic!=null?GC.GetTotalPauseDuration().Ticks:0;
+        OwnerThreadTime threadBefore=diagnostic!=null?OwnerThreadTime.Read():default;
+        long cpuBefore=diagnostic!=null?machine.Cpu.Instructions:0,spcBefore=diagnostic!=null?machine.Bus.Apu.Cpu.Instructions:0,dspBefore=diagnostic!=null?machine.Bus.Apu.Dsp.SampleCount:0;
         machine.Bus.Controllers.Buttons[0]=value.Port1;machine.Bus.Controllers.Buttons[1]=value.Port2;
-        long inputClock=machine.Clock.Now;machine.RunFrame();
+        long inputClock=machine.Clock.Now;machine.RunFrame();long runFrameEnd=diagnostic!=null?clock.Timestamp:0;
         // CompleteField already allocates its own three planes. They are never
         // reused or written by PPU; handing these readonly planes across is safe.
         var frame=machine.Bus.Ppu.CompletedFrame??throw new InvalidOperationException("No completed raw field");
@@ -135,7 +145,9 @@ public sealed class EmulationWorker : IDisposable
         // against this field's scheduled END. Paused deterministic Step does not
         // advance the host pacer; hardware clocks and source timestamps are untouched.
         if(paced)deadline=pacer.Add(machine.Clock.Now-inputClock,machine.Profile,clock.Frequency,turbo?4:1);
-        var result=new FieldOutput(epoch,frame,samples,inputSequence,inputClock,value,turbo,!paused&&(clock.Timestamp-deadline)/(double)clock.Frequency>.1);
+        long completed=clock.Timestamp;
+        var result=new FieldOutput(epoch,frame,samples,inputSequence,inputClock,value,turbo,!paused&&(completed-deadline)/(double)clock.Frequency>.1);
+        diagnostic?.Add(new(0,OwnerTimingKind.Field,machine.Frames,inputSequence,started,completed,scheduledStart,deadline,runFrameEnd,result.CatchingUp,default,false,0,null,allocated,GC.GetAllocatedBytesForCurrentThread(),pause,GC.GetTotalPauseDuration().Ticks,threadBefore,OwnerThreadTime.Read(),new(machine.Clock.Now-inputClock,machine.Cpu.Instructions-cpuBefore,machine.Bus.Apu.Cpu.Instructions-spcBefore,machine.Bus.Apu.Dsp.SampleCount-dspBefore,frame.Geometry.Width,frame.Geometry.Height)));
         Volatile.Write(ref latest,result);
         // Overflow drops presentation history only. Core time, completed field
         // ownership and the source sample timestamps above have already committed.
@@ -153,18 +165,31 @@ public sealed class EmulationWorker : IDisposable
         {
             while(!stopping.IsCancellationRequested)
             {
+                var diagnostic=Volatile.Read(ref timing);long batchStart=diagnostic!=null?clock.Timestamp:0;int batchCount=0;
                 // At most one batch; controls are checked between every field.
                 for(int i=0;i<CommandCapacity;i++)
                 {
                     if(stopping.IsCancellationRequested)break;
                     ICommand? command;lock(gate)command=commands.TryDequeue(out var c)?c:null;
                     if(command==null)break;
-                    long oldEpoch=epoch;command.Execute();if(epoch!=oldEpoch)deadline=clock.Timestamp;
+                    long commandStart=diagnostic!=null?clock.Timestamp:0,commandAllocated=diagnostic!=null?GC.GetAllocatedBytesForCurrentThread():0,commandPause=diagnostic!=null?GC.GetTotalPauseDuration().Ticks:0;
+                    long oldEpoch=epoch;command.Execute();if(epoch!=oldEpoch)deadline=clock.Timestamp;batchCount++;
+                    diagnostic?.Add(new(0,OwnerTimingKind.Command,machine.Frames,appliedSequence,commandStart,clock.Timestamp,deadline,deadline,0,false,default,false,1,command.Name,commandAllocated,GC.GetAllocatedBytesForCurrentThread(),commandPause,GC.GetTotalPauseDuration().Ticks));
                 }
+                if(batchCount>0)diagnostic?.Add(new(0,OwnerTimingKind.CommandBatch,machine.Frames,appliedSequence,batchStart,clock.Timestamp,deadline,deadline,0,false,default,false,batchCount,null,0,0,0,0));
                 if(stopping.IsCancellationRequested)break;
                 PublishStatus();
                 if(paused||fault!=null||machine.Bus.Cartridge==null){changed.WaitOne(50);continue;}
-                if(clock.Timestamp<deadline){clock.WaitUntil(deadline,changed,stopping.Token);continue;}
+                if(clock.Timestamp<deadline){
+                    long start=diagnostic!=null?clock.Timestamp:0;
+                    if(diagnostic!=null){
+                        ClockWaitTiming wait;
+                        if(clock is MonotonicClock actual)wait=actual.WaitObserved(deadline,changed,stopping.Token);
+                        else{clock.WaitUntil(deadline,changed,stopping.Token);wait=new(deadline,start,clock.Timestamp,WaitReturnReason.ExternalClock);}
+                        diagnostic.Add(new(0,OwnerTimingKind.Wait,machine.Frames,appliedSequence,wait.Start,wait.Wake,deadline,deadline,0,false,wait.Reason,wait.Wake<deadline,0,null,0,0,0,0));
+                    }else clock.WaitUntil(deadline,changed,stopping.Token);
+                    continue;
+                }
                 FieldInput next;lock(gate){next=input;appliedSequence=sequence;}
                 try{Emulate(next,appliedSequence,paced:true);}
                 catch(Exception e){fault=e.ToString();paused=true;Discontinuity();}

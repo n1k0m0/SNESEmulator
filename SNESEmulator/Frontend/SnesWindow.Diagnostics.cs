@@ -20,6 +20,10 @@ public sealed partial class SnesWindow
     private long lastUiTimestamp;
     private double maximumUiInterval;
     private int updates;
+    internal void EnableOwnerTimingForProbe()=>worker.EnableTimingDiagnostics();
+    internal void MarkOwnerTimingReady()=>worker.MarkTimingReady();
+    internal OwnerTimingSnapshot? OwnerTimingForProbe=>worker.ReadTimingDiagnostics();
+    internal OwnerTimingPoint? FirstSteadyTimingCatchup=>worker.FirstSteadyTimingCatchup;
     internal WorkerStatus RuntimeStatus=>worker.Status;
     internal HostPresentation.Counters PresentationCountersForProbe=>presentation.ReadCounters();
     internal SNESEmulator.Network.SnesNetServer ProbeServer=>server;

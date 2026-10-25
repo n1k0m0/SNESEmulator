@@ -28,6 +28,39 @@ static class RuntimeTests
     }
     public static void Run(Action<string,Action> test,string root)
     {
+        test("R7 monotonic waits preserve exact deadline arithmetic and interruption reasons",()=>{
+            foreach(long now in new[]{long.MinValue,-1L,0L,1L,long.MaxValue}){
+                Check(MonotonicClock.WaitTimeoutMilliseconds(long.MinValue,now,10000000)==0,"Past extreme deadline cannot wrap");
+                Check(MonotonicClock.WaitTimeoutMilliseconds(now,now,10000000)==0,"Inclusive deadline no wait");
+            }
+            Check(MonotonicClock.WaitTimeoutMilliseconds(long.MaxValue,long.MinValue,10000000)==50,"Future extreme caps safely");
+            Check(MonotonicClock.WaitTimeoutMilliseconds(1,0,10000000)==1&&MonotonicClock.WaitTimeoutMilliseconds(10001,0,10000000)==2,"Original ceil semantics");
+            var clock=new MonotonicClock();using var changed=new AutoResetEvent(false);var wait=clock.WaitObserved(long.MinValue,changed,CancellationToken.None);
+            Check(wait.Reason==WaitReturnReason.DeadlineReached&&wait.Start==wait.Wake,"Past deadlines return without waiting, no wall timing assertion");
+            changed.Set();wait=clock.WaitObserved(long.MaxValue,changed,CancellationToken.None);Check(wait.Reason==WaitReturnReason.Changed&&wait.Wake<long.MaxValue,"Changed returns before deadline");
+            using var cancelled=new CancellationTokenSource();cancelled.Cancel();wait=clock.WaitObserved(long.MaxValue,changed,cancelled.Token);Check(wait.Reason==WaitReturnReason.Cancelled,"Cancellation returns without throwing worker fault");
+            using var signaled=new AutoResetEvent(true);using var idle=new AutoResetEvent(false);
+            var a=Task.Run(()=>clock.WaitObserved(long.MaxValue,signaled,CancellationToken.None));var b=Task.Run(()=>clock.WaitObserved(long.MaxValue,idle,cancelled.Token));Task.WaitAll(a,b);
+            Check(a.Result.Reason==WaitReturnReason.Changed&&b.Result.Reason==WaitReturnReason.Cancelled,"Shared clocks return independent caller observations");
+        });
+        test("R7 timing diagnostics preserve hardware replay and real work counters",()=>{
+            using var worker=new EmulationWorker();var direct=new SnesSystem();byte[] rom=DiagnosticRom.Create();Await(worker.InsertAsync(rom));direct.Insert(new Cartridge(rom));worker.EnableTimingDiagnostics();
+            for(int i=0;i<4;i++){long instructions=direct.Cpu.Instructions;direct.RunFrame();var output=Await(worker.StepAsync(default));Compare(direct,output,"Observed owner");var point=worker.ReadTimingDiagnostics()!.Recent.Last(x=>x.Kind==OwnerTimingKind.Field);
+                Check(point.Work.MasterClocks==output.Video.Geometry.EndClock-output.InputMasterClock&&point.Work.CpuInstructions==direct.Cpu.Instructions-instructions,"Work counters are actual immutable field deltas");
+                Check(point.Work.Width==output.Video.Geometry.Width&&point.ThreadAfter.User100ns>=point.ThreadBefore.User100ns,"Geometry and monotone thread counters");
+            }
+            Check(StateSerializer.Capture(direct).SequenceEqual(Await(worker.CaptureAsync())),"Instrumentation changes no hardware bytes");
+        });
+        test("R7 bounded owner timing retains exact first steady catchup and detached context",()=>{
+            var recorder=new OwnerTimingRecorder(1000);recorder.MarkReady(100);
+            OwnerTimingPoint Point(long at,bool catchup=false)=>new(0,OwnerTimingKind.Field,at,at,at,at+5,at,at+4,at+4,catchup,default,false,0,null,1,2,3,4);
+            recorder.Add(Point(99,true));recorder.Add(Point(101,true));
+            for(int i=0;i<3000;i++)recorder.Add(Point(102+i,true));
+            var snapshot=recorder.Snapshot();Check(snapshot.Total==3002&&snapshot.Overwritten==3002-OwnerTimingRecorder.Capacity,"bounded detail never conceals total records");
+            Check(snapshot.FirstCatchup!.Value.Start==99&&snapshot.FirstSteadyCatchup!.Value.Start==101,"first actual point remains independent of cold start and overwritten ring");
+            Check(snapshot.FirstSteadyContext.Last().Start==101&&snapshot.FirstSteadyContext.First().Start==99,"original bounded preceding context");snapshot.Recent[0]=default;
+            Check(recorder.Snapshot().Recent[0]!=default,"reader cannot mutate retained owner points");
+        });
         test("M10c worker SA1 direct pixel PCM state replay and immutable board load",()=>{
             var rom=SNESEmulator.Testing.Sa1DiagnosticRom.Create();var config=new Sa1Configuration();
             using var w=new EmulationWorker();Await(w.InsertAsync(rom,hardware:config));var direct=new SnesSystem();direct.Insert(new Cartridge(rom,hardware:config));
