@@ -124,8 +124,12 @@ path after compilation; only the owned child environment was corrected. The
 first partial package and hashes remain retained. The interrupted pre-crash
 comparison is labelled interrupted, not passed or failed. A recovery comparison
 producer completed before its wrapper mistakenly queried process image identity
-after exit; that producer and wrapper red are separate. Its corrected wrapper
-captures identity while the retained process handle is live.
+after exit; that producer and wrapper red are separate. The completed producer
+report and CPU samples survive, but its final exit code and live runtime-module
+observations were not saved before that wrapper exception. It is diagnostic
+producer evidence, not a passed wrapper gate. The corrected wrapper captures
+identity while the retained process handle is live; the later baseline and
+current runs retain exit codes and actual module observations.
 
 The first native wrapper rejected before application launch because its manifest
 used POSIX path keys and the Windows dictionary used backslashes. All 983 file
