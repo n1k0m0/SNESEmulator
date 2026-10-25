@@ -38,8 +38,8 @@
     },
     {
       "path": "SNESEmulator.Core.Tests/PpuTests.cs",
-      "bytes": 34489,
-      "sha256": "2940df41b1f99653dc30980d786061bb70bb92bf42cd8d8e90a05cd294dd7ff5"
+      "bytes": 46751,
+      "sha256": "7d643f29839ac2e7b06d8327196c09b85618093f04631cd2845954d2850b067e"
     }
   ],
   "m8ReviewedCorrections": [
@@ -51,6 +51,18 @@
       },
       "reason": "Format9 rejects ambiguous old WAI/H0 saves, including8; no rendering oracle change.",
       "evidence": "docs/m8-compatibility-contract.md; testdata/m8-console/manifest.json; testdata/m8-console-own-ipl/manifest.json"
+    }
+  ],
+  "r5ReviewedSourceAdditions": [
+    {
+      "superseded": {
+        "path": "SNESEmulator.Core.Tests/PpuTests.cs",
+        "bytes": 34489,
+        "sha256": "2940df41b1f99653dc30980d786061bb70bb92bf42cd8d8e90a05cd294dd7ff5"
+      },
+      "reason": "Added 160 lines of observer, snapshot ownership and exact PPU bitplane/color selector regression coverage; all earlier source lines and M5 expectations remain byte-identical and ordered. No fixture or output oracle was regenerated.",
+      "sourceHashDomain": "Canonical LF repository source bytes; already enforced by .gitattributes.",
+      "evidence": "docs/r5-realtime-core.md; docs/r5-realtime-runtime.md; docs/r5-tail-core.md"
     }
   ]
 }

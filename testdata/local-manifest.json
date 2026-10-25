@@ -65,13 +65,18 @@
       "path": "SNESEmulator.Core.Tests/IoDmaTests.cs",
       "source": "Original repository source; M3 analytical protocol/ROM oracle",
       "license": "Apache-2.0",
-      "version": "M4-explicit-isolated-APU-electrical-fixture",
-      "sha256": "dddf689d7a9fceb9068dcac1605bc799f8e1231eb1be9e72cb20c88f5b871d43",
+      "version": "R5-additive-DMA-observer-latch-regression",
+      "sha256": "52423994a956477e0885cb2667e635f94cd23a2139baeeb9ce00e153fad2ffde",
       "profile": "ntsc-separate-2-1-3-unverified",
       "start": "M3 expectations unchanged; APU frozen explicitly for constant electrical port oracle after M4 activates SPC execution; deterministic convenience reset",
       "seed": null,
       "success": "independent WRAM and fixed bus-phase expectations, plus complete-state continuation equality",
-      "timeoutSeconds": 120
+      "timeoutSeconds": 120,
+      "supportSourceRevision": {
+        "previousSha256": "dddf689d7a9fceb9068dcac1605bc799f8e1231eb1be9e72cb20c88f5b871d43",
+        "reason": "Added observer replacement/removal regression only; original M3 electrical expectations and all fixture inputs remain unchanged.",
+        "sourceHashDomain": "Canonical LF repository source bytes; already enforced by .gitattributes."
+      }
     },
     {
       "path": "SNESEmulator.Core/SpcUploadRom.cs",
