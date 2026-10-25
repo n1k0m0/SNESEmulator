@@ -68,6 +68,7 @@ namespace SNESEmulator.Network
         public event Action SessionStarted;
         private double? AudioPlayhead(){var t=timeline;var crystal=_audioOutput?.PlayedCrystal;return t!=null&&crystal.HasValue?crystal.Value*t.ApuDenominator/t.ApuNumerator:null;}
         public NetworkPlayout Playout=>playout;
+        internal NetworkAudioOutput.Diagnostics AudioDiagnostics=>_audioOutput?.ReadDiagnostics();
         public NetworkTimeline TimelineIdentity=>Volatile.Read(ref timeline);
         public uint InputGeneration=>Volatile.Read(ref inputGeneration);
         public int PendingSend {get{lock(_sendLock)return outgoing.Count+(latestInput==null?0:1);}}

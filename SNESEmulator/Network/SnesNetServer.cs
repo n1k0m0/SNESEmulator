@@ -398,7 +398,7 @@ namespace SNESEmulator.Network
             NetworkTimeline identity;lock(_syncRoot){identity=timeline;if(!IsRunning||_clients.Count==0||output.Epoch!=current.Epoch||output.Epoch!=identity.ConsoleEpoch||identity.Paused)return false;}
             // No core/UI-facing lock is held while copying native planes or encoding PCM.
             var g=output.Video.Geometry;
-            byte[] packed=SnesNetProtocol.CreatePackedVideoFrame(output.Video.Argb.ToArray(),g.Width,g.Height);
+            byte[] packed=SnesNetProtocol.CreatePackedVideoFrameSpan(output.Video.Argb.Span,g.Width,g.Height);
             var video=new PendingVideoFrame(packed,g.Width,g.Height,Interlocked.Increment(ref _frameId),g,identity);
             var audio=new List<SnesNetMessage>();
             if(!identity.Muted&&!identity.Turbo&&!output.CatchingUp&&!output.Turbo)

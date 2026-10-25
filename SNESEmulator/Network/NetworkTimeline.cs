@@ -37,9 +37,14 @@ public sealed record NetworkTimeline(long ConsoleEpoch,long StreamEpoch,long Mas
 /// <summary>One bounded software playout timeline for both media kinds. No DAC latency inference.</summary>
 public sealed class NetworkPlayout : IDisposable
 {
-    internal sealed record Observation(long Sequence,long Generation,double Source,double Arrival,double Due,double SampleAt,double CommitAt,double CompletedAt,double? SamplePlayhead,double? CommitPlayhead,double? CompletedPlayhead,bool Delivered,bool GenerationValid,double SchedulingError);
+    internal sealed record Observation(long Sequence,long Generation,double Source,double Arrival,double Due,double SampleAt,double CommitAt,double CompletedAt,double? SamplePlayhead,double? CommitPlayhead,double? CompletedPlayhead,bool Delivered,bool GenerationValid,double SchedulingError,string? RejectionReason=null)
+    {
+        public double? SourceMinusCommitPlayheadSeconds=>CommitPlayhead.HasValue?Source-CommitPlayhead.Value:null;
+    }
     // Opt-in bounded software diagnostics, including rejected commit probes.
     internal bool CaptureDiagnostics {get;set;}
+    // Opt-in diagnostics run after the actual commit decision; no queue policy changes.
+    internal Action<Observation>? DiagnosticObserver {get;set;}
     private readonly Queue<Observation> observations=new();
     private long observationSequence;
     internal Observation[] DiagnosticSnapshot(){lock(commitGate)return observations.ToArray();}
@@ -130,7 +135,11 @@ public sealed class NetworkPlayout : IDisposable
                 for(int i=0;i<queue.Count;i++)
                 {
                     var item=queue[i];double due=hostAnchor+item.Source-sourceAnchor+TargetLatencySeconds;
-                    if(now<due)continue;
+                    // Once the driver has a real source playhead, it is the video
+                    // clock. A stale host anchor must not hold an already-audible
+                    // picture until it is >40ms behind that clock. Audio and
+                    // clockless video retain the original40ms wall deadline.
+                    if(now<due&&(item.Audio||!playhead.HasValue))continue;
                     // Audio is submitted ahead to the driver. Video waits for that driver's
                     // consumed-byte source playhead, including source/resampler/device queues.
                     if(!item.Audio&&needsAudio()&&!playhead.HasValue&&now-item.Arrival<.25)continue;
@@ -146,15 +155,15 @@ public sealed class NetworkPlayout : IDisposable
                 BeforeCommit?.Invoke();
                 lock(commitGate){
                 bool valid;lock(gate)valid=selected.Generation==generation;
-                bool observe=CaptureDiagnostics&&!selected.Audio,delivered=false;double commitAt=observe?Now:0;double? commitPlayhead=!selected.Audio?audioPlayhead():null;
+                string? rejectionReason=null;bool observe=CaptureDiagnostics&&!selected.Audio,delivered=false;double commitAt=observe?Now:0;double? commitPlayhead=!selected.Audio?audioPlayhead():null;
                 try{
                 // Preserve the original short-circuit decision order. Reasons are
                 // disjoint: one rejected item increments exactly one reason and Total.
                 bool reject=true;
-                if(!valid)invalidGenerationDrops++;
-                else if(!selected.Audio&&needsAudio()&&!commitPlayhead.HasValue)missingAudioClockDrops++;
-                else if(selected.Audio&&error>.1)lateAudioDrops++;
-                else if(!selected.Audio&&commitPlayhead.HasValue&&Math.Abs(commitPlayhead.Value-selected.Source)>=MaximumVideoDistanceSeconds)distantVideoDrops++;
+                if(!valid){invalidGenerationDrops++;rejectionReason="InvalidGeneration";}
+                else if(!selected.Audio&&needsAudio()&&!commitPlayhead.HasValue){missingAudioClockDrops++;rejectionReason="MissingAudioClock";}
+                else if(selected.Audio&&error>.1){lateAudioDrops++;rejectionReason="LateAudio";}
+                else if(!selected.Audio&&commitPlayhead.HasValue&&Math.Abs(commitPlayhead.Value-selected.Source)>=MaximumVideoDistanceSeconds){distantVideoDrops++;rejectionReason="DistantVideo";}
                 else reject=false;
                 if(reject){Dropped++;}
                 else
@@ -172,10 +181,10 @@ public sealed class NetworkPlayout : IDisposable
                             if(completed.HasValue)MaximumSoftwareAvErrorSeconds=Math.Max(MaximumSoftwareAvErrorSeconds,Math.Abs(completed.Value-selected.Source));
                         }
                     }
-                    catch(Exception e){Fault=e.ToString();Failed?.Invoke(Fault);Dropped++;deliveryFailureDrops++;ResetCore(ResetCause.Failure);}
+                    catch(Exception e){Fault=e.ToString();Failed?.Invoke(Fault);Dropped++;deliveryFailureDrops++;rejectionReason="DeliveryFailure";ResetCore(ResetCause.Failure);}
                     finally{current=null;}
                 }
-                }finally{if(observe){double? completedPlayhead=audioPlayhead();var observation=new Observation(++observationSequence,selected.Generation,selected.Source,selected.Arrival,selectedDue,sampleAt,commitAt,Now,playhead,commitPlayhead,completedPlayhead,delivered,valid,error);if(observations.Count==4096)observations.Dequeue();observations.Enqueue(observation);}}
+                }finally{if(observe){double? completedPlayhead=audioPlayhead();var observation=new Observation(++observationSequence,selected.Generation,selected.Source,selected.Arrival,selectedDue,sampleAt,commitAt,Now,playhead,commitPlayhead,completedPlayhead,delivered,valid,error,rejectionReason);if(observations.Count==4096)observations.Dequeue();observations.Enqueue(observation);DiagnosticObserver?.Invoke(observation);}}
                 }
             }
 
@@ -194,4 +203,21 @@ public sealed class EpochPublication<T> where T:class
     public bool Publish(NetworkTimeline identity,T owned){lock(gate){if(identity!=timeline)return false;value=owned;return true;}}
     public T? Read(NetworkTimeline? expected){lock(gate)return timeline==expected?value:null;}
     public void Clear(){lock(gate){timeline=null;value=null;}}
+}
+
+/// <summary>Opt-in durable rejection export: first point, then one per10s, bounded.</summary>
+internal sealed class PlayoutDiagnosticExportGate(int capacity=2048,double intervalSeconds=10)
+{
+    private double next=double.NegativeInfinity;
+    public int Exported {get;private set;}
+    public int CadenceOmitted {get;private set;}
+    public int CapacityOmitted {get;private set;}
+    public bool TryExport(NetworkPlayout.Observation row)
+    {
+        if(row.Delivered)return false;
+        if(row.CommitAt<next){CadenceOmitted++;return false;}
+        next=row.CommitAt+intervalSeconds;
+        if(Exported>=capacity){CapacityOmitted++;return false;}
+        Exported++;return true;
+    }
 }

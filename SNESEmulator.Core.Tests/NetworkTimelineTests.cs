@@ -5,6 +5,7 @@ internal static class NetworkTimelineTests
     private static void Check(bool value,string reason){if(!value)throw new Exception(reason);}
     public static void Run(Action<string,Action> test)
     {
+        NetworkClockTests.Run(test);
         test("M9d version4 envelope bounds epoch and opaque media identity",()=>{
             var t=new NetworkTimeline(123,42,945000000,44,24576000,1,false,false,false);
             Check(NetworkTimeline.Decode(t.Encode())==t,"roundtrip");byte[] raw=[0x33,0x44,0x49,0x56,1,2,3];

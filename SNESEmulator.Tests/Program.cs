@@ -36,6 +36,17 @@ if(args.Contains("--network-only"))
     NetworkTests.Run((name,body)=>{var filter=args.FirstOrDefault(a=>a.StartsWith("--filter="))?[9..];if(filter==null||name.Contains(filter,StringComparison.OrdinalIgnoreCase))Test(name,body);},testRoot);report.Metadata["limits"]="Own real localhost TLS/Relay sockets; software driver boundaries; no physical input/DAC/console or external relay";
     report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9d-network-windows");return failed==0?0:1;
 }
+Test("R6 borrowed ARGB packing retains exact VID3 bytes ownership and public invalid input",()=>{
+    foreach(int width in new[]{256,512})foreach(int height in new[]{224,239}){
+        uint[] pixels=Enumerable.Range(0,width*height).Select(i=>0xff000000u|(uint)(i*7919)&0x00ffffffu).ToArray();
+        byte[] expected=new byte[pixels.Length*4];Buffer.BlockCopy(pixels,0,expected,0,expected.Length);
+        byte[] packed=SnesNetProtocol.CreatePackedVideoFrameSpan(pixels,width,height);Check(packed.SequenceEqual(expected),"exact old packed bytes");
+        var wire=SnesNetProtocol.CreateBestVideoFramePayload(packed,null,width,height,1,0,out _);var old=SnesNetProtocol.CreateBestVideoFramePayload(expected,null,width,height,1,0,out _);Check(wire.SequenceEqual(old),"exact VID3 payload");
+        uint original=pixels[0];pixels[0]^=1;Check(packed.SequenceEqual(expected),"retained wire bytes independent of reused source");packed[0]^=128;Check(pixels[0]==(original^1),"wire edits cannot mutate immutable plane owner");
+    }
+    Check(SnesNetProtocol.CreatePackedVideoFrame(null!,256,224).Length==0,"public null contract");
+    foreach(var size in new[]{(256,448),(512,478),(0,224),(256,0),(255,224)})Check(SnesNetProtocol.CreatePackedVideoFrameSpan(new uint[Math.Max(0,size.Item1*size.Item2)],size.Item1,size.Item2).Length==0,"unchanged invalid geometry");
+});
 Test("Network video retains all 32768 SNES colors",()=>
 {
     uint[] pixels=Enumerable.Range(0,256*224).Select(i=>0xFF000000u|(uint)(((i&31)*255/31)<<16|(((i>>5)&31)*255/31)<<8|((i>>10)&31)*255/31)).ToArray();

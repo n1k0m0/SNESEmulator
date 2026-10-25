@@ -13,6 +13,17 @@ internal static class SoakObservationTests
     }
     internal static void Run(Action<string, Action> test)
     {
+        test("Soak screenshot failures retain counted errors and permit final reporting", () =>
+        {
+            int captures=0,errors=0;var messages=new List<string>();
+            void Error(string message){errors++;messages.Add(message);}
+            foreach(var size in new[]{(0,1),(1,0),(0,0),(-1,1)})
+                Check(!SoakSmoke.TryCaptureScreenshot(size.Item1,size.Item2,()=>captures++,Error),"Missing drawable size cannot create a valid screenshot");
+            Check(captures==0&&errors==4,"Invalid dimensions are counted without calling GDI/OpenGL");
+            Check(SoakSmoke.TryCaptureScreenshot(256,224,()=>captures++,Error)&&captures==1&&errors==4,"Normal capture remains successful");
+            Check(!SoakSmoke.TryCaptureScreenshot(256,224,()=>throw new IOException("capture fault"),Error)&&errors==5,"Actual capture exception remains a counted failure");
+            Check(messages.Last().Contains("capture fault"),"Original failure remains visible");
+        });
         test("Soak cumulative counter detects catchup between ten-second status samples", () =>
         {
             var observer = new SoakQualityTracker();

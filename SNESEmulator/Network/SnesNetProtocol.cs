@@ -558,11 +558,14 @@ namespace SNESEmulator.Network
         /// <returns>Four bytes per pixel, or an empty array for invalid input.</returns>
         public static byte[] CreatePackedVideoFrame(uint[] pixels, int width, int height)
         {
-            if (width is not (256 or 512) || height is not (224 or 239) || pixels==null || pixels.Length != width * height)
-                return EmptyPayload;
-            byte[] bytes = new byte[width * height * 4];
-            Buffer.BlockCopy(pixels, 0, bytes, 0, bytes.Length);
-            return bytes;
+            return pixels==null?EmptyPayload:CreatePackedVideoFrameSpan(pixels,width,height);
+        }
+        // The completed immutable plane is borrowed only for this synchronous copy.
+        // The returned wire buffer remains owned, so encoders/clients may retain it.
+        internal static byte[] CreatePackedVideoFrameSpan(ReadOnlySpan<uint> pixels,int width,int height)
+        {
+            if(width is not (256 or 512)||height is not (224 or 239)||pixels.Length!=width*height)return EmptyPayload;
+            return System.Runtime.InteropServices.MemoryMarshal.AsBytes(pixels).ToArray();
         }
         public static bool PackedVideoFramesEqual(byte[] a, byte[] b) => a != null && b != null && a.AsSpan().SequenceEqual(b);
         public static byte[] CreateVideoFramePayload(uint[] pixels, int width, int height, long frameId)

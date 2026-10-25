@@ -6,7 +6,7 @@ namespace SNESEmulator.Network;
 public sealed class NetworkAudioOutput : ISampleProvider,IDisposable
 {
     private readonly object gate=new();
-    private readonly NetworkAudioBuffer source=new();
+    private readonly NetworkAudioBuffer source;
     private readonly DriverByteCursor cursor=new();
     private readonly WaveOutEvent wave=new(){DesiredLatency=100,NumberOfBuffers=2};
     private bool active;
@@ -14,7 +14,11 @@ public sealed class NetworkAudioOutput : ISampleProvider,IDisposable
     public WaveFormat WaveFormat {get;}=WaveFormat.CreateIeeeFloatWaveFormat(48000,2);
     public int BufferedNativeFrames=>source.BufferedNativeFrames;
     public long PaddingFrames=>source.PaddingFrames;
-    public NetworkAudioOutput(){try{wave.Init(this);}catch{wave.Dispose();throw;}}
+    internal sealed record Diagnostics(bool Active,string DriverStatus,uint RawDriverBytes,ulong ExtendedDriverBytes,long DriverFrame,double? PlayedCrystal,NetworkAudioBuffer.Diagnostics Buffer);
+    internal Diagnostics ReadDiagnostics(){lock(gate){uint raw=unchecked((uint)wave.GetPosition());ulong bytes=active?cursor.Observe(raw):0;long frame=checked((long)(bytes/8));return new(active,wave.PlaybackState.ToString(),raw,bytes,frame,active?source.CrystalAtDriverFrame(frame):null,source.ReadDiagnostics());}}
+    public NetworkAudioOutput():this(true){}
+    // The fixed mode is retained only for controlled native regression comparison.
+    internal NetworkAudioOutput(bool adaptive){source=new(adaptive);try{wave.Init(this);}catch{wave.Dispose();throw;}}
     public int Read(float[] buffer,int offset,int count)=>source.Read(buffer,offset,count,Volume);
     public double? PlayedCrystal
     {

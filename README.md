@@ -15,12 +15,15 @@ Manager and distribution have independent historical acceptance.
 The ordered follow-ups are implemented: [R1 persistence/CI](docs/r1-persistence-ci.md),
 [R2 pacing/performance](docs/r2-performance-soak.md), [R3 accuracy](docs/r3-accuracy.md),
 [R4 comments](docs/r4-readability.md), DSP1, SuperFX and SA-1.
-[Final integration](docs/final-integration.md) passed functional, distribution and
-exact implementation-head hosted CI checks. Both actual native hours completed:
-PAL passed; NTSC retained 288 post-ready muted fields and 127 remote drops.
-Both final core duration tests retained sub-real-time 600-field windows.
-[R5 core overhead](docs/r5-realtime-core.md) reduces observation allocations and
-records a bounded NTSC improvement; new native/realtime acceptance is still pending.
+[Historical final integration](docs/final-integration.md) passed functional,
+distribution and implementation-head hosted CI checks. Subsequent R5 long Core
+gates passed, but both actual 3,600-second native regional sessions remained red.
+[R6 remote presentation recovery](docs/r6-realtime-runtime.md) fixes demonstrated
+clock-drift/padding and competing video-clock defects, with deterministic and
+actual WinMM comparisons. A complete 300-second NTSC session passes; PAL retains
+six owner-muted fields and eight timeline-reset drops in its retained samples.
+Native-hour acceptance after the fixes and the remaining owner timing work are
+still open. Original red evidence and hardware-accuracy limits remain explicit.
 
 **Strict performance/native release acceptance remains open.** Known raw
 accuracy and full-sequence audio differences remain separately documented.
