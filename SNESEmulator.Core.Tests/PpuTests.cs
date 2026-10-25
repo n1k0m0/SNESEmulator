@@ -63,6 +63,86 @@ static class PpuTests
     }
     public static void Run(Action<string,Action> test,string directory)
     {
+        test("R5 actual pixel sampling decodes every plane pattern with unrelated neighboring bits",()=>{
+            var random=new Random(0x5105);
+            foreach(var format in new[]{(Mode:0,Bpp:2),(Mode:1,Bpp:4),(Mode:3,Bpp:8)}){
+                var clock=new MasterClock(HardwareProfile.Ntsc);clock.Reset();clock.AdvanceTo(1364+58);
+                var p=new Ppu{Clock=clock};p.Reset();p.Write(0,15);p.Write(5,3);p.Write(0x2c,1);p.Scanline=1;
+                for(int color=0;color<256;color++)p.Cgram[color*2]=(byte)color;
+                var state=p.CapturePipeline();state.PhaseH=58;state.ProcessedClock=clock.Now-2;
+                var tile=state.Tiles[0];tile.Bpp=8;tile.Priority=12;
+                for(int color=0;color<256;color++)for(int offset=0;offset<8;offset++)foreach(bool flip in new[]{false,true}){
+                    ushort[] words=Enumerable.Range(0,4).Select(_=>(ushort)random.Next(65536)).ToArray();
+                    int bit=flip?offset:7-offset;
+                    for(int plane=0;plane<8;plane++){
+                        int mask=1<<(bit+(plane%2)*8),word=plane/2;
+                        words[word]=(ushort)((words[word]&~mask)|((color&(1<<plane))!=0?mask:0));
+                    }
+                    tile.Low=words[0];tile.High=words[1];tile.UpperLow=words[2];tile.UpperHigh=words[3];tile.Flip=flip;
+                    Array.Clear(state.Video.Samples[5]);state.Video.Samples[5][0]=offset;p.RestorePipeline(state);p.Write(5,(byte)format.Mode);p.Synchronize(false);
+                    int expected=color&((1<<format.Bpp)-1);var result=p.CapturePipeline();
+                    Check(result.SamplePalette[0]==expected&&p.NativePixels[0]==expected,
+                        $"mode={format.Mode}, color={color}, offset={offset}, flip={flip}");
+                    Check(result.Video.Samples[5][0]==offset+1,"Sampling lost a render-position increment");
+                }
+            }
+        });
+        test("R5 main and sub selection preserve enable masks and background object priority ties",()=>{
+            for(int mode=0;mode<7;mode++){
+                var clock=new MasterClock(HardwareProfile.Ntsc);clock.Reset();clock.AdvanceTo(1364+58);
+                var p=new Ppu{Clock=clock};p.Reset();p.Write(0,15);p.Write(5,(byte)mode);p.Scanline=1;
+                for(int color=0;color<256;color++)p.Cgram[color*2]=(byte)color;
+                var state=p.CapturePipeline();state.PhaseH=58;state.ProcessedClock=clock.Now-2;
+                int[] ranks=[12,11,9,8];
+                for(int bg=0;bg<4;bg++){
+                    var tile=state.Tiles[bg*66];tile.Low=255;tile.Palette=bg*2;tile.Priority=ranks[bg];
+                    state.Video.Samples[2][bg]=1+bg*2;state.Video.Samples[3][bg]=ranks[bg];
+                }
+                state.ObjectPalette[0]=129;state.ObjectPriority[0]=3;
+                int count=mode==0?4:mode==1?3:mode==6?1:2;
+                int Expected(int mask)=> (mask&1)!=0?1:count>=2&&(mask&2)!=0?3:(mask&16)!=0?129:
+                    count>=3&&(mask&4)!=0?5:count>=4&&(mask&8)!=0?7:0;
+                for(int mask=0;mask<256;mask++){
+                    Array.Clear(state.Video.Samples[5]);p.RestorePipeline(state);p.Write(0x2c,(byte)mask);p.Write(0x2d,(byte)~mask);p.Synchronize(false);
+                    var result=p.CapturePipeline();
+                    Check(p.NativePixels[mode is 5 or 6?1:0]==Expected(mask),$"Main mode={mode}, mask={mask:X2}");
+                    Check(result.BelowColor==Expected(~mask),$"Sub mode={mode}, mask={mask:X2}");
+                }
+            }
+        });
+        test("R5 display conversion matches the independent arithmetic for every color and brightness",()=>{
+            for(int light=0;light<16;light++)for(int color=0;color<=ushort.MaxValue;color++){
+                int Component(int shift)=>((((color>>shift)&31)*light*2+15)/30)*255/31;
+                uint expected=0xff000000u|(uint)(Component(0)<<16|Component(5)<<8|Component(10));
+                Check(Ppu.ToArgb((ushort)color,(byte)light)==expected,$"RGB555={color:X4}, brightness={light}");
+            }
+            foreach(byte light in new byte[]{16,255}){
+                try{Ppu.ToArgb(0,light);throw new Exception("Invalid brightness accepted");}
+                catch(ArgumentOutOfRangeException e){Check(e.ParamName=="brightness");}
+            }
+        });
+        test("R5 restored pixel phase samples live mode despite stale eight-plane tile latches",()=>{
+            // Literal mode/plane worksheet. Tile bit columns encode palette
+            // 1,2,4,...,128; a mode write masks planes at sampling, not at fetch.
+            int[][] planes=[[2,2,2,2],[4,4,2,0],[4,4,0,0],[8,4,0,0],[8,2,0,0],[4,2,0,0],[4,0,0,0]];
+            for(int mode=0;mode<planes.Length;mode++)for(int bg=0;bg<4;bg++)
+            for(int offset=0;offset<8;offset++)foreach(bool flip in new[]{false,true}){
+                var clock=new MasterClock(HardwareProfile.Ntsc);clock.Reset();clock.AdvanceTo(1364+58);
+                var p=new Ppu{Clock=clock};p.Reset();p.Write(0,15);p.Write(5,3);p.Write(0x2c,(byte)(1<<bg));p.Scanline=1;
+                for(int color=0;color<256;color++)p.Cgram[color*2]=(byte)color;
+                var state=p.CapturePipeline();state.PhaseH=58;state.ProcessedClock=clock.Now-2;
+                var tile=state.Tiles[bg*66];tile.Bpp=8;tile.Priority=12;tile.Flip=flip;
+                tile.Low=0x4080;tile.High=0x1020;tile.UpperLow=0x0408;tile.UpperHigh=0x0102;
+                state.Video.Samples[5][bg]=offset;p.RestorePipeline(state);
+                p.Write(5,(byte)mode);p.Synchronize(false);
+                int bit=flip?7-offset:offset;int expected=bit<planes[mode][bg]?1<<bit:0;
+                var result=p.CapturePipeline();
+                Check(result.SamplePalette[bg]==expected,$"mode={mode}, bg={bg}, offset={offset}, flip={flip}");
+                Check(result.Video.Samples[5][bg]==offset+1,"Plane optimization skipped the render-position latch");
+                int nativeIndex=mode is 5 or 6?1:0;
+                Check(p.NativePixels[nativeIndex]==expected,"Native pixel differs from the selected palette entry");
+            }
+        });
         test("R5 direct PPU snapshots preserve pre-change JSON at arbitrary NTSC PAL phases",()=>{
             // Frozen from the old JSON-roundtrip implementation at9db216a before
             // replacing it. Midline/field cuts exercise non-default pipeline data.

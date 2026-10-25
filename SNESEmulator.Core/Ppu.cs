@@ -150,11 +150,22 @@ public sealed partial class Ppu
         int result=0;for(int shift=0;shift<15;shift+=5)result|=((((color>>shift)&31)*brightness*2+15)/30)<<shift;
         return (ushort)result;
     }
+    // Preserve both integer rounding stages of RGB555 brightness and display
+    // expansion. This table contains channel arithmetic, never hardware state.
+    private static readonly byte[] displayChannels=CreateDisplayChannels();
+    private static byte[] CreateDisplayChannels()
+    {
+        var result=new byte[16*32];
+        for(int light=0;light<16;light++)for(int color=0;color<32;color++)
+            result[(light<<5)+color]=(byte)(((color*light*2+15)/30)*255/31);
+        return result;
+    }
     public static uint ToArgb(ushort color,byte brightness)
     {
-        int digital=ApplyBrightness(color,brightness);
-        int r=(digital&31)*255/31,g=((digital>>5)&31)*255/31,b=((digital>>10)&31)*255/31;
-        return 0xff000000u|(uint)(r<<16|g<<8|b);
+        if(brightness>15)throw new ArgumentOutOfRangeException(nameof(brightness));
+        int row=brightness<<5;
+        return 0xff000000u|(uint)(displayChannels[row+(color&31)]<<16|
+            displayChannels[row+((color>>5)&31)]<<8|displayChannels[row+((color>>10)&31)]);
     }
     public PpuFrame Frame=>new(FrameGeometry,NativePixels,Brightness,Pixels);
 }

@@ -202,8 +202,15 @@ public sealed partial class Ppu
     {
         int pos=x,tileIndex=pos/8;
         var tile=backgroundTiles[bg*66+tileIndex];int bit=tile.Flip?pos&7:7-(pos&7);
-        int pixel=((tile.Low>>bit)&1)|((tile.Low>>(bit+8))&1)<<1|((tile.High>>bit)&1)<<2|((tile.High>>(bit+8))&1)<<3|((tile.UpperLow>>bit)&1)<<4|((tile.UpperLow>>(bit+8))&1)<<5|((tile.UpperHigh>>bit)&1)<<6|((tile.UpperHigh>>(bit+8))&1)<<7;
-        int bpp=BitsPerPixel(Registers[5]&7,bg);pixel&=(1<<bpp)-1;
+        // Extract the same bit column from each byte of the fetched words.
+        // The live mode limits planes at sampling, even after a midline mode write.
+        int bpp=BitsPerPixel(Registers[5]&7,bg),planes=0;
+        if(bpp!=0){
+            planes=(tile.Low>>bit)&0x0101;
+            if(bpp>=4)planes|=((tile.High>>bit)&0x0101)<<2;
+            if(bpp==8)planes|=(((tile.UpperLow>>bit)&0x0101)<<4)|(((tile.UpperHigh>>bit)&0x0101)<<6);
+        }
+        int pixel=(planes|(planes>>7))&255;
         int priority=pixel==0?-1:tile.Priority,palette=pixel==0?0:tile.Palette+pixel;
         return(palette,priority,tile.PaletteGroup);
     }
@@ -227,11 +234,19 @@ public sealed partial class Ppu
     {
         int mask=Registers[sub?0x2d:0x2c],windowMask=Registers[sub?0x2f:0x2e];
         var best=(Palette:0,Layer:5,Priority:-1,Group:0);int mode=Registers[5]&7;
+        // Selection has no bus effects. PixelColor still performs the palette
+        // access for the resulting backdrop outside this selector.
+        if((mask&31)==0)return best;
         int count=mode switch{0=>4,1=>3,6=>1,7=>(Registers[0x33]&64)!=0?2:1,_=>2};
+        bool half=sub&&Hires;
+        var palettes=half?subPalette:samplePalette;
+        var priorities=half?subPriority:samplePriority;
+        var groups=half?subGroup:sampleGroup;
         for(int bg=0;bg<count;bg++)
         {
-            bool half=sub&&Hires;int palette=half?subPalette[bg]:samplePalette[bg],priority=half?subPriority[bg]:samplePriority[bg],group=half?subGroup[bg]:sampleGroup[bg];
-            if((mask&(1<<bg))!=0&&((windowMask&(1<<bg))==0||!Window(bg,x))&&priority>best.Priority)best=(palette,bg,priority,group);
+            if((mask&(1<<bg))==0)continue;
+            int priority=priorities[bg];
+            if(((windowMask&(1<<bg))==0||!Window(bg,x))&&priority>best.Priority)best=(palettes[bg],bg,priority,groups[bg]);
         }
         if((mask&16)!=0&&objectPalette[x]!=0&&((windowMask&16)==0||!Window(4,x)))
         {

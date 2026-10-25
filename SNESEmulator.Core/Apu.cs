@@ -146,13 +146,24 @@ public sealed class Apu : ISpcBus
         if(!holding)return true;if(!AdvanceSegment(nextEffect,timerLength/2))return false;holding=false;hold=0;var c=heldCycle;heldCycle=null;
         FlushDsp();if(c!=null)PhaseObserved?.Invoke(new("read-complete",Crystal,c));return true;
     }
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     public void RunUntil(long crystal)
     {
         if(crystal<Crystal)throw new ArgumentOutOfRangeException(nameof(crystal));budget=crystal;
         if(Isolated){Crystal=crystal;return;}
-        // No segment endpoint: timer input and MMIO stay untouched. Avoid replaying
-        // the SPC continuation at every intervening PPU half-dot.
-        if((cycleActive||holding)&&nextEffect>crystal){AdvanceCrystal(crystal,false);return;}
+        // Most PPU half-dots end before either crystal-domain effect. Only the
+        // current crystal moves there: timers, held ports, DSP and SPC registers
+        // retain their pending endpoints. Equality still executes the real DSP
+        // boundary below, including its existing notification order.
+        if((cycleActive||holding)&&nextEffect>crystal){
+            if(crystal<Dsp.NextBoundary)Crystal=crystal;
+            else AdvanceCrystal(crystal,false);
+            return;
+        }
+        RunEndpoint();
+    }
+    private void RunEndpoint()
+    {
         while(true){if(!FinishHold()||!Cpu.RunInstruction()){FlushDsp();return;}}
     }
     private void FlushDsp(){var row=pendingDsp;pendingDsp=null;if(row!=null)dspObserved?.Invoke(row);}

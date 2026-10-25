@@ -11,6 +11,28 @@ static class ApuTests
     static SnesSystem Upload(){var m=new SnesSystem();m.Insert(new Cartridge(SpcUploadRom.Create()));return m;}
     public static void Run(Action<string,Action> test,string directory)
     {
+        test("R5 APU pending crystal budgets retain every timer and DSP endpoint",()=>{
+            for(int speed=0;speed<4;speed++){
+                var a=Program(0xe4,0xf4,0x2f,0xfc);a.Write(0xf0,(byte)(0x0a|(speed<<4)|(speed<<6)));
+                var dsp=new List<DspPhase>();var bus=new List<ApuPhase>();a.DspPhaseObserved=dsp.Add;a.PhaseObserved=bus.Add;
+                a.RunUntil(1);var first=a.Capture();int events=dsp.Count+bus.Count;
+                a.RunUntil(23);Check(Json(first with{Crystal=23})==Json(a.Capture()),"A pre-endpoint budget changed hardware state");
+                Check(dsp.Count+bus.Count==events,"A pre-endpoint budget published an effect");
+                a.RunUntil(24);Check(dsp.Count==1&&dsp[0].Crystal==24&&a.Dsp.Capture().NextCrystal==48,"Exact DSP endpoint was skipped");
+                if(speed>0)Check(a.Cycles==0&&a.Capture().CycleActive,"A slow pending SPC cycle committed at the DSP endpoint");
+                a.RunUntil(25);var next=a.Capture();events=dsp.Count+bus.Count;
+                a.RunUntil(47);Check(Json(next with{Crystal=47})==Json(a.Capture()),"A common DSP-free budget changed a latch");
+                Check(dsp.Count+bus.Count==events,"A common budget repeated an observer");
+                string before=Json(a.Capture());try{a.RunUntil(46);throw new Exception("Backwards APU time accepted");}catch(ArgumentOutOfRangeException e){Check(e.ParamName=="crystal");}
+                Check(Json(a.Capture())==before,"A rejected backwards budget changed the machine");
+            }
+        });
+        test("R5 APU pending port hold keeps its exact trailing DSP and bus completion",()=>{
+            var a=Program(0xe4,0xf4,0x2f,0xfc);a.CpuToApu[0]=0x53;var rows=new List<ApuPhase>();a.PhaseObserved=rows.Add;
+            a.RunUntil(60);var held=a.Capture();Check(held.Holding&&held.NextEffect==72&&held.Hold==12,"Expected real half-period port hold");
+            int observed=rows.Count;a.RunUntil(71);Check(Json(held with{Crystal=71})==Json(a.Capture())&&rows.Count==observed,"Pending hold advanced an endpoint early");
+            a.RunUntil(72);Check(!a.Capture().Holding&&a.Cpu.A==0x53&&rows.Count(x=>x.Phase=="read-complete"&&x.Crystal==72)==1,"Trailing hold was skipped or repeated");
+        });
         test("M4 complete opcode sample both direct and resumable state bus",()=>{
             string root=Path.GetFullPath(Path.Combine(AppContext.BaseDirectory,"../../../../testdata/spc700-sample"));
             var b=new SpcFlatBus();var c=new Spc700(b);List<SpcCycle> rows=[];c.CycleObserved=rows.Add;
