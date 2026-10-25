@@ -77,3 +77,6 @@ tools/dsp1-reference.cpp text eol=lf
 
 # R5 provenance manifest uses stable LF bytes.
 /docs/r5-realtime-core-evidence-manifest.json text eol=lf
+
+# R5 native/capture provenance uses stable LF bytes.
+/docs/r5-realtime-runtime-evidence-manifest.json text eol=lf

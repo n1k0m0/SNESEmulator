@@ -18,7 +18,7 @@ public sealed class PpuVideoState
 }
 public sealed partial class Ppu
 {
-    private PpuVideoState CaptureVideo()=>new(){Mode7Horizontal=mode7Horizontal,OffsetH=offsetHorizontal,OffsetV=offsetVertical,Samples=[sampleGroup,mosaicGroup,subPalette,subPriority,subGroup,renderPosition],
+    private PpuVideoState CaptureVideo()=>new(){Mode7Horizontal=mode7Horizontal.ToArray(),OffsetH=offsetHorizontal,OffsetV=offsetVertical,Samples=[sampleGroup.ToArray(),mosaicGroup.ToArray(),subPalette.ToArray(),subPriority.ToArray(),subGroup.ToArray(),renderPosition.ToArray()],
         PreviousMain=previousMain,PreviousMath=previousMath,PreviousClip=previousClip,PreviousBlend=previousBlend,PreviousHalf=previousHalf,
         CompletedGeometry=CompletedFrame?.Geometry,CompletedNative=CompletedFrame?.Native.ToArray()??[],CompletedBrightness=CompletedFrame?.Brightness.ToArray()??[],CompletedArgb=CompletedFrame?.Argb.ToArray()??[]};
     private void RestoreVideo(PpuVideoState s)

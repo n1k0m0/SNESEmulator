@@ -47,8 +47,77 @@ static class PpuTests
     {
         var r=new PpuDiagnosticRom();r.Write(0x2101,obsel);r.Write(0x212c,16);r.Palette(0,0);r.Palette(129,992);r.Palette(145,31);r.Vram(0x4000,Enumerable.Range(0,256).SelectMany(_=>Tile(4,1)).ToArray());r.Objects(oam);return r;
     }
+    // Traverse the public snapshot graph, excluding immutable geometry/value data.
+    // This catches new mutable members too, rather than listing today's arrays.
+    static HashSet<object> MutableSnapshotNodes(object root)
+    {
+        var nodes=new HashSet<object>(ReferenceEqualityComparer.Instance);
+        void Visit(object? item){
+            if(item==null||item is string or PpuGeometry||item.GetType().IsValueType)return;
+            if(item is Array empty&&empty.Length==0)return;
+            if(!nodes.Add(item))return;
+            if(item is Array array){foreach(var child in array)Visit(child);}
+            else foreach(var property in item.GetType().GetProperties())Visit(property.GetValue(item));
+        }
+        Visit(root);return nodes;
+    }
     public static void Run(Action<string,Action> test,string directory)
     {
+        test("R5 direct PPU snapshots preserve pre-change JSON at arbitrary NTSC PAL phases",()=>{
+            // Frozen from the old JSON-roundtrip implementation at9db216a before
+            // replacing it. Midline/field cuts exercise non-default pipeline data.
+            var expected=new (bool Pal,long Clock,string Hash)[]{
+                (false,0L,"ce3c31855ef9dee307ffc54e435fb373ca8bcc4ee32d8d493d608da4b2684a36"),
+                (false,1L,"ce3c31855ef9dee307ffc54e435fb373ca8bcc4ee32d8d493d608da4b2684a36"),
+                (false,58L,"09a5b13fa3688cc70de89105706e6c04c17ca5344f573a8da9047dcb3e72a4fe"),
+                (false,1080L,"eb65bf97bb83e6b2e424aee644360c8c38dfac785028b88dc96f5b1793232e2e"),
+                (false,1363L,"e9458882e49b79b5cc8f6f0ce28ad6c14e940b4d8d041ae1518239694d125b69"),
+                (false,120000L,"aa3b59044c1a6af4f5acaebcb3a786d93c31a1ff82e9083ba4ab661946a37a0b"),
+                (false,357368L,"0d1a1ab9b333969de2cdaf96140ae49994654ca39d75f76ce00ef50389ba6266"),
+                (false,358000L,"5a34652f5a303a96355f0ac900bae096cb53c75ce04bca3f12ae14041597a454"),
+                (false,500000L,"6214ffbb2430e7b81a22a4ddbd195f89f4bd368e9c863c28d006566452fc6bcb"),
+                (true,0L,"ce3c31855ef9dee307ffc54e435fb373ca8bcc4ee32d8d493d608da4b2684a36"),
+                (true,1L,"ce3c31855ef9dee307ffc54e435fb373ca8bcc4ee32d8d493d608da4b2684a36"),
+                (true,58L,"09a5b13fa3688cc70de89105706e6c04c17ca5344f573a8da9047dcb3e72a4fe"),
+                (true,1080L,"eb65bf97bb83e6b2e424aee644360c8c38dfac785028b88dc96f5b1793232e2e"),
+                (true,1363L,"e9458882e49b79b5cc8f6f0ce28ad6c14e940b4d8d041ae1518239694d125b69"),
+                (true,120000L,"aa3b59044c1a6af4f5acaebcb3a786d93c31a1ff82e9083ba4ab661946a37a0b"),
+                (true,357368L,"53dc4124bdac9929467162bcc28e79a0c112b67360ae7f5d2734db3441c2e216"),
+                (true,358000L,"0c08e888ffba91d74cdc3118207c49f6ba70277c12afe642a5e603f672ef5386"),
+                (true,500000L,"a457544ae5d25de303a81d34c0591479640c4f9d62e43da99e134d121236e80c"),
+            };
+            foreach(bool pal in new[]{false,true}){
+                var m=new SnesSystem(pal?HardwareProfile.PalProfile:HardwareProfile.Ntsc);m.Insert(new Cartridge(DiagnosticRom.Create()));
+                foreach(var row in expected.Where(x=>x.Pal==pal)){
+                    m.RunUntil(row.Clock);string hash=Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(JsonSerializer.SerializeToUtf8Bytes(m.Bus.Ppu.CapturePipeline())));
+                    Check(hash==row.Hash,$"Pre-change snapshot JSON differs at PAL={pal} clock={row.Clock}");
+                }
+            }
+        });
+        test("R5 PPU capture detaches every mutable nested snapshot in both directions",()=>{
+            var p=new Ppu();p.Reset();p.CompleteField();var installed=p.CapturePipeline();
+            installed.Tiles[0].Low=123;installed.ObjectDescriptor=new(){Width=8,Row=7};installed.Fetches=[new(){Palette=128,Low=456}];p.RestorePipeline(installed);
+            var retained=p.CapturePipeline();var next=p.CapturePipeline();
+            Check(!MutableSnapshotNodes(retained).Overlaps(MutableSnapshotNodes(next)),"Independent snapshots share mutable objects/planes");
+            string before=JsonSerializer.Serialize(retained);
+            // RestorePipeline owns installed latches; changing those exercises
+            // real live tile/fetch/descriptor changes after the retained capture.
+            installed.Tiles[0].Low++;installed.Fetches[0].Low++;installed.ObjectDescriptor.Row++;p.StartLine(7);
+            Check(JsonSerializer.Serialize(retained)==before,"Live owner changes rewrote retained snapshot");
+            string live=JsonSerializer.Serialize(p.CapturePipeline());
+            foreach(var node in MutableSnapshotNodes(retained)){
+                if(node is Array array){Array.Clear(array);continue;}
+                foreach(var property in node.GetType().GetProperties().Where(x=>x.CanWrite)){
+                    object? value=property.GetValue(node);
+                    if(value is int n)property.SetValue(node,n^1);
+                    else if(value is bool b)property.SetValue(node,!b);
+                    else if(value is ushort u)property.SetValue(node,(ushort)(u^1));
+                    else if(value is byte v)property.SetValue(node,(byte)(v^1));
+                }
+            }
+            Check(JsonSerializer.Serialize(p.CapturePipeline())==live,"Snapshot edits rewrote live owner latches/planes");
+        });
+
         test("R5 queued PPU observations use the current subscriber and clear removed observers",()=>{
             var c=new MasterClock(HardwareProfile.Ntsc);c.Reset();var p=new Ppu{Clock=c};
             int oldCalls=0,newCalls=0;p.PhaseObserved=_=>oldCalls++;p.Synchronize(false);

@@ -1,4 +1,3 @@
-using System.Text.Json;
 namespace SNESEmulator.Core;
 
 public sealed class PpuPipelineState
@@ -49,12 +48,16 @@ public sealed class PpuPipelineState
 public sealed partial class Ppu
 {
     // Deep data snapshot: callers may retain it across future device advances.
-    public PpuPipelineState CapturePipeline()=>JsonSerializer.Deserialize<PpuPipelineState>(JsonSerializer.Serialize(new PpuPipelineState{
-        Video=CaptureVideo(),VramBuffer=vramBuffer,OamReload=oamReload,FixedColor=fixedColor,OamLatch=oamLatch,CgramLatch=cgramLatch,ScrollFineLatch=scrollFineLatch,Mode7Latch=mode7Latch,Mode7=mode7,
-        Ppu1Mdr=Ppu1Mdr,Ppu2Mdr=Ppu2Mdr,RangeOver=RangeOver,TimeOver=TimeOver,Tiles=backgroundTiles,FineScroll=fineScroll,MosaicPalette=mosaicPalette,MosaicPriority=mosaicPriority,
-        ObjectPalette=objectPalette,ObjectPriority=objectPriority,NextObjectPalette=nextObjectPalette,NextObjectPriority=nextObjectPriority,SelectedObjects=selectedObjects,
-        ObjectCursor=objectCursor,ObjectColumn=objectColumn,ObjectNextH=objectNextH,ObjectFetchDone=objectFetchDone,ObjectDescriptor=objectDescriptor,SelectedCount=selectedCount,FirstObject=firstObject,FetchIndex=objectFetchIndex,Fetches=objectFetches,InternalOam=internalOamAddress,InternalCgram=internalCgramAddress,
-        MosaicRemaining=mosaicRemaining,MosaicHorizontal=mosaicHorizontal,SamplePalette=samplePalette,SamplePriority=samplePriority,MosaicStart=mosaicStart,PhaseH=phaseH,ProcessedClock=processedClock,BelowColor=belowColor,BelowLayer=belowLayer}))!;
+    // Copy data directly: the previous JSON round trip encoded completed frame
+    // planes only to decode them and immediately encode them again in a save.
+    // Capture runs on the hardware owner, so that redundant work delays its next
+    // field. Every mutable array/descriptor below belongs solely to the snapshot.
+    public PpuPipelineState CapturePipeline()=>new PpuPipelineState{
+        Video=CaptureVideo(),VramBuffer=vramBuffer,OamReload=oamReload,FixedColor=fixedColor,OamLatch=oamLatch,CgramLatch=cgramLatch,ScrollFineLatch=scrollFineLatch,Mode7Latch=mode7Latch,Mode7=mode7.ToArray(),
+        Ppu1Mdr=Ppu1Mdr,Ppu2Mdr=Ppu2Mdr,RangeOver=RangeOver,TimeOver=TimeOver,Tiles=backgroundTiles.Select(t=>t.Copy()).ToArray(),FineScroll=fineScroll.ToArray(),MosaicPalette=mosaicPalette.ToArray(),MosaicPriority=mosaicPriority.ToArray(),
+        ObjectPalette=objectPalette.ToArray(),ObjectPriority=objectPriority.ToArray(),NextObjectPalette=nextObjectPalette.ToArray(),NextObjectPriority=nextObjectPriority.ToArray(),SelectedObjects=selectedObjects.ToArray(),
+        ObjectCursor=objectCursor,ObjectColumn=objectColumn,ObjectNextH=objectNextH,ObjectFetchDone=objectFetchDone,ObjectDescriptor=objectDescriptor?.Copy(),SelectedCount=selectedCount,FirstObject=firstObject,FetchIndex=objectFetchIndex,Fetches=objectFetches.Select(f=>f.Copy()).ToArray(),InternalOam=internalOamAddress,InternalCgram=internalCgramAddress,
+        MosaicRemaining=mosaicRemaining,MosaicHorizontal=mosaicHorizontal.ToArray(),SamplePalette=samplePalette.ToArray(),SamplePriority=samplePriority.ToArray(),MosaicStart=mosaicStart,PhaseH=phaseH,ProcessedClock=processedClock,BelowColor=belowColor,BelowLayer=belowLayer};
     public void ValidateClock()
     {
         if(Clock==null)return;

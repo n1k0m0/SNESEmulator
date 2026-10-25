@@ -1,0 +1,1093 @@
+{
+  "schema": 1,
+  "createdUtc": "2026-10-25T07:57:10.105479+00:00",
+  "scope": "Bounded Windows native realtime verification and owner checkpoint capture optimization. Not full sustained/native-hour/final-release acceptance. Ignored artifact paths are local evidence, not bundled fixtures.",
+  "baseCommit": "9db216a1a35d1ae2a8cf0e68c44a2be5594e4cc7",
+  "hashDomains": {
+    "retainedEvidenceAndBinaries": "Exact retained bytes. Source/dependency seals preserve their original before/after measurement boundaries.",
+    "sourceLf": "UTF-8 text normalized CRLF to LF; identity of measured implementation across Git checkouts. Full raw Windows source bytes retained in candidate source seals.",
+    "documentation": "Added after functional/native measurements; no claim these later documentation bytes were present during native runs.",
+    "baselineDirtyLocks": "Original baseline dirty lock bytes are retained separately, not relabeled as a clean source boundary."
+  },
+  "canonicalCoreSources": [
+    {
+      "path": "SNESEmulator.Core/Apu.cs",
+      "sha256LfText": "1a1bd348e9e696deff90d04404d369ac6dd95b5fb855af4e2173375f2355757b"
+    },
+    {
+      "path": "SNESEmulator.Core/AtomicFile.cs",
+      "sha256LfText": "a33bb6c4a8fe9ac5500eee0c46dc4b5cab21a7645f44804b05edabcda5a53c51"
+    },
+    {
+      "path": "SNESEmulator.Core/AudioDiagnosticRom.cs",
+      "sha256LfText": "77fd761913c02deb72d7a1aa936876ec066ead2e8c0a62f3c5adfbee749b1f1d"
+    },
+    {
+      "path": "SNESEmulator.Core/Cartridge.cs",
+      "sha256LfText": "4e755d31e2df4da46e372c2542d37542989d06af1904546349765c22a11f3243"
+    },
+    {
+      "path": "SNESEmulator.Core/ControllerPorts.cs",
+      "sha256LfText": "2c1793f66af6b5f18ba776428b55b42d45839b5ceca05b21471f251b3459a3e5"
+    },
+    {
+      "path": "SNESEmulator.Core/Cpu65816.Cycles.cs",
+      "sha256LfText": "0c68f18a8f6024eee05b4fe1be7900329ccfa8deea93d756bb02365b53aebc40"
+    },
+    {
+      "path": "SNESEmulator.Core/Cpu65816.cs",
+      "sha256LfText": "e33fdf26dbf0704e69630ec11a04b5684a00ca40226ac96d31439d4ed6505679"
+    },
+    {
+      "path": "SNESEmulator.Core/CpuCycle.cs",
+      "sha256LfText": "cbb5acf5bc59f8c2308d57a7b5691c40336b804a5c40d24822875fbe6f407830"
+    },
+    {
+      "path": "SNESEmulator.Core/CpuIo.cs",
+      "sha256LfText": "bbeef0d2583323e7577da239bd8e4e1bd30008c1b6ac61ba6f878313d5049517"
+    },
+    {
+      "path": "SNESEmulator.Core/DiagnosticRom.cs",
+      "sha256LfText": "d9573272081901d21d53f6ecd762ebf2b945863315593a60fb8e66d13a2a621b"
+    },
+    {
+      "path": "SNESEmulator.Core/DmaController.cs",
+      "sha256LfText": "7d583e2105d301ae49b352f2132e5327953f84c5707c54c41d39a9fccd09be0b"
+    },
+    {
+      "path": "SNESEmulator.Core/Dsp1CartridgeHardware.cs",
+      "sha256LfText": "8c09c4f103e09f7b14e1f493d3b8fadbe2439690c2f5be90e084683567f1bb2f"
+    },
+    {
+      "path": "SNESEmulator.Core/DspGaussian.cs",
+      "sha256LfText": "8747164fa65b199c7057c9fb2675ecf70ef90c03ad03b541ede990c720c8b327"
+    },
+    {
+      "path": "SNESEmulator.Core/EmulatorSettings.cs",
+      "sha256LfText": "90c7d42bc5973451c7279666be2bd77bde76ca47442c1272ca92724eb704bc34"
+    },
+    {
+      "path": "SNESEmulator.Core/Gsu.cs",
+      "sha256LfText": "aa3bfe3df9d3dd4007b604759f1161cca6a5e3481897fe64062facdca797c752"
+    },
+    {
+      "path": "SNESEmulator.Core/HardwareProfile.cs",
+      "sha256LfText": "fa683ae4e36eef2d6811228a5deb094605b75be68d1b3f59c856bf72d4b9ac07"
+    },
+    {
+      "path": "SNESEmulator.Core/InputBindings.cs",
+      "sha256LfText": "6a6f72e74cd773f7c19ee4829299555bf3fd42a2345844ed9e66d6c642fa16f6"
+    },
+    {
+      "path": "SNESEmulator.Core/IoDmaDiagnosticRom.cs",
+      "sha256LfText": "1b0eedf498a9e2cc8c27b75de9b9bf26998e5de0bf3d4bc79e22f27d2e533b70"
+    },
+    {
+      "path": "SNESEmulator.Core/MasterClock.cs",
+      "sha256LfText": "5479c7cc9108dabf796fcfdbef62e504bb78a4b9e3a39ea46f315c29f5a7d2e2"
+    },
+    {
+      "path": "SNESEmulator.Core/OwnIpl.cs",
+      "sha256LfText": "a7bc93883ae294ab53cdf08140395bed6d8a9f89c23228cd89480aa7ea51fb33"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Objects.cs",
+      "sha256LfText": "1ab11b50b7da9b268fb0a9f128f375b6ec54665b6219108de48b473125323b05"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Pipeline.cs",
+      "sha256LfText": "fe2d6d1266efb74a26ca957b72dd6b5e11516d2edc3f42c0be023af006340b48"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.State.cs",
+      "sha256LfText": "bc5a313fefca106708fddda8bc58595c983115210f0c7bce7d18b75cae487ff1"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Video.cs",
+      "sha256LfText": "c8a0a2671611e39374f3e653d80a4e9e98d878fae4690c140a75c44ac038038d"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.VideoState.cs",
+      "sha256LfText": "0a327ea13491e4acdd6bc0203dda821345a60da5b134caaf08df6f2a9c911485"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.cs",
+      "sha256LfText": "f0c7f67b6588bfebeb4d8ae0c82c92826743535b63781ab36348d9c30e8fed1a"
+    },
+    {
+      "path": "SNESEmulator.Core/PpuDiagnosticRom.cs",
+      "sha256LfText": "a4ddbef10396684987969af14a38b5908bf558c96bf3dfd27b1436f78fbfe72c"
+    },
+    {
+      "path": "SNESEmulator.Core/Sa1CartridgeHardware.cs",
+      "sha256LfText": "334b574c5608f67e63f6e949e55a032287e662059b96b2710f222efb6b674647"
+    },
+    {
+      "path": "SNESEmulator.Core/SaveStates/StateSerializer.cs",
+      "sha256LfText": "41096ccf4f4d260814218a1fc07b0d5d295cca9c888fc2898adf2603c7c725bd"
+    },
+    {
+      "path": "SNESEmulator.Core/SnesDsp.cs",
+      "sha256LfText": "93d0205d870aee7c79b7fa71b168f2c20fae7cfd968857429f5a88372c0f55eb"
+    },
+    {
+      "path": "SNESEmulator.Core/SnesSystem.cs",
+      "sha256LfText": "4d290076d39f7159f3f1853575edbc9c512a0d8e12605fbb53dda0b2aff08c27"
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.HotPath.cs",
+      "sha256LfText": "de8a7404e796e4cfb3839c3d9c90cae2af788a77fb1ec2d11f0f6c90a1527d5e"
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.HotPath.g.cs",
+      "sha256LfText": "384a9eee483756457ea196b2d9157a90d1a42f209bac6153b3848f8267f24f23"
+    },
+    {
+      "path": "SNESEmulator.Core/Spc700.cs",
+      "sha256LfText": "67f4efa09168bea400d593b168b6bae86061807022ca65b9e570e9328331a7ba"
+    },
+    {
+      "path": "SNESEmulator.Core/SpcUploadRom.cs",
+      "sha256LfText": "b72fe72fad2b7c82ffadcac65a3ccf9cbf4b047dd13178864066864125d752ae"
+    },
+    {
+      "path": "SNESEmulator.Core/SuperFxCartridgeHardware.cs",
+      "sha256LfText": "e349dd28b1c30430677b7d6060deb9caaa087a62c31fd6a89ff43332f951ac6e"
+    },
+    {
+      "path": "SNESEmulator.Core/SystemBus.cs",
+      "sha256LfText": "3d92f4c11021325b4243caa6985725300284342bb5623771adb4435617f43a0f"
+    },
+    {
+      "path": "SNESEmulator.Core/Upd7725.cs",
+      "sha256LfText": "5a931f64276db14c2d3a502c16088b0a64c6bae69bf000a408488a5d62e73d3f"
+    },
+    {
+      "path": "SNESEmulator.Core/UserDataPaths.cs",
+      "sha256LfText": "7217f39589739e7443906709640301e7e2f011390870cfcedc2a06584758fc8d"
+    }
+  ],
+  "changedMeasuredSources": [
+    {
+      "path": "SNESEmulator.Core/Ppu.Objects.cs",
+      "sha256": "d29f41a936ff56dd7a7dc80e0e0e281d901a5ad9d91b174712bda7860fd02548",
+      "sha256LfText": "1ab11b50b7da9b268fb0a9f128f375b6ec54665b6219108de48b473125323b05"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.Pipeline.cs",
+      "sha256": "4bbc91a479fa0fdac4c339ae93b7539957e4ce5f1f27e7da1ba6039340a65014",
+      "sha256LfText": "fe2d6d1266efb74a26ca957b72dd6b5e11516d2edc3f42c0be023af006340b48"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.State.cs",
+      "sha256": "79e1c3de2c3551f74e6eb0f600eb333b8f243617d37325508be5d0c2f49a274c",
+      "sha256LfText": "bc5a313fefca106708fddda8bc58595c983115210f0c7bce7d18b75cae487ff1"
+    },
+    {
+      "path": "SNESEmulator.Core/Ppu.VideoState.cs",
+      "sha256": "a70b82f222c493903b6ca8e5aebb8d4466569dde183f8bd9024e2c2cfa88f172",
+      "sha256LfText": "0a327ea13491e4acdd6bc0203dda821345a60da5b134caaf08df6f2a9c911485"
+    },
+    {
+      "path": "SNESEmulator.Core.Tests/PpuTests.cs",
+      "sha256": "4d08ec67ff630de4bf792391aef275349e951e753727f107d41a95760e6b2240",
+      "sha256LfText": "34c1c9580c02f6ab18dd00d353fa267854aacbc7f6b82489593d5bea5f0c20e5"
+    }
+  ],
+  "measuredCurrentCoreSha256": "9fd84f45413159b12af00d248ce1469bc5670e823e3bd02a42776937b7c97a61",
+  "native": [
+    {
+      "label": "baseline",
+      "accepted": true,
+      "region": "ntsc",
+      "requestedCutoffSeconds": 180,
+      "reportedWallIncludingCleanupSeconds": 180.2959098,
+      "ownedProcessWallSeconds": 181.25,
+      "readySeconds": 7.2901794,
+      "actualPostReadyMutedFields": 0,
+      "steadyRemoteDropped": 0,
+      "laterMeasurementDropped": 0,
+      "maximumSoftwareAvSeconds": 0.0079354914351768,
+      "nonzeroSourcePcmPairs": 0,
+      "differentStereoSourcePairs": 0,
+      "actualAppLastModulesAtSeconds": 175.21800000000076,
+      "actualManagerLastModulesAtSeconds": 175.21800000000076,
+      "wrapperErrors": [],
+      "changedDiagnosticSources": [],
+      "ownedManagerCleanup": {
+        "forced": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "label": "candidate-ntsc",
+      "accepted": true,
+      "region": "ntsc",
+      "requestedCutoffSeconds": 360,
+      "reportedWallIncludingCleanupSeconds": 360.1426554,
+      "ownedProcessWallSeconds": 360.3899999999994,
+      "readySeconds": 10.9472511,
+      "actualPostReadyMutedFields": 0,
+      "steadyRemoteDropped": 0,
+      "laterMeasurementDropped": 0,
+      "maximumSoftwareAvSeconds": 0.007937239847876754,
+      "nonzeroSourcePcmPairs": 0,
+      "differentStereoSourcePairs": 0,
+      "actualAppLastModulesAtSeconds": 355.35899999999674,
+      "actualManagerLastModulesAtSeconds": 355.35899999999674,
+      "wrapperErrors": [],
+      "changedDiagnosticSources": [],
+      "ownedManagerCleanup": {
+        "forced": false,
+        "exitCode": 0
+      }
+    },
+    {
+      "label": "candidate-pal",
+      "accepted": true,
+      "region": "pal",
+      "requestedCutoffSeconds": 180,
+      "reportedWallIncludingCleanupSeconds": 180.2805059,
+      "ownedProcessWallSeconds": 181.2190000000046,
+      "readySeconds": 6.4295486,
+      "actualPostReadyMutedFields": 0,
+      "steadyRemoteDropped": 0,
+      "laterMeasurementDropped": 0,
+      "maximumSoftwareAvSeconds": 0.007936968477665118,
+      "nonzeroSourcePcmPairs": 6273,
+      "differentStereoSourcePairs": 6260,
+      "actualAppLastModulesAtSeconds": 175.18800000000192,
+      "actualManagerLastModulesAtSeconds": 175.18800000000192,
+      "wrapperErrors": [],
+      "changedDiagnosticSources": [],
+      "ownedManagerCleanup": {
+        "forced": false,
+        "exitCode": 0
+      }
+    }
+  ],
+  "tests": {
+    "coreGroups": 133,
+    "runtimeGroups": 27,
+    "stateGroups": 27,
+    "portableNetworkGroups": 16,
+    "ppuSubsetGroups": 45,
+    "frozenSpcResumptions": 18952,
+    "frozenHorizons": 128,
+    "frozenCompleteOutputs": 14
+  },
+  "remainingFinalAcceptance": [
+    "Clean final package and full supported regressions",
+    "37000 NTSC and31000 PAL fields, every complete600-field window >=1.0",
+    "Actual3600-second NTSC and3600-second PAL native strict sessions",
+    "Exact pushed-head required GitHub CI jobs"
+  ],
+  "binaries": [
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-package/SNESEmulator.Core.dll",
+      "sha256": "9fd84f45413159b12af00d248ce1469bc5670e823e3bd02a42776937b7c97a61"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-package/SNESEmulator.dll",
+      "sha256": "1e227644417392052105b45c70d5b7f6d4f19d2206ea0ad0439cb2da58d7cce3"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-package/SNESEmulator.Runtime.dll",
+      "sha256": "8aba0dad8b0582a8cf0e884c86f88ee494cbf8ef6d5bbec50e9c85a7c2b85ac5"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-package/Manager/SNESEmulatorManager.dll",
+      "sha256": "4edeb70aa9fbcc6768e0b18aa09beddc60b1f81c4e209dcdf3bed401faf91a6d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-probe/bin/Release/net10.0/Probe.dll",
+      "sha256": "a57cf9ec910d4b1d4c35419ef7af77694afdc42c257f535490449bc438338cc5"
+    }
+  ],
+  "retainedFiles": [
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-binary-identities.json",
+      "bytes": 144263,
+      "sha256": "f7fe7cbb15adf5104149e2e6f71900f6f3d73f2c91aaaeaa84881a1e5ed64d74"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-current.json",
+      "bytes": 70,
+      "sha256": "d2bc9ae97cd5dab6dcc5fe170f5a4fa3038d7bbd37c8e5f325aba2abd8742716"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-manager-publish.log",
+      "bytes": 1082,
+      "sha256": "6ea74d45f367709690ad1f3aa4dee667f82b23406e523138a4588e8967ba472b"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-native-ntsc/progress.jsonl",
+      "bytes": 23811,
+      "sha256": "4be75be7a7aebedf7ed22473c5268c8d70ae7dc7c38beaa024c68c4a20850c3d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-native-ntsc/result.json",
+      "bytes": 170159,
+      "sha256": "dcf7a0c3fa8f7d9e99f840666a64b0609326cc0d4800a34c3c20fce04a69a45d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-native-ntsc.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-native-ntsc.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-processes.json",
+      "bytes": 430738,
+      "sha256": "e05a922bb810cf44ddbe8439035b02212861be16c52423c9bb24dd8f1365139b"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-publish.log",
+      "bytes": 2292,
+      "sha256": "ea471ca8c701e210596ccc88364154954822ad2c2847b0c028cea2c7c19a7bee"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-source-identities.json",
+      "bytes": 460937,
+      "sha256": "603f08ee92d3823e5b0b77831609376df8a0961c9b1a29b628b1d17025a931aa"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-transient-lock-audit.json",
+      "bytes": 3699,
+      "sha256": "0ce97fa964d7009889c896ac64923db184f02a238ac9f5ae95c7dcbbdf185bc6"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-transient-locks/SharpPixels.packages.lock.json",
+      "bytes": 4001,
+      "sha256": "295e71152162d7015d7dc23167bd896fa71d9c8229bc79c9e01d9370762cc658"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-transient-locks/SNESEmulator.Contracts.packages.lock.json",
+      "bytes": 94,
+      "sha256": "cd97f644c24bb2cd8c96d92c519036a65133ab22cafc294d07b527626ad20e84"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-transient-locks/SNESEmulator.Core.packages.lock.json",
+      "bytes": 94,
+      "sha256": "cd97f644c24bb2cd8c96d92c519036a65133ab22cafc294d07b527626ad20e84"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-transient-locks/SNESEmulator.Management.packages.lock.json",
+      "bytes": 2630,
+      "sha256": "57f2da09074d66b5b26c042dc74031f534ba48f8f0d8d7d2a3aa69a7da6efffe"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-transient-locks/SNESEmulator.packages.lock.json",
+      "bytes": 9156,
+      "sha256": "b088aa6385261fa33387dae7c2b038079514662ecdfca0e8af22bb6ca829d0ef"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-transient-locks/SNESEmulator.Runtime.packages.lock.json",
+      "bytes": 166,
+      "sha256": "0a1808c1f37b4cda80f8a8124b6622635bbee6ab3421c56d7f0d7da0845c330a"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/baseline-transient-locks/SNESEmulatorManager.packages.lock.json",
+      "bytes": 3055,
+      "sha256": "849f1b02641bfaee746f280adf25b65ea1bb141c818e400c17dfcf5e6d06c815"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/build-manifest.py",
+      "bytes": 13245,
+      "sha256": "137154443de61f081dc529edcca46cd8b7367c857a2d9fb08e1a9dc3bca7c1f2"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-ntsc-binary-identities.json",
+      "bytes": 197169,
+      "sha256": "11722b6808be334220296dcac4f5c82a01e0a736fa6509aa40cf9bbe001a2a13"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-ntsc-current.json",
+      "bytes": 70,
+      "sha256": "e42c2f5cc719a75f1c4edfecf088acb5bb398416bbd5104f173184cff11b7e5f"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-ntsc-native-ntsc/progress.jsonl",
+      "bytes": 46787,
+      "sha256": "3bd5e5e7dbc7285d1b871643383f7fb202839fc14ef3728fb6940f874a8b6a55"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-ntsc-native-ntsc/result.json",
+      "bytes": 170868,
+      "sha256": "c54f11dbe1d09ab0c56c4ff8438816d8631d9ef29c2c5d9905fe44ca81e4c35e"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-ntsc-native-ntsc.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-ntsc-native-ntsc.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-ntsc-processes.json",
+      "bytes": 517403,
+      "sha256": "15c94d63a4a490869ab575323dfc857c9b82f6eb6f208a4b260a4d380d757af8"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-ntsc-source-identities.json",
+      "bytes": 461819,
+      "sha256": "a33bba4e4fc76c14895a63469911eeae979bd2d1f3566b8652eb48ed5a3f24ab"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-pal-binary-identities.json",
+      "bytes": 197169,
+      "sha256": "11722b6808be334220296dcac4f5c82a01e0a736fa6509aa40cf9bbe001a2a13"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-pal-current.json",
+      "bytes": 70,
+      "sha256": "ad15d37e2bf721f0a3d99cdbdfe253d55f7a381d5cb60de43eaa1c8eb2393aa0"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-pal-native-pal/progress.jsonl",
+      "bytes": 23796,
+      "sha256": "4a394d8039dd82a4c5d518835bd3d13cabb30e000c5d1494fa44a214bba9f42c"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-pal-native-pal/result.json",
+      "bytes": 141548,
+      "sha256": "5498fbab90a7014fb6486e133b138a160f830c0a8a362595feb59c670f5dacae"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-pal-native-pal.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-pal-native-pal.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-pal-processes.json",
+      "bytes": 484454,
+      "sha256": "401d1b87f4bcfa9c1c95e252025de459b9f1ce4a02aecf83f42bc59fe50268ae"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-pal-source-identities.json",
+      "bytes": 461819,
+      "sha256": "a33bba4e4fc76c14895a63469911eeae979bd2d1f3566b8652eb48ed5a3f24ab"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/candidate-publish.log",
+      "bytes": 4590,
+      "sha256": "610653628494d954d74961d0b8c81a064087a6a6b038d97ca20a842c7275108c"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-baseline-oracle.json",
+      "bytes": 2838,
+      "sha256": "e1070bb15f3ed82ebb02758538e046b6490fc1ca20656503ca9db8651576b983"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-baseline.json",
+      "bytes": 1286,
+      "sha256": "880474b6f68d373217b67c230605f2ff28e67d01cdc4f30701a190687b4342bb"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-build.log",
+      "bytes": 543,
+      "sha256": "a3ceb059debdd0977ebb8c9df0d58355d152ef675bf14e42e93d5fd199eea868"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-candidate-build.log",
+      "bytes": 543,
+      "sha256": "4aae19478fe6e29a28ecfe13fffb4008ddd9513a509ab37bb07494203baad950"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-candidate-oracle.json",
+      "bytes": 2838,
+      "sha256": "e1070bb15f3ed82ebb02758538e046b6490fc1ca20656503ca9db8651576b983"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-candidate.json",
+      "bytes": 1280,
+      "sha256": "1f938cea0924222c7dca72f96558d3c4190df998aca5ec672a9a067923283645"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-oracle-build.log",
+      "bytes": 543,
+      "sha256": "53f95514caa009b02503c9cd874b3c83c18cfaca433084bb81262079c6f5c0bb"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-probe/Probe.csproj",
+      "bytes": 317,
+      "sha256": "8e32db4af490dc3e4004d916df5a61f642e0b4e66b58ee84135520792f67e355"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-probe/Program.cs",
+      "bytes": 2407,
+      "sha256": "b646907c2d2b68cc6a13af1f6f09481df432032fac7134bd9c15790fb3e7b8cd"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-repeat-0-candidate.json",
+      "bytes": 1274,
+      "sha256": "1b7316f7ceabc77c15b9ce7650cf602b8a64b7b5fe1bfc002272f5794ad5baa6"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-repeat-1-baseline.json",
+      "bytes": 1285,
+      "sha256": "7563be31c418c61d084c7804daeed72ffd80e04621852c61b1dadfaefb4ae985"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-repeat-2-baseline.json",
+      "bytes": 1278,
+      "sha256": "3b7234f176165dbedb9f3a667df956b3a2f4ce87179d45d8bb151711b98535a1"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-repeat-3-candidate.json",
+      "bytes": 1290,
+      "sha256": "473f793a31c460c714d5d2626e0b3f36c992787fbd801cee686f72e392af5fec"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/capture-repeat-results.json",
+      "bytes": 5520,
+      "sha256": "7d738d56fac445b19f968aebe20460eecdfe5410b07eadc9fe5a8715e4bb71b9"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/compare-capture.py",
+      "bytes": 1357,
+      "sha256": "9447b6fc0c96470a79a3672649a464d9f38f800427b3632c5aa30605e6a4793b"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/default-report-overwrite-audit.json",
+      "bytes": 1962,
+      "sha256": "d50ce6ab1e53fc97e8864f20f6213f8bfc3326e9a6754186921d4095d7c4f8a0"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/lab-build.log",
+      "bytes": 842,
+      "sha256": "2d4df68173106ef04242b3895439bb8e36c35b4ff954837eedfae9f8b71947ff"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/owned_runtime_identity.py",
+      "bytes": 4145,
+      "sha256": "03bc2deb9f65e5d76b355597d6b0deb9baf16b74912f7dbdff2920adb88038b0"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/ppu-tests.json",
+      "bytes": 18638,
+      "sha256": "aaa6b46787b689770ad2f0265c01bbf10bb579f4935c7bfb806d39bdd7f3db74"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/ppu-tests.junit.xml",
+      "bytes": 10655,
+      "sha256": "c4579164b0ffcb71c8c2d61aedb1c872c09bdb76ac0a334846106d40d958ec6d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/ppu-tests.log",
+      "bytes": 3381,
+      "sha256": "48cdabe7ee8f050d636fe23aa99d174dcc60a55b0797b8104cb5a1240b28712f"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/run-native.py",
+      "bytes": 9650,
+      "sha256": "df1c15fe47186a107c703dd8ab9fa36bd5ebd7ace5c88a790ca9d42376f3759b"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/seal-native.py",
+      "bytes": 1022,
+      "sha256": "58715d482caeb658991da97bab690dd89eabffe4d0bac60017a6ae05f1fd5eda"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/test-build.log",
+      "bytes": 1335,
+      "sha256": "fa9a7c09aa39b88d3270d41f7438c952b298564030332d37f4825f8577cac7c2"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/commands.json",
+      "bytes": 6719,
+      "sha256": "d971908448ccfd585b400eef718df757ee2a815fc729c20b7712192aac409844"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/core.json",
+      "bytes": 35919,
+      "sha256": "451ff353ef66241e81e2ed63d8a282669209a870aa2a77a92eaf3d30fed5212a"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/core.junit.xml",
+      "bytes": 30664,
+      "sha256": "cde873c0216956857ae5ddf694a7fb2b1ef2b50f93d7d9ae6bc415c629080009"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/core.log",
+      "bytes": 9932,
+      "sha256": "0d883fb4fcb61e3365254fcbea7b40942c0751680978d29aaf801ecb933dafea"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/commands.log",
+      "bytes": 6098,
+      "sha256": "94978183c18d87f78a11e98f4434a1839020beba7ab832d63603e26380a5defd"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/audio-ntsc-devices.field0.state",
+      "bytes": 19453,
+      "sha256": "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/audio-ntsc-devices.field13.state",
+      "bytes": 19506,
+      "sha256": "5f6cb64d8020fad866d56c430963e5bd417cf7e231882e049723049f0af49125"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/audio-ntsc-devices.field9.state",
+      "bytes": 19443,
+      "sha256": "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/audio-ntsc-devices.json",
+      "bytes": 3123,
+      "sha256": "99ceb5e2a7b474cf9eb81f6443f4fa2697f6ee1190ad5e535e7341b0277ff843"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/audio-ntsc-devices.state",
+      "bytes": 19647,
+      "sha256": "b8cef407b6d81e263a76a1bab174def506e0b00be012f29ac4b62f2c1c79755b"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/diagnostic-ntsc-devices.field0.state",
+      "bytes": 41732,
+      "sha256": "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/diagnostic-ntsc-devices.field13.state",
+      "bytes": 48776,
+      "sha256": "f00d49227ecb619d84248c861920c4b4067f361518ec4f7699f795b2e2c4dbe8"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/diagnostic-ntsc-devices.field9.state",
+      "bytes": 49620,
+      "sha256": "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/diagnostic-ntsc-devices.json",
+      "bytes": 3129,
+      "sha256": "5e517ca08f8630db411e4dccec86d1098c85cf5684904ebcfd74479646075901"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/devices/diagnostic-ntsc-devices.state",
+      "bytes": 49082,
+      "sha256": "d33538e2f5b0b71c6e9816bdc720a2124a48259bf816cfe0bb2df9b3156c7a61"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/horizons/cache-result.json",
+      "bytes": 96,
+      "sha256": "24d667e7e1c50a1a889d03ce976546ab1a63819fe13149e872ae4f1a2eb180db"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/horizons/cache.state",
+      "bytes": 41786,
+      "sha256": "3bcec90dea8e4ea8aaee4c02a2b2c11e9a440fea0c7645dc2b5e62e6a62558a1"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/horizons/clock-result.json",
+      "bytes": 113,
+      "sha256": "66f2152a105906345c3d72941a52f6ee1dd60f2224e74b51106699ddcde4ff55"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/horizons/result.json",
+      "bytes": 41561,
+      "sha256": "abf0e488e539ffd5b16182bed49126d40e96b67092f0fcb99d0e1f727c5c1481"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/horizons/scratch.state",
+      "bytes": 20157,
+      "sha256": "6e9b7f394d6819336aa6c6aad1763462eae1a9b263755f6d0172570bb28e0fd4"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/provenance.json",
+      "bytes": 8538,
+      "sha256": "849249fb06eab76ca03523dd50bed68b67d5e2b07f02d8e667599a1bb6da4b54"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/result.json",
+      "bytes": 2288,
+      "sha256": "45a0c898551aa7fed17bd7a44df63edad657df32d4e07482fa756321041c2496"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/suspend.json",
+      "bytes": 539,
+      "sha256": "e8db1d2e232645c00b1e9d787b8e50d3ef1cedb83ab5a4198234bd142ad6da48"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/audio-ntsc-traced.field0.state",
+      "bytes": 19453,
+      "sha256": "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/audio-ntsc-traced.field25.state",
+      "bytes": 19498,
+      "sha256": "b97419d3ecaaf27ec29a95bde5b010ee7d942d87d79bd4f6ed12486da8baedbf"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/audio-ntsc-traced.field9.state",
+      "bytes": 19443,
+      "sha256": "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/audio-ntsc-traced.json",
+      "bytes": 4656,
+      "sha256": "98cd2c79626af5f6a4f87d9f37e22efb09fd8e382600f3a6c69a61d6894de584"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/audio-ntsc-traced.state",
+      "bytes": 19618,
+      "sha256": "ed2a9454de1b8f08e098ef10d5111d6f27a518d15aeba8eedd9c4ed7a50584ce"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/diagnostic-ntsc-traced.field0.state",
+      "bytes": 41732,
+      "sha256": "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/diagnostic-ntsc-traced.field25.state",
+      "bytes": 49490,
+      "sha256": "98e6f3bb17202faeba35a0411111a79438852178fe1246737b0f0ec944d686df"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/diagnostic-ntsc-traced.field9.state",
+      "bytes": 49620,
+      "sha256": "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/diagnostic-ntsc-traced.json",
+      "bytes": 4658,
+      "sha256": "173775b0b4ae11b9f6dc98d937eeea6bc292879a7d0a5085cf004483fd289ecd"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/diagnostic-ntsc-traced.state",
+      "bytes": 50717,
+      "sha256": "66ebf79bfd62f557f3141b20c3a200eed8603f5feb1cbf1fac6c24a5c8e0127c"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-ntsc-traced.field0.state",
+      "bytes": 19297,
+      "sha256": "f9bd5ae1b3b024e97ee858fdb5f63ead3ec0f9373ccfdc0ecc02b70863071e6b"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-ntsc-traced.field329.state",
+      "bytes": 145838,
+      "sha256": "74a32360ebcfd7f4fc7fccbc311141add74da97dbe85f3215912b8c1843ffed4"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-ntsc-traced.field9.state",
+      "bytes": 28689,
+      "sha256": "c2fa789c162c346d4c2580bfc05922bfb76ecbe77b2928b5a0c07d96ccac1227"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-ntsc-traced.json",
+      "bytes": 44652,
+      "sha256": "20ceca1fea9b64eacf4d748dd9a847fd18882d2708f0379ea959a1857978ebe1"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-ntsc-traced.state",
+      "bytes": 146039,
+      "sha256": "eca8b2fe64f64f86901b90324f835469727663b60ef5e77526c689b2b40c90be"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-pal-traced.field0.state",
+      "bytes": 19297,
+      "sha256": "16eab4f61ca632b613fa998565e3692592fbeacfdd37f552906fd0182ac721cc"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-pal-traced.field329.state",
+      "bytes": 145106,
+      "sha256": "5c9168356ba209c80a1b8efa3e222a5fc84d473be8bc5407abf0d4d45ef26a4d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-pal-traced.field9.state",
+      "bytes": 29403,
+      "sha256": "762e01d15a862696ada5cdd19fcb965ac60bd101b512fd0a2efb49e218404e4f"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-pal-traced.json",
+      "bytes": 44656,
+      "sha256": "22431738a30b65d01e36c768ff118be59d6f4c99419502cd637b5d2e4f086399"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/game-pal-traced.state",
+      "bytes": 145835,
+      "sha256": "31bb450adbd07c77abe46c97a2653292bc439900024ad9a1c577880129a82ec1"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-ntsc-traced.field0.state",
+      "bytes": 33444,
+      "sha256": "a6952d68e53767dc5e5b0d1064828167af82505f133ee1c86cea7450cfdc0b53"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-ntsc-traced.field25.state",
+      "bytes": 33545,
+      "sha256": "0c3761c436669815d03f711dda77f15c056bb2999d06fd32c61b567c70ca2583"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-ntsc-traced.field9.state",
+      "bytes": 33550,
+      "sha256": "4751c827b576bf1fc9c1ccc2264124a035d2343d17e448e379e7f899dcc4707d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-ntsc-traced.json",
+      "bytes": 4634,
+      "sha256": "d944c536916568f9292943a3132b11079b04b3a11977726c05fd40def349b173"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-ntsc-traced.state",
+      "bytes": 33575,
+      "sha256": "399770960834ba37ddd36737e57831895397bd7c2fc6410c18b491a9dcfc7dcf"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-pal-traced.field0.state",
+      "bytes": 33440,
+      "sha256": "740b3bdbdf5aa3ccd9a185b7c99e7240e15ea1a5b3e4f6d3571533034cde2689"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-pal-traced.field25.state",
+      "bytes": 33484,
+      "sha256": "c5e62f6923dcf64c162073ee108ce2998abb0c92db80d2f6446b340516a2e77f"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-pal-traced.field9.state",
+      "bytes": 33518,
+      "sha256": "157785fb5b912d74523e60308b34dbd35399a2190c14859ee7fc5c551669e956"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-pal-traced.json",
+      "bytes": 4634,
+      "sha256": "b2ff71afe91847f254f510ad46a0a99323a54a5eab8ead942db5e92a0706ff36"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/traced/geometry-pal-traced.state",
+      "bytes": 33527,
+      "sha256": "1e5eb6af3509de87c1dc687864992b312823b707d50cce19d113588306e5fc5d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/audio-ntsc-untraced.field0.state",
+      "bytes": 19453,
+      "sha256": "4ea61b2c115c336197d44fae43f96cfe5cdd4dd62ab9cab350d5eb354d6b35dd"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/audio-ntsc-untraced.field129.state",
+      "bytes": 19549,
+      "sha256": "945e716496f7e5539928de25ea3737469b5ea4dd1f00c5a7a2f506278dec89d0"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/audio-ntsc-untraced.field9.state",
+      "bytes": 19443,
+      "sha256": "1e4c5f70bfaf12fa8d11209854d5aaedb0f278c534300c401affa13d1b045725"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/audio-ntsc-untraced.json",
+      "bytes": 17847,
+      "sha256": "e81f4eab40506ece1fa5fa821c64c29b41a8adb686283502eaf3ec4036a7343d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/audio-ntsc-untraced.state",
+      "bytes": 19666,
+      "sha256": "99649671110d72942bb3290322e994fbd254a769ea08a3c0f04fd5eec8c0e5a3"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/diagnostic-ntsc-untraced.field0.state",
+      "bytes": 41732,
+      "sha256": "afb481ee965c024ec639de14e7362aa3b94bc49e1a3d9d68e149bed43d90f23e"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/diagnostic-ntsc-untraced.field129.state",
+      "bytes": 49259,
+      "sha256": "a33b57a85e2788c0210030674247f77cc408031265e2eadac6411586fca7cf82"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/diagnostic-ntsc-untraced.field9.state",
+      "bytes": 49620,
+      "sha256": "ad5ca816ec6a9409e851e6a69f183a4cc26f2d9f0ce9dc94f99dd870d77aa6cc"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/diagnostic-ntsc-untraced.json",
+      "bytes": 17852,
+      "sha256": "3f4a7fc31f6d8311ca2afe58af2c86b951ae6dbaafb5cb315bf60f17e7904e62"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/diagnostic-ntsc-untraced.state",
+      "bytes": 50394,
+      "sha256": "963be3c6d93d78b31f88339776f65d8f766fc7f6915dd3fe340b25a6ab88d780"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-ntsc-untraced.field0.state",
+      "bytes": 19297,
+      "sha256": "f9bd5ae1b3b024e97ee858fdb5f63ead3ec0f9373ccfdc0ecc02b70863071e6b"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-ntsc-untraced.field329.state",
+      "bytes": 145838,
+      "sha256": "74a32360ebcfd7f4fc7fccbc311141add74da97dbe85f3215912b8c1843ffed4"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-ntsc-untraced.field9.state",
+      "bytes": 28689,
+      "sha256": "c2fa789c162c346d4c2580bfc05922bfb76ecbe77b2928b5a0c07d96ccac1227"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-ntsc-untraced.json",
+      "bytes": 44049,
+      "sha256": "9b8c53a590a24b5b0edd9d72394ce08f22c353940a167a47148348d3e67245bc"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-ntsc-untraced.state",
+      "bytes": 146039,
+      "sha256": "eca8b2fe64f64f86901b90324f835469727663b60ef5e77526c689b2b40c90be"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-pal-untraced.field0.state",
+      "bytes": 19297,
+      "sha256": "16eab4f61ca632b613fa998565e3692592fbeacfdd37f552906fd0182ac721cc"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-pal-untraced.field329.state",
+      "bytes": 145106,
+      "sha256": "5c9168356ba209c80a1b8efa3e222a5fc84d473be8bc5407abf0d4d45ef26a4d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-pal-untraced.field9.state",
+      "bytes": 29403,
+      "sha256": "762e01d15a862696ada5cdd19fcb965ac60bd101b512fd0a2efb49e218404e4f"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-pal-untraced.json",
+      "bytes": 44065,
+      "sha256": "f496557e0cae338ded7868c88ea3c8c203c988ff5598f6a93c1bbd333ccaf8fd"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/game-pal-untraced.state",
+      "bytes": 145835,
+      "sha256": "31bb450adbd07c77abe46c97a2653292bc439900024ad9a1c577880129a82ec1"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-ntsc-untraced.field0.state",
+      "bytes": 33444,
+      "sha256": "a6952d68e53767dc5e5b0d1064828167af82505f133ee1c86cea7450cfdc0b53"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-ntsc-untraced.field129.state",
+      "bytes": 33540,
+      "sha256": "2b25d695f45752754b3b412522017287799e473253dcf7e646e3d2e15a1af2f8"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-ntsc-untraced.field9.state",
+      "bytes": 33550,
+      "sha256": "4751c827b576bf1fc9c1ccc2264124a035d2343d17e448e379e7f899dcc4707d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-ntsc-untraced.json",
+      "bytes": 17990,
+      "sha256": "510b57358d50f7ee2d986adf23849bdde74e09003f2d3dd515494da06868da6e"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-ntsc-untraced.state",
+      "bytes": 33518,
+      "sha256": "56d12ad52b42578a4681ea0a872255f9f6ceb193ec81286d8e9ae1415386ad18"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-pal-untraced.field0.state",
+      "bytes": 33440,
+      "sha256": "740b3bdbdf5aa3ccd9a185b7c99e7240e15ea1a5b3e4f6d3571533034cde2689"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-pal-untraced.field129.state",
+      "bytes": 33519,
+      "sha256": "dfbc285060be56b317ff0b744394d4ba3f546dbbf78e18bc87ae76aa7b3bbf98"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-pal-untraced.field9.state",
+      "bytes": 33518,
+      "sha256": "157785fb5b912d74523e60308b34dbd35399a2190c14859ee7fc5c551669e956"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-pal-untraced.json",
+      "bytes": 17995,
+      "sha256": "ee437032397f67523293884d935907c9fe6cdbf58368e44621458b73178f585e"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen/untraced/geometry-pal-untraced.state",
+      "bytes": 33573,
+      "sha256": "9b77dac11f34b3151b0bcd6437eb918b3278df8bf29065360308d46c0a7e459a"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/frozen.log",
+      "bytes": 6470,
+      "sha256": "34c5da95fcc41482befbe38ae45f332de46a6a14df1073d470345419462aac56"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/inputs.json",
+      "bytes": 18215,
+      "sha256": "49a640d2e5b699d5e4fdc7489b22da192d2eb990601b6cefc38f128d4d72e5f2"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/network.json",
+      "bytes": 3816,
+      "sha256": "4ed9eb7fffee8c679c3c5c8604ee157c0359e6666f4172c0eaf6a34801869d3d"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/network.junit.xml",
+      "bytes": 3983,
+      "sha256": "06197a685bb45230df55923d197bd7a2d29375583f8e5d7a4f9b92ff3ee2bab3"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/network.log",
+      "bytes": 1349,
+      "sha256": "2d68963a574b364fdfb268b0c3dc7f1bb29eff22d3deb6b93366c8e1f26ce8e8"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/runtime.json",
+      "bytes": 6044,
+      "sha256": "0dd2149cefa35808dc501684ffdccc4ef92acfc177da5ca3266a87367100b914"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/runtime.junit.xml",
+      "bytes": 6508,
+      "sha256": "4660d403ab18ed971055bcaf19d5d2509869897c305eb24670887b75a857e6be"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/runtime.log",
+      "bytes": 2187,
+      "sha256": "3a513330a04622cfa06db01d4e9bdba688c5795f0a2d487e537fa9b79f2d9842"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/state.json",
+      "bytes": 17141,
+      "sha256": "0be7e28a5394dd524e9fdff2e51c8123b68ea004bda6477b24cb09196f7f45ca"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/state.junit.xml",
+      "bytes": 6102,
+      "sha256": "1e845c6d8db2bb223298ab065815ce5e2b13d87d0f04cc22739228bb5aba92be"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verification/state.log",
+      "bytes": 1778,
+      "sha256": "4e242b40fd953410048d0c64d54d26f15adb5b09af2c0ccc5d94636854d31be8"
+    },
+    {
+      "path": "artifacts/r5-realtime-runtime/verify.py",
+      "bytes": 3036,
+      "sha256": "355faa771e276c1189e938b87ee53a50fc645a53bbe850789aa40b7913d079cf"
+    }
+  ],
+  "reproductionCommands": [
+    "Set child-process DOTNET_ROOT and PATH to artifacts/toolchains/dotnet-10.0.402-win-x64",
+    "python artifacts/r5-realtime-runtime/compare-capture.py (retained diagnostic; requires its original baseline/candidate DLLs)",
+    "python artifacts/r5-realtime-runtime/verify.py (requires a fresh verification output directory)",
+    "scripts/publish-win-x64.ps1 -OutputDirectory NEW_PACKAGE -DotnetPath PRIVATE_DOTNET",
+    "python artifacts/r5-realtime-runtime/seal-native.py NEW_LABEL NEW_PACKAGE_NAME",
+    "python artifacts/r5-realtime-runtime/run-native.py NEW_LABEL 360 NEW_PACKAGE_NAME ntsc",
+    "python artifacts/r5-realtime-runtime/run-native.py OTHER_NEW_LABEL 180 NEW_PACKAGE_NAME pal"
+  ]
+}

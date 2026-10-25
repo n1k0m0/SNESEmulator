@@ -2,6 +2,7 @@ namespace SNESEmulator.Core;
 
 public sealed class ObjFetch
 {
+    internal ObjFetch Copy()=>(ObjFetch)MemberwiseClone();
     public int X {get;set;}
     public int Address {get;set;}
     public int Palette {get;set;}
@@ -83,6 +84,7 @@ public sealed partial class Ppu
 }
 public sealed class ObjDescriptor
 {
+    internal ObjDescriptor Copy()=>(ObjDescriptor)MemberwiseClone();
     public int X {get;set;}
     public int Row {get;set;}
     public int Tile {get;set;}

@@ -2,6 +2,8 @@ namespace SNESEmulator.Core;
 
 public sealed class PpuTile
 {
+    // All fields are scalar latches; the returned tile may be changed independently.
+    internal PpuTile Copy()=>(PpuTile)MemberwiseClone();
     public int Address {get;set;}
     public int Palette {get;set;}
     public int Priority {get;set;}
