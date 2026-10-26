@@ -1,6 +1,21 @@
 #!/usr/bin/env python3
+# Copyright 2026 Nils Kopal
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See LICENSE and NOTICE for permissions and attribution.
+#
+# Verifies immutable whole-console fixtures and explicitly archived historical adapter bytes.
+#
+
 """Offline immutable M8 fixture and adapter identities; never updates goldens."""
 from pathlib import Path
+from historical_sources import historical_source
 import hashlib,json,gzip
 ROOT=Path(__file__).resolve().parents[1]
 manifest=json.loads((ROOT/'testdata/m8-integrity.json').read_text())
@@ -16,7 +31,7 @@ HISTORICAL_ADAPTERS = {
 }
 for e in manifest['files']:
  logical=e['path'];actual=HISTORICAL_ADAPTERS.get(logical,logical)
- p=ROOT/actual;data=p.read_bytes()
+ p=historical_source(ROOT/actual);data=p.read_bytes()
  assert len(data)==e['bytes'] and hashlib.sha256(data).hexdigest()==e['sha256'],str(p)
  if logical in HISTORICAL_ADAPTERS:
   print(f'Historical M8 adapter verified: {logical} -> {actual}; SHA256 {e["sha256"]}')

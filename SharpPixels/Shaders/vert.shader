@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Transforms SharpPixels geometry and forwards texture coordinates for pixel presentation.
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

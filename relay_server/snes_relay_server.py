@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
+#
+# Routes bounded relay connections while leaving emulator session traffic end-to-end encrypted.
+#
+
 #
 # Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 #

@@ -1,8 +1,23 @@
+# Copyright 2026 Nils Kopal
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See LICENSE and NOTICE for permissions and attribution.
+#
+# Fetches bounded upstream 65816 samples or verifies the existing immutable offline fixture set.
+#
+
 """Rebuild/verify pinned small offline corpus. No expected output comes from this emulator.
 Downloads only a prefix of each immutable source; full upstream suite is NOT sampled implicitly.
 Use --verify for offline verification. Requires Python standard library only.
 """
 import concurrent.futures, hashlib, json, pathlib, urllib.request, sys, time
+from historical_sources import historical_source
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DEST=ROOT/'testdata'/'65816'
 REV='307c63f5673c8c6b861c52f71ddb89212a227480'
@@ -12,11 +27,11 @@ def sha(b): return hashlib.sha256(b).hexdigest()
 if '--verify' in sys.argv:
  m=json.loads(MANIFEST.read_text())
  for f in m['files'] + m.get('supportFiles',[]):
-  p=ROOT/f['path']
+  p=historical_source(ROOT/f['path'])
   assert p.is_file() and sha(p.read_bytes())==f['sha256'],str(p)
  local=json.loads((ROOT/'testdata/local-manifest.json').read_text())
  for f in local['files']:
-  p=ROOT/f['path']
+  p=historical_source(ROOT/f['path'])
   assert p.is_file() and sha(p.read_bytes())==f['sha256'],str(p)
  print(f"Verified {len(m['files'])} pinned fixtures; {m['representedCases']} represented, {m['upstreamCases']} upstream cases")
  sys.exit(0)

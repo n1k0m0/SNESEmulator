@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Hosts sessions, authorizes remote input and publishes completed outputs.
+// Clients cannot directly mutate the owner-thread machine or bypass input permission.
+//
+
 #nullable disable
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de

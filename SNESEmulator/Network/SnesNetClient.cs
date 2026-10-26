@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Receives bounded remote state, video and audio over the session transport.
+// Reconnect/trust and queue recovery are explicit parts of client lifecycle.
+//
+
 #nullable disable
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de

@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Hosts the C64-derived OpenTK pixel window and graphics resources.
+// SNES frontend ownership and scaling are layered above this rendering primitive.
+//
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

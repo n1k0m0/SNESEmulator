@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Contains designer-generated strongly typed SharpPixels resources.
+// Regenerate resource accessors through the resource tooling rather than editing properties.
+//
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

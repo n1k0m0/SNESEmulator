@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Presents explicit download/install decisions on a WinForms STA thread.
+// Cancellation drains outstanding work before the message pump is disposed.
+//
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
    Licensed under the Apache License, Version 2.0 (the "License");

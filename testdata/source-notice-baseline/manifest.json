@@ -1,0 +1,121 @@
+{
+  "sourceCommit": "e9e7e7ad579c92d669c52960e489edca41ccd78b",
+  "files": {
+    "SNESEmulator.Core.Tests/CompatibilityTests.cs": {
+      "bytes": 13441,
+      "sha256": "2d0ffd452ec0ca899a2887d23d65ed55e50b8ace460623813d641481e0470a08"
+    },
+    "SNESEmulator.Core.Tests/IoDmaTests.cs": {
+      "bytes": 37775,
+      "sha256": "52423994a956477e0885cb2667e635f94cd23a2139baeeb9ce00e153fad2ffde"
+    },
+    "SNESEmulator.Core.Tests/PpuTests.cs": {
+      "bytes": 46751,
+      "sha256": "7d643f29839ac2e7b06d8327196c09b85618093f04631cd2845954d2850b067e"
+    },
+    "SNESEmulator.Core.Tests/TimingTests.cs": {
+      "bytes": 23900,
+      "sha256": "5762c356c45d01609c3446490b7aa92a9ccf1fe164a38198b010b2f7ea3ad8a6"
+    },
+    "SNESEmulator.Core.Tests/VideoTests.cs": {
+      "bytes": 28685,
+      "sha256": "28e0c8b429f4cc827a34a2eae74a9507ab838e7f8071ab72a55f3522e95e3254"
+    },
+    "SNESEmulator.Core/DiagnosticRom.cs": {
+      "bytes": 2798,
+      "sha256": "d9573272081901d21d53f6ecd762ebf2b945863315593a60fb8e66d13a2a621b"
+    },
+    "SNESEmulator.Core/IoDmaDiagnosticRom.cs": {
+      "bytes": 2222,
+      "sha256": "1b0eedf498a9e2cc8c27b75de9b9bf26998e5de0bf3d4bc79e22f27d2e533b70"
+    },
+    "SNESEmulator.Core/OwnIpl.cs": {
+      "bytes": 424,
+      "sha256": "a7bc93883ae294ab53cdf08140395bed6d8a9f89c23228cd89480aa7ea51fb33"
+    },
+    "SNESEmulator.Core/PpuDiagnosticRom.cs": {
+      "bytes": 2181,
+      "sha256": "a4ddbef10396684987969af14a38b5908bf558c96bf3dfd27b1436f78fbfe72c"
+    },
+    "SNESEmulator.Core/SpcUploadRom.cs": {
+      "bytes": 2649,
+      "sha256": "b72fe72fad2b7c82ffadcac65a3ccf9cbf4b047dd13178864066864125d752ae"
+    },
+    "SNESEmulator.Lab/FrameProof.cs": {
+      "bytes": 5849,
+      "sha256": "126271cdb148cd7971da9f846e3b3c94132453ea62ae4d6b907c30a6c7c7dda3"
+    },
+    "SNESEmulator.Lab/Performance.cs": {
+      "bytes": 9451,
+      "sha256": "5b9a42b343bfae60eb08bddbc91d4e2edf609a6a09194abcd38498ec1ffa4765"
+    },
+    "tools/ares-console.cpp": {
+      "bytes": 5149,
+      "sha256": "cab7ecd0c5e604ed5002d9cccdb527a86d7094568503aaea943cce227b432407"
+    },
+    "tools/bsnes-console.cpp": {
+      "bytes": 5502,
+      "sha256": "0b93db05690e06e88a144e3f49d2fc692e44353a5c29aef9edab6044b6e87d07"
+    },
+    "tools/dsp1-reference.cpp": {
+      "bytes": 6075,
+      "sha256": "6d0f6cac71673e35d28cb4a7458a05e0216f6cf5c0f1d660b966b68ceb2df458"
+    },
+    "tools/generate-dsp1-vectors.py": {
+      "bytes": 1888,
+      "sha256": "765a1a272e9991cf79d8e1ce5a3d2ac790170867a6657f4f5de69805dcb45400"
+    },
+    "tools/m8-audio-probe.cpp": {
+      "bytes": 1890,
+      "sha256": "b3dd4dbd3299b005163fd56b3dd0aedab4e4d2093a2a448c6a021f8a36a92471"
+    },
+    "tools/m8-audio-probe.py": {
+      "bytes": 6041,
+      "sha256": "1f286314d5c7b080bf68ac47771303089d70eb37cf6a892b535bc191689c18f1"
+    },
+    "tools/m8-game-build.py": {
+      "bytes": 2756,
+      "sha256": "9d1e3d70f2fc502d8649b7f602967da86b9cb50881c93fbb7f7b8e2aede428b2"
+    },
+    "tools/m8-internal-roms.py": {
+      "bytes": 1189,
+      "sha256": "44c729e44b48108ebdef70abcc73dbc694873ad7de2c317a4a397b81ce675fbd"
+    },
+    "tools/m8-observer.hpp": {
+      "bytes": 343,
+      "sha256": "97afa0f3f02af9fef0451de83b424efbb7f0239f7dc1ebc8cc7c5b1d4858c987"
+    },
+    "tools/m8-probe-observer.hpp": {
+      "bytes": 79,
+      "sha256": "fe707f815d21703d0c873ed9df30c91ce7704cf5125223650edc869e3a0f093a"
+    },
+    "tools/m8-reference-build.py": {
+      "bytes": 7425,
+      "sha256": "10fd50d8820a2a592ef46c9238289bec8a2cbba2674d8a96ecce21d3b0c09d1d"
+    },
+    "tools/m8-replay.hpp": {
+      "bytes": 530,
+      "sha256": "7288d586902ef7487d988b38f8ab138f5a5d863168ddccab1505405acb506f4f"
+    },
+    "tools/m8-rom-build.py": {
+      "bytes": 4218,
+      "sha256": "df55acb4210b840a72a15a2d5feade4e00c28a7c9621c514085cd8a9ec0cda3c"
+    },
+    "tools/m8-rust-bootstrap.py": {
+      "bytes": 1044,
+      "sha256": "89353e5e16a5044a384ae541dd96f5a07a88d06520989d776767b4a653b09612"
+    },
+    "tools/m8-title-matrix.py": {
+      "bytes": 5587,
+      "sha256": "c980e0013c8d750b16ceadc6fdbcd02cd3c80b31ee147bc1da1fbf2fd348f84d"
+    },
+    "tools/own-ipl.py": {
+      "bytes": 2081,
+      "sha256": "588bc1868e07ed27e37c24f6de65a251ade1f67d4ac0b37da0a3484fd6c0ae74"
+    },
+    "tools/video-mutations.py": {
+      "bytes": 3435,
+      "sha256": "d89b9b01b70a68cbb84a21e22517b7fff7d84aea27884f957fe74411eae582ab"
+    }
+  }
+}

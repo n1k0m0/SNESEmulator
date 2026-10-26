@@ -44,6 +44,7 @@ No original-console measurements have been made by this project. User-local
 Super Mario World and Zelda play observations are separate from formal coverage.
 
 See the [test laboratory](docs/test-laboratory.md),
+[source headers and commenting rules](docs/source-comments.md),
 [M4 APU contract](docs/m4-apu-contract.md),
 [M5 PPU contract](docs/m5-ppu-contract.md),
 [M6 DSP contract](docs/m6-dsp-contract.md),

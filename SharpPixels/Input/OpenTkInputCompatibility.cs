@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Adapts the legacy SharpPixels input surface to current OpenTK events.
+// The compatibility layer keeps toolkit details out of emulator hardware code.
+//
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

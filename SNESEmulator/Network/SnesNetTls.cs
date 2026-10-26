@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Handles encrypted session identity and certificate trust decisions.
+// A changed fingerprint requires explicit recovery rather than silent trust replacement.
+//
+
 #nullable disable
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de

@@ -1,3 +1,18 @@
+// Copyright 2026 Nils Kopal
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See LICENSE and NOTICE for permissions and attribution.
+//
+// Defines versioned Manager/emulator messages and bounded framing.
+// Revision and epoch fields reject stale commands after settings or ROM-session changes.
+//
+
 using System.Buffers.Binary;
 using System.Text;
 using System.Text.Json;
@@ -38,6 +53,7 @@ public static class Framing
         MaxDepth = 16,
         UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow
     };
+    /// <summary>Reads one length-prefixed bounded JSON message; partial reads are not complete frames.</summary>
     public static async Task<T> ReadAsync<T>(Stream stream, CancellationToken token)
     {
         byte[] prefix = new byte[4];
@@ -92,6 +108,7 @@ public static class Framing
         await stream.FlushAsync(token);
     }
 
+    /// <summary>Rejects a response whose version or correlation identity does not match the request.</summary>
     public static void ValidateResponse(Response response, Request request)
     {
         if (response == null || response.Version != IpcProtocol.Version || response.RequestId != request.RequestId)

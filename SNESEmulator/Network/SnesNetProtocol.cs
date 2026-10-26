@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Defines the versioned SNES network handshake and bounded packet encoding.
+// Malformed lengths and incompatible peers are rejected before payload processing.
+//
+
 #nullable disable
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de

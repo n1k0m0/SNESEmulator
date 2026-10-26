@@ -99,3 +99,6 @@ tools/dsp1-reference.cpp text eol=lf
 
 # Retain vendored license texts exactly, including their original newline bytes.
 /licenses/** -text
+
+# Original source pins are historical bytes, including their original newlines.
+/testdata/source-notice-baseline/** -text -whitespace

@@ -1,3 +1,18 @@
+// Copyright 2026 Nils Kopal
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See LICENSE and NOTICE for permissions and attribution.
+//
+// Validates custom package manifests and stages transactional ZIP updates.
+// Successful owner shutdown is required before any installed files are replaced.
+//
+
 using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -96,6 +111,7 @@ public static class ReleaseUpdates
         }
         catch { Directory.Delete(stage, true); throw; }
     }
+    /// <summary>Rejects rooted or traversal paths before any package entry is written to disk.</summary>
     public static string SafeRelative(string path)
     {
         if (string.IsNullOrEmpty(path) || path.Any(char.IsControl) || path.Length > 240 || path.Contains('\\') || path.StartsWith('/') || path.Contains(':') || path.Split('/').Any(x => x is "" or "." or ".." || x.EndsWith('.') || x.EndsWith(' ') || (new[] { "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9" }.Contains(x.Split('.')[0], StringComparer.OrdinalIgnoreCase)) || x.IndexOfAny(['<', '>', '"', '|', '?', '*']) >= 0)) throw new InvalidDataException("Unsafe package path");
@@ -136,6 +152,7 @@ public static class ReleaseUpdates
             }
         }
     }
+    /// <summary>Checks the declared inventory against package bytes before installation or execution.</summary>
     public static PackageManifest VerifyPackage(string directory, bool allowUserFiles = false)
     {
         string manifestPath = System.IO.Path.Combine(directory, "package-manifest.json");
@@ -160,6 +177,7 @@ public static class ReleaseUpdates
         return manifest;
     }
     /// <summary>Both directories must be siblings on one volume. Existing unknown files are preserved; never delete user data.</summary>
+    /// <summary>Replaces a verified package transactionally and restores its backup on installation failure.</summary>
     public static string Install(string prepared, string target, Action<string>? fault = null)
     {
         prepared = System.IO.Path.GetFullPath(prepared); target = System.IO.Path.GetFullPath(target);

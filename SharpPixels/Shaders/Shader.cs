@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Compiles and owns the SharpPixels OpenGL shader resources.
+// OpenGL operations must execute on the thread owning the rendering context.
+//
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

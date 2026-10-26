@@ -18,6 +18,13 @@ Preserve the Apache license and attribution for reused C64 frontend/transport.
 Write repository documentation, code comments, user-facing text, and GitHub
 descriptions in English.
 
+Maintain Apache-2.0 SPDX headers, existing copyright/third-party attribution and
+brief responsibility comments in active sources. Explain timing and ownership
+invariants at important interfaces. Run `python tools/verify-source-notices.py
+--negative-controls` after adding sources. Keep historical testdata snapshots
+byte-exact; see docs/source-comments.md. Generate the SPC hot-path header through
+tools/generate-spc-hotpath.py rather than editing the generated file alone.
+
 ## Temporary Windows Codex browser crash workaround (2026-10-13)
 
 Use external Chrome/Edge for browser automation. Never call `tab.close()` on an

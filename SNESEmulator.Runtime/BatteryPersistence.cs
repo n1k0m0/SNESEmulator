@@ -1,3 +1,18 @@
+// Copyright 2026 Nils Kopal
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See LICENSE and NOTICE for permissions and attribution.
+//
+// Coordinates SRAM generations and reports write/recovery failures.
+// A failed save must remain visible and must not be treated as a clean shutdown.
+//
+
 using System.Security.Cryptography;
 using System.Text;
 using SNESEmulator.Core;
@@ -69,12 +84,14 @@ public sealed class BatteryPersistence(Func<Task<BatterySnapshot?>> capture,Func
         AtomicFile.Write(path,file=>file.Write(encoded),candidate=>Valid(AtomicFile.ReadBytes(candidate,MaximumBytes+256),snapshot.Hash,snapshot.Bytes.Length));
         persistedHash=snapshot.Hash;persistedBytes=snapshot.Bytes;needsRepair=false;Writes++;
     }
+    /// <summary>Serializes pending battery writes and propagates failure to the shutdown/session caller.</summary>
     public async Task FlushAsync()
     {
         await order.WaitAsync().ConfigureAwait(false);try{await FlushOrderedAsync().ConfigureAwait(false);}finally{order.Release();}
     }
     // Hold both old and tentative target leases until validated installation succeeds.
     // A rejected import/owner command leaves the old live session exclusively owned.
+    /// <summary>Flushes the old session and obtains the new SRAM lease before installing battery data.</summary>
     public async Task SwitchAsync(string hash,int size,Func<byte[],Task> install)
     {
         await order.WaitAsync().ConfigureAwait(false);FileStream? tentative=null;

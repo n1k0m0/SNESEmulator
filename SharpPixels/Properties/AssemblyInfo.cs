@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Retains SharpPixels assembly identity and C64-derived metadata.
+// Versioning for SDK projects is configured separately in Directory.Build.props.
+//
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

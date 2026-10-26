@@ -1,4 +1,18 @@
 #!/usr/bin/env python3
+# Copyright 2026 Nils Kopal
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See LICENSE and NOTICE for permissions and attribution.
+#
+# Runs supervised laboratory suites and checks explicit expected coverage and known accuracy limits.
+#
+
 """Portable laboratory verification; --windows adds the native Windows suites.
 --full requires all pinned CPU semantics. Sample-only omissions stay explicit.
 """
@@ -23,6 +37,7 @@ run(['dotnet','build','SNESEmulator.Manager.Tests','-c','Release','--nologo'])
 run(['dotnet','build','SNESEmulator.Distribution.Tests','-c','Release','--nologo'])
 supervised('distribution-conformance',['dotnet',str(ROOT/'SNESEmulator.Distribution.Tests/bin/Release/net10.0/SNESEmulator.Distribution.Tests.dll')],timeout=180)
 supervised('manager-conformance',['dotnet',str(ROOT/'SNESEmulator.Manager.Tests/bin/Release/net10.0/SNESEmulator.Manager.Tests.dll')],timeout=180)
+run([sys.executable,'tools/verify-source-notices.py','--negative-controls'])
 run([sys.executable,'tools/fetch-testdata.py','--verify'])
 run([sys.executable,'tools/fetch-spc700.py','--verify',*(['--full'] if args.full else [])])
 run([sys.executable,'tools/own-ipl.py'])

@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Carries end-to-end encrypted sessions through the optional relay.
+// Relay routing does not grant access to plaintext emulator traffic.
+//
+
 #nullable disable
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de

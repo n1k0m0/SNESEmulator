@@ -1,13 +1,30 @@
+// Copyright 2026 Nils Kopal
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See LICENSE and NOTICE for permissions and attribution.
+//
+// Reads and writes bounded, versioned complete-machine snapshots.
+// Loads validate an independent temporary machine before replacing live state.
+//
+
 using System.IO.Compression;
 using System.Text.Json;
 using SNESEmulator.Core;
 
 namespace SNESEmulator.SaveStates;
 
+/// <summary>Serializes bounded complete hardware state with explicit format and cartridge identity.</summary>
 public static class StateSerializer
 {
     // Includes all state currently implemented. Validate into a temporary machine
     // before replacing the running instance; rejected/corrupt files leave it intact.
+    /// <summary>Publishes a validated snapshot atomically while retaining a usable prior generation.</summary>
     public static void Save(SnesSystem machine, string path)
     {
         var cart = machine.Bus.Cartridge ?? throw new InvalidOperationException("Load a cartridge first.");
@@ -25,6 +42,7 @@ public static class StateSerializer
     private static readonly JsonSerializerOptions JsonOptions=new(){MaxDepth=32};
     // The host captures uncompressed hardware bytes on its owner thread, then
     // compresses/writes those owned bytes outside the emulation loop.
+    /// <summary>Captures an uncompressed snapshot on the machine owner thread for later background writing.</summary>
     public static byte[] Capture(SnesSystem machine)
     {
         using var stream=new MemoryStream();Write(machine,stream,false);return stream.ToArray();

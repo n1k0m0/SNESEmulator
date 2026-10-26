@@ -1,8 +1,24 @@
+// Copyright 2026 Nils Kopal
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See LICENSE and NOTICE for permissions and attribution.
+//
+// Coordinates the CPU, DMA, PPU and APU on one master-clock timeline.
+// Budget exits retain partial cycles so MMIO effects are never repeated on resume.
+//
+
 namespace SNESEmulator.Core;
 
 public sealed record ExecutionPhase(int CycleRemaining,bool CycleActive,int HoldRemaining=0,CpuCycle? HeldRead=null,long CycleStart=0,long LatchClock=0,bool WriteAluDone=false);
 public sealed record TimedCpuCycleEvent(string Phase,long MasterClock,long StartClock,long? LatchClock,CpuCycle Cycle);
 
+/// <summary>Runs the independently modeled console on a single deterministic hardware timeline.</summary>
 public sealed class SnesSystem
 {
     public SystemBus Bus {get;}=new();
@@ -65,6 +81,7 @@ public sealed class SnesSystem
         if(Clock.V==0)Clock.Schedule(Clock.Now+12+(Clock.Now&7),HardwareEventKind.Device,7,-2);
         if(Clock.V<Clock.VblankLine)Clock.Schedule(Clock.Now+1104,HardwareEventKind.Device,0x107,-2);
     }
+    /// <summary>Attaches a cartridge and initializes the selected hardware profile before execution.</summary>
     public void Insert(Cartridge cartridge)
     {if(cartridge.Hardware is SuperFxCartridgeHardware candidate)candidate.ValidateProfile(forcedProfile?Profile:cartridge.Pal?HardwareProfile.PalProfile:HardwareProfile.Ntsc);Bus.Cartridge=cartridge;ConfigureClock();if(!forcedProfile&&cartridge.Pal!=Profile.Pal){Profile=cartridge.Pal?HardwareProfile.PalProfile:HardwareProfile.Ntsc;Clock=new(Profile);ConfigureClock();}if(cartridge.Hardware is SuperFxCartridgeHardware fx){
         // Only shared-memory boards install this extra boundary. Normal boards
@@ -86,7 +103,9 @@ public sealed class SnesSystem
         Bus.Reset(powerOn);if(Bus.Cartridge?.Hardware is SuperFxCartridgeHardware or Sa1CartridgeHardware)Clock.Reset();Cpu.BeforeCycle=null;Cpu.EffectCompleted=null;Cpu.AfterCycle=null;Cpu.ResumeCycle=null;Cpu.Reset();Cpu.BeforeCycle=BeforeCycle;Cpu.EffectCompleted=OnBusEffect;Cpu.AfterCycle=AfterCycle;Cpu.ResumeCycle=FinishReadHold;
         Clock.Reset();cycleRemaining=holdRemaining=0;cycleActive=false;heldRead=null;cycleStart=latchClock=0;writeAluDone=false;ScheduleIoLine();
     }
+    /// <summary>Captures the partial CPU cycle and read-hold phase needed for exact continuation.</summary>
     public ExecutionPhase CapturePhase()=>new(cycleRemaining,cycleActive,holdRemaining,heldRead,cycleStart,latchClock,writeAluDone);
+    /// <summary>Restores the scheduler-side cycle phase alongside the CPU continuation journal.</summary>
     public void RestorePhase(ExecutionPhase p)
     {
         if(p.CycleRemaining is <0 or >12||p.HoldRemaining is <0 or >4||p.CycleStart<0||p.LatchClock<0||(p.HeldRead!=null&&(!p.HeldRead.Valid||!p.HeldRead.Read))||(p.HoldRemaining>0&&p.HeldRead==null))throw new InvalidDataException("Invalid CPU phase");
@@ -97,6 +116,8 @@ public sealed class SnesSystem
         Cpu.SetInterruptLines(Bus.CpuIo.State.NmiOutput,Bus.CpuIo.IrqOutput||Bus.ExternalIrqLine);
         if(Bus.NmiPending){Cpu.PulseNmi();Bus.NmiPending=false;}
     }
+    // Admit a CPU cycle only after shared-bus DMA/refresh contention is resolved.
+    // The cycle may then suspend without repeating its externally visible bus effect.
     private void BeforeCycle(CpuCycle cycle)
     {
         if(cycle.Pins=="--------"){cycleStart=Clock.Now;return;}
@@ -149,6 +170,8 @@ public sealed class SnesSystem
             if(Bus.Dma.State.Remaining==0&&Clock.StallUntil<=Clock.Now){Bus.Dma.Boundary(Clock.Now);CommitPpuEndpoint();}
         }
     }
+    // Advance only as far as the next event, budget or bus phase.
+    // The selected elapsed callback charges active work; refresh stalls are accounted separately.
     private void AdvanceActive(ref int remaining,bool hold)
     {
         while(remaining>0||Clock.StallUntil>Clock.Now)
@@ -165,6 +188,8 @@ public sealed class SnesSystem
             try{Clock.AdvanceTo(until);}finally{Clock.ActiveTimeElapsed=null;}SyncInterrupts();
         }
     }
+    /// <summary>Executes up to an absolute master-clock budget, retaining any unfinished bus phase.</summary>
+    /// <remarks>The target cannot precede the current clock. A budget boundary is not an instruction boundary.</remarks>
     public void RunUntil(long masterClock,Action<SnesSystem>? beforeInstruction=null,Action<SnesSystem>? afterInstruction=null)
     {
         if(masterClock<Clock.Now)throw new ArgumentOutOfRangeException(nameof(masterClock));target=masterClock;
@@ -195,6 +220,7 @@ public sealed class SnesSystem
             catch(ClockBudget){break;}
         }
     }
+    /// <summary>Advances through one completed hardware field; interlaced field geometry remains clock-owned.</summary>
     public void RunFrame(Action<SnesSystem>? beforeInstruction=null,Action<SnesSystem>? afterInstruction=null)
     {
         if(Bus.Cartridge==null)return;long frame=Frames;

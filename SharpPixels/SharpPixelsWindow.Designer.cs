@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Retains the designer-managed SharpPixels window component setup.
+// Keep generated component lifetime/disposal conventions when regenerating this file.
+//
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

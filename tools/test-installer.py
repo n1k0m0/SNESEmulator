@@ -1,4 +1,18 @@
 #!/usr/bin/env python3
+# Copyright 2026 Nils Kopal
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See LICENSE and NOTICE for permissions and attribution.
+#
+# Installs, repairs and uninstalls an isolated test identity while checking user-data preservation.
+#
+
 """Silent Inno tests use a distinct TEST AppId and isolated target; never install the production AppId."""
 import argparse,hashlib,json,pathlib,subprocess,time
 p=argparse.ArgumentParser();p.add_argument('--installer',required=True);p.add_argument('--package',required=True);p.add_argument('--output',required=True);a=p.parse_args()

@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Adapts C64-derived PCM output to host playback of SNES stereo samples.
+// Buffer/device timing affects presentation, not the S-DSP execution clock.
+//
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

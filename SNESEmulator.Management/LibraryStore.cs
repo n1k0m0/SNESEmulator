@@ -1,3 +1,18 @@
+// Copyright 2026 Nils Kopal
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See LICENSE and NOTICE for permissions and attribution.
+//
+// Stores Manager cartridge metadata in the user-local SQLite library.
+// Transactions protect library consistency independently of running emulation.
+//
+
 using Microsoft.Data.Sqlite;
 using SNESEmulator.Core;
 
@@ -100,6 +115,7 @@ public sealed class LibraryStore : IDisposable
         }
     }
 
+    /// <summary>Scans cartridge files into library metadata with cancellable, serialized database access.</summary>
     public async Task<int> ScanAsync(string root, CancellationToken token = default)
     {
         // One scanner, <=10000 files, <=64 levels; skip reparse points and inaccessible folders.
@@ -182,6 +198,7 @@ public sealed class LibraryStore : IDisposable
         }
     }
 
+    /// <summary>Relinks an entry only after validating the selected cartridge against its identity.</summary>
     public async Task RelinkAsync(GameItem item, string file, CancellationToken token = default)
     {
         var cart = await Task.Run(() => new Cartridge(AtomicFile.ReadBytes(file, 8 * 1024 * 1024 + 512),file), token);

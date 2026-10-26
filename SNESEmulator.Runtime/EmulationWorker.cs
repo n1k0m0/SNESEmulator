@@ -1,3 +1,18 @@
+// Copyright 2026 Nils Kopal
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See LICENSE and NOTICE for permissions and attribution.
+//
+// Owns the live SnesSystem on one worker thread and accepts bounded commands.
+// Published frames/snapshots cross ownership boundaries; UI code never runs the core.
+//
+
 using SNESEmulator.Core;
 using SNESEmulator.SaveStates;
 
@@ -16,6 +31,7 @@ public sealed record BatterySnapshot(string Hash,byte[] Bytes);
 public readonly record struct FieldInput(ushort Port1,ushort Port2);
 
 /// <summary>Exactly one thread owns the live machine. No machine escapes this class.</summary>
+/// <summary>Owns all live hardware mutation and publishes bounded, completed field outputs.</summary>
 public sealed class EmulationWorker : IDisposable
 {
     public const int CommandCapacity=32,OutputCapacity=8;
@@ -112,6 +128,7 @@ public sealed class EmulationWorker : IDisposable
             machine=restored;fault=null;Discontinuity();return true;
         },cancellation).ConfigureAwait(false);
     }
+    /// <summary>Queues a state capture on the hardware owner instead of reading a concurrently running machine.</summary>
     public Task<byte[]> CaptureAsync(CancellationToken cancellation=default)=>Enqueue(()=>StateSerializer.Capture(machine),cancellation);
     public Task<BatterySnapshot?> BatteryAsync(CancellationToken cancellation=default)=>Enqueue(()=>machine.Bus.Cartridge is {} cart?new BatterySnapshot(cart.Hash,cart.Sram.ToArray()):null,cancellation);
     public Task<FieldOutput> StepAsync(FieldInput value,CancellationToken cancellation=default)=>Enqueue(()=>{
@@ -119,7 +136,10 @@ public sealed class EmulationWorker : IDisposable
         if(machine.Bus.Cartridge==null)throw new InvalidOperationException("Load a cartridge first");
         return Emulate(value,++appliedSequence);
     },cancellation);
+    /// <summary>Transfers the next completed field output to the presentation consumer.</summary>
     public bool TryDequeue(out FieldOutput? output){lock(gate){if(outputs.TryDequeue(out var found)){output=found;return true;}output=null;return false;}}
+    // A reset/load/session change invalidates queued presentation from the previous epoch.
+    // Keep this separate from the hardware state restored by a snapshot.
     private void Discontinuity(bool keepFrame=false,bool inputBoundary=true)
     {
         epoch++;if(!keepFrame)hardwareGeneration++;if(inputBoundary)inputEpoch++;machine.Bus.Apu.Dsp.ClearPresentation();

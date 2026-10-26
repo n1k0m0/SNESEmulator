@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Applies SharpPixels texture sampling and display filters after native pixel generation.
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

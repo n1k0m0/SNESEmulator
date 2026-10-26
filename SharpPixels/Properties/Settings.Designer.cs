@@ -1,3 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Contains designer-generated SharpPixels application settings accessors.
+// SNES user settings and recovery are handled by the separate persistence layer.
+//
+
 /*
    Copyright 2026 Nils Kopal <Nils.Kopal<at>kopaldev.de
 

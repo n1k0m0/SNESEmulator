@@ -1,3 +1,18 @@
+// Copyright 2026 Nils Kopal
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See LICENSE and NOTICE for permissions and attribution.
+//
+// Binds installation to an exact owner process and verified installer file.
+// A retained handle prevents PID reuse and replacement between verification and launch.
+//
+
 using System.Diagnostics;
 using System.Security.Cryptography;
 
@@ -8,10 +23,12 @@ public sealed class ExactUpdateOwner : IDisposable
 {
     readonly Process process;
     ExactUpdateOwner(Process process)=>this.process=process;
+    /// <summary>Retains the process handle and checks creation time before acknowledging the update owner.</summary>
     public static ExactUpdateOwner Bind(int pid,long utcStartTicks){
         var owner=Process.GetProcessById(pid);
         try{_ = owner.Handle;if(owner.StartTime.ToUniversalTime().Ticks!=utcStartTicks)throw new InvalidDataException("Emulator process identity changed");return new(owner);}catch{owner.Dispose();throw;}
     }
+    /// <summary>Waits for a successful normal exit; timeout or shutdown failure cancels installation.</summary>
     public void WaitForCleanExit(int milliseconds=60000){
         if(!process.WaitForExit(milliseconds))throw new TimeoutException("Emulator did not exit normally; update cancelled");
         if(process.ExitCode!=0)throw new IOException("Emulator shutdown failed with exit code "+process.ExitCode);

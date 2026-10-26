@@ -1,3 +1,18 @@
+// Copyright 2026 Nils Kopal
+// SPDX-License-Identifier: Apache-2.0
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy at https://www.apache.org/licenses/LICENSE-2.0
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See LICENSE and NOTICE for permissions and attribution.
+//
+// Discovers official GitHub setups and streams bounded verified downloads.
+// Preview policy, repository ownership and optional publisher digests are checked separately.
+//
+
 using System.Net;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -49,6 +64,7 @@ public sealed class GitHubReleases : IDisposable
         client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         client.DefaultRequestHeaders.Add("X-GitHub-Api-Version","2022-11-28");
     }
+    /// <summary>Selects a newer official setup using bounded anonymous metadata and the installed version channel.</summary>
     public async Task<InstallerRelease?> FindNewerAsync(string currentVersion,CancellationToken token=default)
     {
         var current=SemanticVersion.Parse(currentVersion);
@@ -111,6 +127,8 @@ public sealed class GitHubReleases : IDisposable
     }
     Task<HttpResponseMessage> OpenInstaller(InstallerRelease release,CancellationToken token)=>
         GitHubReleaseTransport.OpenAsync(client,ValidateAssetUri(release.DownloadUri.AbsoluteUri,Repository,release.Tag,release.AssetName),Repository,token);
+    /// <summary>Stages a complete bounded setup and verifies any published digest before returning it.</summary>
+    /// <remarks>A prepared file is a download result; explicit user approval and clean owner exit still precede launch.</remarks>
     public async Task<PreparedSetup> DownloadInstallerAsync(InstallerRelease release,string stagingParent,IProgress<InstallerProgress>? progress=null,CancellationToken token=default)
     {
         if(release.Repository!=Repository||release.Bytes is <1 or >InstallerLimit||release.AssetName!=$"SNESEmulator-{SemanticVersion.Parse(release.Version).Text}-win-x64-setup.exe")throw new InvalidDataException("Invalid setup metadata");
