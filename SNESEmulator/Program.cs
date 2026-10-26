@@ -80,8 +80,15 @@ internal static class Program
                 preview.Run(); return 0;
             }
             SNESEmulator.Management.PreparedUpdate? install;
-            using(var window=new SnesWindow(args.Length>0?args[0]:null)){window.Run(); install=window.InstallAfterNormalClose;}
-            if(install != null)SnesWindow.StartPreparedInstaller(install); return 0;
+            SNESEmulator.Management.PreparedSetup? setup;
+            using(var window=new SnesWindow(args.Length>0?args[0]:null)){
+                if(SNESEmulator.Management.OfficialReleaseSettings.IsNormalGuiLaunch(args))window.EnableOfficialUpdatesOnStartup();
+                window.Run();install=window.InstallAfterNormalClose;setup=window.SetupAfterNormalClose;
+            }
+            // Failed SRAM/settings shutdown prevents both helper modes from starting.
+            if(install!=null)SnesWindow.StartPreparedInstaller(install);
+            if(setup!=null)SnesWindow.StartSetupInstaller(setup);
+            return 0;
         }
         catch(Exception e)
         {

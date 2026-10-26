@@ -1,0 +1,30 @@
+{
+  "scope": "Verbatim license text bytes, pinned without Git newline conversion by .gitattributes; licensing does not relicense external data Apache",
+  "files": [
+    {
+      "file": "NAudio-MIT.txt",
+      "source": "https://raw.githubusercontent.com/naudio/NAudio/c89fee940ee6f8d7374d18714a6b85d8b7a18ab0/license.txt",
+      "sha256ExactLocalBytes": "303e01786b271eb464b3f43d18a375f2f17d37bc708a37c2fdf45b289fb5bfaa"
+    },
+    {
+      "file": "OpenTK-MIT.txt",
+      "source": "https://raw.githubusercontent.com/opentk/opentk/8d1d462877936922a3989f56aac8c17add824919/LICENSE.md",
+      "sha256ExactLocalBytes": "153d157c35f9f8229a206036450040952268da4d8d6c28a833c6d0463f56263d"
+    },
+    {
+      "file": "THIRD_PARTIES.md",
+      "source": "https://raw.githubusercontent.com/opentk/opentk/8d1d462877936922a3989f56aac8c17add824919/THIRD_PARTIES.md",
+      "sha256ExactLocalBytes": "2b499225ac89ff1a813b30e666ea0f2b5d22c5e71b25edc99ea0eb4bfd974fa6"
+    },
+    {
+      "file": "Inno-Setup.txt",
+      "source": "https://raw.githubusercontent.com/jrsoftware/issrc/is-6_7_3/license.txt",
+      "sha256ExactLocalBytes": "2e5346868c2a18434489824e11d65c3031620f792fefc415d05f19cd441abf5c"
+    },
+    {
+      "file": "ares-ISC.txt",
+      "source": "Local verbatim retained ISC attribution testdata/dsp-reference/ares-ISC.txt; ares9408cb43d4948fc3ea6e152a307a34348df3fe04/LICENSE",
+      "sha256ExactLocalBytes": "e51d8ae62c3294ccdb79f87fa6695192d191b0c6be1a138ede392ae2384e9696"
+    }
+  ]
+}

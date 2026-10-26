@@ -42,3 +42,12 @@ M10b laboratory comparisons execute unmodified bsnes GSU processor instructions
 (commit78474e5d39f58872dc21aca18cf9eb583b147fe7) in a separate lab-only binary.
 No reference core is linked into the emulator. PeterLemon original GSU ROMs are
 local-only and are not redistributed.
+
+The normal-start GitHub setup update flow is adapted from C64Emulator's
+StartupUpdateChecker, Copyright 2026 Nils Kopal, Apache-2.0. SNES adaptations
+add preview version ordering, repository/asset bounds and exact process identity.
+The original C64 repository is preserved.
+
+The installed package retains NAudio/OpenTK notices, GLFW COPYING, .NET runtime
+licenses/third-party notices and the ares ISC hardware-table attribution.
+See THIRD-PARTY-NOTICES.md and licenses/ for the complete distribution boundary.

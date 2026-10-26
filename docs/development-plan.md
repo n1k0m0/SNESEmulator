@@ -2,6 +2,12 @@
 
 ## Current follow-up status
 
+Windows distribution now has a [versioned setup/ZIP release workflow](windows-releases.md)
+and the C64-style [normal-start GitHub setup update flow](release-update-flow.md).
+The [publication review](publication-audit.md) covers licenses and reachable
+history before public visibility. Preview distribution does not close the
+independent native timing or hardware-accuracy work below.
+
 [R5 exact-tail Core](r5-tail-core.md) passed the retained 37,000-field NTSC and
 31,000-field PAL gates on its exact tested package. The subsequent R5 actual
 native hours both failed: NTSC retained 19,242 post-ready muted fields and 2,562

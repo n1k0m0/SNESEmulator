@@ -8,6 +8,7 @@ using System.Text.Json;
 using SNESEmulator.Management;
 using SNESEmulator.Testing;
 
+if(args.Length==2&&args[0]=="--update-owner-fixture"){Console.WriteLine("READY");Console.Out.Flush();Console.ReadLine();return int.Parse(args[1]);}
 string root = Path.Combine(Path.GetTempPath(), "SNESEmulator-distribution-tests-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
 Environment.SetEnvironmentVariable("SNESEMULATOR_DATA_DIR", root);
 var report = new TestReport("distribution-portable"); report.Metadata["temporaryRoot"] = root;
@@ -69,8 +70,16 @@ await Test("M9f actual loopback download verifies hash origin version and execut
         if (mode == "older") Check(prepared == null && server.Requests == 1, "Downgrade downloaded package");
     }
 });
+await Test("Release custom ZIP preview ordering skips current older and build-only payloads",async()=>{
+    foreach(var pair in new[]{("1.0.0-preview.2","1.0.0-preview.10"),("1.0.0-preview.10","1.0.0-preview.10"),("1.0.0-preview.10","1.0.0"),("1.0.0+new","1.0.0+old")}){
+        using var server=new FixtureServer();server.Files["/manifest.json"]=JsonSerializer.SerializeToUtf8Bytes(new ReleaseManifest(1,pair.Item1,server.Url+"must-not-request.zip",1,new string('a',64)));server.Start();
+        string policy=Path.Combine(root,"preview-"+Guid.NewGuid().ToString("N")+".json");File.WriteAllText(policy,JsonSerializer.Serialize(new UpdatePolicy(1,true,server.Url+"manifest.json",null)));
+        Check(await ReleaseUpdates.PrepareAsync(policy,pair.Item2,root,default)==null&&server.Requests==1,"Current/older version requested payload");
+    }
+});
+await GitHubReleaseTests.Run(Test,root,Package,Archive);
 report.Metadata["knownLimits"] = "Portable update fixtures contain inert mock application bytes; separate Windows package tests start the actual published applications. No external release or clean VM execution.";
-report.Save(Path.Combine(Directory.GetCurrentDirectory(), "artifacts/distribution-conformance-child"));
+report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??Path.Combine(Directory.GetCurrentDirectory(), "artifacts/distribution-conformance-child"));
 return failures == 0 ? 0 : 1;
 
 sealed class FixtureServer : IDisposable

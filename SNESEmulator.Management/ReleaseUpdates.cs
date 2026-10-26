@@ -4,7 +4,7 @@ using System.Text.Json;
 
 namespace SNESEmulator.Management;
 
-public sealed record UpdatePolicy(int Schema, bool Enabled, string? ManifestUrl, string? Reason);
+public sealed record UpdatePolicy(int Schema, bool Enabled, string? ManifestUrl, string? Reason, bool UseOfficialGitHub = false);
 public sealed record ReleaseManifest(int Schema, string Version, string PackageUrl, long Bytes, string Sha256);
 public sealed record PackageFile(string Path, long Bytes, string Sha256);
 public sealed record PackageManifest(string Schema, string Product, string Version, string SourceCommit, bool SourceDirty, string Rid, bool SelfContained, PackageFile[] Files);
@@ -22,7 +22,7 @@ public static class ReleaseUpdates
         ? UserPolicyPath : System.IO.Path.Combine(packageDirectory, "update-policy.json");
     public static void SaveUserPolicy(UpdatePolicy policy)
     {
-        if (policy.Schema != 1 || (policy.Enabled && string.IsNullOrWhiteSpace(policy.ManifestUrl))) throw new InvalidDataException("Enabled updates require an explicit release source");
+        if (policy.Schema != 1 || (policy.Enabled && !policy.UseOfficialGitHub && string.IsNullOrWhiteSpace(policy.ManifestUrl))) throw new InvalidDataException("Enabled updates require an explicit release source");
         if (!string.IsNullOrWhiteSpace(policy.ManifestUrl)) _ = AllowedUri(policy.ManifestUrl);
         byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(policy, new JsonSerializerOptions(Json) { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
         if (bytes.Length > 8192) throw new InvalidDataException("Update policy exceeds8192 bytes");
@@ -34,8 +34,8 @@ public static class ReleaseUpdates
         if (stream.Length > 8192) throw new InvalidDataException("Update policy exceeds8192 bytes");
         var policy = JsonSerializer.Deserialize<UpdatePolicy>(stream, Json) ?? throw new InvalidDataException("Missing update policy");
         if (policy.Schema != 1) throw new InvalidDataException("Unknown update policy schema");
-        if (policy.Enabled && string.IsNullOrWhiteSpace(policy.ManifestUrl)) throw new InvalidDataException("Enabled updates require an explicit release source");
-        if (policy.Enabled) _ = AllowedUri(policy.ManifestUrl!);
+        if (policy.Enabled && !policy.UseOfficialGitHub && string.IsNullOrWhiteSpace(policy.ManifestUrl)) throw new InvalidDataException("Enabled updates require an explicit release source");
+        if (policy.Enabled && !policy.UseOfficialGitHub) _ = AllowedUri(policy.ManifestUrl!);
         return policy;
     }
     static Uri AllowedUri(string text)
@@ -45,11 +45,13 @@ public static class ReleaseUpdates
             throw new InvalidDataException("Updates require HTTPS or an explicit loopback test source");
         return uri;
     }
-    static async Task<byte[]> Download(Uri uri, long maximum, CancellationToken token)
+    static async Task<byte[]> Download(HttpClient client,Uri uri, long maximum, CancellationToken token)
     {
-        using var handler = new HttpClientHandler { AllowAutoRedirect = false };
-        using var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(90) };
-        using var response = await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, token);
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(token);timeout.CancelAfter(TimeSpan.FromSeconds(90));
+        token = timeout.Token;
+        using var response = GitHubReleaseTransport.IsOfficialAsset(uri,OfficialReleaseSettings.Repository)
+            ? await GitHubReleaseTransport.OpenAsync(client,uri,OfficialReleaseSettings.Repository,token)
+            : await client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, token);
         response.EnsureSuccessStatusCode();
         if (response.Content.Headers.ContentLength > maximum) throw new InvalidDataException("Update download exceeds limit");
         using var input = await response.Content.ReadAsStreamAsync(token);
@@ -63,19 +65,23 @@ public static class ReleaseUpdates
         }
         return output.ToArray();
     }
-    public static async Task<PreparedUpdate?> PrepareAsync(string policyPath, string currentVersion, string stagingParent, CancellationToken token)
+    public static Task<PreparedUpdate?> PrepareAsync(string policyPath,string currentVersion,string stagingParent,CancellationToken token)=>PrepareAsync(policyPath,currentVersion,stagingParent,token,null);
+    public static async Task<PreparedUpdate?> PrepareAsync(string policyPath, string currentVersion, string stagingParent, CancellationToken token,HttpMessageHandler? handler)
     {
         var policy = ReadPolicy(policyPath);
         if (!policy.Enabled) return null;
+        if (policy.UseOfficialGitHub) throw new InvalidOperationException("Official GitHub setup updates use the installer flow");
+        using var client=new HttpClient(handler??new HttpClientHandler{AllowAutoRedirect=false},true){Timeout=Timeout.InfiniteTimeSpan};
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("SNESEmulator-Updates");
         var manifestUri = AllowedUri(policy.ManifestUrl!);
-        byte[] manifestBytes = await Download(manifestUri, 65536, token);
+        byte[] manifestBytes = await Download(client,manifestUri, 65536, token);
         var release = JsonSerializer.Deserialize<ReleaseManifest>(manifestBytes, Json) ?? throw new InvalidDataException("Missing release manifest");
         if (release.Schema != 1 || !Digest(release.Sha256) || release.Bytes is < 1 or > PackageLimit || release.Version.Length > 64 || string.IsNullOrWhiteSpace(release.Version)) throw new InvalidDataException("Invalid release manifest");
-        if (!Version.TryParse(release.Version.Split('-')[0], out var next) || !Version.TryParse(currentVersion.Split('-')[0], out var current)) throw new InvalidDataException("Invalid release version");
-        if (next < current || (next == current && (release.Version == currentVersion || !currentVersion.Contains('-')))) return null;
+        var next = SemanticVersion.Parse(release.Version);var current = SemanticVersion.Parse(currentVersion);
+        if (next.CompareTo(current) <= 0) return null;
         var packageUri = AllowedUri(release.PackageUrl);
         if (packageUri.Scheme != manifestUri.Scheme || packageUri.Authority != manifestUri.Authority) throw new InvalidDataException("Release package must share the configured manifest origin");
-        var bytes = await Download(packageUri, release.Bytes, token);
+        var bytes = await Download(client,packageUri, release.Bytes, token);
         if (bytes.LongLength != release.Bytes || Hash(bytes) != release.Sha256.ToLowerInvariant()) throw new InvalidDataException("Update package size/hash mismatch");
         Directory.CreateDirectory(stagingParent);
         string stage = System.IO.Path.Combine(stagingParent, "prepared-" + Guid.NewGuid().ToString("N"));

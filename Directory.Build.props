@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <!-- One version feeds the application, package manifest, setup and release tag. -->
+    <Version Condition="'$(Version)' == ''">$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)VERSION').Trim())</Version>
+    <Authors>Nils Kopal</Authors>
+    <RepositoryUrl>https://github.com/n1k0m0/SNESEmulator</RepositoryUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+  </PropertyGroup>
+</Project>

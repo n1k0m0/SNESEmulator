@@ -11,15 +11,17 @@ internal static class UpdateSourceDialog
 
     internal static bool ShowEditor()
     {
-        using var form = new Forms.Form { Text = "SNESEmulator – Update source", ClientSize = new Size(560, 220), FormBorderStyle = Forms.FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, StartPosition = Forms.FormStartPosition.CenterScreen };
-        var explanation = new Forms.Label { Text = "Updates are disabled by default. Only the source you configure will be checked.", AutoSize = false, Location = new Point(18, 16), Size = new Size(524, 36) };
-        var enabled = new Forms.CheckBox { Text = "Enable updates from this source", AutoSize = true, Location = new Point(18, 62), Enabled = false };
-        var label = new Forms.Label { Text = "Manifest URL (HTTPS)", AutoSize = true, Location = new Point(18, 92) };
-        var url = new Forms.TextBox { Location = new Point(18, 113), Size = new Size(524, 24), MaxLength = 2048, Enabled = false };
-        var notice = new Forms.Label { Location = new Point(18, 145), Size = new Size(524, 28), ForeColor = Color.DarkRed };
-        var save = new Forms.Button { Text = "Save", Location = new Point(350, 180), Size = new Size(92, 28), Enabled = false };
-        var cancel = new Forms.Button { Text = "Cancel", Location = new Point(450, 180), Size = new Size(92, 28), DialogResult = Forms.DialogResult.Cancel };
-        form.Controls.AddRange([explanation, enabled, label, url, notice, save, cancel]);
+        using var form = new Forms.Form { Text = "SNESEmulator – Update source", ClientSize = new Size(560, 255), FormBorderStyle = Forms.FormBorderStyle.FixedDialog, MaximizeBox = false, MinimizeBox = false, StartPosition = Forms.FormStartPosition.CenterScreen };
+        var explanation = new Forms.Label { Text = "Official GitHub releases are checked by default. A custom ZIP manifest remains optional.", AutoSize = false, Location = new Point(18, 16), Size = new Size(524, 36) };
+        var enabled = new Forms.CheckBox { Text = "Enable update checks", AutoSize = true, Location = new Point(18, 62), Enabled = false };
+        var official = new Forms.CheckBox { Text = "Use official GitHub setup releases", Checked = true, AutoSize = true, Location = new Point(18, 90), Enabled = false };
+        var label = new Forms.Label { Text = "Manifest URL (HTTPS)", AutoSize = true, Location = new Point(18, 120) };
+        var url = new Forms.TextBox { Location = new Point(18, 141), Size = new Size(524, 24), MaxLength = 2048, Enabled = false };
+        var notice = new Forms.Label { Location = new Point(18, 173), Size = new Size(524, 28), ForeColor = Color.DarkRed };
+        var save = new Forms.Button { Text = "Save", Location = new Point(350, 215), Size = new Size(92, 28), Enabled = false };
+        var cancel = new Forms.Button { Text = "Cancel", Location = new Point(450, 215), Size = new Size(92, 28), DialogResult = Forms.DialogResult.Cancel };
+        form.Controls.AddRange([explanation, enabled, official, label, url, notice, save, cancel]);
+        official.CheckedChanged += (_, _) => url.Enabled = !official.Checked;
         form.CancelButton = cancel;
         Exception? probeFailure = null;
         bool saving = false;
@@ -37,7 +39,7 @@ internal static class UpdateSourceDialog
             saving = true;
             try
             {
-                var policy = new UpdatePolicy(1, enabled.Checked, string.IsNullOrWhiteSpace(url.Text) ? null : url.Text.Trim(), "Configured explicitly by user");
+                var policy = new UpdatePolicy(1, enabled.Checked, official.Checked || string.IsNullOrWhiteSpace(url.Text) ? null : url.Text.Trim(), "Configured explicitly by user", official.Checked);
                 await Task.Run(async () => { if (probe?.Phase == "close-save") await Task.Delay(200); ReleaseUpdates.SaveUserPolicy(policy); });
                 saving = false;
                 saved = true;
@@ -61,12 +63,13 @@ internal static class UpdateSourceDialog
                 if (probe?.Phase == "close-load") cancel.PerformClick();
                 var existing = await loading;
                 if (closed || form.IsDisposed || form.Disposing) { abandonedLoad = true; return; }
-                enabled.Checked = existing?.Enabled ?? false;
+                enabled.Checked = existing?.Enabled ?? true;
+                official.Checked = existing?.UseOfficialGitHub ?? true;
                 url.Text = existing?.ManifestUrl ?? "";
-                enabled.Enabled = url.Enabled = save.Enabled = true;
+                enabled.Enabled = official.Enabled = save.Enabled = true;url.Enabled = !official.Checked;
                 if (probe != null)
                 {
-                    enabled.Checked = true;
+                    enabled.Checked = true;official.Checked = false;
                     url.Text = probe.Url;
                     form.Update();
                     using var bitmap = new Bitmap(form.Width, form.Height);
@@ -76,7 +79,7 @@ internal static class UpdateSourceDialog
                     if (probe.Phase == "close-save") form.Close();
                 }
             }
-            catch (Exception error) { if (closed || form.IsDisposed || form.Disposing) { abandonedLoad = true; return; } notice.Text = "Cannot read configuration. Enter the source again: " + error.Message; enabled.Enabled = url.Enabled = save.Enabled = true; }
+            catch (Exception error) { if (closed || form.IsDisposed || form.Disposing) { abandonedLoad = true; return; } notice.Text = "Cannot read configuration. Enter the source again: " + error.Message; enabled.Enabled = official.Enabled = save.Enabled = true;url.Enabled = !official.Checked; }
             finally { loadFinished.TrySetResult(); }
         };
         bool result = form.ShowDialog() == Forms.DialogResult.OK;

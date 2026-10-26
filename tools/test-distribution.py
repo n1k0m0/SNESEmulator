@@ -44,8 +44,13 @@ rom=pathlib.Path(a.game).resolve() if a.game else diagnostic
 rom_before=sha(rom)
 run('native-runtime',[package/'SNESEmulator.exe','--ui-runtime-smoke',out/'runtime',rom,'8'],env_for('runtime'),timeout=150)
 assert json.loads((out/'runtime/result.json').read_text())['Success']
-# Actual F10 menu disabled check. No network service exists in this mode.
-run('update-disabled',[package/'SNESEmulator.exe','--ui-update-smoke',out/'disabled','check'],env_for('disabled'))
+# Actual F10 explicit user opt-out. Fresh releases now default to official GitHub
+# checks, so this fixture must save the opt-out rather than assume old defaults.
+disabled_env=env_for('disabled')
+disabled_policy=pathlib.Path(disabled_env['SNESEMULATOR_DATA_DIR'])/'updates/update-policy.json'
+disabled_policy.parent.mkdir(parents=True)
+disabled_policy.write_text(json.dumps({'schema':1,'enabled':False,'manifestUrl':None,'useOfficialGitHub':True,'reason':'Explicit isolated test opt-out'}))
+run('update-disabled',[package/'SNESEmulator.exe','--ui-update-smoke',out/'disabled','check'],disabled_env)
 disabled=json.loads((out/'disabled/check.json').read_text());assert not disabled['Ready'] and 'DISABLED' in disabled['Status']
 # Create one inert release package from these verified product files; no game ROM is copied.
 fixture=out/'http';fixture.mkdir();candidate=out/'candidate';shutil.copytree(package,candidate)

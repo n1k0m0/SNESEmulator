@@ -5,7 +5,7 @@ architecture of [C64Emulator](https://github.com/n1k0m0/C64Emulator).
 The SNES hardware core is developed in this repository; it does not embed a
 Snes9x, bsnes, or Libretro core.
 
-**Status: 0.1.0-preview — experimental, with scoped test evidence and no general
+**Status: 0.1.0-preview.1 — experimental, with scoped test evidence and no general
 commercial-game or original-hardware certification.** The independently developed
 C# core supports clocked Mode 0–7 graphics, SPC700/S-DSP stereo, DMA/HDMA, standard
 cartridge mappings, normal format 9 savestates and explicitly configured DSP1
@@ -53,6 +53,12 @@ See the [test laboratory](docs/test-laboratory.md),
 
 ## Getting started
 
+Get the self-contained Windows x64 [Setup or portable ZIP from GitHub Releases](https://github.com/n1k0m0/SNESEmulator/releases).
+Setup provides Start Menu entries and an optional desktop shortcut. The
+[release guide](docs/windows-releases.md) describes installation, checksums and
+updates; the [publication review](docs/publication-audit.md) records licenses and
+the source/history boundary. No commercial games or original firmware are included.
+
 Double-click `Start-SNESEmulator.cmd`. In a standalone package, it starts the
 included emulator. In a source checkout, it uses a `publish/` package with a
 package manifest when available, otherwise it runs the development project. Quoted arguments
@@ -68,7 +74,8 @@ preserved locally under `artifacts/final-integration/previous-publish-preserved/
 The current documentation commit is separate from the tested package commit.
 The fresh `1431b93` package remains isolated under
 `artifacts/r7-final-integration/package/`; it has not replaced `publish/`.
-No public release is currently published.
+Versioned public preview packages are built separately by the release workflow;
+publishing them does not replace an existing local checkout's `publish/` folder.
 
 Development requires the exact SDK version **10.0.402**, pinned in `global.json`.
 The following commands assume that SDK is on `PATH`. The local private
@@ -98,9 +105,13 @@ with explicit board/clock configuration and shared RAM, graphics, DMA, IRQ and
 state integration. [SA-1 setup and evidence](docs/m10c-sa1.md) adds own dual-CPU/MMC/DMA/character-conversion integration. DSP2/3/4 and other cartridge hardware remain unsupported. Original source-author FMULT-R4 and other
 accuracy contradictions remain visible; neither chip stage certifies all games.
 
-Updates are disabled by default. Configure your own source under
-F10 → SETTINGS → UPDATE SOURCE, then explicitly check through UPDATES in the
-main menu. No public release source is configured automatically.
+Normal GUI startup checks official SNES GitHub Releases in the background, as
+in C64Emulator. Newer setups are offered with download progress, cancel/retry and
+an explicit Install action after clean shutdown. F10 → CHECK FOR UPDATES checks
+manually; SETTINGS → UPDATE SOURCE can disable checks or choose a custom ZIP
+manifest. Saved opt-outs are respected. Headless/diagnostic modes make no startup
+requests. Preview installations can receive newer previews and final versions;
+stable installations receive stable versions.
 
 ## Controls
 
@@ -251,10 +262,11 @@ $app = '.\SNESEmulator\bin\Release\net10.0-windows\SNESEmulator.exe'
 # Other views: demo, settings, network, saves
 ```
 
-The repository includes an updater, an Inno Setup installer definition, and a
-game-library Manager. Update checks are disabled until a source is explicitly
-configured; no update endpoint points to C64 releases. Packaging and installer
-verification limits are documented in the
+The repository includes the game-library Manager, self-contained package and
+versioned Inno Setup/release workflow. Updates point to SNES releases, never to
+C64 releases. The current [Windows release guide](docs/windows-releases.md) and
+[application update flow](docs/release-update-flow.md) supersede the historical
+disabled-default distribution snapshot in the
 [distribution contract](docs/m9-distribution-contract.md).
 
 ## License and attribution
@@ -263,6 +275,9 @@ Apache-2.0; see [LICENSE](LICENSE) and [NOTICE](NOTICE). SharpPixels, the bitmap
 menu font, PCM output, and network/relay infrastructure are reused from
 C64Emulator. The C64 hardware core was not copied and the original repository
 was not modified. No commercial game ROMs or Nintendo firmware are included.
+External materials retain their own licenses; see
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). This independent project is not
+affiliated with or endorsed by Nintendo.
 
 ## Test laboratory and historical evidence
 

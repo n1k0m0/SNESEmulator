@@ -401,6 +401,7 @@ public sealed partial class SnesWindow : SharpPixelsWindow
         if(unreportedMediaError!=null)errors.Add(unreportedMediaError);
         Finish(()=>previewTask.GetAwaiter().GetResult());
         Finish(()=>networkTask.GetAwaiter().GetResult());
+        Finish(()=>startupUpdateTask.GetAwaiter().GetResult());
         Finish(()=>updateTask.GetAwaiter().GetResult());
         Finish(()=>autosave.Pending.GetAwaiter().GetResult());
         Finish(()=>settingsPersistence.Pending.GetAwaiter().GetResult());

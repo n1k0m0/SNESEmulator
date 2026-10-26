@@ -1,0 +1,135 @@
+name: Windows setup and portable release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag matching VERSION, for example v0.1.0-preview.1
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: snes-release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+jobs:
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ format('refs/tags/{0}', inputs.tag || github.ref_name) }}
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.402'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Audit reachable publication contents
+        run: python tools/audit-publication.py --history --output artifacts/release-publication-audit.json
+      - run: python tools/test-lab.py
+      - name: Full external CPU and SPC vectors
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python tools/fetch-full-testdata.py
+          python tools/fetch-spc700.py --full
+          dotnet build SNESEmulator.Lab -c Release
+          dotnet SNESEmulator.Lab/bin/Release/net10.0/SNESEmulator.Lab.dll cpu-full artifacts/release-cpu testdata/65816-full
+          dotnet SNESEmulator.Lab/bin/Release/net10.0/SNESEmulator.Lab.dll cpu-bus-full artifacts/release-bus testdata/65816-full
+          dotnet SNESEmulator.Lab/bin/Release/net10.0/SNESEmulator.Lab.dll spc-full artifacts/release-spc testdata/spc700-full
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-tests-${{ matrix.os }}
+          path: |
+            artifacts/*.json
+            artifacts/*.junit.xml
+            artifacts/*.stdout.txt
+            artifacts/*.stderr.txt
+  build:
+    needs: tests
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ format('refs/tags/{0}', inputs.tag || github.ref_name) }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.402'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Require tag and package version agreement
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          $version=(Get-Content VERSION -Raw).Trim()
+          if($env:RELEASE_TAG -ne ('v'+$version)){throw 'Tag must match VERSION'}
+      - name: Install pinned setup compiler
+        id: inno
+        shell: pwsh
+        run: ./scripts/bootstrap-inno.ps1 -OutputDirectory (Join-Path $env:RUNNER_TEMP ('snes-inno-'+[guid]::NewGuid().ToString('N')))
+      - name: Build and verify production release assets
+        shell: pwsh
+        env:
+          INNO_COMPILER: ${{ steps.inno.outputs.compiler }}
+        run: ./scripts/build-release.ps1 -OutputDirectory artifacts/release -CompilerPath $env:INNO_COMPILER
+      - name: Install, repair and uninstall with isolated test AppId
+        shell: pwsh
+        env:
+          INNO_COMPILER: ${{ steps.inno.outputs.compiler }}
+        run: |
+          ./scripts/build-installer.ps1 -PackageDirectory artifacts/release/package -OutputDirectory artifacts/release/test-installer -IsolatedTest -CompilerPath $env:INNO_COMPILER
+          $version=(Get-Content VERSION -Raw).Trim()
+          $setup=Join-Path (Get-Location) ('artifacts/release/test-installer/SNESEmulator-'+$version+'-win-x64-setup.exe')
+          python tools/test-installer.py --installer $setup --package artifacts/release/package --output (Join-Path $env:RUNNER_TEMP ('snes-installer-'+[guid]::NewGuid().ToString('N')))
+          if($LASTEXITCODE -ne 0){throw 'Isolated setup test failed'}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-release-assets
+          path: artifacts/release/assets/*
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-build-evidence
+          path: |
+            artifacts/release/release-info.json
+            artifacts/release/package/package-manifest.json
+            artifacts/release/installer/provenance.json
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ format('refs/tags/{0}', inputs.tag || github.ref_name) }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-release-assets
+          path: artifacts/release-assets
+      - name: Verify and publish complete release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(cat VERSION | tr -d '\r\n')"
+          commit="$(git rev-parse HEAD)"
+          python tools/verify-release-assets.py --assets artifacts/release-assets --version "$version" --repository "$GITHUB_REPOSITORY" --commit "$commit"
+          args=(--repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "SNESEmulator $version" --notes-file docs/release-notes.md)
+          if [[ "$version" == *-* ]]; then args+=(--prerelease); fi
+          gh release create "$RELEASE_TAG" artifacts/release-assets/* "${args[@]}"
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false

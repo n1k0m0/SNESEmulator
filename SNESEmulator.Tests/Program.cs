@@ -24,6 +24,11 @@ void Test(string name,Action test)
     try { test(); passed++; report.Add(name,"pass",seconds:timer.Elapsed.TotalSeconds); Console.WriteLine("PASS "+name); }
     catch(Exception e) { failed++; report.Add(name,"fail",e.ToString(),timer.Elapsed.TotalSeconds); Console.WriteLine("FAIL "+name+": "+e); }
 }
+if(args.Contains("--update-dialog-only"))
+{
+    GitHubUpdateDialogTests.Run(Test);
+    report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/update-dialog");return failed==0?0:1;
+}
 if(args.Contains("--soak-observation-only"))
 {
     SoakObservationTests.Run(Test);
@@ -36,6 +41,7 @@ if(args.Contains("--network-only"))
     NetworkTests.Run((name,body)=>{var filter=args.FirstOrDefault(a=>a.StartsWith("--filter="))?[9..];if(filter==null||name.Contains(filter,StringComparison.OrdinalIgnoreCase))Test(name,body);},testRoot);report.Metadata["limits"]="Own real localhost TLS/Relay sockets; software driver boundaries; no physical input/DAC/console or external relay";
     report.Save(Environment.GetEnvironmentVariable("SNES_LAB_CHILD_REPORT")??"artifacts/m9d-network-windows");return failed==0?0:1;
 }
+GitHubUpdateDialogTests.Run(Test);
 Test("R6 borrowed ARGB packing retains exact VID3 bytes ownership and public invalid input",()=>{
     foreach(int width in new[]{256,512})foreach(int height in new[]{224,239}){
         uint[] pixels=Enumerable.Range(0,width*height).Select(i=>0xff000000u|(uint)(i*7919)&0x00ffffffu).ToArray();
