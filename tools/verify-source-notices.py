@@ -84,6 +84,12 @@ def main():
     for name, expected in SOURCES.items():
         assert historical_source(ROOT / name) == BASELINE / name
         validate_snapshot(BASELINE / name, expected)
+    # These legacy pins are implicit fields rather than named source paths.
+    # Check their presence too, so a path-only inventory cannot miss them again.
+    dsp = json.loads((ROOT / 'testdata/dsp-reference/manifest.json').read_text())
+    for name, key in [('tools/dsp-oracle.cpp', 'adapterSha256'), ('tools/dsp-reference.py', 'generatorSha256')]:
+        if SOURCES.get(name, {}).get('sha256') != dsp[key]:
+            raise ValueError('Missing/mismatched historical DSP source pin: ' + name)
     print(json.dumps({'maintainedSources': len(sources), 'historicalSnapshots': len(SOURCES),
                       'negativeControlsRejected': negative_controls() if args.negative_controls else 0,
                       'success': True}))

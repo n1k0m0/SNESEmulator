@@ -57,6 +57,14 @@
       "bytes": 5502,
       "sha256": "0b93db05690e06e88a144e3f49d2fc692e44353a5c29aef9edab6044b6e87d07"
     },
+    "tools/dsp-oracle.cpp": {
+      "bytes": 1883,
+      "sha256": "e98e40562fcbbb16d5cf713ec29638a775d9b24c2c8778d1434f42fb9f5a6f93"
+    },
+    "tools/dsp-reference.py": {
+      "bytes": 6166,
+      "sha256": "1f9385e7470bb8726cd91aaea8fa7fc4c2e7886b0c55d63e5c1f20c9573da859"
+    },
     "tools/dsp1-reference.cpp": {
       "bytes": 6075,
       "sha256": "6d0f6cac71673e35d28cb4a7458a05e0216f6cf5c0f1d660b966b68ceb2df458"

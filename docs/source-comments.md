@@ -15,13 +15,13 @@ SharpPixels files retain both their generator markers and license notices.
 ## Historical source pins
 
 Several old fixture manifests also pin original source-file bytes. Their hashes
-remain unchanged. The exact 29 pre-notice sources are retained under
+remain unchanged. The exact 31 pre-notice sources are retained under
 `testdata/source-notice-baseline/`, with lengths and hashes, following the existing
 M8/M9 historical-adapter approach. These snapshots intentionally retain their
 original comments and line endings. They are covered by the root LICENSE/NOTICE
 and the adjacent README, and are excluded from maintained-source header coverage.
 
-The six affected fixture verifiers resolve only this explicit historical source
+The affected fixture verifiers resolve only this explicit historical source
 inventory. Existing historical M8/M9 mappings take precedence. Actual ROM,
 vector, state, video and audio fixtures still use their original paths and
 unchanged expected hashes. Current compilation and execution always use the
@@ -41,7 +41,9 @@ against the pre-edit source bytes and builds the entire solution. Comments do no
 change emulator timing, instructions, formats or acceptance thresholds. Source
 fingerprints and rebuilt binaries may change and are not claimed byte-identical.
 
-The source-header audit currently covers 214 maintained files. The SDK Roslyn
+## Header-only verification at 7b0cb0a
+
+The source-header audit covers 214 maintained files. The SDK Roslyn
 comparison covers all 150 C# files and 374,405 tokens against the pre-edit
 `e9e7e7a` sources with zero executable token differences. Twelve header/generator/
 fixture verification commands pass, and 33 Python files retain identical syntax

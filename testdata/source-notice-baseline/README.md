@@ -1,8 +1,8 @@
 # Original source fingerprints before license/comment additions
 
-These 29 own-source snapshots retain the exact pre-notice bytes from
+These 31 own-source snapshots retain the exact pre-notice bytes from
 `e9e7e7ad579c92d669c52960e489edca41ccd78b`, including original line endings.
-They are historical inputs to the existing local/M5/M7/M8/M9/DSP1 fixture
+They are historical inputs to the existing local/M5/M7/M8/M9/DSP/DSP1 fixture
 manifests, not maintained application code. Apache-2.0 applies to these original
 project sources; see the repository LICENSE and NOTICE. Existing third-party
 reference and data attribution remains applicable.

@@ -35,6 +35,18 @@ public static class StateCatalog
         return hash;
     }
 
+    /// <summary>Identifies a candidate cartridge for explicit backup review, without restoring files.</summary>
+    public static string ReadIdentityForReview(string path)
+    {
+        try{return ReadIdentity(path);}
+        catch(Exception e) when((e is FileNotFoundException or DirectoryNotFoundException or InvalidDataException or EndOfStreamException)&&File.Exists(path+".bak")){
+            // This selects a cartridge for review only. Normal loading still uses
+            // the strict primary reader; Preview/Recover validate the entire backup.
+            // Access/permission failures deliberately remain visible to the user.
+            return ReadIdentity(path+".bak");
+        }
+    }
+
     public static StateInfo Preview(string path, Cartridge cart, bool recover = false)
     {
         try

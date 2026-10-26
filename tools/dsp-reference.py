@@ -101,8 +101,12 @@ def main():
   manifest={'reference':'https://github.com/blarggs-audio-libraries/snes_spc','commit':PIN,'license':'LGPL-2.1-or-later, external executable only; no product linkage','adapterSha256':sha(ROOT/'tools/dsp-oracle.cpp'),'generatorSha256':sha(pathlib.Path(__file__)),'cases':71,'clocksPerCase':'65536; long/phase/reset cases64..69 explicitly specified by generator','pcm':'signed16 stereo LE; count(int32), PCM, final64KiB RAM,128 registers; case68 appends128regs+FNV64ARAM per clock','files':entries,'referenceLicenseSha256':sha(DATA/'reference-license.txt'),'sourceSha256':sha(REPO/'snes_spc/SPC_DSP.cpp')}
   (DATA/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n',newline='\n')
  m=json.loads((DATA/'manifest.json').read_text());assert m['commit']==PIN
- assert sha(ROOT/'tools/dsp-oracle.cpp')==m['adapterSha256']
- assert sha(pathlib.Path(__file__))==m['generatorSha256']
+ # Existing fixture pins describe the original source bytes, before notices.
+ # A requested rebuild instead records the actual current generator/adapter.
+ from historical_sources import historical_source
+ source_path=(lambda path:path) if a.rebuild else historical_source
+ assert sha(source_path(ROOT/'tools/dsp-oracle.cpp'))==m['adapterSha256']
+ assert sha(source_path(pathlib.Path(__file__)))==m['generatorSha256']
  assert sha(DATA/'reference-license.txt')==m['referenceLicenseSha256']
  for e in m['files']:assert sha(DATA/e['file'])==e['sha256'],e['file']
  print('Verified71 independently rendered DSP fixtures at '+PIN)

@@ -889,7 +889,7 @@ public sealed class MainWindow : Window
         string? hash;
         try
         {
-            hash = await Task.Run(() => StateCatalog.ReadIdentity(state.Path), lifetime.Token);
+            hash = await Task.Run(() => StateCatalog.ReadIdentityForReview(state.Path), lifetime.Token);
         }
         catch (InvalidDataException)
         {
@@ -1103,6 +1103,15 @@ public sealed class MainWindow : Window
         await PreviewState();
         if (preview.Source == null || originalHash != Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(originalState))))
             throw new InvalidOperationException("Validated UI recovery differs from original state");
+        // A backup-only logical entry must reach the same explicit recovery UI.
+        await Task.Run(()=>File.Delete(originalState));
+        await PreviewState();
+        if(preview.Source!=null||!stateInfo.Text.Contains("Recovery"))
+            throw new InvalidOperationException("Missing primary must expose validated backup recovery");
+        await RecoverStateCore(true);
+        await PreviewState();
+        if(preview.Source==null||originalHash!=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(originalState))))
+            throw new InvalidOperationException("Missing-primary UI recovery differs from original state");
         await LoadSettings();
         if (settingControls["AudioVolume"] is not TextBox volume)
             throw new InvalidOperationException("Typed volume editor missing");

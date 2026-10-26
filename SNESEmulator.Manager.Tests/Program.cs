@@ -336,6 +336,26 @@ if (!args.Contains("--windows"))
         Check(!File.Exists(file) && !File.Exists(file + ".bak"));
         await Task.CompletedTask;
     });
+    await Test("Audit Manager reviews and explicitly recovers a backup when the primary is missing", async () =>
+    {
+        var cart=new Cartridge(DiagnosticRom.Create());var machine=new SnesSystem();machine.Insert(cart);
+        string folder=Path.Combine(root,"backup-only-review");Directory.CreateDirectory(folder);
+        string file=Path.Combine(folder,"missing-primary.snessav");
+        StateSerializer.Save(machine,file);StateSerializer.Save(machine,file);
+        byte[] backup=File.ReadAllBytes(file+".bak");File.Delete(file);
+        Check(StateCatalog.List(folder).Contains(file),"backup-only logical save is listed");
+        await Throws<FileNotFoundException>(()=>{StateCatalog.ReadIdentity(file);return Task.CompletedTask;});
+        Check(StateCatalog.ReadIdentityForReview(file)==cart.Hash,"Manager identifies the backup cartridge for review");
+        var preview=StateCatalog.Preview(file,cart);
+        Check(preview.Error!=null&&preview.RecoveryAvailable,"normal preview requires explicit recovery");
+        Check(StateCatalog.Preview(file,cart,true).Error==null,"complete backup validation succeeds");
+        Check(!File.Exists(file)&&File.ReadAllBytes(file+".bak").SequenceEqual(backup),"review does not restore or mutate files");
+        StateCatalog.Recover(file,cart);
+        Check(File.ReadAllBytes(file).SequenceEqual(backup)&&StateCatalog.ReadIdentity(file)==cart.Hash,"explicit recovery restores exact original bytes");
+        File.Delete(file);File.WriteAllText(file+".bak","damaged backup");
+        await Throws<InvalidDataException>(()=>{StateCatalog.ReadIdentityForReview(file);return Task.CompletedTask;});
+        Check(StateCatalog.Preview(file,cart,true).Error!=null&&!File.Exists(file),"invalid backup is rejected without restoration");
+    });
     await Test("M9e separate process discovery handshake unsupported parallel and PID reuse", async () =>
     {
         using var child = Child("--pipe-host", root);

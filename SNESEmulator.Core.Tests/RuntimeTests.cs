@@ -204,6 +204,36 @@ static class RuntimeTests
             Check(mailbox.TakeStatus()=="status9999","latest status coalesces");mailbox.Drain();Await(waiting);mailbox.Drain();Check(completed==3,"critical completion never dropped");
             using var cancel=new CancellationTokenSource();Await(mailbox.PostAsync(()=>completed++));Await(mailbox.PostAsync(()=>completed++));var canceled=mailbox.PostAsync(()=>completed++,cancel.Token);cancel.Cancel();try{Await(canceled);throw new Exception("canceled post ran");}catch(OperationCanceledException){}mailbox.Drain();Check(completed==5,"shutdown cancellation no stale completion");
         });
+        test("Audit UI mailbox disposal releases blocked producers and discards stale callbacks",()=>{
+            using var cancellation=new CancellationTokenSource();
+            using var mailbox=new UiMailbox(1);int callbacks=0;
+            Await(mailbox.PostAsync(()=>callbacks++));
+            var blocked=mailbox.PostAsync(()=>callbacks++,cancellation.Token);
+            Check(!blocked.IsCompleted,"producer is waiting for bounded capacity");
+            mailbox.Dispose();
+            try
+            {
+                Check(SpinWait.SpinUntil(()=>blocked.IsCompleted,TimeSpan.FromSeconds(1)),"dispose must finish blocked producers");
+                try{Await(blocked);throw new Exception("accepted completion after disposal");}catch(ObjectDisposedException){}
+                mailbox.Drain();Check(callbacks==0&&mailbox.Pending==0,"queued callbacks discarded on close");
+                mailbox.SetStatus("late status");Check(mailbox.TakeStatus()==null,"late status ignored");
+                try{Await(mailbox.PostAsync(()=>callbacks++));throw new Exception("accepted post after disposal");}catch(ObjectDisposedException){}
+                mailbox.Dispose();
+            }
+            finally{cancellation.Cancel();}
+        });
+        test("Audit UI callbacks permit concurrent status reporting and reentrant close",()=>{
+            using var mailbox=new UiMailbox(2);int callbacks=0;
+            Await(mailbox.PostAsync(()=>{
+                // Real close callbacks can wait for I/O whose failure reports status.
+                // Holding the mailbox gate while invoking this action would deadlock.
+                Await(Task.Run(()=>mailbox.SetStatus("background I/O completed")));
+                Check(mailbox.TakeStatus()=="background I/O completed","status producer is not blocked by callback");
+                callbacks++;mailbox.Dispose();
+            }));
+            Await(mailbox.PostAsync(()=>callbacks++));mailbox.Drain();
+            Check(callbacks==1&&mailbox.Pending==0,"reentrant close discards the remaining callback");
+        });
         test("M9b worker fault visibility and shutdown",()=>{
             var c=new ControlledClock{Throw=true};using var w=new EmulationWorker(clock:c);Await(w.InsertAsync(DiagnosticRom.Create()));Await(w.SetModeAsync(false,false));Until(()=>w.Status.Fault!=null,"clock failure reported");Check(w.Status.Paused,"fault pauses");Until(()=>!w.IsAlive,"faulted owner exits");try{Await(w.CaptureAsync());throw new Exception("dead owner accepted command");}catch(InvalidOperationException){}w.Dispose();Check(!w.IsAlive,"fault shutdown");
         });

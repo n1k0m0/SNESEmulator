@@ -2,6 +2,10 @@
 
 ## Current follow-up status
 
+The [October 26 bug audit](bug-audit-2026-10-26.md) corrects mailbox shutdown,
+Manager backup-only recovery and omitted historical DSP source-pin verification.
+Its validation is separate from the existing hardware/realtime limits below.
+
 Windows distribution now has a [versioned setup/ZIP release workflow](windows-releases.md)
 and the C64-style [normal-start GitHub setup update flow](release-update-flow.md).
 The [publication review](publication-audit.md) covers licenses and reachable
