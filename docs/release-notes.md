@@ -1,4 +1,23 @@
-# First Windows preview
+# SNESEmulator 0.1.0-preview.2
+
+## Changes since preview.1
+
+* Fix UI mailbox shutdown ownership and ensure pending work is completed or
+  rejected consistently while the emulator closes.
+* Restore the Manager's valid backup recovery path when a savestate's primary
+  file is missing, and refresh the available actions after recovery.
+* Tighten DSP fixture verification so changes to pinned reference inputs cannot
+  silently pass verification.
+* Add consistent Apache-2.0 source notices, retain third-party attribution, and
+  document execution timing and ownership invariants.
+
+Regression tests cover the shutdown, Manager recovery and fixture-validation
+changes. Release publication requires the Windows/Linux laboratory jobs, full
+external CPU/SPC vector checks, publication-content audit, verified clean-tag
+package and isolated installer lifecycle checks. These checks do not establish
+a fresh-VM, physical SNES or sustained native realtime acceptance result.
+
+## Preview status
 
 This is an experimental preview of the independently developed C# SNES emulator.
 It follows the C64Emulator interface, setup and update interaction. It is not a

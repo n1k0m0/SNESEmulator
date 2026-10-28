@@ -5,7 +5,7 @@ architecture of [C64Emulator](https://github.com/n1k0m0/C64Emulator).
 The SNES hardware core is developed in this repository; it does not embed a
 Snes9x, bsnes, or Libretro core.
 
-**Status: 0.1.0-preview.1 — experimental, with scoped test evidence and no general
+**Status: 0.1.0-preview.2 — experimental, with scoped test evidence and no general
 commercial-game or original-hardware certification.** The independently developed
 C# core supports clocked Mode 0–7 graphics, SPC700/S-DSP stereo, DMA/HDMA, standard
 cartridge mappings, normal format 9 savestates and explicitly configured DSP1
